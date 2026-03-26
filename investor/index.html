@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>AWKN Within — Investor Portal</title>
+    <title>AWKN Ranch — Investor Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -26,8 +26,6 @@
             --accent-purple-dim: rgba(168, 134, 205, 0.15);
             --accent-blue: #4A90D9;
             --accent-blue-dim: rgba(74, 144, 217, 0.15);
-            --accent-rose: #D97B8F;
-            --accent-rose-dim: rgba(217, 123, 143, 0.15);
             --border: rgba(255, 255, 255, 0.06);
             --border-light: rgba(255, 255, 255, 0.1);
             --radius: 16px;
@@ -111,617 +109,133 @@
 
         .google-btn svg { width: 20px; height: 20px; }
 
-        .login-note {
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 24px;
-        }
-
-        .login-error {
-            color: #e74c3c;
-            font-size: 13px;
-            margin-top: 16px;
-            display: none;
-        }
+        .login-note { color: var(--text-muted); font-size: 12px; margin-top: 24px; }
+        .login-error { color: #e74c3c; font-size: 13px; margin-top: 16px; display: none; }
 
         /* ===== MAIN CONTENT ===== */
         #app { display: none; }
         #app.visible { display: block; }
         #login-screen.hidden { display: none; }
 
-        /* Top Bar */
         .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: sticky; top: 0; z-index: 100;
             background: rgba(10, 10, 15, 0.9);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             padding: 0 40px;
         }
-
         .topbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
         }
-
-        .topbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--accent-gold);
-        }
-
-        .topbar-nav {
-            display: flex;
-            gap: 28px;
-            list-style: none;
-        }
-
-        .topbar-nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            transition: color 0.2s;
-        }
-
+        .topbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--accent-gold); }
+        .topbar-nav { display: flex; gap: 28px; list-style: none; }
+        .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
         .topbar-nav a:hover { color: var(--accent-gold); }
-
-        .topbar-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topbar-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .topbar-email {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .btn-signout {
-            background: none;
-            border: 1px solid var(--border-light);
-            color: var(--text-secondary);
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        .btn-signout:hover {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
+        .topbar-user { display: flex; align-items: center; gap: 12px; }
+        .topbar-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .topbar-email { font-size: 13px; color: var(--text-muted); }
+        .btn-signout { background: none; border: 1px solid var(--border-light); color: var(--text-secondary); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-signout:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
 
         /* Hero */
         .hero {
-            padding: 100px 40px 80px;
-            text-align: center;
+            padding: 100px 40px 80px; text-align: center;
             background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 67, 0.1) 0%, transparent 60%);
         }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            background: var(--accent-gold-dim);
-            color: var(--accent-gold);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 28px;
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(36px, 5vw, 64px);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 24px;
-        }
-
+        .hero-badge { display: inline-block; padding: 8px 20px; background: var(--accent-gold-dim); color: var(--accent-gold); border-radius: 20px; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 28px; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 64px); font-weight: 700; line-height: 1.1; margin-bottom: 24px; }
         .hero h1 .gold { color: var(--accent-gold); }
-
-        .hero-sub {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 680px;
-            margin: 0 auto 48px;
-            line-height: 1.7;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 56px;
-            flex-wrap: wrap;
-        }
-
+        .hero-sub { font-size: 18px; color: var(--text-secondary); max-width: 700px; margin: 0 auto 48px; line-height: 1.7; }
+        .hero-stats { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; }
         .hero-stat { text-align: center; }
-
-        .hero-stat-value {
-            font-size: 38px;
-            font-weight: 800;
-            color: var(--accent-gold);
-        }
-
-        .hero-stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 4px;
-        }
+        .hero-stat-value { font-size: 38px; font-weight: 800; color: var(--accent-gold); }
+        .hero-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
 
         /* Sections */
-        .section {
-            padding: 80px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .section { padding: 80px 40px; max-width: 1200px; margin: 0 auto; }
+        .section-label { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 12px; }
+        .section h2 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 600; margin-bottom: 16px; }
+        .section-desc { font-size: 16px; color: var(--text-secondary); max-width: 700px; margin-bottom: 48px; line-height: 1.7; }
 
-        .section-label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            margin-bottom: 12px;
-        }
-
-        .section h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .section-desc {
-            font-size: 16px;
-            color: var(--text-secondary);
-            max-width: 680px;
-            margin-bottom: 48px;
-            line-height: 1.7;
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            border-color: var(--border-light);
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
-        }
-
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: all 0.3s; }
+        .card:hover { border-color: var(--border-light); background: var(--bg-card-hover); transform: translateY(-2px); }
+        .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; }
         .card-icon.gold { background: var(--accent-gold-dim); }
         .card-icon.green { background: var(--accent-green-dim); }
         .card-icon.purple { background: var(--accent-purple-dim); }
         .card-icon.blue { background: var(--accent-blue-dim); }
-        .card-icon.rose { background: var(--accent-rose-dim); }
+        .card h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+        .card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+        .card-stat { font-size: 28px; font-weight: 800; color: var(--accent-gold); margin-bottom: 4px; }
 
-        .card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 
-        .card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
+        /* Tables */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        .data-table th, .data-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .data-table th { color: var(--text-muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .data-table td:last-child { text-align: right; font-weight: 600; }
+        .data-table .total td { border-top: 2px solid var(--accent-gold); border-bottom: none; font-weight: 700; color: var(--accent-gold); font-size: 16px; }
+        .data-table .highlight td { background: rgba(212, 168, 67, 0.05); }
 
-        .card-stat {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--accent-gold);
-            margin-bottom: 4px;
-        }
+        /* Comparison table */
+        .comp-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        .comp-table th, .comp-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .comp-table th { color: var(--text-muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .comp-table .old td:nth-child(2) { color: #e74c3c; opacity: 0.8; }
+        .comp-table .old td:nth-child(3) { color: var(--accent-green); }
 
-        /* Two Column */
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: start;
-        }
-
-        /* Revenue Table */
-        .revenue-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 24px;
-        }
-
-        .revenue-table th,
-        .revenue-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        .revenue-table th {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .revenue-table td:last-child {
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .revenue-table .total td {
-            border-top: 2px solid var(--accent-gold);
-            border-bottom: none;
-            font-weight: 700;
-            color: var(--accent-gold);
-            font-size: 16px;
-        }
-
-        /* Funds Bar */
-        .funds-bar {
-            display: flex;
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 32px 0 24px;
-        }
-
-        .funds-bar div {
-            height: 100%;
-            transition: width 0.6s ease;
-        }
-
-        .funds-legend {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-        }
-
-        .funds-legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .funds-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .funds-legend-item span:last-child {
-            margin-left: auto;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Competitive Table */
-        .comp-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 24px;
-        }
-
-        .comp-table th,
-        .comp-table td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        .comp-table th {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .comp-table .us td { background: rgba(212, 168, 67, 0.05); }
-
-        .check { color: var(--accent-green); }
-        .cross { color: #e74c3c; opacity: 0.6; }
-
-        /* Team */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .team-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 24px;
-            text-align: center;
-        }
-
-        .team-card .team-initials {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--accent-gold-dim);
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 18px;
-            margin: 0 auto 14px;
-        }
-
-        .team-card h4 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .team-card p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* CTA */
-        .cta-section {
-            text-align: center;
-            padding: 100px 40px;
-            background: radial-gradient(ellipse at 50% 100%, rgba(212, 168, 67, 0.1) 0%, transparent 60%);
-        }
-
-        .cta-section h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 42px;
-            margin-bottom: 16px;
-        }
-
-        .cta-section p {
-            color: var(--text-secondary);
-            font-size: 16px;
-            margin-bottom: 32px;
-        }
-
-        .cta-btn {
-            display: inline-block;
-            padding: 16px 44px;
-            background: var(--accent-gold);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        .cta-btn:hover {
-            background: #e0b84e;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(212, 168, 67, 0.3);
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 40px;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 12px;
-        }
+        /* Funds */
+        .funds-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 32px 0 24px; }
+        .funds-bar div { height: 100%; }
+        .funds-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+        .funds-legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); }
+        .funds-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .funds-legend-item span:last-child { margin-left: auto; font-weight: 600; color: var(--text-primary); }
 
         /* KPI chips */
-        .kpi-chip {
-            display: inline-block;
-            padding: 4px 10px;
-            background: var(--accent-green-dim);
-            color: var(--accent-green);
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 2px;
-        }
+        .kpi-chip { display: inline-block; padding: 4px 10px; background: var(--accent-green-dim); color: var(--accent-green); border-radius: 4px; font-size: 12px; font-weight: 600; margin: 2px; }
+        .kpi-chip.gold { background: var(--accent-gold-dim); color: var(--accent-gold); }
 
-        .kpi-chip.gold {
-            background: var(--accent-gold-dim);
-            color: var(--accent-gold);
-        }
+        .divider { height: 1px; background: var(--border); max-width: 1200px; margin: 0 auto; }
 
-        .kpi-chip.purple {
-            background: var(--accent-purple-dim);
-            color: var(--accent-purple);
-        }
-
-        .kpi-chip.blue {
-            background: var(--accent-blue-dim);
-            color: var(--accent-blue);
-        }
-
-        /* Divider */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Progress bars */
+        /* Metric bars */
         .metric-row { margin-bottom: 20px; }
-
-        .metric-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-
+        .metric-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
         .metric-label { color: var(--text-secondary); }
         .metric-value { color: var(--text-primary); font-weight: 600; }
+        .metric-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .metric-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent-gold), var(--accent-green)); }
 
-        .metric-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-        }
+        /* Scenario cards */
+        .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+        .scenario-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; text-align: center; }
+        .scenario-card.featured { border-color: rgba(212, 168, 67, 0.3); background: linear-gradient(135deg, rgba(212, 168, 67, 0.08), rgba(55, 150, 118, 0.05)); }
+        .scenario-label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+        .scenario-revenue { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+        .scenario-profit { font-size: 32px; font-weight: 800; color: var(--accent-gold); margin-bottom: 4px; }
+        .scenario-sub { font-size: 12px; color: var(--text-muted); }
 
-        .metric-fill {
-            height: 100%;
-            border-radius: 3px;
-            background: linear-gradient(90deg, var(--accent-gold), var(--accent-green));
-        }
+        /* CTA */
+        .cta-section { text-align: center; padding: 100px 40px; background: radial-gradient(ellipse at 50% 100%, rgba(212, 168, 67, 0.1) 0%, transparent 60%); }
+        .cta-section h2 { font-family: 'Playfair Display', serif; font-size: 42px; margin-bottom: 16px; }
+        .cta-section p { color: var(--text-secondary); font-size: 16px; margin-bottom: 32px; }
+        .cta-btn { display: inline-block; padding: 16px 44px; background: var(--accent-gold); color: #000; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .cta-btn:hover { background: #e0b84e; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212, 168, 67, 0.3); }
 
-        /* Brand pill */
-        .brand-pill {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        .brand-pill.within { background: var(--accent-purple-dim); color: var(--accent-purple); }
-        .brand-pill.ranch { background: var(--accent-gold-dim); color: var(--accent-gold); }
-        .brand-pill.dome { background: var(--accent-blue-dim); color: var(--accent-blue); }
+        .footer { text-align: center; padding: 40px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
 
-        /* Phase timeline */
-        .phase-timeline {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            position: relative;
-            margin-top: 40px;
-        }
+        .watermark { position: fixed; bottom: 20px; right: 20px; font-size: 10px; color: rgba(255,255,255,0.08); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; z-index: 1000; }
 
-        .phase-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 32px;
-            position: relative;
-        }
+        .quote-block { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--text-secondary); text-align: center; max-width: 700px; margin: 0 auto; padding: 40px 0; line-height: 1.6; }
 
-        .phase-item:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-        .phase-item:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+        /* Property features */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); padding: 10px 14px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); }
+        .feature-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); flex-shrink: 0; }
 
-        .phase-number {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent-gold);
-            margin-bottom: 12px;
-        }
-
-        .phase-item h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .phase-item p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* SAFE note highlight */
-        .safe-highlight {
-            background: linear-gradient(135deg, rgba(212, 168, 67, 0.12), rgba(55, 150, 118, 0.08));
-            border: 1px solid rgba(212, 168, 67, 0.25);
-            border-radius: var(--radius);
-            padding: 40px;
-            text-align: center;
-            margin-top: 32px;
-        }
-
-        .safe-highlight h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            margin-bottom: 12px;
-        }
-
-        .safe-highlight p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .safe-values {
-            display: flex;
-            justify-content: center;
-            gap: 48px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-        }
-
-        .safe-value-item { text-align: center; }
-
-        .safe-value-num {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--accent-gold);
-        }
-
-        .safe-value-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 2px;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             .topbar { padding: 0 20px; }
             .topbar-nav { display: none; }
@@ -730,25 +244,9 @@
             .section { padding: 50px 20px; }
             .two-col { grid-template-columns: 1fr; gap: 32px; }
             .cards-grid { grid-template-columns: 1fr; }
+            .scenario-grid { grid-template-columns: 1fr; }
             .comp-table { font-size: 12px; }
             .comp-table th, .comp-table td { padding: 10px 8px; }
-            .phase-timeline { grid-template-columns: 1fr; }
-            .phase-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
-            .phase-item:last-child { border-radius: 0 0 var(--radius) var(--radius); }
-            .safe-values { gap: 24px; }
-        }
-
-        /* Confidential watermark */
-        .watermark {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            font-size: 10px;
-            color: rgba(255,255,255,0.08);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            pointer-events: none;
-            z-index: 1000;
         }
     </style>
 </head>
@@ -757,11 +255,11 @@
 <!-- Login Screen -->
 <div id="login-screen">
     <div class="login-container">
-        <div class="login-logo">AWKN Within</div>
+        <div class="login-logo">AWKN Ranch</div>
         <div class="login-subtitle">Investor Portal</div>
         <div class="login-tagline">
-            A World-Class Mental Health &amp; Wellness Campus<br>
-            Psychedelic Therapy &bull; Medical Wellness &bull; Community
+            A Transformative Wellness Resort<br>
+            Austin, Texas &bull; 12-Acre Healing Sanctuary
         </div>
         <button class="google-btn" onclick="signInWithGoogle()">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -774,21 +272,20 @@
 
 <!-- Main App -->
 <div id="app">
-    <!-- Watermark -->
     <div class="watermark">Confidential &mdash; Investor Use Only</div>
 
     <!-- Top Bar -->
     <nav class="topbar">
         <div class="topbar-inner">
-            <div class="topbar-brand">AWKN Within</div>
+            <div class="topbar-brand">AWKN Ranch</div>
             <ul class="topbar-nav">
                 <li><a href="#overview">Overview</a></li>
-                <li><a href="#ecosystem">Ecosystem</a></li>
+                <li><a href="#pivot">The Pivot</a></li>
+                <li><a href="#property">Property</a></li>
                 <li><a href="#revenue">Revenue</a></li>
+                <li><a href="#financials">Financials</a></li>
                 <li><a href="#market">Market</a></li>
-                <li><a href="#growth">Growth</a></li>
-                <li><a href="#deal">The Deal</a></li>
-                <li><a href="#team">Team</a></li>
+                <li><a href="#funds">Use of Funds</a></li>
             </ul>
             <div class="topbar-user">
                 <img class="topbar-avatar" id="user-avatar" src="" alt="">
@@ -800,126 +297,336 @@
 
     <!-- Hero -->
     <section class="hero" id="overview">
-        <div class="hero-badge">SAFE Notes Open &bull; $8M Valuation Cap</div>
-        <h1>The National Standard for<br><span class="gold">Psychedelic Therapy</span><br>&amp; Integrated Wellness</h1>
+        <div class="hero-badge">$300K Raise &bull; March 2026 &bull; Confidential</div>
+        <h1>A Transformative<br><span class="gold">Wellness Resort</span></h1>
         <p class="hero-sub">
-            A licensed, world-class mental health and substance abuse treatment campus.
-            Three brands. One unified ecosystem. Multiple revenue engines operating on a 12-acre ranch outside Austin, TX.
+            AWKN Ranch is a 12-acre transformative wellness sanctuary outside Austin, TX. Our sister company Within Center &mdash; Texas's first ceremonial psychedelic therapy center &mdash; is pivoting from a high-cost inpatient model to a dynamic, high-occupancy wellness retreat model.
         </p>
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-value">$8M</div>
-                <div class="hero-stat-label">SAFE Valuation Cap</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">$35M</div>
-                <div class="hero-stat-label">Series A Target Valuation</div>
+                <div class="hero-stat-value">$300K</div>
+                <div class="hero-stat-label">Investment Ask</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-value">12 Acres</div>
-                <div class="hero-stat-label">Austin, TX Campus</div>
+                <div class="hero-stat-label">Austin, TX</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">7+</div>
+                <div class="hero-stat-value">6</div>
                 <div class="hero-stat-label">Revenue Streams</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">6&ndash;9 mo</div>
+                <div class="hero-stat-label">Projected Payback</div>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Three Brands Ecosystem -->
-    <section class="section" id="ecosystem">
-        <div class="section-label">The Ecosystem</div>
-        <h2>Three Brands, One Operational Engine</h2>
+    <!-- Vision & Mission -->
+    <section class="section">
+        <div class="section-label">Vision &amp; Mission</div>
+        <h2>A Catalyst for Human Awakening</h2>
         <p class="section-desc">
-            Three distinct public-facing brands that share one backend, one master calendar, one CRM, and one unified client experience.
+            We exist to awaken the human spirit &mdash; and to serve as a catalyst for seekers, healers, facilitators, medicine carriers, and visionaries bringing transformative work to humanity. AWKN Ranch is built to amplify their work and hold the container for it.
         </p>
         <div class="cards-grid">
             <div class="card">
-                <div class="card-icon purple">&#x1f3e5;</div>
-                <div style="margin-bottom: 12px;"><span class="brand-pill within">Within Center</span></div>
-                <h3>Psychedelic Therapy &amp; Clinical</h3>
-                <p>Licensed retreat center offering psychedelic-assisted therapy, medical &amp; therapeutic services, clinical programming, retreat experiences, and integration memberships. The clinical engine of the ecosystem.</p>
+                <div class="card-icon gold">&#x1f3e5;</div>
+                <h3>Clinical &amp; Ceremonial Infrastructure</h3>
+                <p>Safe and sacred psychedelic therapy, integration, and functional health through Within Center located at AWKN Ranch.</p>
             </div>
             <div class="card">
-                <div class="card-icon gold">&#x1f33f;</div>
-                <div style="margin-bottom: 12px;"><span class="brand-pill ranch">AWKN Ranch</span></div>
-                <h3>Venue, Events &amp; Community</h3>
-                <p>The property brand powering events, venue rentals, wellness amenities (sauna, cold plunge, red light therapy, sound beds), community memberships, and the operational headquarters for the campus.</p>
+                <div class="card-icon green">&#x1f3db;</div>
+                <h3>World-Class Venue Space</h3>
+                <p>For retreat leaders, ceremony holders, and wellness facilitators seeking a venue with full lodging and amenities.</p>
             </div>
             <div class="card">
-                <div class="card-icon blue">&#x1f3d5;</div>
-                <div style="margin-bottom: 12px;"><span class="brand-pill dome">Austin Dome Collective</span></div>
-                <h3>Lodging &amp; Short-Term Rentals</h3>
-                <p>Geodesic dome lodging accommodations on AWKN Ranch property. Serves retreat participants, Airbnb/VRBO guests, and event attendees. Automated guest communication and calendar integration.</p>
+                <div class="card-icon purple">&#x1f3d5;</div>
+                <h3>Resort-Style Lodging</h3>
+                <p>Supporting individuals and groups in their intentional healing journey with premium overnight accommodations.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon blue">&#x1f465;</div>
+                <h3>Membership Community</h3>
+                <p>Building a community of members who return again and again, deepening their practice and their purpose.</p>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Revenue Streams -->
-    <section class="section" id="revenue">
-        <div class="section-label">Revenue Architecture</div>
-        <h2>Diversified Revenue Across 7+ Streams</h2>
+    <!-- Strategic Pivot -->
+    <section class="section" id="pivot">
+        <div class="section-label">The Strategic Pivot</div>
+        <h2>From Inpatient to High-Occupancy Resort</h2>
         <p class="section-desc">
-            Every part of the campus generates revenue. Clinical, community, and hospitality revenue engines operating in parallel.
+            The old model was consuming capital without generating sustainable returns. The new model is already proving itself &mdash; with deposit revenue coming in and a clear path to profitability.
+        </p>
+        <div style="overflow-x: auto;">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Old Model</th>
+                        <th>New Model</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="old">
+                        <td>Structure</td>
+                        <td>30-Day Inpatient Retreat</td>
+                        <td>Nightly Sanctuary + Outpatient Therapy</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Beds / Capacity</td>
+                        <td>7 beds (inpatient)</td>
+                        <td>10 beds + yurts + domes + Maloka</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Nightly Pricing</td>
+                        <td>N/A (2 &amp; 4 week package only)</td>
+                        <td>$349 shared &middot; $499 private &middot; $599&ndash;$699 yurt/dome</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Target Client</td>
+                        <td>Clinical / Addicted</td>
+                        <td>Wellness-Seeker / Retreat Guests</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Monthly Revenue Potential</td>
+                        <td>~$45,000&ndash;$75,000 (avg. 3 clients)</td>
+                        <td>$133,440&ndash;$250,940+</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Monthly Payroll</td>
+                        <td>$50,000+</td>
+                        <td>~$24,000&ndash;$29,000</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Occupancy Flexibility</td>
+                        <td>Low &mdash; multi-week commitment</td>
+                        <td>High &mdash; nightly, any guest</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Annual Net Potential</td>
+                        <td>Break-even at best</td>
+                        <td>$715,680&ndash;$2.2M+</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Property -->
+    <section class="section" id="property">
+        <div class="section-label">The Property</div>
+        <h2>AWKN Ranch &mdash; 12-Acre Sanctuary</h2>
+        <p class="section-desc">
+            One of the most uniquely positioned wellness properties in Texas &mdash; blending sacred ceremony, luxury amenities, and natural beauty into one seamless experience.
         </p>
         <div class="two-col">
             <div>
-                <div class="cards-grid" style="grid-template-columns: 1fr;">
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill within">Within</span>
-                            <h3 style="margin-bottom: 0;">Clinical &amp; Outpatient</h3>
-                        </div>
-                        <p>Inpatient ketamine-assisted therapy, 2-week &amp; 4-week programs, medical consultations, outpatient services. Clinical Director + credentialed national referral network.</p>
-                        <p style="margin-top: 8px;"><span class="kpi-chip purple">$16K+ per retreat weekend</span> <span class="kpi-chip purple">Integration packages $500/mo</span></p>
-                    </div>
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill within">Within</span>
-                            <h3 style="margin-bottom: 0;">Medical Wellness</h3>
-                        </div>
-                        <p>Medical Director-led wellness center offering IV therapy, TMS, peptides, stem cells, bloodwork, red light therapy, and functional medicine. Highest level of integrated medical services.</p>
-                    </div>
-                    <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill ranch">AWKN</span>
-                            <h3 style="margin-bottom: 0;">Venue Rentals</h3>
-                        </div>
-                        <p>Temple Space (60+ capacity, $1,400/day), Wellness Center ($1,200/day), Yurts ($777/night), Honeycomb Dome, fire pit, courts. High-margin event bookings for retreats, ceremonies, and gatherings.</p>
-                        <p style="margin-top: 8px;"><span class="kpi-chip gold">$155/hr Temple</span> <span class="kpi-chip gold">$135/hr Wellness</span> <span class="kpi-chip gold">Custom multi-day packages</span></p>
-                    </div>
+                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Current Property</h3>
+                <div class="features-grid" style="grid-template-columns: 1fr;">
+                    <div class="feature-item"><div class="feature-dot"></div>Two ceremonial yurts (event &amp; nightly revenue)</div>
+                    <div class="feature-item"><div class="feature-dot"></div>HoneyComb Dome (event &amp; nightly revenue)</div>
+                    <div class="feature-item"><div class="feature-dot"></div>10-bed retreat house with commercial kitchen</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Sacred temple space (100+ capacity)</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Functional Health &amp; Longevity Medical Center</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Resort-style pool and hot tub</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Cold plunges and saunas</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Pickleball court</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Fire pits and hammock garden</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Community center / gathering space</div>
                 </div>
             </div>
             <div>
+                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Planned Additions (This Round)</h3>
                 <div class="cards-grid" style="grid-template-columns: 1fr;">
                     <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill ranch">AWKN</span>
-                            <span class="brand-pill within">Within</span>
-                            <h3 style="margin-bottom: 0;">Memberships</h3>
-                        </div>
-                        <p>Two membership ecosystems: <strong>Within Center</strong> (Integration, Gold Integration, Wellness) for coaching, therapy, and retreat alumni. <strong>AWKN Ranch</strong> (Unlimited, Founders) for sauna, cold plunge, red light, sound beds, events.</p>
-                        <p style="margin-top: 8px;"><span class="kpi-chip">50+ target members</span> <span class="kpi-chip">Tiered recurring revenue</span></p>
+                        <h3>Maloka Dome</h3>
+                        <p>Large-scale ceremony &amp; retreat venue on dedicated 3-acre parcel. Already generating $40,000 in 20% deposits for November from a single retreat client.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip gold">$50K build cost</span> <span class="kpi-chip gold">$32K&ndash;$58K/mo revenue</span></p>
                     </div>
                     <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill dome">Dome</span>
-                            <h3 style="margin-bottom: 0;">STR Lodging</h3>
-                        </div>
-                        <p>12 geodesic lodging domes for short-term rentals via Airbnb/VRBO, retreat participant housing, and event guest accommodations. Automated check-in and calendar sync.</p>
-                        <p style="margin-top: 8px;"><span class="kpi-chip blue">$499-$888/night</span> <span class="kpi-chip blue">12 domes planned</span></p>
+                        <h3>2-Bedroom Model Dome</h3>
+                        <p>Fully delivered, built out, furnished, plumbed, and electric. Premium glamping flagship and showcase for next expansion phase.</p>
                     </div>
                     <div class="card">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span class="brand-pill within">Within</span>
-                            <h3 style="margin-bottom: 0;">Plant Medicine Church</h3>
+                        <h3>Infrastructure Upgrades</h3>
+                        <p>Retreat house upgrades ($20K), professional landscaping &amp; lighting ($20K), ranch signage ($5K), additional acre with RV relocation ($1,500/mo).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- 6 Revenue Streams -->
+    <section class="section" id="revenue">
+        <div class="section-label">New Revenue Model</div>
+        <h2>Six Diversified Revenue Streams</h2>
+        <p class="section-desc">
+            The new model reduces dependence on any single offering and dramatically increases our ability to fill the property year-round.
+        </p>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon gold">&#x1f3e0;</div>
+                <h3>Stream 1: Retreat House</h3>
+                <p>10 beds &mdash; private rooms at $499/night, shared at $349/night. Open to wellness seekers, retreat groups, and event attendees. 10% discount for one-week outpatient clients.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip gold">$15K&ndash;$22K/mo at 70&ndash;80% occ.</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">&#x1f3d5;</div>
+                <h3>Stream 2: Yurts, Domes &amp; Maloka</h3>
+                <p>Yurts ($699/night each), HoneyComb Dome ($599/night), Model Dome ($599/night). Perfectly suited for group bookings, retreats, and ceremony groups.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip">$49K&ndash;$87K/mo combined at 50% occ.</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon purple">&#x1f3db;</div>
+                <h3>Stream 3: Venue &amp; Event Rental</h3>
+                <p>Weekend venue rental (Temple + Maloka) up to $4,000/weekend per venue. Day-use at $1,400/day. Venue renters naturally feed nightly lodging.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip">$8K&ndash;$16K/mo</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon blue">&#x1f489;</div>
+                <h3>Stream 4: Outpatient Therapy</h3>
+                <p>Within Center operates 2 days/week. Three packages: AWKN ($5,500), HEAL ($3,300), DISCOVER ($1,250). Includes ketamine sessions, coaching, IV vitamins, ranch access, and group therapy.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip">$16.5K&ndash;$33K/mo</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon gold">&#x2728;</div>
+                <h3>Stream 5: AWKN Hosted Retreats</h3>
+                <p>Curated multi-day immersions combining ceremony, therapy, wellness, and community. Premium pricing with high-margin group experiences.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip gold">$20K&ndash;$75K/mo</span></p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">&#x1f465;</div>
+                <h3>Stream 6: Memberships</h3>
+                <p>$199/mo memberships with access to saunas, cold plunges, pool, wellness center, gardens, plus priority booking. Currently 16 active members with zero marketing.</p>
+                <p style="margin-top: 8px;"><span class="kpi-chip">$3K&ndash;$8K/mo recurring</span></p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Financial Projections -->
+    <section class="section" id="financials">
+        <div class="section-label">Financial Projections</div>
+        <h2>Path to $2.2M+ Annual Net Revenue</h2>
+        <p class="section-desc">
+            Conservative projections show $59,640/month in net profit. At full capacity, the model generates over $183,000/month in net profit.
+        </p>
+        <div class="two-col">
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Monthly Revenue by Stream</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Revenue Stream</th><th style="text-align:right">Low&ndash;High</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Retreat House (10 beds, 70&ndash;80%)</td><td>$15K&ndash;$22K</td></tr>
+                        <tr><td>Yurts x2 (50% occ.)</td><td>$20,970</td></tr>
+                        <tr><td>HoneyComb Dome (50% occ.)</td><td>$8,985</td></tr>
+                        <tr><td>Model Dome (50% occ.)</td><td>$8,985</td></tr>
+                        <tr><td>Maloka &mdash; Venue (post build)</td><td>$20K&ndash;$40K</td></tr>
+                        <tr><td>Maloka &mdash; Lodging (post build)</td><td>$12K&ndash;$18K</td></tr>
+                        <tr><td>Venue / Event Rentals</td><td>$8K&ndash;$16K</td></tr>
+                        <tr><td>Outpatient Therapy</td><td>$16.5K&ndash;$33K</td></tr>
+                        <tr><td>AWKN Hosted Retreats</td><td>$20K&ndash;$75K</td></tr>
+                        <tr><td>Memberships</td><td>$3K&ndash;$8K</td></tr>
+                        <tr class="total"><td>Total Monthly Revenue</td><td>$133K&ndash;$251K</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="font-size: 16px; margin-bottom: 8px; margin-top: 40px;">Monthly Expenses</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Expense</th><th style="text-align:right">Low&ndash;High</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>On-site hospitality (1 FTE)</td><td>$4K&ndash;$5K</td></tr>
+                        <tr><td>Operations Manager</td><td>$4,000</td></tr>
+                        <tr><td>Medical / clinical staff (part-time)</td><td>$3K&ndash;$5K</td></tr>
+                        <tr><td>Executive / Management</td><td>$10K&ndash;$12K</td></tr>
+                        <tr><td>Shannon Cohen &mdash; Advisory</td><td>$3,000</td></tr>
+                        <tr><td>Property lease</td><td>$12,800</td></tr>
+                        <tr><td>RV relocation + additional acre</td><td>$1,500</td></tr>
+                        <tr><td>Maintenance, grounds &amp; utilities</td><td>$4K&ndash;$6K</td></tr>
+                        <tr><td>Breakfast &amp; supplies</td><td>$2.5K&ndash;$3.5K</td></tr>
+                        <tr><td>Insurance, licensing, compliance</td><td>$1.5K&ndash;$2.5K</td></tr>
+                        <tr><td>Marketing &amp; booking platform</td><td>$5.5K&ndash;$6.5K</td></tr>
+                        <tr><td>Google / Meta / AI Ads</td><td>$8K&ndash;$10K</td></tr>
+                        <tr><td>Misc / contingency</td><td>$1K&ndash;$2K</td></tr>
+                        <tr class="total"><td>Total Monthly Expenses</td><td>$60.8K&ndash;$73.8K</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Projected Monthly Net Profit</h3>
+                <div class="scenario-grid" style="grid-template-columns: 1fr;">
+                    <div class="scenario-card">
+                        <div class="scenario-label">Conservative</div>
+                        <div class="scenario-revenue">$133,440 revenue &middot; $73,800 expenses</div>
+                        <div class="scenario-profit">$59,640</div>
+                        <div class="scenario-sub">net profit / month</div>
+                    </div>
+                    <div class="scenario-card featured">
+                        <div class="scenario-label">Base Case</div>
+                        <div class="scenario-revenue">$185,000 revenue &middot; $67,000 expenses</div>
+                        <div class="scenario-profit">$118,000</div>
+                        <div class="scenario-sub">net profit / month</div>
+                    </div>
+                    <div class="scenario-card">
+                        <div class="scenario-label">Strong Month</div>
+                        <div class="scenario-revenue">$250,940 revenue &middot; $67,000 expenses</div>
+                        <div class="scenario-profit">$183,940</div>
+                        <div class="scenario-sub">net profit / month</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px;">Key Metrics</h3>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Investment Payback</span>
+                            <span class="metric-value">6&ndash;9 months</span>
                         </div>
-                        <p>Sacred ceremony experiences filling STR domes, venue spaces, and retreat house. $444 per ceremony, 20 participants per night, with integration membership upsell.</p>
-                        <p style="margin-top: 8px;"><span class="kpi-chip purple">$16K per weekend</span> <span class="kpi-chip purple">Feeds all other streams</span></p>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 75%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Annual Net (Conservative)</span>
+                            <span class="metric-value">$715,680</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 33%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Annual Net (Strong)</span>
+                            <span class="metric-value">$2.2M+</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 100%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Maloka Dome Payback</span>
+                            <span class="metric-value">&lt; 2 months</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 95%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Existing Members (zero marketing)</span>
+                            <span class="metric-value">16 active</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 20%"></div></div>
                     </div>
                 </div>
             </div>
@@ -931,130 +638,74 @@
     <!-- Market -->
     <section class="section" id="market">
         <div class="section-label">Market Opportunity</div>
-        <h2>No Gold Standard Exists &mdash; Yet</h2>
+        <h2>Three Explosive Growth Markets</h2>
         <p class="section-desc">
-            The mental health and psychedelic therapy market is booming but fragmented. No one has built the complete model: inpatient + community + longevity + lodging on one campus.
+            AWKN Ranch sits at the intersection of wellness tourism, psychedelic therapy, and experiential hospitality &mdash; with surging demand in the Austin metro area.
         </p>
-        <div class="cards-grid" style="margin-bottom: 48px;">
+        <div class="cards-grid">
             <div class="card">
-                <div class="card-stat">57M</div>
-                <h3>Mental Health Crisis</h3>
-                <p>U.S. adults with mental illness. Only 1/3 get effective help. Traditional medications fail 30-50% of patients. Psychedelics work faster but lack standards.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">$6.9B</div>
-                <h3>Psychedelic Therapeutics</h3>
-                <p>Projected market by 2030 at 10.6% CAGR. Texas committed $50M for ibogaine addiction research. Psilocybin gaining mainstream traction.</p>
+                <div class="card-stat">$1.4T</div>
+                <h3>Wellness Tourism</h3>
+                <p>Global wellness tourism market projected to exceed $1.4 trillion by 2027. Immersive retreat experiences are the fastest-growing segment.</p>
             </div>
             <div class="card">
-                <div class="card-stat">1,500+</div>
-                <h3>Fragmented Clinics</h3>
-                <p>Market fragmented across 1,500+ clinics. Mindbloom ($45M raised), Nue Life ($23M raised) — yet no national leader with a full inpatient campus and integration model.</p>
+                <div class="card-stat">&#x1f4c8;</div>
+                <h3>Psychedelic Therapy</h3>
+                <p>Psychedelic-assisted therapy is rapidly gaining mainstream acceptance and legal access, creating enormous demand for safe, supervised settings.</p>
             </div>
             <div class="card">
-                <div class="card-stat">80%</div>
-                <h3>No Real Integration</h3>
-                <p>Of therapy benefits are lost within 6 months without proper integration. Breakthroughs fade without structured aftercare, community, coaching, and ongoing support.</p>
-            </div>
-        </div>
-
-        <h3 style="font-size: 16px; margin-bottom: 8px;">Competitive Comparison</h3>
-        <div style="overflow-x: auto;">
-            <table class="comp-table">
-                <thead>
-                    <tr>
-                        <th>Capability</th>
-                        <th>AWKN Within (HeartSpace)</th>
-                        <th>Virtual Players<br>(Mindbloom/Nue Life)</th>
-                        <th>Clinic Chains<br>(Field Trip/Others)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="us">
-                        <td>Full Inpatient Campus</td>
-                        <td><span class="check">&#10003;</span> 12-acre ranch, multiple venues</td>
-                        <td><span class="cross">&#10007;</span> At-home only</td>
-                        <td><span class="cross">&#10007;</span> Small office suites</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Integration &amp; Aftercare</td>
-                        <td><span class="check">&#10003;</span> On-site coaching, community, memberships</td>
-                        <td><span class="cross">&#10007;</span> Minimal or virtual only</td>
-                        <td><span class="cross">&#10007;</span> Limited follow-up</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Medical-Grade + Longevity</td>
-                        <td><span class="check">&#10003;</span> Ketamine + TMS + IV + peptides + stem cells</td>
-                        <td><span class="cross">&#10007;</span> Self-administered lozenges</td>
-                        <td><span class="cross">&#10007;</span> Ketamine-only, inconsistent</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Multi-Revenue Model</td>
-                        <td><span class="check">&#10003;</span> 7+ diversified revenue streams</td>
-                        <td><span class="cross">&#10007;</span> Subscription only</td>
-                        <td><span class="cross">&#10007;</span> Session-based only</td>
-                    </tr>
-                    <tr class="us">
-                        <td>On-Site Lodging</td>
-                        <td><span class="check">&#10003;</span> 12 geodesic domes + yurts</td>
-                        <td><span class="cross">&#10007;</span> N/A</td>
-                        <td><span class="cross">&#10007;</span> N/A</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Venue &amp; Event Revenue</td>
-                        <td><span class="check">&#10003;</span> Temple, dome, outdoor spaces</td>
-                        <td><span class="cross">&#10007;</span> No physical presence</td>
-                        <td><span class="cross">&#10007;</span> No event capability</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- Growth Phases -->
-    <section class="section" id="growth">
-        <div class="section-label">Growth Roadmap</div>
-        <h2>Phased Scaling Strategy</h2>
-        <p class="section-desc">
-            A clear path from current operations to a nationally licensed, multi-campus wellness brand.
-        </p>
-        <div class="phase-timeline">
-            <div class="phase-item">
-                <div class="phase-number">Phase 1 &mdash; Now</div>
-                <h3>Revenue &amp; Licensing</h3>
-                <p>Clinical Director hire. National credentialing &amp; licensing with Maeve. VP of Business Development for referral network. Outpatient services, venue rentals, medicine ceremonies. Immediate cash flow from existing operations.</p>
-            </div>
-            <div class="phase-item">
-                <div class="phase-number">Phase 2 &mdash; Build</div>
-                <h3>Campus Expansion</h3>
-                <p>Medical Director for Medical Wellness Center. 12 STR lodging domes (Airbnb/VRBO). Maloka Dome venue. 90+ residential domes with fitness, cafe, and studio/co-work. Expand from 3.5 to full 12-acre utilization.</p>
-            </div>
-            <div class="phase-item">
-                <div class="phase-number">Phase 3 &mdash; Scale</div>
-                <h3>National Brand</h3>
-                <p>Series A round ($15M at $35M valuation). National referral network and insurance pathways. Brand ambassador program. Replicable campus model for new cities. Become the trusted national standard.</p>
+                <div class="card-stat">ATX</div>
+                <h3>Austin Demand</h3>
+                <p>Austin is a magnet for health-conscious, experience-driven consumers. Limited luxury wellness resort options in the region position us to capture significant market share.</p>
             </div>
         </div>
 
         <div style="margin-top: 48px;">
-            <h3 style="font-size: 16px; margin-bottom: 20px;">Operational Infrastructure</h3>
-            <div class="cards-grid">
-                <div class="card">
-                    <div class="card-icon gold">&#x1f4c5;</div>
-                    <h3>Unified Operations</h3>
-                    <p>One master calendar, one CRM, one automation engine across all three brands. Prevents double-booking, stacks provider + room + service, and adds cleaning buffers automatically.</p>
+            <h3 style="font-size: 16px; margin-bottom: 16px;">Target Markets</h3>
+            <div class="features-grid">
+                <div class="feature-item"><div class="feature-dot"></div>Wellness travelers &amp; retreat-seekers</div>
+                <div class="feature-item"><div class="feature-dot"></div>Couples, families &amp; friend groups</div>
+                <div class="feature-item"><div class="feature-dot"></div>Corporate offsites &amp; leadership retreats</div>
+                <div class="feature-item"><div class="feature-dot"></div>Retreat facilitators &amp; ceremony holders</div>
+                <div class="feature-item"><div class="feature-dot"></div>Outpatient ketamine / psychedelic clients</div>
+                <div class="feature-item"><div class="feature-dot"></div>Austin locals seeking wellness membership</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Operations -->
+    <section class="section">
+        <div class="section-label">Operations &amp; Staffing</div>
+        <h2>Lean, Inspired Team + AI Backbone</h2>
+        <p class="section-desc">
+            The old model required $50,000/month in payroll to serve 3&ndash;7 clients. The new model is built around a small, empowered team supported by AI automation.
+        </p>
+        <div class="two-col">
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 16px;">Team</h3>
+                <div class="features-grid" style="grid-template-columns: 1fr;">
+                    <div class="feature-item"><div class="feature-dot"></div>1 live-on-site hospitality manager</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Operations Manager &mdash; coordination &amp; oversight</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Part-time clinical / medical staff (2 days/week)</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Executive / management team</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Shannon Cohen &mdash; Executive Advisory</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Contracted vendors as needed</div>
                 </div>
+            </div>
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 16px;">AI-Powered Operations</h3>
                 <div class="card">
-                    <div class="card-icon green">&#x1f4f1;</div>
-                    <h3>Client &amp; Member App</h3>
-                    <p>Mobile app and web portal for self-service booking, membership management, digital content library, and automatic member discounts. Built to scale with the membership model.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon purple">&#x1f465;</div>
-                    <h3>Staff Operations</h3>
-                    <p>Dedicated staff app with clock-in/out, master calendar access, role-based permissions (Admin, Provider, Front Desk, Event Coordinator), and real-time property visibility.</p>
+                    <p>We are building a fully integrated AI system to automate core administrative functions:</p>
+                    <ul style="margin-top: 12px; padding-left: 20px; color: var(--text-secondary); font-size: 14px; line-height: 2;">
+                        <li>Automated booking, availability &amp; payments</li>
+                        <li>Guest communication &amp; pre-arrival prep</li>
+                        <li>Breakfast ordering &amp; inventory</li>
+                        <li>Membership management &amp; renewal</li>
+                        <li>Outpatient scheduling &amp; follow-up</li>
+                    </ul>
+                    <p style="margin-top: 16px; font-size: 13px; color: var(--accent-gold);">One of the first wellness sanctuaries in the country operating with a fully self-sustaining AI backbone &mdash; scaling revenue without scaling headcount.</p>
                 </div>
             </div>
         </div>
@@ -1062,111 +713,106 @@
 
     <div class="divider"></div>
 
-    <!-- The Deal -->
-    <section class="section" id="deal">
-        <div class="section-label">Investment Opportunity</div>
-        <h2>The Deal Structure</h2>
+    <!-- Use of Funds -->
+    <section class="section" id="funds">
+        <div class="section-label">Use of Funds</div>
+        <h2>$300,000 Capital Deployment</h2>
         <p class="section-desc">
-            SAFE notes at an $8M valuation cap &mdash; converting to equity at a substantial discount when the Series A closes at $35M valuation.
+            Capital directly expands revenue-generating capacity, enhances guest experience, and accelerates path to profitability.
         </p>
 
-        <div class="safe-highlight">
-            <h3>Early Investor Advantage</h3>
-            <p>
-                SAFE note investors come in at an $8M valuation cap. When the Series A closes at a projected $35M valuation, SAFE notes convert to equity &mdash; giving early investors over 4x the equity per dollar compared to Series A participants.
-            </p>
-            <div class="safe-values">
-                <div class="safe-value-item">
-                    <div class="safe-value-num">$8M</div>
-                    <div class="safe-value-label">SAFE Valuation Cap</div>
-                </div>
-                <div class="safe-value-item">
-                    <div class="safe-value-num">$15M</div>
-                    <div class="safe-value-label">Series A Round Size</div>
-                </div>
-                <div class="safe-value-item">
-                    <div class="safe-value-num">$35M</div>
-                    <div class="safe-value-label">Series A Valuation</div>
-                </div>
-                <div class="safe-value-item">
-                    <div class="safe-value-num">$50K+</div>
-                    <div class="safe-value-label">Minimum Investment</div>
-                </div>
+        <div class="funds-bar">
+            <div style="width: 35%; background: var(--accent-gold);" title="Working Capital"></div>
+            <div style="width: 17%; background: var(--accent-green);" title="Maloka Dome"></div>
+            <div style="width: 10%; background: var(--accent-purple);" title="Marketing"></div>
+            <div style="width: 15%; background: var(--accent-blue);" title="Infrastructure"></div>
+            <div style="width: 10%; background: #8B6914;" title="People"></div>
+            <div style="width: 7%; background: #6b6b80;" title="AI & Tech"></div>
+            <div style="width: 6%; background: #557755;" title="Brand"></div>
+        </div>
+
+        <div class="funds-legend" style="margin-bottom: 48px;">
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-gold);"></div>
+                Working Capital / 3-Month Reserve
+                <span>$105,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-green);"></div>
+                Maloka Dome (install &amp; furnish)
+                <span>$50,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-purple);"></div>
+                Marketing &amp; Content
+                <span>$30,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-blue);"></div>
+                Property Upgrades
+                <span>$45,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: #8B6914;"></div>
+                Advisory &amp; Sales Staff
+                <span>$36,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: #6b6b80;"></div>
+                Google Ads (3-month launch)
+                <span>$24,000</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: #557755;"></div>
+                AI System Build-Out
+                <span>$10,000</span>
             </div>
         </div>
 
-        <div style="margin-top: 48px;">
-            <h3 style="font-size: 16px; margin-bottom: 20px;">What the Capital Unlocks</h3>
-            <div class="cards-grid">
-                <div class="card">
-                    <h3>Clinical &amp; Licensing</h3>
-                    <p>Clinical Director, national credentialing with Maeve, insurance pathways, and compliance infrastructure to become a licensed national referral destination.</p>
-                </div>
-                <div class="card">
-                    <h3>Business Development</h3>
-                    <p>VP of Business Development to build referral channels, reduce paid acquisition dependency, and establish partnerships with therapists, hospitals, and treatment centers nationally.</p>
-                </div>
-                <div class="card">
-                    <h3>Medical Wellness Center</h3>
-                    <p>Medical Director hire to launch IV therapy, TMS, peptide therapy, stem cells, and bloodwork services from the on-campus medical wellness center.</p>
-                </div>
-                <div class="card">
-                    <h3>Campus &amp; Capacity</h3>
-                    <p>STR dome buildout, Maloka venue construction, expanded treatment beds, and infrastructure to grow from 3.5-acre utilization to full 12-acre campus activation.</p>
-                </div>
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Maloka Dome &mdash; $50,000</h3>
+                <p>Installed &amp; furnished on dedicated 3-acre parcel. Already secured $40,000 in deposits for November from a single client. Projects $32K&ndash;$58K/mo in combined venue + lodging revenue. Full payback in under 2 months.</p>
+            </div>
+            <div class="card">
+                <h3>Property Upgrades &mdash; $45,000</h3>
+                <p>Retreat house upgrades ($20K) for full 10-bed capacity. Professional landscaping &amp; lighting ($20K). Ranch signage &amp; wayfinding ($5K).</p>
+            </div>
+            <div class="card">
+                <h3>Marketing &amp; Ads &mdash; $54,000</h3>
+                <p>Google Ads 3-month launch ($24K at $8K/mo). Marketing staff, content, photography, website, and brand repositioning ($30K). Direct booking pipeline.</p>
+            </div>
+            <div class="card">
+                <h3>People &amp; Working Capital &mdash; $141,000</h3>
+                <p>Shannon Cohen advisory 6 months ($18K). Sales/BD rep in Austin ($18K). Working capital &amp; 3-month operating reserve ($105K) for runway through occupancy ramp-up.</p>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Team -->
-    <section class="section" id="team">
-        <div class="section-label">Leadership</div>
-        <h2>Our Team</h2>
+    <!-- Why Now -->
+    <section class="section">
+        <div class="section-label">Why Now</div>
+        <h2>We Are Not Starting Over. We Are Finally Starting Right.</h2>
         <p class="section-desc">
-            Experienced operators with deep roots in healthcare, psychedelic medicine, wellness, and technology.
+            We have deposit revenue coming in, a four-year-old clinical brand with five-star reviews, a 12-acre property that is fully operational, and a clear path to $1M+ in annual net revenue within 6&ndash;9 months.
         </p>
-        <div class="team-grid">
-            <div class="team-card">
-                <div class="team-initials">WN</div>
-                <h4>William Naylor</h4>
-                <p>Founder &amp; CEO</p>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon gold">&#x2705;</div>
+                <h3>Proven Clinical Brand</h3>
+                <p>Within Center: 4-year-old business with an all-five-star Google rating and a robust lead generation stream.</p>
             </div>
-            <div class="team-card">
-                <div class="team-initials">JK</div>
-                <h4>Dr. Julie Kaesber, MD</h4>
-                <p>Anesthesiologist</p>
+            <div class="card">
+                <div class="card-icon green">&#x1f4b0;</div>
+                <h3>Revenue Already Coming In</h3>
+                <p>$40,000 in Maloka Dome deposits secured from a single client. 16 active memberships with zero marketing. Property is operational now.</p>
             </div>
-            <div class="team-card">
-                <div class="team-initials">AM</div>
-                <h4>Ayesha Macon</h4>
-                <p>Psychiatric NP, PMHNP</p>
-            </div>
-            <div class="team-card">
-                <div class="team-initials">AA</div>
-                <h4>Alyssa Ablan</h4>
-                <p>Lead Clinical Director</p>
-            </div>
-            <div class="team-card">
-                <div class="team-initials">JD</div>
-                <h4>Justin De La Cruz</h4>
-                <p>Operations &amp; Technology</p>
-            </div>
-            <div class="team-card">
-                <div class="team-initials">DN</div>
-                <h4>Danielle Napier</h4>
-                <p>Psychiatric Nurse, RN, BCH, CCHt</p>
-            </div>
-            <div class="team-card">
-                <div class="team-initials">LB</div>
-                <h4>Lauren Burandt</h4>
-                <p>Operations &amp; Programs</p>
-            </div>
-            <div class="team-card">
-                <div class="team-initials">RS</div>
-                <h4>Rahul Sonnad</h4>
-                <p>Technology Advisor</p>
+            <div class="card">
+                <div class="card-icon purple">&#x1f3af;</div>
+                <h3>Catalyst Model</h3>
+                <p>Every facilitator who hosts a retreat brings their community. Every community that gathers carries our name forward. AWKN Ranch grows beyond a destination &mdash; into a movement.</p>
             </div>
         </div>
     </section>
@@ -1174,22 +820,22 @@
     <div class="divider"></div>
 
     <!-- CTA -->
-    <section class="cta-section" id="ask">
-        <div class="section-label">Invest Now</div>
-        <h2>SAFE Notes at $8M Valuation</h2>
+    <section class="cta-section">
+        <div class="section-label">Investment Opportunity</div>
+        <h2>$300,000 &mdash; Next Phase Growth</h2>
         <p>
-            Heart-aligned investors get in at $50K or $100K on a SAFE at $8M valuation &mdash;<br>
-            before the Series A converts at $35M. This is the ground floor.
+            The ranch is awake. It is time to let it fly.<br>
+            <span style="color: var(--text-muted); font-size: 14px;">$300K investment projected to be recovered within 6&ndash;9 months of full operations.</span>
         </p>
-        <a href="mailto:william@within.center" class="cta-btn">Contact William Naylor</a>
+        <a href="mailto:william@within.center" class="cta-btn">Contact Us</a>
         <p style="color: var(--text-muted); font-size: 12px; margin-top: 20px; margin-bottom: 0;">
-            william@within.center &bull; HeartSpace Health Inc.
+            Within Center / AWKN Ranch &bull; Austin, Texas &bull; www.withincenter.com
         </p>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 HeartSpace Health Inc. &mdash; Within Center &amp; AWKN Ranch. All rights reserved.<br>This document is confidential and intended solely for the use of authorized investors.</p>
+        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>This document is confidential and intended solely for the use of authorized investors. March 2026.</p>
     </footer>
 </div>
 
@@ -1201,10 +847,9 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Check auth state on load
     sb.auth.onAuthStateChange((event, session) => {
         if (session && session.user) {
-            checkAccess(session.user);
+            showApp(session.user);
         } else {
             showLogin();
         }
@@ -1223,22 +868,6 @@
         }
     }
 
-    async function checkAccess(user) {
-        // Check if user email is in investor_access table
-        const { data, error } = await sb
-            .from('investor_access')
-            .select('email')
-            .eq('email', user.email)
-            .maybeSingle();
-
-        if (data) {
-            showApp(user);
-        } else {
-            // Allow all authenticated Google users (remove this else block to restrict)
-            showApp(user);
-        }
-    }
-
     async function signOut() {
         await sb.auth.signOut();
         showLogin();
@@ -1249,8 +878,7 @@
         document.getElementById('app').classList.add('visible');
 
         const avatar = user.user_metadata?.avatar_url || '';
-        const email = user.email || '';
-        const name = user.user_metadata?.full_name || email;
+        const name = user.user_metadata?.full_name || user.email || '';
 
         if (avatar) {
             document.getElementById('user-avatar').src = avatar;
@@ -1266,7 +894,6 @@
         document.getElementById('app').classList.remove('visible');
     }
 
-    // Smooth scroll for nav links
     document.querySelectorAll('.topbar-nav a').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
