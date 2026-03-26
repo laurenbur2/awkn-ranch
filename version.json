@@ -1,12 +1,12 @@
 {
-  "version": "v260326.07 7:52p",
-  "release": 7,
-  "sha": "4a7f7c5",
-  "fullSha": "4a7f7c549aeebd9161029201414c8168dc10c1f1",
+  "version": "v260326.08 8:17p",
+  "release": 8,
+  "sha": "ad3329d",
+  "fullSha": "ad3329d626d61831e0337930ab1fac56ed5c38e5",
   "actor": "justinwithin",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-26T14:52:34-05:00",
-  "commits": [{"sha":"4a7f7c5","message":"Add investor portal with Google Auth and full pitch deck","author":"Justin DeLaCruz"}]
+  "machine": "runnervm46oaq",
+  "pushedAt": "2026-03-26T15:16:50-05:00",
+  "commits": [{"sha":"ad3329d","message":"Rebuild investor portal with correct business plan data","author":"Justin DeLaCruz"}]
 }
