@@ -1,12 +1,12 @@
 {
-  "version": "v260326.08 8:17p",
-  "release": 8,
-  "sha": "ad3329d",
-  "fullSha": "ad3329d626d61831e0337930ab1fac56ed5c38e5",
+  "version": "v260326.09 8:41p",
+  "release": 9,
+  "sha": "14ece14",
+  "fullSha": "14ece145c4dbff0e1b32e2032f48fc451db81772",
   "actor": "justinwithin",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervm46oaq",
-  "pushedAt": "2026-03-26T15:16:50-05:00",
-  "commits": [{"sha":"ad3329d","message":"Rebuild investor portal with correct business plan data","author":"Justin DeLaCruz"}]
+  "machine": "runnervmrg6be",
+  "pushedAt": "2026-03-26T15:40:50-05:00",
+  "commits": [{"sha":"14ece14","message":"Rebuild investor portal from AWKN_Ranch_Within_Business_Plan_Final.docx.pdf","author":"Justin DeLaCruz"}]
 }
