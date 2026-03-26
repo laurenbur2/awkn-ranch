@@ -25,6 +25,9 @@
             --accent-purple: #A886CD;
             --accent-purple-dim: rgba(168, 134, 205, 0.15);
             --accent-blue: #4A90D9;
+            --accent-blue-dim: rgba(74, 144, 217, 0.15);
+            --accent-rose: #D97B8F;
+            --accent-rose-dim: rgba(217, 123, 143, 0.15);
             --border: rgba(255, 255, 255, 0.06);
             --border-light: rgba(255, 255, 255, 0.1);
             --radius: 16px;
@@ -54,8 +57,8 @@
 
         .login-container {
             text-align: center;
-            max-width: 420px;
-            padding: 48px 40px;
+            max-width: 440px;
+            padding: 56px 44px;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -63,7 +66,7 @@
 
         .login-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--accent-gold);
             margin-bottom: 8px;
@@ -71,9 +74,9 @@
 
         .login-subtitle {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 36px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
@@ -81,14 +84,14 @@
             color: var(--text-secondary);
             font-size: 15px;
             margin-bottom: 32px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .google-btn {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 32px;
+            padding: 14px 36px;
             background: #fff;
             color: #333;
             border: none;
@@ -131,7 +134,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(10, 10, 15, 0.85);
+            background: rgba(10, 10, 15, 0.9);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             padding: 0 40px;
@@ -155,14 +158,14 @@
 
         .topbar-nav {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             list-style: none;
         }
 
         .topbar-nav a {
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -215,15 +218,15 @@
 
         .hero-badge {
             display: inline-block;
-            padding: 6px 16px;
+            padding: 8px 20px;
             background: var(--accent-gold-dim);
             color: var(--accent-gold);
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .hero h1 {
@@ -231,7 +234,7 @@
             font-size: clamp(36px, 5vw, 64px);
             font-weight: 700;
             line-height: 1.1;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .hero h1 .gold { color: var(--accent-gold); }
@@ -239,33 +242,31 @@
         .hero-sub {
             font-size: 18px;
             color: var(--text-secondary);
-            max-width: 640px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
+            max-width: 680px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
         }
 
         .hero-stats {
             display: flex;
             justify-content: center;
-            gap: 48px;
+            gap: 56px;
             flex-wrap: wrap;
         }
 
-        .hero-stat {
-            text-align: center;
-        }
+        .hero-stat { text-align: center; }
 
         .hero-stat-value {
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 800;
             color: var(--accent-gold);
         }
 
         .hero-stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin-top: 4px;
         }
 
@@ -295,7 +296,7 @@
         .section-desc {
             font-size: 16px;
             color: var(--text-secondary);
-            max-width: 640px;
+            max-width: 680px;
             margin-bottom: 48px;
             line-height: 1.7;
         }
@@ -335,6 +336,8 @@
         .card-icon.gold { background: var(--accent-gold-dim); }
         .card-icon.green { background: var(--accent-green-dim); }
         .card-icon.purple { background: var(--accent-purple-dim); }
+        .card-icon.blue { background: var(--accent-blue-dim); }
+        .card-icon.rose { background: var(--accent-rose-dim); }
 
         .card h3 {
             font-size: 18px;
@@ -399,7 +402,7 @@
             font-size: 16px;
         }
 
-        /* Use of Funds Bar */
+        /* Funds Bar */
         .funds-bar {
             display: flex;
             height: 12px;
@@ -415,7 +418,7 @@
 
         .funds-legend {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 12px;
         }
 
@@ -529,7 +532,7 @@
 
         .cta-btn {
             display: inline-block;
-            padding: 16px 40px;
+            padding: 16px 44px;
             background: var(--accent-gold);
             color: #000;
             border: none;
@@ -569,6 +572,21 @@
             margin: 2px;
         }
 
+        .kpi-chip.gold {
+            background: var(--accent-gold-dim);
+            color: var(--accent-gold);
+        }
+
+        .kpi-chip.purple {
+            background: var(--accent-purple-dim);
+            color: var(--accent-purple);
+        }
+
+        .kpi-chip.blue {
+            background: var(--accent-blue-dim);
+            color: var(--accent-blue);
+        }
+
         /* Divider */
         .divider {
             height: 1px;
@@ -578,9 +596,7 @@
         }
 
         /* Progress bars */
-        .metric-row {
-            margin-bottom: 20px;
-        }
+        .metric-row { margin-bottom: 20px; }
 
         .metric-header {
             display: flex;
@@ -605,6 +621,106 @@
             background: linear-gradient(90deg, var(--accent-gold), var(--accent-green));
         }
 
+        /* Brand pill */
+        .brand-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .brand-pill.within { background: var(--accent-purple-dim); color: var(--accent-purple); }
+        .brand-pill.ranch { background: var(--accent-gold-dim); color: var(--accent-gold); }
+        .brand-pill.dome { background: var(--accent-blue-dim); color: var(--accent-blue); }
+
+        /* Phase timeline */
+        .phase-timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .phase-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 32px;
+            position: relative;
+        }
+
+        .phase-item:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+        .phase-item:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+
+        .phase-number {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+        }
+
+        .phase-item h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .phase-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* SAFE note highlight */
+        .safe-highlight {
+            background: linear-gradient(135deg, rgba(212, 168, 67, 0.12), rgba(55, 150, 118, 0.08));
+            border: 1px solid rgba(212, 168, 67, 0.25);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .safe-highlight h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .safe-highlight p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .safe-values {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .safe-value-item { text-align: center; }
+
+        .safe-value-num {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .safe-value-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .topbar { padding: 0 20px; }
@@ -616,6 +732,10 @@
             .cards-grid { grid-template-columns: 1fr; }
             .comp-table { font-size: 12px; }
             .comp-table th, .comp-table td { padding: 10px 8px; }
+            .phase-timeline { grid-template-columns: 1fr; }
+            .phase-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+            .phase-item:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+            .safe-values { gap: 24px; }
         }
 
         /* Confidential watermark */
@@ -640,7 +760,8 @@
         <div class="login-logo">AWKN Within</div>
         <div class="login-subtitle">Investor Portal</div>
         <div class="login-tagline">
-            America's Leading Psychedelic-Integrated<br>Longevity Campus
+            A World-Class Mental Health &amp; Wellness Campus<br>
+            Psychedelic Therapy &bull; Medical Wellness &bull; Community
         </div>
         <button class="google-btn" onclick="signInWithGoogle()">
             <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -662,11 +783,11 @@
             <div class="topbar-brand">AWKN Within</div>
             <ul class="topbar-nav">
                 <li><a href="#overview">Overview</a></li>
-                <li><a href="#problem">Problem</a></li>
-                <li><a href="#solution">Solution</a></li>
-                <li><a href="#traction">Traction</a></li>
+                <li><a href="#ecosystem">Ecosystem</a></li>
+                <li><a href="#revenue">Revenue</a></li>
                 <li><a href="#market">Market</a></li>
-                <li><a href="#funds">Use of Funds</a></li>
+                <li><a href="#growth">Growth</a></li>
+                <li><a href="#deal">The Deal</a></li>
                 <li><a href="#team">Team</a></li>
             </ul>
             <div class="topbar-user">
@@ -679,208 +800,127 @@
 
     <!-- Hero -->
     <section class="hero" id="overview">
-        <div class="hero-badge">$1M Raise &bull; $8M Pre-Money Valuation</div>
-        <h1>America's Leading<br><span class="gold">Psychedelic-Integrated</span><br>Longevity Campus</h1>
+        <div class="hero-badge">SAFE Notes Open &bull; $8M Valuation Cap</div>
+        <h1>The National Standard for<br><span class="gold">Psychedelic Therapy</span><br>&amp; Integrated Wellness</h1>
         <p class="hero-sub">
-            The first national gold-standard psychedelic treatment and integration company.
-            A sanctuary where ancient wisdom meets modern medicine.
+            A licensed, world-class mental health and substance abuse treatment campus.
+            Three brands. One unified ecosystem. Multiple revenue engines operating on a 12-acre ranch outside Austin, TX.
         </p>
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-value">$1.65M</div>
-                <div class="hero-stat-label">2025 Revenue</div>
+                <div class="hero-stat-value">$8M</div>
+                <div class="hero-stat-label">SAFE Valuation Cap</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">30%</div>
-                <div class="hero-stat-label">Net Margins</div>
+                <div class="hero-stat-value">$35M</div>
+                <div class="hero-stat-label">Series A Target Valuation</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">4 yrs</div>
-                <div class="hero-stat-label">Operating History</div>
+                <div class="hero-stat-value">12 Acres</div>
+                <div class="hero-stat-label">Austin, TX Campus</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">1,200+</div>
-                <div class="hero-stat-label">Sessions Guided</div>
+                <div class="hero-stat-value">7+</div>
+                <div class="hero-stat-label">Revenue Streams</div>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Executive Summary -->
-    <section class="section">
-        <div class="section-label">Executive Summary</div>
-        <h2>A Proven Model in an Emerging Market</h2>
+    <!-- Three Brands Ecosystem -->
+    <section class="section" id="ecosystem">
+        <div class="section-label">The Ecosystem</div>
+        <h2>Three Brands, One Operational Engine</h2>
         <p class="section-desc">
-            Within Center &amp; AWKN Ranch operate a 12-acre wellness campus outside Austin, TX with three profitable revenue streams: psychedelic therapy, memberships, and venue rentals.
+            Three distinct public-facing brands that share one backend, one master calendar, one CRM, and one unified client experience.
         </p>
         <div class="cards-grid">
             <div class="card">
-                <div class="card-icon gold">&#x1f4c8;</div>
-                <h3>Market Opportunity</h3>
-                <p>Projected $6.9B psychedelic therapeutics market by 2030 (10.6% CAGR), within a $1T wellness tourism and $80B longevity landscape.</p>
+                <div class="card-icon purple">&#x1f3e5;</div>
+                <div style="margin-bottom: 12px;"><span class="brand-pill within">Within Center</span></div>
+                <h3>Psychedelic Therapy &amp; Clinical</h3>
+                <p>Licensed retreat center offering psychedelic-assisted therapy, medical &amp; therapeutic services, clinical programming, retreat experiences, and integration memberships. The clinical engine of the ecosystem.</p>
             </div>
             <div class="card">
-                <div class="card-icon green">&#x2705;</div>
-                <h3>Proven Track Record</h3>
-                <p>4-year pioneer with $1.65M annual revenue, $81.5K/month average, 30% net margins across three revenue streams.</p>
+                <div class="card-icon gold">&#x1f33f;</div>
+                <div style="margin-bottom: 12px;"><span class="brand-pill ranch">AWKN Ranch</span></div>
+                <h3>Venue, Events &amp; Community</h3>
+                <p>The property brand powering events, venue rentals, wellness amenities (sauna, cold plunge, red light therapy, sound beds), community memberships, and the operational headquarters for the campus.</p>
             </div>
             <div class="card">
-                <div class="card-icon purple">&#x1f3af;</div>
-                <h3>Gold-Standard Model</h3>
-                <p>Integrating psychedelic therapy with TMS, red-light, IVs, peptides, stem cells, bloodwork, and longevity care — no competitor matches this.</p>
+                <div class="card-icon blue">&#x1f3d5;</div>
+                <div style="margin-bottom: 12px;"><span class="brand-pill dome">Austin Dome Collective</span></div>
+                <h3>Lodging &amp; Short-Term Rentals</h3>
+                <p>Geodesic dome lodging accommodations on AWKN Ranch property. Serves retreat participants, Airbnb/VRBO guests, and event attendees. Automated guest communication and calendar integration.</p>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- The Problem -->
-    <section class="section" id="problem">
-        <div class="section-label">The Problem</div>
-        <h2>No Gold Standard Exists</h2>
+    <!-- Revenue Streams -->
+    <section class="section" id="revenue">
+        <div class="section-label">Revenue Architecture</div>
+        <h2>Diversified Revenue Across 7+ Streams</h2>
         <p class="section-desc">
-            No gold standard exists for safe psychedelic therapy and long-term integration — leaving patients without proven, full healing.
-        </p>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-stat">57M</div>
-                <h3>Growing Mental Health Crisis</h3>
-                <p>U.S. adults have mental illness; only 1/3 get effective help. Traditional meds fail 30-50% of patients. Psychedelics work faster but lack standards.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">1,500+</div>
-                <h3>Fragmented Clinics</h3>
-                <p>$3.4B market fragmented across 1,500+ clinics. Hundreds of clinics (Mindbloom $45M / Nue $23M raised) but no national leader with inpatient campus.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">80%</div>
-                <h3>No Real Integration</h3>
-                <p>80% of therapy benefits lost in 6 months without proper integration. Breakthroughs fade without structured aftercare, community, coaching, and support.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">400%</div>
-                <h3>Wide-Open Race</h3>
-                <p>Ketamine clinics up 400% since 2020 — no clear gold standard yet. No one has built the complete model: inpatient + community + longevity in one place.</p>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- The Solution -->
-    <section class="section" id="solution">
-        <div class="section-label">Our Solution</div>
-        <h2>The Complete Model</h2>
-        <p class="section-desc">
-            Safe inpatient therapy + full integration on one campus — no competitor matches this combination.
+            Every part of the campus generates revenue. Clinical, community, and hospitality revenue engines operating in parallel.
         </p>
         <div class="two-col">
             <div>
                 <div class="cards-grid" style="grid-template-columns: 1fr;">
                     <div class="card">
-                        <div class="card-icon gold">&#x1f3e5;</div>
-                        <h3>Safe Medical-Grade Treatments</h3>
-                        <p>Inpatient ketamine in supervised, calming settings, plus TMS, peptides, stem cells, bloodwork, and functional medicine for rapid, profound healing.</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill within">Within</span>
+                            <h3 style="margin-bottom: 0;">Clinical &amp; Outpatient</h3>
+                        </div>
+                        <p>Inpatient ketamine-assisted therapy, 2-week &amp; 4-week programs, medical consultations, outpatient services. Clinical Director + credentialed national referral network.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip purple">$16K+ per retreat weekend</span> <span class="kpi-chip purple">Integration packages $500/mo</span></p>
                     </div>
                     <div class="card">
-                        <div class="card-icon green">&#x1f91d;</div>
-                        <h3>Built-In Integration &amp; Aftercare</h3>
-                        <p>Ongoing therapy, coaching, community classes, IV hydration, ceremonies, and events — on-site support to make breakthroughs permanent.</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill within">Within</span>
+                            <h3 style="margin-bottom: 0;">Medical Wellness</h3>
+                        </div>
+                        <p>Medical Director-led wellness center offering IV therapy, TMS, peptides, stem cells, bloodwork, red light therapy, and functional medicine. Highest level of integrated medical services.</p>
                     </div>
                     <div class="card">
-                        <div class="card-icon purple">&#x1f30e;</div>
-                        <h3>National Scaling Strategy</h3>
-                        <p>National/state credentialing + insurance pathways; leadership hires &amp; brand ambassador for nationwide scaling &amp; reimbursement.</p>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill ranch">AWKN</span>
+                            <h3 style="margin-bottom: 0;">Venue Rentals</h3>
+                        </div>
+                        <p>Temple Space (60+ capacity, $1,400/day), Wellness Center ($1,200/day), Yurts ($777/night), Honeycomb Dome, fire pit, courts. High-margin event bookings for retreats, ceremonies, and gatherings.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip gold">$155/hr Temple</span> <span class="kpi-chip gold">$135/hr Wellness</span> <span class="kpi-chip gold">Custom multi-day packages</span></p>
                     </div>
                 </div>
             </div>
             <div>
-                <h3 style="margin-bottom: 24px; color: var(--text-primary);">Current Revenue Streams</h3>
-                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">All operating profitably on 3.5 acres of our 12-acre AWKN Ranch</p>
-                <div class="card" style="margin-bottom: 16px;">
-                    <h3>Psychedelic Treatments</h3>
-                    <p>Inpatient ketamine-assisted therapy, guided 2-week &amp; 4-week programs, medical consultations, conscious integration sessions, IV hydration</p>
-                </div>
-                <div class="card" style="margin-bottom: 16px;">
-                    <h3>Memberships</h3>
-                    <p>Recurring tiered models, unlimited group classes, access to saunas/cold plunge/red light, wellness workshops, integration coaching</p>
-                </div>
-                <div class="card">
-                    <h3>Venue Rental</h3>
-                    <p>High-margin event bookings: wellness center, temple space, saunas, cold plunges, hot tub, pickleball court, fire pit, yurts</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- Traction -->
-    <section class="section" id="traction">
-        <div class="section-label">Traction &amp; Financials</div>
-        <h2>Consistent Revenue Growth</h2>
-        <p class="section-desc">
-            Four years of proven operations with growing revenue and strong margins — rare in early-stage wellness.
-        </p>
-        <div class="two-col">
-            <div>
-                <table class="revenue-table">
-                    <thead>
-                        <tr><th>Year</th><th style="text-align:right">Revenue</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>2023</td><td>$1,300,000</td></tr>
-                        <tr><td>2024</td><td>$1,520,000</td></tr>
-                        <tr><td>2025</td><td>$1,650,000</td></tr>
-                        <tr class="total"><td>Net Income (2025)</td><td>$240,000</td></tr>
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 40px;">
-                    <h3 style="font-size: 16px; margin-bottom: 20px;">Key Metrics</h3>
-                    <div class="metric-row">
-                        <div class="metric-header">
-                            <span class="metric-label">Monthly Run Rate</span>
-                            <span class="metric-value">$137.5K/mo</span>
+                <div class="cards-grid" style="grid-template-columns: 1fr;">
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill ranch">AWKN</span>
+                            <span class="brand-pill within">Within</span>
+                            <h3 style="margin-bottom: 0;">Memberships</h3>
                         </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 85%"></div></div>
+                        <p>Two membership ecosystems: <strong>Within Center</strong> (Integration, Gold Integration, Wellness) for coaching, therapy, and retreat alumni. <strong>AWKN Ranch</strong> (Unlimited, Founders) for sauna, cold plunge, red light, sound beds, events.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip">50+ target members</span> <span class="kpi-chip">Tiered recurring revenue</span></p>
                     </div>
-                    <div class="metric-row">
-                        <div class="metric-header">
-                            <span class="metric-label">Net Margins</span>
-                            <span class="metric-value">30%</span>
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill dome">Dome</span>
+                            <h3 style="margin-bottom: 0;">STR Lodging</h3>
                         </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 30%"></div></div>
+                        <p>12 geodesic lodging domes for short-term rentals via Airbnb/VRBO, retreat participant housing, and event guest accommodations. Automated check-in and calendar sync.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip blue">$499-$888/night</span> <span class="kpi-chip blue">12 domes planned</span></p>
                     </div>
-                    <div class="metric-row">
-                        <div class="metric-header">
-                            <span class="metric-label">Campus Utilization (3.5 of 12 acres)</span>
-                            <span class="metric-value">29%</span>
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="brand-pill within">Within</span>
+                            <h3 style="margin-bottom: 0;">Plant Medicine Church</h3>
                         </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 29%"></div></div>
+                        <p>Sacred ceremony experiences filling STR domes, venue spaces, and retreat house. $444 per ceremony, 20 participants per night, with integration membership upsell.</p>
+                        <p style="margin-top: 8px;"><span class="kpi-chip purple">$16K per weekend</span> <span class="kpi-chip purple">Feeds all other streams</span></p>
                     </div>
-                </div>
-            </div>
-            <div>
-                <h3 style="font-size: 16px; margin-bottom: 20px;">Investment History</h3>
-                <div class="card" style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <h3>Total Raised to Date</h3>
-                        <span style="font-size: 24px; font-weight: 800; color: var(--accent-gold);">$1.5M</span>
-                    </div>
-                    <p style="margin-top: 8px;">3 rounds of $500K (first round 2021, last round 2024)</p>
-                </div>
-                <div class="card" style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <h3>Current Raise</h3>
-                        <span style="font-size: 24px; font-weight: 800; color: var(--accent-green);">$1M</span>
-                    </div>
-                    <p style="margin-top: 8px;">at $8M pre-money valuation</p>
-                </div>
-                <div class="card">
-                    <h3 style="margin-bottom: 12px;">Operational Highlights</h3>
-                    <p><span class="kpi-chip">5-star reviews</span> <span class="kpi-chip">1,200+ sessions</span> <span class="kpi-chip">6 treatment beds</span> <span class="kpi-chip">12-acre campus</span> <span class="kpi-chip">All 3 streams profitable</span></p>
                 </div>
             </div>
         </div>
@@ -890,27 +930,31 @@
 
     <!-- Market -->
     <section class="section" id="market">
-        <div class="section-label">Market &amp; Competition</div>
-        <h2>$6.9B Fragmented Market</h2>
+        <div class="section-label">Market Opportunity</div>
+        <h2>No Gold Standard Exists &mdash; Yet</h2>
         <p class="section-desc">
-            The psychedelic therapeutics market is booming. Texas committed $50M for ibogaine addiction research in June 2025 — trials centered in Austin.
+            The mental health and psychedelic therapy market is booming but fragmented. No one has built the complete model: inpatient + community + longevity + lodging on one campus.
         </p>
-
         <div class="cards-grid" style="margin-bottom: 48px;">
+            <div class="card">
+                <div class="card-stat">57M</div>
+                <h3>Mental Health Crisis</h3>
+                <p>U.S. adults with mental illness. Only 1/3 get effective help. Traditional medications fail 30-50% of patients. Psychedelics work faster but lack standards.</p>
+            </div>
             <div class="card">
                 <div class="card-stat">$6.9B</div>
                 <h3>Psychedelic Therapeutics</h3>
-                <p>Projected market by 2030 at 10.6% CAGR. Psilocybin gaining mainstream traction (Bloomberg Dec 2025).</p>
+                <p>Projected market by 2030 at 10.6% CAGR. Texas committed $50M for ibogaine addiction research. Psilocybin gaining mainstream traction.</p>
             </div>
             <div class="card">
-                <div class="card-stat">$1T</div>
-                <h3>Wellness Tourism</h3>
-                <p>Global wellness tourism opportunity. Immersive retreat experiences are the fastest-growing segment.</p>
+                <div class="card-stat">1,500+</div>
+                <h3>Fragmented Clinics</h3>
+                <p>Market fragmented across 1,500+ clinics. Mindbloom ($45M raised), Nue Life ($23M raised) — yet no national leader with a full inpatient campus and integration model.</p>
             </div>
             <div class="card">
-                <div class="card-stat">$80B</div>
-                <h3>Longevity &amp; Functional Medicine</h3>
-                <p>Rapidly expanding market for anti-aging, peptides, stem cells, and functional diagnostics.</p>
+                <div class="card-stat">80%</div>
+                <h3>No Real Integration</h3>
+                <p>Of therapy benefits are lost within 6 months without proper integration. Breakthroughs fade without structured aftercare, community, coaching, and ongoing support.</p>
             </div>
         </div>
 
@@ -919,48 +963,48 @@
             <table class="comp-table">
                 <thead>
                     <tr>
-                        <th>Feature</th>
-                        <th>HeartSpace (AWKN)</th>
-                        <th>Virtual Players<br>(Mindbloom/Nue)</th>
+                        <th>Capability</th>
+                        <th>AWKN Within (HeartSpace)</th>
+                        <th>Virtual Players<br>(Mindbloom/Nue Life)</th>
                         <th>Clinic Chains<br>(Field Trip/Others)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="us">
-                        <td>Profitable</td>
-                        <td><span class="check">&#10003;</span> $1.65M / 30% margins</td>
-                        <td><span class="cross">&#10007;</span> Cash burn / unprofitable</td>
-                        <td><span class="cross">&#10007;</span> Closures post-hype</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Full On-Site Integration</td>
-                        <td><span class="check">&#10003;</span> Therapy, coaching, community</td>
-                        <td><span class="cross">&#10007;</span> Minimal or virtual only</td>
-                        <td><span class="cross">&#10007;</span> Limited aftercare</td>
-                    </tr>
-                    <tr class="us">
-                        <td>Inpatient Campus</td>
-                        <td><span class="check">&#10003;</span> 12-acre ranch, 6 beds</td>
+                        <td>Full Inpatient Campus</td>
+                        <td><span class="check">&#10003;</span> 12-acre ranch, multiple venues</td>
                         <td><span class="cross">&#10007;</span> At-home only</td>
-                        <td><span class="cross">&#10007;</span> Inconsistent</td>
+                        <td><span class="cross">&#10007;</span> Small office suites</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Integration &amp; Aftercare</td>
+                        <td><span class="check">&#10003;</span> On-site coaching, community, memberships</td>
+                        <td><span class="cross">&#10007;</span> Minimal or virtual only</td>
+                        <td><span class="cross">&#10007;</span> Limited follow-up</td>
                     </tr>
                     <tr class="us">
                         <td>Medical-Grade + Longevity</td>
-                        <td><span class="check">&#10003;</span> Ketamine + TMS / peptides</td>
+                        <td><span class="check">&#10003;</span> Ketamine + TMS + IV + peptides + stem cells</td>
                         <td><span class="cross">&#10007;</span> Self-administered lozenges</td>
-                        <td><span class="cross">&#10007;</span> Inconsistent</td>
+                        <td><span class="cross">&#10007;</span> Ketamine-only, inconsistent</td>
                     </tr>
                     <tr class="us">
-                        <td>Membership Model</td>
-                        <td><span class="check">&#10003;</span> Tiered recurring revenue</td>
+                        <td>Multi-Revenue Model</td>
+                        <td><span class="check">&#10003;</span> 7+ diversified revenue streams</td>
                         <td><span class="cross">&#10007;</span> Subscription only</td>
-                        <td><span class="cross">&#10007;</span> Session-based</td>
+                        <td><span class="cross">&#10007;</span> Session-based only</td>
                     </tr>
                     <tr class="us">
-                        <td>Proven &amp; Scalable</td>
-                        <td><span class="check">&#10003;</span> 4 yrs operating profitably</td>
-                        <td><span class="cross">&#10007;</span> Overdose risks reported</td>
-                        <td><span class="cross">&#10007;</span> Closures post-hype</td>
+                        <td>On-Site Lodging</td>
+                        <td><span class="check">&#10003;</span> 12 geodesic domes + yurts</td>
+                        <td><span class="cross">&#10007;</span> N/A</td>
+                        <td><span class="cross">&#10007;</span> N/A</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Venue &amp; Event Revenue</td>
+                        <td><span class="check">&#10003;</span> Temple, dome, outdoor spaces</td>
+                        <td><span class="cross">&#10007;</span> No physical presence</td>
+                        <td><span class="cross">&#10007;</span> No event capability</td>
                     </tr>
                 </tbody>
             </table>
@@ -969,104 +1013,107 @@
 
     <div class="divider"></div>
 
-    <!-- Use of Funds -->
-    <section class="section" id="funds">
-        <div class="section-label">Use of Funds</div>
-        <h2>$550,000 Growth Capital Deployment</h2>
+    <!-- Growth Phases -->
+    <section class="section" id="growth">
+        <div class="section-label">Growth Roadmap</div>
+        <h2>Phased Scaling Strategy</h2>
         <p class="section-desc">
-            Strategic deployment to strengthen core revenue, launch scalable medical wellness, and reduce dependency on paid acquisition — with clear 2026 phase-out plans.
+            A clear path from current operations to a nationally licensed, multi-campus wellness brand.
         </p>
-
-        <div class="funds-bar">
-            <div style="width: 32%; background: var(--accent-gold);" title="Revenue Infrastructure"></div>
-            <div style="width: 12%; background: var(--accent-green);" title="Marketing"></div>
-            <div style="width: 10%; background: var(--accent-purple);" title="Integration Program"></div>
-            <div style="width: 12%; background: var(--accent-blue);" title="Medical Wellness"></div>
-            <div style="width: 30%; background: #6b6b80;" title="Capital Reserves"></div>
-            <div style="width: 4%; background: #8B6914;" title="Property"></div>
-        </div>
-
-        <div class="funds-legend" style="margin-bottom: 48px;">
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-gold);"></div>
-                Revenue Infrastructure
-                <span>$160K (32%)</span>
+        <div class="phase-timeline">
+            <div class="phase-item">
+                <div class="phase-number">Phase 1 &mdash; Now</div>
+                <h3>Revenue &amp; Licensing</h3>
+                <p>Clinical Director hire. National credentialing &amp; licensing with Maeve. VP of Business Development for referral network. Outpatient services, venue rentals, medicine ceremonies. Immediate cash flow from existing operations.</p>
             </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-green);"></div>
-                Marketing &amp; Acquisition
-                <span>$60K (12%)</span>
+            <div class="phase-item">
+                <div class="phase-number">Phase 2 &mdash; Build</div>
+                <h3>Campus Expansion</h3>
+                <p>Medical Director for Medical Wellness Center. 12 STR lodging domes (Airbnb/VRBO). Maloka Dome venue. 90+ residential domes with fitness, cafe, and studio/co-work. Expand from 3.5 to full 12-acre utilization.</p>
             </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-purple);"></div>
-                Integration Program
-                <span>$50K (10%)</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-blue);"></div>
-                Medical Wellness (IV/Labs)
-                <span>$60K (12%)</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: #6b6b80;"></div>
-                Capital Reserves
-                <span>$170K (30%)</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: #8B6914;"></div>
-                Property Improvements
-                <span>$20K (4%)</span>
+            <div class="phase-item">
+                <div class="phase-number">Phase 3 &mdash; Scale</div>
+                <h3>National Brand</h3>
+                <p>Series A round ($15M at $35M valuation). National referral network and insurance pathways. Brand ambassador program. Replicable campus model for new cities. Become the trusted national standard.</p>
             </div>
         </div>
 
-        <div class="cards-grid">
-            <div class="card">
-                <h3>Revenue Infrastructure — $160K</h3>
-                <p style="margin-bottom: 12px;"><strong>VP of Business Development</strong> ($120K/12mo) — Build referral channel to reduce paid ad reliance.</p>
-                <p><span class="kpi-chip">5-10 new partners/mo</span> <span class="kpi-chip">25-35% referral revenue by Q4</span> <span class="kpi-chip">$750K-$950K attributable revenue</span></p>
-            </div>
-            <div class="card">
-                <h3>Marketing — $100K</h3>
-                <p style="margin-bottom: 12px;"><strong>Performance + Brand Media</strong> — Google Ads, Meta retargeting, SEO, video production, social campaigns.</p>
-                <p><span class="kpi-chip">3-5x ROAS</span> <span class="kpi-chip">CPA &le; 15-20%</span> <span class="kpi-chip">$100K monthly revenue target</span></p>
-            </div>
-            <div class="card">
-                <h3>Integration Program — $50K</h3>
-                <p style="margin-bottom: 12px;"><strong>Monthly subscription aftercare</strong> — Staff for integration coaching, admin support, community programs.</p>
-                <p><span class="kpi-chip">30-50% enrollment</span> <span class="kpi-chip">20-40% LTV increase</span> <span class="kpi-chip">$7.5K/mo by month 6</span></p>
-            </div>
-            <div class="card">
-                <h3>Medical Wellness — $50K</h3>
-                <p style="margin-bottom: 12px;"><strong>IV Therapy &amp; Drip Lounge</strong> — Infrastructure, protocols, nursing staff, compliance, marketing.</p>
-                <p><span class="kpi-chip">$20-30K/mo by month 6</span> <span class="kpi-chip">&ge;60% gross margin</span> <span class="kpi-chip">Cash-flow positive 6-9 mo</span></p>
+        <div style="margin-top: 48px;">
+            <h3 style="font-size: 16px; margin-bottom: 20px;">Operational Infrastructure</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon gold">&#x1f4c5;</div>
+                    <h3>Unified Operations</h3>
+                    <p>One master calendar, one CRM, one automation engine across all three brands. Prevents double-booking, stacks provider + room + service, and adds cleaning buffers automatically.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon green">&#x1f4f1;</div>
+                    <h3>Client &amp; Member App</h3>
+                    <p>Mobile app and web portal for self-service booking, membership management, digital content library, and automatic member discounts. Built to scale with the membership model.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon purple">&#x1f465;</div>
+                    <h3>Staff Operations</h3>
+                    <p>Dedicated staff app with clock-in/out, master calendar access, role-based permissions (Admin, Provider, Front Desk, Event Coordinator), and real-time property visibility.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Growth Strategy -->
-    <section class="section">
-        <div class="section-label">Growth Strategy</div>
-        <h2>Phase 2: Scale &amp; Expand</h2>
+    <!-- The Deal -->
+    <section class="section" id="deal">
+        <div class="section-label">Investment Opportunity</div>
+        <h2>The Deal Structure</h2>
         <p class="section-desc">
-            Maximize current resources, expand capacity, then replicate the model nationally.
+            SAFE notes at an $8M valuation cap &mdash; converting to equity at a substantial discount when the Series A closes at $35M valuation.
         </p>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-icon gold">&#x1f3d7;</div>
-                <h3>Campus Expansion</h3>
-                <p>Develop 4 more acres with 25 lodging geodomes &amp; geo village. Expand venue rental space (Maloka). Add 6+ practitioner spaces and new build-outs.</p>
+
+        <div class="safe-highlight">
+            <h3>Early Investor Advantage</h3>
+            <p>
+                SAFE note investors come in at an $8M valuation cap. When the Series A closes at a projected $35M valuation, SAFE notes convert to equity &mdash; giving early investors over 4x the equity per dollar compared to Series A participants.
+            </p>
+            <div class="safe-values">
+                <div class="safe-value-item">
+                    <div class="safe-value-num">$8M</div>
+                    <div class="safe-value-label">SAFE Valuation Cap</div>
+                </div>
+                <div class="safe-value-item">
+                    <div class="safe-value-num">$15M</div>
+                    <div class="safe-value-label">Series A Round Size</div>
+                </div>
+                <div class="safe-value-item">
+                    <div class="safe-value-num">$35M</div>
+                    <div class="safe-value-label">Series A Valuation</div>
+                </div>
+                <div class="safe-value-item">
+                    <div class="safe-value-num">$50K+</div>
+                    <div class="safe-value-label">Minimum Investment</div>
+                </div>
             </div>
-            <div class="card">
-                <div class="card-icon green">&#x1f4ca;</div>
-                <h3>Revenue Scaling</h3>
-                <p>7 new inpatient beds at $22K/bed/mo = $154K additional monthly revenue. Membership model targeting 50+ monthly members. Goal: $3.3M total annual revenue.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon purple">&#x1f680;</div>
-                <h3>National Rollout</h3>
-                <p>Once proven, scale to new cities and repeat. National credentialing &amp; insurance pathways. Branded as America's premier psychedelic-integrated longevity campus.</p>
+        </div>
+
+        <div style="margin-top: 48px;">
+            <h3 style="font-size: 16px; margin-bottom: 20px;">What the Capital Unlocks</h3>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>Clinical &amp; Licensing</h3>
+                    <p>Clinical Director, national credentialing with Maeve, insurance pathways, and compliance infrastructure to become a licensed national referral destination.</p>
+                </div>
+                <div class="card">
+                    <h3>Business Development</h3>
+                    <p>VP of Business Development to build referral channels, reduce paid acquisition dependency, and establish partnerships with therapists, hospitals, and treatment centers nationally.</p>
+                </div>
+                <div class="card">
+                    <h3>Medical Wellness Center</h3>
+                    <p>Medical Director hire to launch IV therapy, TMS, peptide therapy, stem cells, and bloodwork services from the on-campus medical wellness center.</p>
+                </div>
+                <div class="card">
+                    <h3>Campus &amp; Capacity</h3>
+                    <p>STR dome buildout, Maloka venue construction, expanded treatment beds, and infrastructure to grow from 3.5-acre utilization to full 12-acre campus activation.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -1078,7 +1125,7 @@
         <div class="section-label">Leadership</div>
         <h2>Our Team</h2>
         <p class="section-desc">
-            Experienced operators with deep roots in healthcare, psychedelic medicine, and entrepreneurship.
+            Experienced operators with deep roots in healthcare, psychedelic medicine, wellness, and technology.
         </p>
         <div class="team-grid">
             <div class="team-card">
@@ -1104,12 +1151,22 @@
             <div class="team-card">
                 <div class="team-initials">JD</div>
                 <h4>Justin De La Cruz</h4>
-                <p>Operations Manager</p>
+                <p>Operations &amp; Technology</p>
             </div>
             <div class="team-card">
                 <div class="team-initials">DN</div>
                 <h4>Danielle Napier</h4>
-                <p>Psychiatric Nurse, RN, BCH, CCHt — Lead Guide</p>
+                <p>Psychiatric Nurse, RN, BCH, CCHt</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">LB</div>
+                <h4>Lauren Burandt</h4>
+                <p>Operations &amp; Programs</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">RS</div>
+                <h4>Rahul Sonnad</h4>
+                <p>Technology Advisor</p>
             </div>
         </div>
     </section>
@@ -1118,21 +1175,21 @@
 
     <!-- CTA -->
     <section class="cta-section" id="ask">
-        <div class="section-label">The Ask</div>
-        <h2>$1M at $8M Pre-Money</h2>
+        <div class="section-label">Invest Now</div>
+        <h2>SAFE Notes at $8M Valuation</h2>
         <p>
-            Invest in national business development leadership, scale marketing with measurable acquisition,<br>
-            upgrade client experience, and increase clinical capacity &amp; operating runway.
+            Heart-aligned investors get in at $50K or $100K on a SAFE at $8M valuation &mdash;<br>
+            before the Series A converts at $35M. This is the ground floor.
         </p>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">
-            Join us in transforming psychedelic wellness.
+        <a href="mailto:william@within.center" class="cta-btn">Contact William Naylor</a>
+        <p style="color: var(--text-muted); font-size: 12px; margin-top: 20px; margin-bottom: 0;">
+            william@within.center &bull; HeartSpace Health Inc.
         </p>
-        <a href="mailto:william@within.center" class="cta-btn">Contact Us</a>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved. This document is confidential and intended solely for the use of authorized investors.</p>
+        <p>&copy; 2026 HeartSpace Health Inc. &mdash; Within Center &amp; AWKN Ranch. All rights reserved.<br>This document is confidential and intended solely for the use of authorized investors.</p>
     </footer>
 </div>
 
@@ -1147,7 +1204,7 @@
     // Check auth state on load
     sb.auth.onAuthStateChange((event, session) => {
         if (session && session.user) {
-            showApp(session.user);
+            checkAccess(session.user);
         } else {
             showLogin();
         }
@@ -1163,6 +1220,22 @@
         if (error) {
             document.getElementById('login-error').textContent = error.message;
             document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    async function checkAccess(user) {
+        // Check if user email is in investor_access table
+        const { data, error } = await sb
+            .from('investor_access')
+            .select('email')
+            .eq('email', user.email)
+            .maybeSingle();
+
+        if (data) {
+            showApp(user);
+        } else {
+            // Allow all authenticated Google users (remove this else block to restrict)
+            showApp(user);
         }
     }
 
