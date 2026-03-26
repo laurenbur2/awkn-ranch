@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AWKN Within — Investor Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #1e1e35;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6b6b80;
+            --accent-gold: #D4A843;
+            --accent-gold-dim: rgba(212, 168, 67, 0.15);
+            --accent-green: #379676;
+            --accent-green-dim: rgba(55, 150, 118, 0.15);
+            --accent-purple: #A886CD;
+            --accent-purple-dim: rgba(168, 134, 205, 0.15);
+            --accent-blue: #4A90D9;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        #login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 30% 20%, rgba(212, 168, 67, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(55, 150, 118, 0.06) 0%, transparent 50%),
+                        var(--bg-primary);
+        }
+
+        .login-container {
+            text-align: center;
+            max-width: 420px;
+            padding: 48px 40px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .login-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 36px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .login-tagline {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 32px;
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .google-btn svg { width: 20px; height: 20px; }
+
+        .login-note {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 24px;
+        }
+
+        .login-error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #app { display: none; }
+        #app.visible { display: block; }
+        #login-screen.hidden { display: none; }
+
+        /* Top Bar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+        }
+
+        .topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .topbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .topbar-nav {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .topbar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .topbar-nav a:hover { color: var(--accent-gold); }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .topbar-email {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .btn-signout {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-signout:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 100px 40px 80px;
+            text-align: center;
+            background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 67, 0.1) 0%, transparent 60%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--accent-gold-dim);
+            color: var(--accent-gold);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(36px, 5vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 .gold { color: var(--accent-gold); }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .hero-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+        }
+
+        .section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin-bottom: 48px;
+            line-height: 1.7;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--border-light);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon.gold { background: var(--accent-gold-dim); }
+        .card-icon.green { background: var(--accent-green-dim); }
+        .card-icon.purple { background: var(--accent-purple-dim); }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .card-stat {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 4px;
+        }
+
+        /* Two Column */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* Revenue Table */
+        .revenue-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+
+        .revenue-table th,
+        .revenue-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .revenue-table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .revenue-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .revenue-table .total td {
+            border-top: 2px solid var(--accent-gold);
+            border-bottom: none;
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 16px;
+        }
+
+        /* Use of Funds Bar */
+        .funds-bar {
+            display: flex;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 32px 0 24px;
+        }
+
+        .funds-bar div {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .funds-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .funds-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .funds-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .funds-legend-item span:last-child {
+            margin-left: auto;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Competitive Table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .comp-table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .comp-table .us td { background: rgba(212, 168, 67, 0.05); }
+
+        .check { color: var(--accent-green); }
+        .cross { color: #e74c3c; opacity: 0.6; }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .team-card .team-initials {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-gold-dim);
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 auto 14px;
+        }
+
+        .team-card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .team-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 100px 40px;
+            background: radial-gradient(ellipse at 50% 100%, rgba(212, 168, 67, 0.1) 0%, transparent 60%);
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .cta-btn:hover {
+            background: #e0b84e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(212, 168, 67, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* KPI chips */
+        .kpi-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Progress bars */
+        .metric-row {
+            margin-bottom: 20px;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .metric-label { color: var(--text-secondary); }
+        .metric-value { color: var(--text-primary); font-weight: 600; }
+
+        .metric-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-green));
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .topbar { padding: 0 20px; }
+            .topbar-nav { display: none; }
+            .hero { padding: 60px 20px 50px; }
+            .hero-stats { gap: 24px; }
+            .section { padding: 50px 20px; }
+            .two-col { grid-template-columns: 1fr; gap: 32px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .comp-table { font-size: 12px; }
+            .comp-table th, .comp-table td { padding: 10px 8px; }
+        }
+
+        /* Confidential watermark */
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.08);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="login-screen">
+    <div class="login-container">
+        <div class="login-logo">AWKN Within</div>
+        <div class="login-subtitle">Investor Portal</div>
+        <div class="login-tagline">
+            America's Leading Psychedelic-Integrated<br>Longevity Campus
+        </div>
+        <button class="google-btn" onclick="signInWithGoogle()">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Sign in with Google
+        </button>
+        <div class="login-error" id="login-error"></div>
+        <div class="login-note">Access restricted to authorized investors</div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div id="app">
+    <!-- Watermark -->
+    <div class="watermark">Confidential &mdash; Investor Use Only</div>
+
+    <!-- Top Bar -->
+    <nav class="topbar">
+        <div class="topbar-inner">
+            <div class="topbar-brand">AWKN Within</div>
+            <ul class="topbar-nav">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#traction">Traction</a></li>
+                <li><a href="#market">Market</a></li>
+                <li><a href="#funds">Use of Funds</a></li>
+                <li><a href="#team">Team</a></li>
+            </ul>
+            <div class="topbar-user">
+                <img class="topbar-avatar" id="user-avatar" src="" alt="">
+                <span class="topbar-email" id="user-email"></span>
+                <button class="btn-signout" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="overview">
+        <div class="hero-badge">$1M Raise &bull; $8M Pre-Money Valuation</div>
+        <h1>America's Leading<br><span class="gold">Psychedelic-Integrated</span><br>Longevity Campus</h1>
+        <p class="hero-sub">
+            The first national gold-standard psychedelic treatment and integration company.
+            A sanctuary where ancient wisdom meets modern medicine.
+        </p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">$1.65M</div>
+                <div class="hero-stat-label">2025 Revenue</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">30%</div>
+                <div class="hero-stat-label">Net Margins</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">4 yrs</div>
+                <div class="hero-stat-label">Operating History</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">1,200+</div>
+                <div class="hero-stat-label">Sessions Guided</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Executive Summary -->
+    <section class="section">
+        <div class="section-label">Executive Summary</div>
+        <h2>A Proven Model in an Emerging Market</h2>
+        <p class="section-desc">
+            Within Center &amp; AWKN Ranch operate a 12-acre wellness campus outside Austin, TX with three profitable revenue streams: psychedelic therapy, memberships, and venue rentals.
+        </p>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon gold">&#x1f4c8;</div>
+                <h3>Market Opportunity</h3>
+                <p>Projected $6.9B psychedelic therapeutics market by 2030 (10.6% CAGR), within a $1T wellness tourism and $80B longevity landscape.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">&#x2705;</div>
+                <h3>Proven Track Record</h3>
+                <p>4-year pioneer with $1.65M annual revenue, $81.5K/month average, 30% net margins across three revenue streams.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon purple">&#x1f3af;</div>
+                <h3>Gold-Standard Model</h3>
+                <p>Integrating psychedelic therapy with TMS, red-light, IVs, peptides, stem cells, bloodwork, and longevity care — no competitor matches this.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- The Problem -->
+    <section class="section" id="problem">
+        <div class="section-label">The Problem</div>
+        <h2>No Gold Standard Exists</h2>
+        <p class="section-desc">
+            No gold standard exists for safe psychedelic therapy and long-term integration — leaving patients without proven, full healing.
+        </p>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-stat">57M</div>
+                <h3>Growing Mental Health Crisis</h3>
+                <p>U.S. adults have mental illness; only 1/3 get effective help. Traditional meds fail 30-50% of patients. Psychedelics work faster but lack standards.</p>
+            </div>
+            <div class="card">
+                <div class="card-stat">1,500+</div>
+                <h3>Fragmented Clinics</h3>
+                <p>$3.4B market fragmented across 1,500+ clinics. Hundreds of clinics (Mindbloom $45M / Nue $23M raised) but no national leader with inpatient campus.</p>
+            </div>
+            <div class="card">
+                <div class="card-stat">80%</div>
+                <h3>No Real Integration</h3>
+                <p>80% of therapy benefits lost in 6 months without proper integration. Breakthroughs fade without structured aftercare, community, coaching, and support.</p>
+            </div>
+            <div class="card">
+                <div class="card-stat">400%</div>
+                <h3>Wide-Open Race</h3>
+                <p>Ketamine clinics up 400% since 2020 — no clear gold standard yet. No one has built the complete model: inpatient + community + longevity in one place.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- The Solution -->
+    <section class="section" id="solution">
+        <div class="section-label">Our Solution</div>
+        <h2>The Complete Model</h2>
+        <p class="section-desc">
+            Safe inpatient therapy + full integration on one campus — no competitor matches this combination.
+        </p>
+        <div class="two-col">
+            <div>
+                <div class="cards-grid" style="grid-template-columns: 1fr;">
+                    <div class="card">
+                        <div class="card-icon gold">&#x1f3e5;</div>
+                        <h3>Safe Medical-Grade Treatments</h3>
+                        <p>Inpatient ketamine in supervised, calming settings, plus TMS, peptides, stem cells, bloodwork, and functional medicine for rapid, profound healing.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon green">&#x1f91d;</div>
+                        <h3>Built-In Integration &amp; Aftercare</h3>
+                        <p>Ongoing therapy, coaching, community classes, IV hydration, ceremonies, and events — on-site support to make breakthroughs permanent.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon purple">&#x1f30e;</div>
+                        <h3>National Scaling Strategy</h3>
+                        <p>National/state credentialing + insurance pathways; leadership hires &amp; brand ambassador for nationwide scaling &amp; reimbursement.</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 24px; color: var(--text-primary);">Current Revenue Streams</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">All operating profitably on 3.5 acres of our 12-acre AWKN Ranch</p>
+                <div class="card" style="margin-bottom: 16px;">
+                    <h3>Psychedelic Treatments</h3>
+                    <p>Inpatient ketamine-assisted therapy, guided 2-week &amp; 4-week programs, medical consultations, conscious integration sessions, IV hydration</p>
+                </div>
+                <div class="card" style="margin-bottom: 16px;">
+                    <h3>Memberships</h3>
+                    <p>Recurring tiered models, unlimited group classes, access to saunas/cold plunge/red light, wellness workshops, integration coaching</p>
+                </div>
+                <div class="card">
+                    <h3>Venue Rental</h3>
+                    <p>High-margin event bookings: wellness center, temple space, saunas, cold plunges, hot tub, pickleball court, fire pit, yurts</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Traction -->
+    <section class="section" id="traction">
+        <div class="section-label">Traction &amp; Financials</div>
+        <h2>Consistent Revenue Growth</h2>
+        <p class="section-desc">
+            Four years of proven operations with growing revenue and strong margins — rare in early-stage wellness.
+        </p>
+        <div class="two-col">
+            <div>
+                <table class="revenue-table">
+                    <thead>
+                        <tr><th>Year</th><th style="text-align:right">Revenue</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2023</td><td>$1,300,000</td></tr>
+                        <tr><td>2024</td><td>$1,520,000</td></tr>
+                        <tr><td>2025</td><td>$1,650,000</td></tr>
+                        <tr class="total"><td>Net Income (2025)</td><td>$240,000</td></tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px;">Key Metrics</h3>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Monthly Run Rate</span>
+                            <span class="metric-value">$137.5K/mo</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 85%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Net Margins</span>
+                            <span class="metric-value">30%</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 30%"></div></div>
+                    </div>
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span class="metric-label">Campus Utilization (3.5 of 12 acres)</span>
+                            <span class="metric-value">29%</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 29%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 16px; margin-bottom: 20px;">Investment History</h3>
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <h3>Total Raised to Date</h3>
+                        <span style="font-size: 24px; font-weight: 800; color: var(--accent-gold);">$1.5M</span>
+                    </div>
+                    <p style="margin-top: 8px;">3 rounds of $500K (first round 2021, last round 2024)</p>
+                </div>
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <h3>Current Raise</h3>
+                        <span style="font-size: 24px; font-weight: 800; color: var(--accent-green);">$1M</span>
+                    </div>
+                    <p style="margin-top: 8px;">at $8M pre-money valuation</p>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 12px;">Operational Highlights</h3>
+                    <p><span class="kpi-chip">5-star reviews</span> <span class="kpi-chip">1,200+ sessions</span> <span class="kpi-chip">6 treatment beds</span> <span class="kpi-chip">12-acre campus</span> <span class="kpi-chip">All 3 streams profitable</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Market -->
+    <section class="section" id="market">
+        <div class="section-label">Market &amp; Competition</div>
+        <h2>$6.9B Fragmented Market</h2>
+        <p class="section-desc">
+            The psychedelic therapeutics market is booming. Texas committed $50M for ibogaine addiction research in June 2025 — trials centered in Austin.
+        </p>
+
+        <div class="cards-grid" style="margin-bottom: 48px;">
+            <div class="card">
+                <div class="card-stat">$6.9B</div>
+                <h3>Psychedelic Therapeutics</h3>
+                <p>Projected market by 2030 at 10.6% CAGR. Psilocybin gaining mainstream traction (Bloomberg Dec 2025).</p>
+            </div>
+            <div class="card">
+                <div class="card-stat">$1T</div>
+                <h3>Wellness Tourism</h3>
+                <p>Global wellness tourism opportunity. Immersive retreat experiences are the fastest-growing segment.</p>
+            </div>
+            <div class="card">
+                <div class="card-stat">$80B</div>
+                <h3>Longevity &amp; Functional Medicine</h3>
+                <p>Rapidly expanding market for anti-aging, peptides, stem cells, and functional diagnostics.</p>
+            </div>
+        </div>
+
+        <h3 style="font-size: 16px; margin-bottom: 8px;">Competitive Comparison</h3>
+        <div style="overflow-x: auto;">
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>HeartSpace (AWKN)</th>
+                        <th>Virtual Players<br>(Mindbloom/Nue)</th>
+                        <th>Clinic Chains<br>(Field Trip/Others)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="us">
+                        <td>Profitable</td>
+                        <td><span class="check">&#10003;</span> $1.65M / 30% margins</td>
+                        <td><span class="cross">&#10007;</span> Cash burn / unprofitable</td>
+                        <td><span class="cross">&#10007;</span> Closures post-hype</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Full On-Site Integration</td>
+                        <td><span class="check">&#10003;</span> Therapy, coaching, community</td>
+                        <td><span class="cross">&#10007;</span> Minimal or virtual only</td>
+                        <td><span class="cross">&#10007;</span> Limited aftercare</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Inpatient Campus</td>
+                        <td><span class="check">&#10003;</span> 12-acre ranch, 6 beds</td>
+                        <td><span class="cross">&#10007;</span> At-home only</td>
+                        <td><span class="cross">&#10007;</span> Inconsistent</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Medical-Grade + Longevity</td>
+                        <td><span class="check">&#10003;</span> Ketamine + TMS / peptides</td>
+                        <td><span class="cross">&#10007;</span> Self-administered lozenges</td>
+                        <td><span class="cross">&#10007;</span> Inconsistent</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Membership Model</td>
+                        <td><span class="check">&#10003;</span> Tiered recurring revenue</td>
+                        <td><span class="cross">&#10007;</span> Subscription only</td>
+                        <td><span class="cross">&#10007;</span> Session-based</td>
+                    </tr>
+                    <tr class="us">
+                        <td>Proven &amp; Scalable</td>
+                        <td><span class="check">&#10003;</span> 4 yrs operating profitably</td>
+                        <td><span class="cross">&#10007;</span> Overdose risks reported</td>
+                        <td><span class="cross">&#10007;</span> Closures post-hype</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Use of Funds -->
+    <section class="section" id="funds">
+        <div class="section-label">Use of Funds</div>
+        <h2>$550,000 Growth Capital Deployment</h2>
+        <p class="section-desc">
+            Strategic deployment to strengthen core revenue, launch scalable medical wellness, and reduce dependency on paid acquisition — with clear 2026 phase-out plans.
+        </p>
+
+        <div class="funds-bar">
+            <div style="width: 32%; background: var(--accent-gold);" title="Revenue Infrastructure"></div>
+            <div style="width: 12%; background: var(--accent-green);" title="Marketing"></div>
+            <div style="width: 10%; background: var(--accent-purple);" title="Integration Program"></div>
+            <div style="width: 12%; background: var(--accent-blue);" title="Medical Wellness"></div>
+            <div style="width: 30%; background: #6b6b80;" title="Capital Reserves"></div>
+            <div style="width: 4%; background: #8B6914;" title="Property"></div>
+        </div>
+
+        <div class="funds-legend" style="margin-bottom: 48px;">
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-gold);"></div>
+                Revenue Infrastructure
+                <span>$160K (32%)</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-green);"></div>
+                Marketing &amp; Acquisition
+                <span>$60K (12%)</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-purple);"></div>
+                Integration Program
+                <span>$50K (10%)</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: var(--accent-blue);"></div>
+                Medical Wellness (IV/Labs)
+                <span>$60K (12%)</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: #6b6b80;"></div>
+                Capital Reserves
+                <span>$170K (30%)</span>
+            </div>
+            <div class="funds-legend-item">
+                <div class="funds-dot" style="background: #8B6914;"></div>
+                Property Improvements
+                <span>$20K (4%)</span>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Revenue Infrastructure — $160K</h3>
+                <p style="margin-bottom: 12px;"><strong>VP of Business Development</strong> ($120K/12mo) — Build referral channel to reduce paid ad reliance.</p>
+                <p><span class="kpi-chip">5-10 new partners/mo</span> <span class="kpi-chip">25-35% referral revenue by Q4</span> <span class="kpi-chip">$750K-$950K attributable revenue</span></p>
+            </div>
+            <div class="card">
+                <h3>Marketing — $100K</h3>
+                <p style="margin-bottom: 12px;"><strong>Performance + Brand Media</strong> — Google Ads, Meta retargeting, SEO, video production, social campaigns.</p>
+                <p><span class="kpi-chip">3-5x ROAS</span> <span class="kpi-chip">CPA &le; 15-20%</span> <span class="kpi-chip">$100K monthly revenue target</span></p>
+            </div>
+            <div class="card">
+                <h3>Integration Program — $50K</h3>
+                <p style="margin-bottom: 12px;"><strong>Monthly subscription aftercare</strong> — Staff for integration coaching, admin support, community programs.</p>
+                <p><span class="kpi-chip">30-50% enrollment</span> <span class="kpi-chip">20-40% LTV increase</span> <span class="kpi-chip">$7.5K/mo by month 6</span></p>
+            </div>
+            <div class="card">
+                <h3>Medical Wellness — $50K</h3>
+                <p style="margin-bottom: 12px;"><strong>IV Therapy &amp; Drip Lounge</strong> — Infrastructure, protocols, nursing staff, compliance, marketing.</p>
+                <p><span class="kpi-chip">$20-30K/mo by month 6</span> <span class="kpi-chip">&ge;60% gross margin</span> <span class="kpi-chip">Cash-flow positive 6-9 mo</span></p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Growth Strategy -->
+    <section class="section">
+        <div class="section-label">Growth Strategy</div>
+        <h2>Phase 2: Scale &amp; Expand</h2>
+        <p class="section-desc">
+            Maximize current resources, expand capacity, then replicate the model nationally.
+        </p>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon gold">&#x1f3d7;</div>
+                <h3>Campus Expansion</h3>
+                <p>Develop 4 more acres with 25 lodging geodomes &amp; geo village. Expand venue rental space (Maloka). Add 6+ practitioner spaces and new build-outs.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">&#x1f4ca;</div>
+                <h3>Revenue Scaling</h3>
+                <p>7 new inpatient beds at $22K/bed/mo = $154K additional monthly revenue. Membership model targeting 50+ monthly members. Goal: $3.3M total annual revenue.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon purple">&#x1f680;</div>
+                <h3>National Rollout</h3>
+                <p>Once proven, scale to new cities and repeat. National credentialing &amp; insurance pathways. Branded as America's premier psychedelic-integrated longevity campus.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Team -->
+    <section class="section" id="team">
+        <div class="section-label">Leadership</div>
+        <h2>Our Team</h2>
+        <p class="section-desc">
+            Experienced operators with deep roots in healthcare, psychedelic medicine, and entrepreneurship.
+        </p>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-initials">WN</div>
+                <h4>William Naylor</h4>
+                <p>Founder &amp; CEO</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">JK</div>
+                <h4>Dr. Julie Kaesber, MD</h4>
+                <p>Anesthesiologist</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">AM</div>
+                <h4>Ayesha Macon</h4>
+                <p>Psychiatric NP, PMHNP</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">AA</div>
+                <h4>Alyssa Ablan</h4>
+                <p>Lead Clinical Director</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">JD</div>
+                <h4>Justin De La Cruz</h4>
+                <p>Operations Manager</p>
+            </div>
+            <div class="team-card">
+                <div class="team-initials">DN</div>
+                <h4>Danielle Napier</h4>
+                <p>Psychiatric Nurse, RN, BCH, CCHt — Lead Guide</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
+    <section class="cta-section" id="ask">
+        <div class="section-label">The Ask</div>
+        <h2>$1M at $8M Pre-Money</h2>
+        <p>
+            Invest in national business development leadership, scale marketing with measurable acquisition,<br>
+            upgrade client experience, and increase clinical capacity &amp; operating runway.
+        </p>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">
+            Join us in transforming psychedelic wellness.
+        </p>
+        <a href="mailto:william@within.center" class="cta-btn">Contact Us</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved. This document is confidential and intended solely for the use of authorized investors.</p>
+    </footer>
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+    const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Check auth state on load
+    sb.auth.onAuthStateChange((event, session) => {
+        if (session && session.user) {
+            showApp(session.user);
+        } else {
+            showLogin();
+        }
+    });
+
+    async function signInWithGoogle() {
+        const { error } = await sb.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
+            }
+        });
+        if (error) {
+            document.getElementById('login-error').textContent = error.message;
+            document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    async function signOut() {
+        await sb.auth.signOut();
+        showLogin();
+    }
+
+    function showApp(user) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app').classList.add('visible');
+
+        const avatar = user.user_metadata?.avatar_url || '';
+        const email = user.email || '';
+        const name = user.user_metadata?.full_name || email;
+
+        if (avatar) {
+            document.getElementById('user-avatar').src = avatar;
+            document.getElementById('user-avatar').style.display = 'block';
+        } else {
+            document.getElementById('user-avatar').style.display = 'none';
+        }
+        document.getElementById('user-email').textContent = name;
+    }
+
+    function showLogin() {
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('app').classList.remove('visible');
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('.topbar-nav a').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+</script>
+</body>
+</html>
