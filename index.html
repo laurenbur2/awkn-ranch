@@ -1,108 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <title>The Austin YOUR_PROPERTY_NAME</title>
-  <meta name="description" content="At the Austin YOUR_PROPERTY_NAME our mission is to let your Property Dreams run free. Our goal is to redefine your idea of what an YOUR_PROPERTY_NAME can be.">
-  <meta name="facebook-domain-verification" content="b80sfd6vsd4k9n0xmojhitut710nbl" />
-  <link rel="canonical" href="https://YOUR_DOMAIN/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWKN Ranch | Where Consciousness Meets Community</title>
+    <meta name="description" content="AWKN Ranch - A wellness and retreat center in Austin, TX offering healing, events, membership, and venue rental.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://YOUR_DOMAIN/">
-  <meta property="og:title" content="The Austin YOUR_PROPERTY_NAME">
-  <meta property="og:description" content="At the Austin YOUR_PROPERTY_NAME our mission is to let your Property Dreams run free. Our goal is to redefine your idea of what an YOUR_PROPERTY_NAME can be.">
-  <meta property="og:site_name" content="Austin YOUR_PROPERTY_NAME">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:image" content="https://YOUR_DOMAIN/shared/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+        :root {
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+            --brown-dark: #3a2a1a;
+            --brown: #6b4c2a;
+            --brown-light: #a67c52;
+            --cream: #f5f0e8;
+            --offwhite: #faf8f4;
+            --white: #ffffff;
+        }
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The Austin YOUR_PROPERTY_NAME">
-  <meta name="twitter:description" content="At the Austin YOUR_PROPERTY_NAME our mission is to let your Property Dreams run free. Our goal is to redefine your idea of what an YOUR_PROPERTY_NAME can be.">
-  <meta name="twitter:image" content="https://YOUR_DOMAIN/shared/og-image.jpg">
+        body {
+            font-family: var(--font-body);
+            color: #333;
+            background: var(--offwhite);
+            -webkit-font-smoothing: antialiased;
+        }
 
-  <!-- JSON-LD: WebSite -->
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebSite","name":"Austin YOUR_PROPERTY_NAME","url":"https://YOUR_DOMAIN/","description":"Creative compound in Your City, Texas","publisher":{"@type":"Organization","name":"Austin YOUR_PROPERTY_NAME"}}
-  </script>
+        /* NAV */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 28px; font-weight: 400;
+            color: var(--brown-dark);
+            text-decoration: none; letter-spacing: 2px;
+        }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            font-size: 12px; font-weight: 500;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--brown-dark); text-decoration: none;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--brown-light); }
 
-  <!-- JSON-LD: LocalBusiness -->
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"LocalBusiness","name":"Austin YOUR_PROPERTY_NAME","url":"https://YOUR_DOMAIN/","telephone":"+17377474737","address":{"@type":"PostalAddress","streetAddress":"123 Main Stive","addressLocality":"Your City","addressRegion":"TX","postalCode":"00000","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":30.13,"longitude":-97.46},"sameAs":["https://www.instagram.com/yourorgatx/"],"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"10:00","closes":"17:00"},"founder":{"@type":"Person","name":"Rahul Sonnad","url":"https://YOUR_DOMAIN/rahulio/bio/"}}
-  </script>
+        /* HERO */
+        .hero {
+            height: 100vh; min-height: 600px;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, var(--brown-dark) 0%, #2a1f14 50%, #1a140d 100%);
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(166,124,82,0.15) 0%, transparent 70%),
+                        radial-gradient(ellipse at 70% 30%, rgba(107,76,42,0.1) 0%, transparent 60%);
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 24px; }
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 300; color: var(--white);
+            line-height: 1.15; margin-bottom: 16px; letter-spacing: 1px;
+        }
+        .hero .subtitle {
+            font-size: clamp(13px, 1.5vw, 16px);
+            font-weight: 300; letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 48px;
+        }
+        .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
-  <!-- JSON-LD: BreadcrumbList -->
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://YOUR_DOMAIN/"}]}
-  </script>
+        /* BUTTONS */
+        .btn {
+            display: inline-block; padding: 14px 36px;
+            font-family: var(--font-body);
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+            text-decoration: none; transition: all 0.3s; cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--brown-light); color: var(--white);
+            border: 1px solid var(--brown-light);
+        }
+        .btn-primary:hover { background: var(--brown); border-color: var(--brown); }
+        .btn-outline {
+            background: transparent; color: var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--white); }
+        .btn-dark {
+            background: var(--brown-dark); color: var(--white);
+            border: 1px solid var(--brown-dark);
+        }
+        .btn-dark:hover { background: #2a1f14; }
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="/styles/site.css">
-  <link rel="stylesheet" href="/styles/tailwind.out.css">
+        /* SECTIONS */
+        section { padding: 100px 24px; }
+        .section-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 60px; align-items: center;
+        }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: clamp(32px, 4vw, 52px);
+            font-weight: 300; line-height: 1.2;
+            color: var(--brown-dark); margin-bottom: 24px;
+        }
+        .section-text {
+            font-size: 15px; line-height: 1.9;
+            color: #666; margin-bottom: 32px;
+        }
+        .lead {
+            font-family: var(--font-heading);
+            font-size: 20px; font-style: italic;
+            color: var(--brown); line-height: 1.6; margin-bottom: 20px;
+        }
+        .img-placeholder {
+            width: 100%; height: 450px;
+            background: linear-gradient(135deg, var(--cream) 0%, #e8ddd0 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-heading); font-size: 18px;
+            color: var(--brown-light); font-style: italic;
+        }
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/favicon.png">
+        /* OFFERINGS */
+        .offerings { background: var(--white); }
+        .offerings-header { text-align: center; margin-bottom: 60px; }
+        .offerings-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+        }
+        .offering-card {
+            text-align: center; padding: 48px 32px;
+            background: var(--offwhite); transition: transform 0.3s;
+        }
+        .offering-card:hover { transform: translateY(-4px); }
+        .offering-icon { font-size: 36px; margin-bottom: 20px; display: block; }
+        .offering-card h3 {
+            font-family: var(--font-heading);
+            font-size: 24px; font-weight: 400;
+            color: var(--brown-dark); margin-bottom: 12px;
+        }
+        .offering-card p {
+            font-size: 14px; line-height: 1.7; color: #888; margin-bottom: 24px;
+        }
+
+        /* QUOTE */
+        .quote-section {
+            background: var(--brown-dark); text-align: center; padding: 100px 24px;
+        }
+        .quote-section blockquote {
+            max-width: 700px; margin: 0 auto;
+            font-family: var(--font-heading);
+            font-size: clamp(20px, 2.5vw, 28px);
+            font-weight: 300; font-style: italic;
+            line-height: 1.7; color: rgba(255,255,255,0.9);
+        }
+
+        /* FOOTER */
+        footer {
+            background: #1a140d; color: rgba(255,255,255,0.6); padding: 60px 24px 30px;
+        }
+        .footer-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+        }
+        .footer-brand .logo { color: var(--white); font-size: 24px; display: block; margin-bottom: 16px; }
+        .footer-brand p { font-size: 13px; line-height: 1.7; }
+        footer h4 {
+            font-family: var(--font-heading); font-size: 16px;
+            font-weight: 400; color: var(--white); margin-bottom: 16px;
+        }
+        footer ul { list-style: none; }
+        footer li { margin-bottom: 8px; }
+        footer a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; }
+        footer a:hover { color: var(--white); }
+        .footer-bottom {
+            max-width: 1200px; margin: 40px auto 0;
+            padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center; font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; }
+            .nav-links { display: none; }
+            .section-grid { grid-template-columns: 1fr; gap: 30px; }
+            .offerings-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .img-placeholder { height: 300px; }
+        }
+    </style>
 </head>
 <body>
-  <span data-site-version style="display:none;">v260326.03 6:47p</span>
-  <div id="siteHeader"></div>
-  <h1 class="sr-only">Austin YOUR_PROPERTY_NAME — Creative Compound in Your City, Texas</h1>
 
-  <!-- Hero Section -->
-  <section class="aap-hero" style="background-image: url('YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/site/hero-property.jpeg')">
-    <div class="aap-hero__content">
-      <p class="aap-hero__subtitle" style="margin-top: 2rem;">
-        At the Austin YOUR_PROPERTY_NAME our mission is to let your Property Dreams run free. Our goal is to redefine your idea of what an YOUR_PROPERTY_NAME can be. When it comes to selecting an YOUR_PROPERTY_NAME, we feel no one need settle.
-      </p>
+    <nav>
+        <a href="./" class="logo">AWKN Ranch</a>
+        <ul class="nav-links">
+            <li><a href="./">Home</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Offerings</a></li>
+            <li><a href="#">Membership</a></li>
+            <li><a href="#">Host An Event</a></li>
+            <li><a href="#">Connect</a></li>
+        </ul>
+    </nav>
 
-      <a href="/spaces/" class="aap-btn aap-btn--outline aap-btn--light" style="margin-top: 1rem;">View Available Spaces</a>
-    </div>
-  </section>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to<br>AWKN Ranch</h1>
+            <p class="subtitle">Where consciousness meets community</p>
+            <div class="hero-ctas">
+                <a href="#" class="btn btn-primary">Explore Membership</a>
+                <a href="#" class="btn btn-outline">Get A Day Pass</a>
+            </div>
+        </div>
+    </section>
 
-  <!-- Footer -->
-  <footer class="aap-footer">
-    <div class="aap-footer__content">
-      <div class="aap-footer__logo">
-        <img width="21" height="30" src="YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/logos/logo-white-transparent.png" alt="YOUR_PROPERTY_NAME Austin" class="aap-footer__icon">
-            <img width="22" height="22" src="YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/logos/wordmark-white-transparent.png" alt="YOUR_PROPERTY_NAME Austin" class="aap-footer__wordmark">
-      </div>
+    <section style="background: var(--offwhite);">
+        <div class="section-grid">
+            <div>
+                <h2 class="section-title">Connect<br>Transform<br>AWKN</h2>
+                <p class="section-text">At AWKN Ranch, ancient knowledge meets modern wellness in the heart of the Texas Hill Country. We are a sanctuary for those seeking authentic connection, personal transformation, and community rooted in the wisdom of the ages.</p>
+                <a href="#" class="btn btn-dark">Get In Now</a>
+            </div>
+            <div class="img-placeholder">Photo coming soon</div>
+        </div>
+    </section>
 
-      <div class="aap-footer__social">
-        <a href="https://www.facebook.com/yourorg" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-          </svg>
-        </a>
-        <a href="https://instagram.com/yourorgatx" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="18" cy="6" r="1" fill="currentColor"/>
-          </svg>
-        </a>
-      </div>
+    <section class="offerings">
+        <div class="offerings-header">
+            <h2 class="section-title">What We Offer</h2>
+        </div>
+        <div class="offerings-grid">
+            <div class="offering-card">
+                <span class="offering-icon">&#9758;</span>
+                <h3>Events</h3>
+                <p>Sound baths, breathwork, community gatherings, and transformative experiences throughout the week.</p>
+                <a href="#" class="btn btn-dark">View Events</a>
+            </div>
+            <div class="offering-card">
+                <span class="offering-icon">&#9672;</span>
+                <h3>Membership</h3>
+                <p>Join our community for unlimited access to the ranch, events, wellness amenities, and member-only perks.</p>
+                <a href="#" class="btn btn-dark">Learn More</a>
+            </div>
+            <div class="offering-card">
+                <span class="offering-icon">&#9733;</span>
+                <h3>Host Your Event</h3>
+                <p>A stunning Hill Country venue for retreats, workshops, weddings, and private gatherings.</p>
+                <a href="#" class="btn btn-dark">Inquire</a>
+            </div>
+        </div>
+    </section>
 
-      <p class="aap-footer__copyright">
-        © 2026 Austin YOUR_PROPERTY_NAME. All rights reserved.<br>
-        123 Main Stive, Your City, TX 00000
-      </p>
-    </div>
-  </footer>
+    <section style="background: var(--offwhite);">
+        <div class="section-grid">
+            <div class="img-placeholder">Photo coming soon</div>
+            <div>
+                <h2 class="section-title">Our Vision</h2>
+                <p class="lead">At AWKN Ranch, we believe healing works best when the whole person is supported.</p>
+                <p class="section-text">Our integrated approach brings together functional medicine, mental health support, psychedelic-assisted therapy, life coaching, wellness practices, and authentic community. Each element strengthens the others, creating a foundation for lasting transformation and growth.</p>
+                <a href="#" class="btn btn-dark">Our Offerings</a>
+            </div>
+        </div>
+    </section>
 
-  <script src="/vendor/supabase-js-2.39.3.min.js"></script>
-  <script type="module" src="shared/version-info.js"></script>
-  <script type="module">
-    import { initPublicPage } from './shared/public-shell.js';
+    <section class="quote-section">
+        <blockquote>
+            &ldquo;Return to the essence of who you are &mdash; rooted in nature, connected to community, and inspired by the wisdom of the ages.&rdquo;
+        </blockquote>
+    </section>
 
-    initPublicPage({ transparent: true, light: true });
-  </script>
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="./" class="logo">AWKN Ranch</a>
+                <p>A wellness and retreat center in Austin, TX. Where consciousness meets community.</p>
+            </div>
+            <div>
+                <h4>Navigate</h4>
+                <ul>
+                    <li><a href="./">Home</a></li>
+                    <li><a href="#">Events</a></li>
+                    <li><a href="#">Offerings</a></li>
+                    <li><a href="#">Membership</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="tel:5125159924">512-515-9924</a></li>
+                    <li><a href="mailto:connect@awknranch.com">connect@awknranch.com</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Hours</h4>
+                <ul>
+                    <li>Mon&ndash;Fri: 9am&ndash;9pm</li>
+                    <li>Saturday: 9am&ndash;8pm</li>
+                    <li>Sunday: 10am&ndash;6pm</li>
+                </ul>
+                <h4 style="margin-top: 20px;">Location</h4>
+                <ul>
+                    <li><a href="https://maps.google.com/?q=7600+Stillridge+Dr+Austin+TX+78736" target="_blank">7600 Stillridge Dr<br>Austin, TX 78736</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AWKN Ranch. All rights reserved.</p>
+        </div>
+    </footer>
+
 </body>
 </html>
