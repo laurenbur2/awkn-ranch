@@ -58,12 +58,16 @@
             height: 100vh; min-height: 600px;
             display: flex; align-items: center; justify-content: center;
             text-align: center; position: relative; overflow: hidden;
-            background: linear-gradient(135deg, var(--brown-dark) 0%, #2a1f14 50%, #1a140d 100%);
         }
-        .hero::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(166,124,82,0.15) 0%, transparent 70%),
-                        radial-gradient(ellipse at 70% 30%, rgba(107,76,42,0.1) 0%, transparent 60%);
+        .hero-bg {
+            position: absolute; inset: 0; z-index: 0;
+        }
+        .hero-bg img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: rgba(26,26,26,0.4); z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 24px; }
         .hero h1 {
@@ -143,9 +147,14 @@
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
         }
         .offering-card {
-            text-align: center; padding: 48px 32px;
+            text-align: center; padding: 0;
             background: var(--offwhite); transition: transform 0.3s;
+            overflow: hidden;
         }
+        .offering-card img {
+            width: 100%; height: 220px; object-fit: cover;
+        }
+        .offering-card-text { padding: 32px; }
         .offering-card:hover { transform: translateY(-4px); }
         .offering-icon { font-size: 36px; margin-bottom: 20px; display: block; }
         .offering-card h3 {
@@ -159,9 +168,20 @@
 
         /* QUOTE */
         .quote-section {
-            background: var(--brown-dark); text-align: center; padding: 100px 24px;
+            position: relative; text-align: center; padding: 120px 24px; overflow: hidden;
+        }
+        .quote-bg {
+            position: absolute; inset: 0;
+        }
+        .quote-bg img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .quote-overlay {
+            position: absolute; inset: 0;
+            background: rgba(26,26,26,0.6);
         }
         .quote-section blockquote {
+            position: relative; z-index: 2;
             max-width: 700px; margin: 0 auto;
             font-family: var(--font-heading);
             font-size: clamp(20px, 2.5vw, 28px);
@@ -206,7 +226,7 @@
 <body>
 
     <nav>
-        <a href="./" class="logo">AWKN Ranch</a>
+        <a href="./" class="logo"><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch" style="height:40px;"></a>
         <ul class="nav-links">
             <li><a href="./">Home</a></li>
             <li><a href="#">Events</a></li>
@@ -218,6 +238,10 @@
     </nav>
 
     <section class="hero">
+        <div class="hero-bg">
+            <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/32553974-337e-4eff-b61c-4c62d726da2b/IMG_5579.jpg" alt="AWKN Ranch interior">
+        </div>
+        <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Welcome to<br>AWKN Ranch</h1>
             <p class="subtitle">Where consciousness meets community</p>
@@ -235,7 +259,7 @@
                 <p class="section-text">At AWKN Ranch, ancient knowledge meets modern wellness in the heart of the Texas Hill Country. We are a sanctuary for those seeking authentic connection, personal transformation, and community rooted in the wisdom of the ages.</p>
                 <a href="#" class="btn btn-dark">Get In Now</a>
             </div>
-            <div class="img-placeholder">Photo coming soon</div>
+            <div><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/cbbf27c9-7557-4ddd-b4ab-ed52ac81c194/PC230227-Enhanced-NR.jpg" alt="AWKN Ranch space" style="width:100%;height:450px;object-fit:cover;"></div>
         </div>
     </section>
 
@@ -245,29 +269,35 @@
         </div>
         <div class="offerings-grid">
             <div class="offering-card">
-                <span class="offering-icon">&#9758;</span>
-                <h3>Events</h3>
-                <p>Sound baths, breathwork, community gatherings, and transformative experiences throughout the week.</p>
-                <a href="#" class="btn btn-dark">View Events</a>
+                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/b9084d60-3178-4880-911d-65218001958f/e2c8b0ea-dbf7-4192-8d27-cec7724b3ee1.jpg" alt="AWKN Ranch events">
+                <div class="offering-card-text">
+                    <h3>Events</h3>
+                    <p>Sound baths, breathwork, community gatherings, and transformative experiences throughout the week.</p>
+                    <a href="#" class="btn btn-dark">View Events</a>
+                </div>
             </div>
             <div class="offering-card">
-                <span class="offering-icon">&#9672;</span>
-                <h3>Membership</h3>
-                <p>Join our community for unlimited access to the ranch, events, wellness amenities, and member-only perks.</p>
-                <a href="#" class="btn btn-dark">Learn More</a>
+                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/6f6766f9-eaee-40b5-8708-4b6c1bf3bc39/ea06753c-76b3-4ee9-a407-cb8b503c8e05.jpg" alt="AWKN Ranch membership">
+                <div class="offering-card-text">
+                    <h3>Membership</h3>
+                    <p>Join our community for unlimited access to the ranch, events, wellness amenities, and member-only perks.</p>
+                    <a href="#" class="btn btn-dark">Learn More</a>
+                </div>
             </div>
             <div class="offering-card">
-                <span class="offering-icon">&#9733;</span>
-                <h3>Host Your Event</h3>
-                <p>A stunning Hill Country venue for retreats, workshops, weddings, and private gatherings.</p>
-                <a href="#" class="btn btn-dark">Inquire</a>
+                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/60bd0b08-73ec-4532-bde5-fd1f7827017b/PC230062-Enhanced-NR.jpg" alt="AWKN Ranch venue">
+                <div class="offering-card-text">
+                    <h3>Host Your Event</h3>
+                    <p>A stunning Hill Country venue for retreats, workshops, weddings, and private gatherings.</p>
+                    <a href="#" class="btn btn-dark">Inquire</a>
+                </div>
             </div>
         </div>
     </section>
 
     <section style="background: var(--offwhite);">
         <div class="section-grid">
-            <div class="img-placeholder">Photo coming soon</div>
+            <div><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="AWKN Ranch wellness space" style="width:100%;height:450px;object-fit:cover;"></div>
             <div>
                 <h2 class="section-title">Our Vision</h2>
                 <p class="lead">At AWKN Ranch, we believe healing works best when the whole person is supported.</p>
@@ -278,6 +308,10 @@
     </section>
 
     <section class="quote-section">
+        <div class="quote-bg">
+            <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/a33e1895-9d7b-4d7e-a8f7-47be83a776cb/2.png" alt="">
+        </div>
+        <div class="quote-overlay"></div>
         <blockquote>
             &ldquo;Return to the essence of who you are &mdash; rooted in nature, connected to community, and inspired by the wisdom of the ages.&rdquo;
         </blockquote>
