@@ -1,12 +1,12 @@
 {
-  "version": "v260327.01 1:33a",
-  "release": 1,
-  "sha": "e5cfcb9",
-  "fullSha": "e5cfcb9d167cced010927a7a4a1f7fb1e028742d",
+  "version": "v260327.02 2:21a",
+  "release": 2,
+  "sha": "f53a303",
+  "fullSha": "f53a3034dc58e59de663246f09ed74d1e1e2fb15",
   "actor": "justinwithin",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-26T20:33:14-05:00",
-  "commits": [{"sha":"e5cfcb9","message":"Redesign capital deployment section with donut chart and strategic categories","author":"Justin DeLaCruz"}]
+  "machine": "runnervm46oaq",
+  "pushedAt": "2026-03-26T21:21:16-05:00",
+  "commits": [{"sha":"f53a303","message":"Update color scheme to warm earth tones for holistic hospitality feel","author":"Justin DeLaCruz"}]
 }
