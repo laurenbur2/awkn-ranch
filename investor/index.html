@@ -187,13 +187,40 @@
         .comp-table .old td:nth-child(2) { color: #e74c3c; opacity: 0.8; }
         .comp-table .old td:nth-child(3) { color: var(--accent-green); }
 
-        /* Funds */
-        .funds-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 32px 0 24px; }
-        .funds-bar div { height: 100%; }
-        .funds-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-        .funds-legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); }
-        .funds-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-        .funds-legend-item span:last-child { margin-left: auto; font-weight: 600; color: var(--text-primary); }
+        /* Funds - Donut Chart */
+        .funds-layout { display: grid; grid-template-columns: 340px 1fr; gap: 56px; align-items: start; margin-top: 40px; }
+        .donut-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+        .donut-chart { width: 100%; height: 100%; border-radius: 50%; position: relative; }
+        .donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .donut-chart circle { fill: none; stroke-width: 32; cx: 140; cy: 140; r: 110; }
+        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .donut-center-amount { font-size: 36px; font-weight: 800; color: var(--accent-gold); }
+        .donut-center-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; }
+        .funds-categories { display: flex; flex-direction: column; gap: 32px; }
+        .funds-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: all 0.3s; }
+        .funds-category:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
+        .funds-cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .funds-cat-label { display: flex; align-items: center; gap: 10px; }
+        .funds-cat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .funds-cat-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .funds-cat-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .funds-cat-total { font-size: 22px; font-weight: 800; }
+        .funds-cat-pct { font-size: 11px; color: var(--text-muted); text-align: right; }
+        .funds-items { display: flex; flex-direction: column; gap: 10px; }
+        .funds-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); }
+        .funds-item-left { display: flex; align-items: center; gap: 10px; }
+        .funds-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .funds-item-name { font-size: 13px; color: var(--text-secondary); }
+        .funds-item-right { text-align: right; }
+        .funds-item-amount { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .funds-item-roi { font-size: 11px; color: var(--accent-green); margin-top: 1px; }
+        .funds-impact-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 16px; overflow: hidden; }
+        .funds-impact-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+        @media (max-width: 768px) {
+            .funds-layout { grid-template-columns: 1fr; gap: 32px; }
+            .donut-wrap { width: 220px; height: 220px; }
+        }
 
         /* KPI chips */
         .kpi-chip { display: inline-block; padding: 4px 10px; background: var(--accent-green-dim); color: var(--accent-green); border-radius: 4px; font-size: 12px; font-weight: 600; margin: 2px; }
@@ -718,73 +745,245 @@
         <div class="section-label">Use of Funds</div>
         <h2>$300,000 Capital Deployment</h2>
         <p class="section-desc">
-            Capital directly expands revenue-generating capacity, enhances guest experience, and accelerates path to profitability.
+            Capital is allocated across three strategic pillars &mdash; each designed to generate revenue, reduce risk, and accelerate our path to profitability.
         </p>
 
-        <div class="funds-bar">
-            <div style="width: 35%; background: var(--accent-gold);" title="Working Capital"></div>
-            <div style="width: 17%; background: var(--accent-green);" title="Maloka Dome"></div>
-            <div style="width: 10%; background: var(--accent-purple);" title="Marketing"></div>
-            <div style="width: 15%; background: var(--accent-blue);" title="Infrastructure"></div>
-            <div style="width: 10%; background: #8B6914;" title="People"></div>
-            <div style="width: 7%; background: #6b6b80;" title="AI & Tech"></div>
-            <div style="width: 6%; background: #557755;" title="Brand"></div>
+        <div class="funds-layout">
+            <!-- Donut Chart -->
+            <div>
+                <div class="donut-wrap">
+                    <div class="donut-chart">
+                        <svg viewBox="0 0 280 280">
+                            <!-- Revenue Infrastructure: $95K = 31.7% → stroke-dasharray: 691 * 0.317 = 219, gap = 472 -->
+                            <circle stroke="var(--accent-gold)" stroke-dasharray="219 472" stroke-dashoffset="0" r="110" cx="140" cy="140" />
+                            <!-- Growth & Marketing: $64K = 21.3% → 147, gap = 544 -->
+                            <circle stroke="var(--accent-green)" stroke-dasharray="147 544" stroke-dashoffset="-219" r="110" cx="140" cy="140" />
+                            <!-- Operations & Reserves: $141K = 47% → 325, gap = 366 -->
+                            <circle stroke="var(--accent-purple)" stroke-dasharray="325 366" stroke-dashoffset="-366" r="110" cx="140" cy="140" />
+                        </svg>
+                        <div class="donut-center">
+                            <div class="donut-center-amount">$300K</div>
+                            <div class="donut-center-label">Total Raise</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Quick legend under donut -->
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 24px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-gold);"></div>
+                        Revenue Assets
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-green);"></div>
+                        Growth
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-purple);"></div>
+                        Operations
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="funds-categories">
+
+                <!-- Category 1: Revenue Infrastructure -->
+                <div class="funds-category">
+                    <div class="funds-cat-header">
+                        <div class="funds-cat-label">
+                            <div class="funds-cat-icon" style="background: var(--accent-gold-dim);">&#x1f3d7;</div>
+                            <div>
+                                <div class="funds-cat-title">Revenue-Generating Assets</div>
+                                <div class="funds-cat-subtitle">Direct capacity expansion &amp; property upgrades</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="funds-cat-total" style="color: var(--accent-gold);">$95,000</div>
+                            <div class="funds-cat-pct">31.7% of raise</div>
+                        </div>
+                    </div>
+                    <div class="funds-items">
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
+                                <div class="funds-item-name">Maloka Dome &mdash; install &amp; furnish</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$50,000</div>
+                                <div class="funds-item-roi">&#x2191; $32K&ndash;$58K/mo &bull; &lt;2 mo payback</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
+                                <div class="funds-item-name">Retreat house upgrades (10-bed capacity)</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$20,000</div>
+                                <div class="funds-item-roi">&#x2191; Unlocks $15K&ndash;$22K/mo</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
+                                <div class="funds-item-name">Landscaping, lighting &amp; guest experience</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$20,000</div>
+                                <div class="funds-item-roi">&#x2191; Premium pricing support</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
+                                <div class="funds-item-name">Ranch signage &amp; wayfinding</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$5,000</div>
+                                <div class="funds-item-roi">&#x2191; Brand presence</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="funds-impact-bar">
+                        <div class="funds-impact-fill" style="width: 95%; background: linear-gradient(90deg, var(--accent-gold), #e0b84e);"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+                        <span>Revenue Impact</span>
+                        <span style="color: var(--accent-gold);">&#x2605; Highest ROI</span>
+                    </div>
+                </div>
+
+                <!-- Category 2: Growth & Marketing -->
+                <div class="funds-category">
+                    <div class="funds-cat-header">
+                        <div class="funds-cat-label">
+                            <div class="funds-cat-icon" style="background: var(--accent-green-dim);">&#x1f4c8;</div>
+                            <div>
+                                <div class="funds-cat-title">Growth &amp; Marketing</div>
+                                <div class="funds-cat-subtitle">Demand generation, content &amp; technology</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="funds-cat-total" style="color: var(--accent-green);">$64,000</div>
+                            <div class="funds-cat-pct">21.3% of raise</div>
+                        </div>
+                    </div>
+                    <div class="funds-items">
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
+                                <div class="funds-item-name">Marketing, content &amp; brand repositioning</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$30,000</div>
+                                <div class="funds-item-roi">&#x2191; Direct booking pipeline</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
+                                <div class="funds-item-name">Google &amp; Meta Ads (3-month launch)</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$24,000</div>
+                                <div class="funds-item-roi">&#x2191; $8K/mo &rarr; occupancy ramp</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
+                                <div class="funds-item-name">AI system build-out &amp; automation</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$10,000</div>
+                                <div class="funds-item-roi">&#x2191; Reduces headcount cost</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="funds-impact-bar">
+                        <div class="funds-impact-fill" style="width: 75%; background: linear-gradient(90deg, var(--accent-green), #4ec09c);"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+                        <span>Revenue Impact</span>
+                        <span style="color: var(--accent-green);">Demand Multiplier</span>
+                    </div>
+                </div>
+
+                <!-- Category 3: Operations & Reserves -->
+                <div class="funds-category">
+                    <div class="funds-cat-header">
+                        <div class="funds-cat-label">
+                            <div class="funds-cat-icon" style="background: var(--accent-purple-dim);">&#x1f6e1;</div>
+                            <div>
+                                <div class="funds-cat-title">Operations &amp; Reserves</div>
+                                <div class="funds-cat-subtitle">People, advisory &amp; working capital runway</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="funds-cat-total" style="color: var(--accent-purple);">$141,000</div>
+                            <div class="funds-cat-pct">47% of raise</div>
+                        </div>
+                    </div>
+                    <div class="funds-items">
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
+                                <div class="funds-item-name">Working capital &amp; 3-month operating reserve</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$105,000</div>
+                                <div class="funds-item-roi">Runway through ramp-up</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
+                                <div class="funds-item-name">Shannon Cohen &mdash; Executive Advisory (6 mo)</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$18,000</div>
+                                <div class="funds-item-roi">Strategic guidance</div>
+                            </div>
+                        </div>
+                        <div class="funds-item">
+                            <div class="funds-item-left">
+                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
+                                <div class="funds-item-name">Sales / BD rep in Austin</div>
+                            </div>
+                            <div class="funds-item-right">
+                                <div class="funds-item-amount">$18,000</div>
+                                <div class="funds-item-roi">&#x2191; Local pipeline</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="funds-impact-bar">
+                        <div class="funds-impact-fill" style="width: 50%; background: linear-gradient(90deg, var(--accent-purple), #c4a6e8);"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
+                        <span>Revenue Impact</span>
+                        <span style="color: var(--accent-purple);">Risk Mitigation</span>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
-        <div class="funds-legend" style="margin-bottom: 48px;">
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-gold);"></div>
-                Working Capital / 3-Month Reserve
-                <span>$105,000</span>
+        <!-- Summary callout -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px;">
+            <div class="card" style="text-align: center; border-color: rgba(212, 168, 67, 0.2);">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Revenue Assets</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-gold);">$95K</div>
+                <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Projected $47K&ndash;$80K/mo return</div>
             </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-green);"></div>
-                Maloka Dome (install &amp; furnish)
-                <span>$50,000</span>
+            <div class="card" style="text-align: center; border-color: rgba(55, 150, 118, 0.2);">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Growth Engine</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-green);">$64K</div>
+                <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Fills occupancy to 70&ndash;80%</div>
             </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-purple);"></div>
-                Marketing &amp; Content
-                <span>$30,000</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: var(--accent-blue);"></div>
-                Property Upgrades
-                <span>$45,000</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: #8B6914;"></div>
-                Advisory &amp; Sales Staff
-                <span>$36,000</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: #6b6b80;"></div>
-                Google Ads (3-month launch)
-                <span>$24,000</span>
-            </div>
-            <div class="funds-legend-item">
-                <div class="funds-dot" style="background: #557755;"></div>
-                AI System Build-Out
-                <span>$10,000</span>
-            </div>
-        </div>
-
-        <div class="cards-grid">
-            <div class="card">
-                <h3>Maloka Dome &mdash; $50,000</h3>
-                <p>Installed &amp; furnished on dedicated 3-acre parcel. Already secured $40,000 in deposits for November from a single client. Projects $32K&ndash;$58K/mo in combined venue + lodging revenue. Full payback in under 2 months.</p>
-            </div>
-            <div class="card">
-                <h3>Property Upgrades &mdash; $45,000</h3>
-                <p>Retreat house upgrades ($20K) for full 10-bed capacity. Professional landscaping &amp; lighting ($20K). Ranch signage &amp; wayfinding ($5K).</p>
-            </div>
-            <div class="card">
-                <h3>Marketing &amp; Ads &mdash; $54,000</h3>
-                <p>Google Ads 3-month launch ($24K at $8K/mo). Marketing staff, content, photography, website, and brand repositioning ($30K). Direct booking pipeline.</p>
-            </div>
-            <div class="card">
-                <h3>People &amp; Working Capital &mdash; $141,000</h3>
-                <p>Shannon Cohen advisory 6 months ($18K). Sales/BD rep in Austin ($18K). Working capital &amp; 3-month operating reserve ($105K) for runway through occupancy ramp-up.</p>
+            <div class="card" style="text-align: center; border-color: rgba(168, 134, 205, 0.2);">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Runway</div>
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-purple);">$141K</div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">3-month buffer + key hires</div>
             </div>
         </div>
     </section>
