@@ -1,12 +1,12 @@
 {
-  "version": "v260327.02 2:21a",
-  "release": 2,
-  "sha": "f53a303",
-  "fullSha": "f53a3034dc58e59de663246f09ed74d1e1e2fb15",
+  "version": "v260327.03 2:24a",
+  "release": 3,
+  "sha": "144f669",
+  "fullSha": "144f6690b112609f333c2fd7747cbbd9c7f87b50",
   "actor": "justinwithin",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm46oaq",
-  "pushedAt": "2026-03-26T21:21:16-05:00",
-  "commits": [{"sha":"f53a303","message":"Update color scheme to warm earth tones for holistic hospitality feel","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-03-26T21:24:31-05:00",
+  "commits": [{"sha":"144f669","message":"Switch to light cream palette with forest green & copper accents","author":"Justin DeLaCruz"}]
 }
