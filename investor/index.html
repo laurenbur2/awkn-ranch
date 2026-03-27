@@ -11,28 +11,28 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            /* Warm earth palette — holistic hospitality */
-            --bg-primary: #1a1510;
-            --bg-secondary: #221d16;
-            --bg-card: #2a2319;
-            --bg-card-hover: #332b1f;
-            --text-primary: #f5f0e8;
-            --text-secondary: #c4b99e;
-            --text-muted: #8a7e6a;
-            --accent-gold: #C8A45E;
-            --accent-gold-dim: rgba(200, 164, 94, 0.15);
-            --accent-green: #7A9E7E;
-            --accent-green-dim: rgba(122, 158, 126, 0.15);
-            --accent-purple: #B8907A;
-            --accent-purple-dim: rgba(184, 144, 122, 0.15);
-            --accent-blue: #8AABAB;
-            --accent-blue-dim: rgba(138, 171, 171, 0.15);
+            /* Light sanctuary — cream, forest green & copper */
+            --bg-primary: #FAF7F2;
+            --bg-secondary: #F2EDE5;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #F8F5EF;
+            --text-primary: #2C3228;
+            --text-secondary: #5A6356;
+            --text-muted: #8E9589;
+            --accent-gold: #B8860B;
+            --accent-gold-dim: rgba(184, 134, 11, 0.1);
+            --accent-green: #2D5A3D;
+            --accent-green-dim: rgba(45, 90, 61, 0.08);
+            --accent-purple: #9B6B5A;
+            --accent-purple-dim: rgba(155, 107, 90, 0.1);
+            --accent-blue: #5B8A7A;
+            --accent-blue-dim: rgba(91, 138, 122, 0.1);
             --accent-terracotta: #C4836A;
-            --accent-terracotta-dim: rgba(196, 131, 106, 0.15);
-            --accent-sage: #7A9E7E;
-            --accent-sage-dim: rgba(122, 158, 126, 0.15);
-            --border: rgba(200, 164, 94, 0.08);
-            --border-light: rgba(200, 164, 94, 0.15);
+            --accent-terracotta-dim: rgba(196, 131, 106, 0.1);
+            --accent-sage: #6B8F71;
+            --accent-sage-dim: rgba(107, 143, 113, 0.1);
+            --border: rgba(45, 90, 61, 0.1);
+            --border-light: rgba(45, 90, 61, 0.18);
             --radius: 16px;
             --radius-sm: 10px;
         }
@@ -53,8 +53,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(ellipse at 30% 20%, rgba(200, 164, 94, 0.1) 0%, transparent 50%),
-                        radial-gradient(ellipse at 70% 80%, rgba(122, 158, 126, 0.06) 0%, transparent 50%),
+            background: radial-gradient(ellipse at 30% 20%, rgba(45, 90, 61, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
                         var(--bg-primary);
         }
 
@@ -62,16 +62,17 @@
             text-align: center;
             max-width: 440px;
             padding: 56px 44px;
-            background: var(--bg-secondary);
+            background: #fff;
             border: 1px solid var(--border);
             border-radius: var(--radius);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
         }
 
         .login-logo {
             font-family: 'Playfair Display', serif;
             font-size: 36px;
             font-weight: 700;
-            color: var(--accent-gold);
+            color: var(--accent-green);
             margin-bottom: 8px;
         }
 
@@ -97,7 +98,7 @@
             padding: 14px 36px;
             background: #fff;
             color: #333;
-            border: none;
+            border: 1px solid rgba(0,0,0,0.12);
             border-radius: 8px;
             font-size: 15px;
             font-weight: 500;
@@ -108,7 +109,7 @@
 
         .google-btn:hover {
             background: #f5f5f5;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transform: translateY(-1px);
         }
 
@@ -124,7 +125,7 @@
 
         .topbar {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(26, 21, 16, 0.92);
+            background: rgba(250, 247, 242, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             padding: 0 40px;
@@ -133,20 +134,20 @@
             max-width: 1200px; margin: 0 auto;
             display: flex; align-items: center; justify-content: space-between; height: 64px;
         }
-        .topbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--accent-gold); }
+        .topbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--accent-green); }
         .topbar-nav { display: flex; gap: 28px; list-style: none; }
         .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
-        .topbar-nav a:hover { color: var(--accent-gold); }
+        .topbar-nav a:hover { color: var(--accent-green); }
         .topbar-user { display: flex; align-items: center; gap: 12px; }
         .topbar-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
         .topbar-email { font-size: 13px; color: var(--text-muted); }
         .btn-signout { background: none; border: 1px solid var(--border-light); color: var(--text-secondary); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .btn-signout:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .btn-signout:hover { border-color: var(--accent-green); color: var(--accent-green); }
 
         /* Hero */
         .hero {
             padding: 100px 40px 80px; text-align: center;
-            background: radial-gradient(ellipse at 50% 0%, rgba(200, 164, 94, 0.12) 0%, transparent 60%);
+            background: radial-gradient(ellipse at 50% 0%, rgba(45, 90, 61, 0.06) 0%, transparent 60%);
         }
         .hero-badge { display: inline-block; padding: 8px 20px; background: var(--accent-gold-dim); color: var(--accent-gold); border-radius: 20px; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 28px; }
         .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 64px); font-weight: 700; line-height: 1.1; margin-bottom: 24px; }
@@ -164,8 +165,8 @@
         .section-desc { font-size: 16px; color: var(--text-secondary); max-width: 700px; margin-bottom: 48px; line-height: 1.7; }
 
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: all 0.3s; }
-        .card:hover { border-color: var(--border-light); background: var(--bg-card-hover); transform: translateY(-2px); }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: all 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+        .card:hover { border-color: var(--border-light); background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
         .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; }
         .card-icon.gold { background: var(--accent-gold-dim); }
         .card-icon.green { background: var(--accent-green-dim); }
@@ -183,7 +184,7 @@
         .data-table th { color: var(--text-muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
         .data-table td:last-child { text-align: right; font-weight: 600; }
         .data-table .total td { border-top: 2px solid var(--accent-gold); border-bottom: none; font-weight: 700; color: var(--accent-gold); font-size: 16px; }
-        .data-table .highlight td { background: rgba(200, 164, 94, 0.05); }
+        .data-table .highlight td { background: rgba(45, 90, 61, 0.04); }
 
         /* Comparison table */
         .comp-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
@@ -202,8 +203,8 @@
         .donut-center-amount { font-size: 36px; font-weight: 800; color: var(--accent-gold); }
         .donut-center-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; }
         .funds-categories { display: flex; flex-direction: column; gap: 32px; }
-        .funds-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: all 0.3s; }
-        .funds-category:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
+        .funds-category { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: all 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+        .funds-category:hover { border-color: var(--border-light); background: var(--bg-card-hover); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
         .funds-cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .funds-cat-label { display: flex; align-items: center; gap: 10px; }
         .funds-cat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
@@ -212,7 +213,7 @@
         .funds-cat-total { font-size: 22px; font-weight: 800; }
         .funds-cat-pct { font-size: 11px; color: var(--text-muted); text-align: right; }
         .funds-items { display: flex; flex-direction: column; gap: 10px; }
-        .funds-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); }
+        .funds-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(45, 90, 61, 0.03); border-radius: 8px; border: 1px solid rgba(45, 90, 61, 0.06); }
         .funds-item-left { display: flex; align-items: center; gap: 10px; }
         .funds-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .funds-item-name { font-size: 13px; color: var(--text-secondary); }
@@ -244,22 +245,22 @@
         /* Scenario cards */
         .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
         .scenario-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; text-align: center; }
-        .scenario-card.featured { border-color: rgba(200, 164, 94, 0.3); background: linear-gradient(135deg, rgba(200, 164, 94, 0.1), rgba(122, 158, 126, 0.06)); }
+        .scenario-card.featured { border-color: rgba(45, 90, 61, 0.25); background: linear-gradient(135deg, rgba(45, 90, 61, 0.05), rgba(184, 134, 11, 0.04)); }
         .scenario-label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
         .scenario-revenue { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
         .scenario-profit { font-size: 32px; font-weight: 800; color: var(--accent-gold); margin-bottom: 4px; }
         .scenario-sub { font-size: 12px; color: var(--text-muted); }
 
         /* CTA */
-        .cta-section { text-align: center; padding: 100px 40px; background: radial-gradient(ellipse at 50% 100%, rgba(200, 164, 94, 0.1) 0%, transparent 60%); }
+        .cta-section { text-align: center; padding: 100px 40px; background: radial-gradient(ellipse at 50% 100%, rgba(45, 90, 61, 0.06) 0%, transparent 60%); }
         .cta-section h2 { font-family: 'Playfair Display', serif; font-size: 42px; margin-bottom: 16px; }
         .cta-section p { color: var(--text-secondary); font-size: 16px; margin-bottom: 32px; }
-        .cta-btn { display: inline-block; padding: 16px 44px; background: var(--accent-gold); color: #000; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-        .cta-btn:hover { background: #d4b068; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200, 164, 94, 0.3); }
+        .cta-btn { display: inline-block; padding: 16px 44px; background: var(--accent-green); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .cta-btn:hover { background: #1e4a2e; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(45, 90, 61, 0.25); }
 
         .footer { text-align: center; padding: 40px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
 
-        .watermark { position: fixed; bottom: 20px; right: 20px; font-size: 10px; color: rgba(200, 164, 94, 0.1); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; z-index: 1000; }
+        .watermark { position: fixed; bottom: 20px; right: 20px; font-size: 10px; color: rgba(45, 90, 61, 0.12); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; z-index: 1000; }
 
         .quote-block { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--text-secondary); text-align: center; max-width: 700px; margin: 0 auto; padding: 40px 0; line-height: 1.6; }
 
@@ -850,7 +851,7 @@
                         </div>
                     </div>
                     <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 95%; background: linear-gradient(90deg, var(--accent-gold), #d4b068);"></div>
+                        <div class="funds-impact-fill" style="width: 95%; background: linear-gradient(90deg, var(--accent-gold), #C9A032);"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
                         <span>Revenue Impact</span>
@@ -906,7 +907,7 @@
                         </div>
                     </div>
                     <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 75%; background: linear-gradient(90deg, var(--accent-sage), #95b898);"></div>
+                        <div class="funds-impact-fill" style="width: 75%; background: linear-gradient(90deg, var(--accent-green), #3D7A50);"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
                         <span>Revenue Impact</span>
@@ -962,7 +963,7 @@
                         </div>
                     </div>
                     <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 50%; background: linear-gradient(90deg, var(--accent-purple), #d1a894);"></div>
+                        <div class="funds-impact-fill" style="width: 50%; background: linear-gradient(90deg, var(--accent-purple), #B8907A);"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
                         <span>Revenue Impact</span>
@@ -975,17 +976,17 @@
 
         <!-- Summary callout -->
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px;">
-            <div class="card" style="text-align: center; border-color: rgba(200, 164, 94, 0.2);">
+            <div class="card" style="text-align: center; border-color: rgba(184, 134, 11, 0.15);">
                 <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Revenue Assets</div>
                 <div style="font-size: 28px; font-weight: 800; color: var(--accent-gold);">$95K</div>
                 <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Projected $47K&ndash;$80K/mo return</div>
             </div>
-            <div class="card" style="text-align: center; border-color: rgba(122, 158, 126, 0.2);">
+            <div class="card" style="text-align: center; border-color: rgba(45, 90, 61, 0.15);">
                 <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Growth Engine</div>
                 <div style="font-size: 28px; font-weight: 800; color: var(--accent-green);">$64K</div>
                 <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Fills occupancy to 70&ndash;80%</div>
             </div>
-            <div class="card" style="text-align: center; border-color: rgba(184, 144, 122, 0.2);">
+            <div class="card" style="text-align: center; border-color: rgba(155, 107, 90, 0.15);">
                 <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Runway</div>
                 <div style="font-size: 28px; font-weight: 800; color: var(--accent-purple);">$141K</div>
                 <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">3-month buffer + key hires</div>
