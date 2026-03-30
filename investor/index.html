@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>AWKN Ranch — Investor Portal</title>
+    <title>AWKN Ranch & Within Center — Investor Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            /* Dark sanctuary — deep charcoal, warm amber & sage */
             --bg-primary: #1a1a1a;
             --bg-secondary: #242420;
             --bg-card: #2a2a26;
@@ -135,8 +134,8 @@
             display: flex; align-items: center; justify-content: space-between; height: 64px;
         }
         .topbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--accent-green); }
-        .topbar-nav { display: flex; gap: 28px; list-style: none; }
-        .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
+        .topbar-nav { display: flex; gap: 24px; list-style: none; }
+        .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
         .topbar-nav a:hover { color: var(--accent-green); }
         .topbar-user { display: flex; align-items: center; gap: 12px; }
         .topbar-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
@@ -263,6 +262,22 @@
         .watermark { position: fixed; bottom: 20px; right: 20px; font-size: 10px; color: rgba(240, 235, 227, 0.1); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; z-index: 1000; }
 
         .quote-block { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--text-secondary); text-align: center; max-width: 700px; margin: 0 auto; padding: 40px 0; line-height: 1.6; }
+        .quote-block-highlight {
+            background: linear-gradient(135deg, rgba(122, 158, 109, 0.12), rgba(212, 160, 85, 0.08));
+            border: 1px solid rgba(122, 158, 109, 0.2);
+            border-radius: var(--radius);
+            padding: 28px 40px;
+            max-width: 800px;
+            margin: 32px auto;
+            text-align: center;
+        }
+        .quote-block-highlight p {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-style: italic;
+            color: var(--accent-gold);
+            line-height: 1.6;
+        }
 
         /* Property features */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
@@ -371,6 +386,71 @@
         .slideshow-nav.prev { left: 20px; }
         .slideshow-nav.next { right: 20px; }
 
+        /* Phase 2 hero style */
+        .phase2-hero {
+            text-align: center;
+            padding: 80px 40px 60px;
+            background: linear-gradient(135deg, rgba(122, 158, 109, 0.06) 0%, rgba(212, 160, 85, 0.04) 100%);
+            border-top: 2px solid rgba(212, 160, 85, 0.2);
+            border-bottom: 2px solid rgba(212, 160, 85, 0.2);
+        }
+        .phase2-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            background: rgba(212, 160, 85, 0.15);
+            color: var(--accent-gold);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        /* Proven vs Unlocks two-col */
+        .proven-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 32px;
+        }
+        .proven-col {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+        .proven-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .proven-col ul {
+            list-style: none;
+            padding: 0;
+        }
+        .proven-col li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            line-height: 1.5;
+        }
+        .proven-col li:last-child { border-bottom: none; }
+        .proven-col li::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .proven-col.what-proven li::before { background: var(--accent-sage); }
+        .proven-col.what-unlocks li::before { background: var(--accent-gold); }
+
         @media (max-width: 768px) {
             .topbar { padding: 0 20px; }
             .topbar-nav { display: none; }
@@ -387,6 +467,7 @@
             .slideshow-caption h3 { font-size: 22px; }
             .slideshow-nav { width: 36px; height: 36px; font-size: 16px; }
             .slideshow-dots { right: 20px; bottom: 12px; }
+            .proven-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -396,9 +477,9 @@
 <div id="login-screen">
     <div class="login-container">
         <div class="login-logo">AWKN Ranch</div>
-        <div class="login-subtitle">Investor Portal</div>
+        <div class="login-subtitle">& Within Center</div>
         <div class="login-tagline">
-            A Transformative Wellness Resort<br>
+            A Transformative Wellness Ecosystem<br>
             Austin, Texas &bull; 12-Acre Healing Sanctuary
         </div>
         <button class="google-btn" onclick="signInWithGoogle()">
@@ -406,27 +487,29 @@
             Sign in with Google
         </button>
         <div class="login-error" id="login-error"></div>
-        <div class="login-note">Access restricted to authorized investors</div>
+        <div class="login-note">Prepared for Aaron &amp; Alex &bull; Strictly Confidential</div>
     </div>
 </div>
 
 <!-- Main App -->
 <div id="app">
-    <div class="watermark">Confidential &mdash; Investor Use Only</div>
+    <div class="watermark">Confidential &mdash; Prepared for Aaron &amp; Alex</div>
 
     <!-- Top Bar -->
     <nav class="topbar">
         <div class="topbar-inner">
-            <div class="topbar-brand">AWKN Ranch</div>
+            <div class="topbar-brand">AWKN Ranch & Within</div>
             <ul class="topbar-nav">
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#pivot">The Pivot</a></li>
-                <li><a href="#property">Property</a></li>
+                <li><a href="#within">Within Center</a></li>
+                <li><a href="#property">The Ranch</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#revenue">Revenue</a></li>
                 <li><a href="#financials">Financials</a></li>
+                <li><a href="#funds">Investment</a></li>
                 <li><a href="#market">Market</a></li>
-                <li><a href="#funds">Use of Funds</a></li>
+                <li><a href="#phase2">Phase 2</a></li>
             </ul>
             <div class="topbar-user">
                 <img class="topbar-avatar" id="user-avatar" src="" alt="">
@@ -438,61 +521,52 @@
 
     <!-- Hero -->
     <section class="hero" id="overview">
-        <div class="hero-badge">$300K Raise &bull; March 2026 &bull; Confidential</div>
-        <h1>A Transformative<br><span class="gold">Wellness Resort</span></h1>
+        <div class="hero-badge">$500K Tranche &bull; $8M Valuation &bull; March 2026</div>
+        <h1>AWKN Ranch<br><span class="gold">& Within Center</span></h1>
         <p class="hero-sub">
-            AWKN Ranch is a 12-acre transformative wellness sanctuary outside Austin, TX. Our sister company Within Center &mdash; Texas's first ceremonial psychedelic therapy center &mdash; is pivoting from a high-cost inpatient model to a dynamic, high-occupancy wellness retreat model.
+            A Transformative Wellness Ecosystem &mdash; a 4.5-year clinical brand with over 1,500 sessions and a flawless five-star reputation, paired with a 12-acre sanctuary that became an Austin community staple in its very first year. And a new business model that finally lets both of them breathe &mdash; and grow.
         </p>
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-value">$300K</div>
-                <div class="hero-stat-label">Investment Ask</div>
+                <div class="hero-stat-value">$500K</div>
+                <div class="hero-stat-label">Tranche</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">12 Acres</div>
-                <div class="hero-stat-label">Austin, TX</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">6</div>
-                <div class="hero-stat-label">Revenue Streams</div>
+                <div class="hero-stat-value">$8M</div>
+                <div class="hero-stat-label">Valuation Cap</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-value">6&ndash;9 mo</div>
-                <div class="hero-stat-label">Projected Payback</div>
+                <div class="hero-stat-label">To Profitability</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">$1.4M+</div>
+                <div class="hero-stat-label">Annual Net (Base)</div>
             </div>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Vision & Mission -->
+    <!-- Executive Summary -->
     <section class="section">
-        <div class="section-label">Vision &amp; Mission</div>
-        <h2>A Catalyst for Human Awakening</h2>
+        <div class="section-label">Executive Summary</div>
+        <h2>The Opportunity at a Glance</h2>
         <p class="section-desc">
-            We exist to awaken the human spirit &mdash; and to serve as a catalyst for seekers, healers, facilitators, medicine carriers, and visionaries bringing transformative work to humanity. AWKN Ranch is built to amplify their work and hold the container for it.
+            Alex and Aaron &mdash; this memorandum tells the story of a pivot. A 4.5-year clinical brand with over 1,500 sessions and a flawless five-star reputation. A 12-acre sanctuary that became an Austin community staple in its very first year. And a new business model that finally lets both of them breathe &mdash; and grow.
         </p>
-        <div class="cards-grid" style="grid-template-columns: repeat(2, 1fr);">
-            <div class="card">
-                <div class="card-icon gold">&#x1f3e5;</div>
-                <h3>Clinical &amp; Ceremonial Infrastructure</h3>
-                <p>Safe and sacred psychedelic therapy, integration, and functional health through Within Center located at AWKN Ranch.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon green">&#x1f3db;</div>
-                <h3>World-Class Venue Space</h3>
-                <p>For retreat leaders, ceremony holders, and wellness facilitators seeking a venue with full lodging and amenities.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon purple">&#x1f3d5;</div>
-                <h3>Resort-Style Lodging</h3>
-                <p>Supporting individuals and groups in their intentional healing journey with premium overnight accommodations.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon blue">&#x1f465;</div>
-                <h3>Membership Community</h3>
-                <p>Building a community of members who return again and again, deepening their practice and their purpose.</p>
-            </div>
+
+        <div class="quote-block-highlight">
+            <p>"Two proven brands. One sacred address. One investment."</p>
+        </div>
+
+        <div style="max-width: 700px; margin-top: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                This $500,000 release of Tranche funds the infrastructure to bring AWKN Ranch and Within Center to full operational profitability. At conservative projections that happens within 9&ndash;12 months. At base case, this ecosystem generates over <strong style="color: var(--accent-gold);">$1.4M in annual net profit</strong>. At a strong year, over <strong style="color: var(--accent-gold);">$2.2M</strong>.
+            </p>
+            <p style="font-size: 16px; color: var(--text-primary); font-weight: 600; margin-top: 24px;">
+                The land is ready. The brands are proven. The model is right. This is the moment.
+            </p>
         </div>
     </section>
 
@@ -500,11 +574,28 @@
 
     <!-- Strategic Pivot -->
     <section class="section" id="pivot">
-        <div class="section-label">The Strategic Pivot</div>
-        <h2>From Inpatient to High-Occupancy Resort</h2>
+        <div class="section-label">The Pivot</div>
+        <h2>Why We Changed. Why It Was the Right Call.</h2>
         <p class="section-desc">
-            The old model was consuming capital without generating sustainable returns. The new model is already proving itself &mdash; with deposit revenue coming in and a clear path to profitability.
+            When we built the original Within Center model, we were solving for clinical depth &mdash; a 30-day inpatient program designed to serve clients in acute need. That model worked for what it was. But it came with a structural ceiling we could not engineer our way out of: seven beds, $50,000+ in monthly payroll, and a client profile so narrow that filling the property required near-perfect conditions every single month.
         </p>
+
+        <div style="max-width: 700px; margin-bottom: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7;">
+                The land was thriving. The community was showing up. The mission was resonating. <strong style="color: var(--text-primary);">The model was the constraint.</strong>
+            </p>
+        </div>
+
+        <div class="quote-block-highlight" style="border-color: rgba(196, 131, 106, 0.25); background: linear-gradient(135deg, rgba(196, 131, 106, 0.08), rgba(212, 160, 85, 0.06));">
+            <p style="color: var(--accent-terracotta); font-size: 15px;">Aaron saw it clearly on our last investment call &mdash; and he was right. The question he pushed us on wasn't whether the mission was real. It was whether the model could actually carry it. That conversation was the inflection point.</p>
+        </div>
+
+        <div style="max-width: 700px; margin-top: 32px; margin-bottom: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7;">
+                So we changed it. The new model does not abandon what Within Center has spent 4.5 years building &mdash; it amplifies it. Within Center's clinical credibility, five-star reputation, and 1,500+ sessions become the anchor of a broader wellness ecosystem. Two days a week of outpatient programming. Ketamine therapy. Integration coaching. IV wellness. All running on the same sacred land &mdash; alongside the new <u>nightly</u> lodging model, venue rentals, hosted retreats, and a membership community that returns again and again.
+            </p>
+        </div>
+
         <div style="overflow-x: auto;">
             <table class="comp-table">
                 <thead>
@@ -517,28 +608,13 @@
                 <tbody>
                     <tr class="old">
                         <td>Structure</td>
-                        <td>30-Day Inpatient Retreat</td>
-                        <td>Nightly Sanctuary + Outpatient Therapy</td>
-                    </tr>
-                    <tr class="old">
-                        <td>Beds / Capacity</td>
-                        <td>7 beds (inpatient)</td>
-                        <td>10 beds + yurts + domes + Maloka</td>
-                    </tr>
-                    <tr class="old">
-                        <td>Nightly Pricing</td>
-                        <td>N/A (2 &amp; 4 week package only)</td>
-                        <td>$349 shared &middot; $499 private &middot; $599&ndash;$699 yurt/dome</td>
-                    </tr>
-                    <tr class="old">
-                        <td>Target Client</td>
-                        <td>Clinical / Addicted</td>
-                        <td>Wellness-Seeker / Retreat Guests</td>
+                        <td>30-Day Inpatient Program</td>
+                        <td>Nightly Lodging + Outpatient Therapy</td>
                     </tr>
                     <tr class="old">
                         <td>Monthly Revenue Potential</td>
-                        <td>~$45,000&ndash;$75,000 (avg. 3 clients)</td>
-                        <td>$133,440&ndash;$250,940+</td>
+                        <td>$45,000&ndash;$75,000</td>
+                        <td>$133,440&ndash;$250,940</td>
                     </tr>
                     <tr class="old">
                         <td>Monthly Payroll</td>
@@ -546,14 +622,24 @@
                         <td>~$24,000&ndash;$29,000</td>
                     </tr>
                     <tr class="old">
-                        <td>Occupancy Flexibility</td>
-                        <td>Low &mdash; multi-week commitment</td>
-                        <td>High &mdash; nightly, any guest</td>
+                        <td>Monthly Net</td>
+                        <td>Negative / Break-even</td>
+                        <td>$59,640&ndash;$183,940</td>
                     </tr>
                     <tr class="old">
-                        <td>Annual Net Potential</td>
-                        <td>Break-even at best</td>
-                        <td>$715,680&ndash;$2.2M+</td>
+                        <td>Clients Required to Operate</td>
+                        <td>7 full inpatient (very difficult)</td>
+                        <td>Mix of nightly guests (accessible)</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Addressable Market</td>
+                        <td>Narrow &mdash; clinical clients only</td>
+                        <td>Vast &mdash; any wellness seeker</td>
+                    </tr>
+                    <tr class="old">
+                        <td>Scalability</td>
+                        <td>Severely limited</td>
+                        <td>Unlimited</td>
                     </tr>
                 </tbody>
             </table>
@@ -562,45 +648,120 @@
 
     <div class="divider"></div>
 
+    <!-- Within Center -->
+    <section class="section" id="within">
+        <div class="section-label">Within Center</div>
+        <h2>The Anchor &mdash; 4.5 Years. 1,500+ Sessions. Five Stars.</h2>
+        <p class="section-desc">
+            Within Center is Texas's foremost psychedelic therapy and integration company. A nationally recognized leader built over four and a half years, with over 1,500 individual sessions delivered and an unblemished five-star rating on every platform. Clients travel from across the country &mdash; and the world &mdash; to work with Within Center's team.
+        </p>
+
+        <!-- Within Center Stats -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 48px;">
+            <div class="card" style="text-align: center; border-color: rgba(122, 158, 109, 0.2);">
+                <div style="font-size: 32px; font-weight: 800; color: var(--accent-green);">1,500+</div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Sessions Delivered</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(122, 158, 109, 0.2);">
+                <div style="font-size: 32px; font-weight: 800; color: var(--accent-green);">5-Star</div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">All Platform Rating</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(122, 158, 109, 0.2);">
+                <div style="font-size: 32px; font-weight: 800; color: var(--accent-green);">4.5 Years</div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Operating History</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(122, 158, 109, 0.2);">
+                <div style="font-size: 32px; font-weight: 800; color: var(--accent-green);">National</div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Client Reach</div>
+            </div>
+        </div>
+
+        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; max-width: 700px; margin-bottom: 40px;">
+            Within Center operates its outpatient ketamine and psychedelic integration programs two days per week at AWKN Ranch &mdash; maintaining its own brand identity, five-star referral network, and the clinical reputation built over nearly five years, while directly feeding the property's lodging and amenities pipeline. It is a business that stands completely on its own. And it makes everything around it stronger.
+        </p>
+
+        <h3 style="font-size: 20px; margin-bottom: 24px; color: var(--accent-green);">Outpatient Therapy Packages</h3>
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Includes</th>
+                        <th style="text-align: right;">Investment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>AWKN Package</strong></td>
+                        <td style="font-weight: 400; text-align: left;">6 ketamine + 6 coaching + 6 IV vitamin sessions + 2 months ranch access + weekly group therapy</td>
+                        <td>$5,500</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HEAL Package</strong></td>
+                        <td style="font-weight: 400; text-align: left;">3 ketamine + 3 coaching + 3 IV vitamin sessions + 1 month ranch access + weekly group therapy</td>
+                        <td>$3,300</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DISCOVER Package</strong></td>
+                        <td style="font-weight: 400; text-align: left;">1 ketamine session + 1 coaching session</td>
+                        <td>$1,250</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size: 14px; color: var(--text-muted); margin-top: 16px; font-style: italic;">
+            Each Within client receives a 10% discount on AWKN Ranch nightly lodging &mdash; creating a direct, immediate cross-feed between the two brands.
+        </p>
+    </section>
+
+    <div class="divider"></div>
+
     <!-- Property -->
     <section class="section" id="property">
-        <div class="section-label">The Property</div>
-        <h2>AWKN Ranch &mdash; 12-Acre Sanctuary</h2>
+        <div class="section-label">AWKN Ranch</div>
+        <h2>The 12-Acre Sanctuary &mdash; Austin's Premier Wellness Destination</h2>
         <p class="section-desc">
-            One of the most uniquely positioned wellness properties in Texas &mdash; blending sacred ceremony, luxury amenities, and natural beauty into one seamless experience.
+            AWKN Ranch is a 12-acre transformative wellness sanctuary on the edge of Austin. Operational for one year. Already a community staple. Hundreds of visitors every week. Venue spaces booked throughout the week and weekend. With current paying monthly members &mdash; with zero marketing spend. The property is alive. Now we let it fly financially.
         </p>
         <div class="two-col">
             <div>
-                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Current Property</h3>
+                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Current Property Assets</h3>
                 <div class="features-grid" style="grid-template-columns: 1fr;">
-                    <div class="feature-item"><div class="feature-dot"></div>Two ceremonial yurts (event &amp; nightly revenue)</div>
-                    <div class="feature-item"><div class="feature-dot"></div>HoneyComb Dome (event &amp; nightly revenue)</div>
-                    <div class="feature-item"><div class="feature-dot"></div>10-bed retreat house with commercial kitchen</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Sacred temple space (100+ capacity)</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Functional Health &amp; Longevity Medical Center</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Resort-style pool and hot tub</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Two ceremonial yurts &mdash; nightly lodging and event revenue</div>
+                    <div class="feature-item"><div class="feature-dot"></div>HoneyComb Dome &mdash; nightly lodging and event revenue</div>
+                    <div class="feature-item"><div class="feature-dot"></div>10-bed retreat house with commercial-grade kitchen</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Sacred Temple Space &mdash; 100+ person capacity</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Within Center Functional Health &amp; Medical Wellness Center</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Resort-style soft water pool and hot tub</div>
                     <div class="feature-item"><div class="feature-dot"></div>Cold plunges and saunas</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Pickleball court</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Fire pits and hammock garden</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Community center / gathering space</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Pickleball court, fire pits, hammock garden, lush gardens</div>
+                    <div class="feature-item"><div class="feature-dot"></div>Community gathering and common space</div>
                 </div>
             </div>
             <div>
-                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Planned Additions (This Round)</h3>
+                <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-primary);">Funded by This Round</h3>
                 <div class="cards-grid" style="grid-template-columns: 1fr;">
                     <div class="card">
                         <h3>Maloka Dome</h3>
-                        <p>Large-scale ceremony &amp; retreat venue on dedicated 3-acre parcel. Already generating $40,000 in 20% deposits for November from a single retreat client.</p>
+                        <p>50-foot large-scale ceremony and retreat venue on a dedicated 3-acre parcel. Already generating $40,000 in 20% deposits for November from a single client booking two weekends.</p>
                         <p style="margin-top: 8px;"><span class="kpi-chip gold">$50K build cost</span> <span class="kpi-chip gold">$32K&ndash;$58K/mo revenue</span></p>
                     </div>
                     <div class="card">
                         <h3>2-Bedroom Model Dome</h3>
-                        <p>Fully delivered, built out, furnished, plumbed, and electric. Premium glamping flagship and showcase for next expansion phase.</p>
+                        <p>Fully delivered, built out, furnished, plumbed, and electric; premium glamping flagship.</p>
                     </div>
                     <div class="card">
                         <h3>Infrastructure Upgrades</h3>
-                        <p>Retreat house upgrades ($20K), professional landscaping &amp; lighting ($20K), ranch signage ($5K), additional acre with RV relocation ($1,500/mo).</p>
+                        <p>Retreat house upgrades (additional beds, finish improvements), professional landscaping &amp; lighting throughout the grounds, ranch signage &amp; wayfinding.</p>
                     </div>
+                    <div class="card">
+                        <h3>AI-Powered Operations</h3>
+                        <p>Booking, guest communications, and operations system &mdash; built on Claude. One of the first transformative wellness sanctuaries in the country to operate this way.</p>
+                    </div>
+                </div>
+
+                <div class="quote-block-highlight" style="margin-top: 24px;">
+                    <p style="font-size: 14px;">Maloka Proof of Demand: $40,000 in 20% deposits secured for November &mdash; from one client, before a single board has been laid.</p>
                 </div>
             </div>
         </div>
@@ -680,50 +841,101 @@
 
     <div class="divider"></div>
 
-    <!-- 6 Revenue Streams -->
+    <!-- Revenue Model -->
     <section class="section" id="revenue">
-        <div class="section-label">New Revenue Model</div>
-        <h2>Six Diversified Revenue Streams</h2>
+        <div class="section-label">Revenue Model</div>
+        <h2>Six Streams. One Property. Compounding Returns.</h2>
         <p class="section-desc">
-            The new model reduces dependence on any single offering and dramatically increases our ability to fill the property year-round.
+            The new model diversifies revenue across six distinct streams &mdash; eliminating dependence on any single offering and dramatically expanding the property's ability to generate income year-round from a vastly larger addressable market.
         </p>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-icon gold">&#x1f3e0;</div>
-                <h3>Stream 1: Retreat House</h3>
-                <p>10 beds &mdash; private rooms at $499/night, shared at $349/night. Open to wellness seekers, retreat groups, and event attendees. 10% discount for one-week outpatient clients.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip gold">$15K&ndash;$22K/mo at 70&ndash;80% occ.</span></p>
-            </div>
-            <div class="card">
-                <div class="card-icon green">&#x1f3d5;</div>
-                <h3>Stream 2: Yurts, Domes &amp; Maloka</h3>
-                <p>Yurts ($699/night each), HoneyComb Dome ($599/night), Model Dome ($599/night). Perfectly suited for group bookings, retreats, and ceremony groups.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip">$49K&ndash;$87K/mo combined at 50% occ.</span></p>
-            </div>
-            <div class="card">
-                <div class="card-icon purple">&#x1f3db;</div>
-                <h3>Stream 3: Venue &amp; Event Rental</h3>
-                <p>Weekend venue rental (Temple + Maloka) up to $4,000/weekend per venue. Day-use at $1,400/day. Venue renters naturally feed nightly lodging.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip">$8K&ndash;$16K/mo</span></p>
-            </div>
-            <div class="card">
-                <div class="card-icon blue">&#x1f489;</div>
-                <h3>Stream 4: Outpatient Therapy</h3>
-                <p>Within Center operates 2 days/week. Three packages: AWKN ($5,500), HEAL ($3,300), DISCOVER ($1,250). Includes ketamine sessions, coaching, IV vitamins, ranch access, and group therapy.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip">$16.5K&ndash;$33K/mo</span></p>
-            </div>
-            <div class="card">
-                <div class="card-icon gold">&#x2728;</div>
-                <h3>Stream 5: AWKN Hosted Retreats</h3>
-                <p>Curated multi-day immersions combining ceremony, therapy, wellness, and community. Premium pricing with high-margin group experiences.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip gold">$20K&ndash;$75K/mo</span></p>
-            </div>
-            <div class="card">
-                <div class="card-icon green">&#x1f465;</div>
-                <h3>Stream 6: Memberships</h3>
-                <p>$199/mo memberships with access to saunas, cold plunges, pool, wellness center, gardens, plus priority booking. Currently 16 active members with zero marketing.</p>
-                <p style="margin-top: 8px;"><span class="kpi-chip">$3K&ndash;$8K/mo recurring</span></p>
-            </div>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Revenue Stream</th>
+                        <th style="text-align: right;">Monthly Low</th>
+                        <th style="text-align: right;">Monthly High</th>
+                        <th style="text-align: right;">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Retreat House &mdash; Nightly Lodging</td>
+                        <td style="text-align: right;">$15,000</td>
+                        <td style="text-align: right;">$22,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$349&ndash;$499/night &middot; 10 beds &middot; 70&ndash;80% occ.</td>
+                    </tr>
+                    <tr>
+                        <td>Yurts x2 &mdash; Nightly Lodging</td>
+                        <td style="text-align: right;">$20,970</td>
+                        <td style="text-align: right;">$20,970</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$699/night &middot; $10,485/yurt &middot; 50% occ.</td>
+                    </tr>
+                    <tr>
+                        <td>HoneyComb Dome &mdash; Nightly</td>
+                        <td style="text-align: right;">$8,985</td>
+                        <td style="text-align: right;">$8,985</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$599/night &middot; 50% occ.</td>
+                    </tr>
+                    <tr>
+                        <td>Model Dome &mdash; Nightly (coming soon)</td>
+                        <td style="text-align: right;">$8,985</td>
+                        <td style="text-align: right;">$8,985</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$599/night &middot; 50% occ.</td>
+                    </tr>
+                    <tr>
+                        <td>Maloka Dome &mdash; Venue Rental</td>
+                        <td style="text-align: right;">$20,000</td>
+                        <td style="text-align: right;">$40,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$40K deposits already secured for Nov</td>
+                    </tr>
+                    <tr>
+                        <td>Maloka Dome &mdash; Nightly Lodging</td>
+                        <td style="text-align: right;">$12,000</td>
+                        <td style="text-align: right;">$18,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Large-group overnight capacity</td>
+                    </tr>
+                    <tr>
+                        <td>Venue &amp; Event Space Rentals</td>
+                        <td style="text-align: right;">$8,000</td>
+                        <td style="text-align: right;">$16,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$1,400/day &middot; $4,000/weekend</td>
+                    </tr>
+                    <tr>
+                        <td>Within Center &mdash; Outpatient Programs</td>
+                        <td style="text-align: right;">$16,500</td>
+                        <td style="text-align: right;">$33,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Ketamine &amp; psychedelic therapy packages</td>
+                    </tr>
+                    <tr>
+                        <td>AWKN Hosted Retreats</td>
+                        <td style="text-align: right;">$20,000</td>
+                        <td style="text-align: right;">$75,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Curated multi-day immersions</td>
+                    </tr>
+                    <tr>
+                        <td>Memberships</td>
+                        <td style="text-align: right;">$3,000</td>
+                        <td style="text-align: right;">$8,000</td>
+                        <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$199/mo &middot; 16 members, zero marketing</td>
+                    </tr>
+                    <tr class="total">
+                        <td>Total Monthly</td>
+                        <td style="text-align: right;">$133,440</td>
+                        <td style="text-align: right;">$250,940</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI-Powered Operations -->
+        <div class="card" style="margin-top: 48px; border-color: rgba(122, 158, 109, 0.2);">
+            <h3 style="color: var(--accent-green);">AI-Powered Operations</h3>
+            <p style="margin-top: 8px;">
+                AWKN Ranch is being built with a self-sustaining AI operations backbone &mdash; powered by Claude &mdash; making it one of the first transformative wellness sanctuaries in the country to operate this way. Automated booking, guest communications, inventory management, membership renewals, scheduling, and revenue reporting. This allows AWKN to scale revenue without scaling headcount &mdash; a structural advantage that compounds with every new stream added.
+            </p>
         </div>
     </section>
 
@@ -732,93 +944,84 @@
     <!-- Financial Projections -->
     <section class="section" id="financials">
         <div class="section-label">Financial Projections</div>
-        <h2>Path to $2.2M+ Annual Net Revenue</h2>
+        <h2>AWKN Ranch &amp; Within Center &mdash; Combined Operations</h2>
         <p class="section-desc">
             Conservative projections show $59,640/month in net profit. At full capacity, the model generates over $183,000/month in net profit.
         </p>
         <div class="two-col">
             <div>
-                <h3 style="font-size: 16px; margin-bottom: 8px;">Monthly Revenue by Stream</h3>
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Monthly Operating Expenses</h3>
                 <table class="data-table">
                     <thead>
-                        <tr><th>Revenue Stream</th><th style="text-align:right">Low&ndash;High</th></tr>
+                        <tr><th>Expense</th><th style="text-align:right">Low</th><th style="text-align:right">High</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>Retreat House (10 beds, 70&ndash;80%)</td><td>$15K&ndash;$22K</td></tr>
-                        <tr><td>Yurts x2 (50% occ.)</td><td>$20,970</td></tr>
-                        <tr><td>HoneyComb Dome (50% occ.)</td><td>$8,985</td></tr>
-                        <tr><td>Model Dome (50% occ.)</td><td>$8,985</td></tr>
-                        <tr><td>Maloka &mdash; Venue (post build)</td><td>$20K&ndash;$40K</td></tr>
-                        <tr><td>Maloka &mdash; Lodging (post build)</td><td>$12K&ndash;$18K</td></tr>
-                        <tr><td>Venue / Event Rentals</td><td>$8K&ndash;$16K</td></tr>
-                        <tr><td>Outpatient Therapy</td><td>$16.5K&ndash;$33K</td></tr>
-                        <tr><td>AWKN Hosted Retreats</td><td>$20K&ndash;$75K</td></tr>
-                        <tr><td>Memberships</td><td>$3K&ndash;$8K</td></tr>
-                        <tr class="total"><td>Total Monthly Revenue</td><td>$133K&ndash;$251K</td></tr>
-                    </tbody>
-                </table>
-
-                <h3 style="font-size: 16px; margin-bottom: 8px; margin-top: 40px;">Monthly Expenses</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr><th>Expense</th><th style="text-align:right">Low&ndash;High</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>On-site hospitality (1 FTE)</td><td>$4K&ndash;$5K</td></tr>
-                        <tr><td>Operations Manager</td><td>$4,000</td></tr>
-                        <tr><td>Medical / clinical staff (part-time)</td><td>$3K&ndash;$5K</td></tr>
-                        <tr><td>Executive / Management</td><td>$10K&ndash;$12K</td></tr>
-                        <tr><td>Shannon Cohen &mdash; Advisory</td><td>$3,000</td></tr>
-                        <tr><td>Property lease</td><td>$12,800</td></tr>
-                        <tr><td>RV relocation + additional acre</td><td>$1,500</td></tr>
-                        <tr><td>Maintenance, grounds &amp; utilities</td><td>$4K&ndash;$6K</td></tr>
-                        <tr><td>Breakfast &amp; supplies</td><td>$2.5K&ndash;$3.5K</td></tr>
-                        <tr><td>Insurance, licensing, compliance</td><td>$1.5K&ndash;$2.5K</td></tr>
-                        <tr><td>Marketing &amp; booking platform</td><td>$5.5K&ndash;$6.5K</td></tr>
-                        <tr><td>Google / Meta / AI Ads</td><td>$8K&ndash;$10K</td></tr>
-                        <tr><td>Misc / contingency</td><td>$1K&ndash;$2K</td></tr>
-                        <tr class="total"><td>Total Monthly Expenses</td><td>$60.8K&ndash;$73.8K</td></tr>
+                        <tr><td>On-Site Hospitality Manager (live-in, FT)</td><td style="text-align:right">$4,000</td><td style="text-align:right">$5,000</td></tr>
+                        <tr><td>Operations Manager</td><td style="text-align:right">$4,000</td><td style="text-align:right">$4,000</td></tr>
+                        <tr><td>Medical / Clinical Staff (2 days/wk)</td><td style="text-align:right">$3,000</td><td style="text-align:right">$5,000</td></tr>
+                        <tr><td>Executive / Management (Justin &amp; William)</td><td style="text-align:right">$10,000</td><td style="text-align:right">$12,000</td></tr>
+                        <tr><td>Shannon Cohen &mdash; Executive Advisory</td><td style="text-align:right">$3,000</td><td style="text-align:right">$3,000</td></tr>
+                        <tr><td>Property Lease</td><td style="text-align:right">$12,800</td><td style="text-align:right">$12,800</td></tr>
+                        <tr><td>RV Relocation + Additional Acre</td><td style="text-align:right">$1,500</td><td style="text-align:right">$1,500</td></tr>
+                        <tr><td>Maintenance, Groundskeeping &amp; Utilities</td><td style="text-align:right">$4,000</td><td style="text-align:right">$6,000</td></tr>
+                        <tr><td>Continental Breakfast &amp; Supplies</td><td style="text-align:right">$2,500</td><td style="text-align:right">$3,500</td></tr>
+                        <tr><td>Insurance, Licensing &amp; Compliance</td><td style="text-align:right">$1,500</td><td style="text-align:right">$2,500</td></tr>
+                        <tr><td>Marketing &amp; Booking Platform</td><td style="text-align:right">$5,500</td><td style="text-align:right">$6,500</td></tr>
+                        <tr><td>Google / Meta / AI Advertising</td><td style="text-align:right">$8,000</td><td style="text-align:right">$10,000</td></tr>
+                        <tr><td>Miscellaneous / Contingency</td><td style="text-align:right">$1,000</td><td style="text-align:right">$2,000</td></tr>
+                        <tr class="total"><td>Total Monthly Expenses</td><td style="text-align:right">$60,800</td><td style="text-align:right">$73,800</td></tr>
                     </tbody>
                 </table>
             </div>
             <div>
-                <h3 style="font-size: 16px; margin-bottom: 8px;">Projected Monthly Net Profit</h3>
-                <div class="scenario-grid" style="grid-template-columns: 1fr;">
+                <h3 style="font-size: 16px; margin-bottom: 8px;">Net Profit Scenarios</h3>
+                <div style="overflow-x: auto; margin-bottom: 32px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Scenario</th><th style="text-align:right">Revenue</th><th style="text-align:right">Expenses</th><th style="text-align:right">Net Profit</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Conservative</td><td style="text-align:right; font-weight: 400;">$133,440</td><td style="text-align:right; font-weight: 400;">$73,800</td><td style="text-align:right; color: var(--accent-green);">$59,640</td></tr>
+                            <tr class="highlight"><td><strong>Base Case</strong></td><td style="text-align:right; font-weight: 400;">$185,000</td><td style="text-align:right; font-weight: 400;">$67,000</td><td style="text-align:right; color: var(--accent-gold);"><strong>$118,000</strong></td></tr>
+                            <tr><td>Strong Month</td><td style="text-align:right; font-weight: 400;">$250,940</td><td style="text-align:right; font-weight: 400;">$67,000</td><td style="text-align:right; color: var(--accent-gold);">$183,940</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Annual scenarios -->
+                <div class="scenario-grid" style="grid-template-columns: repeat(3, 1fr);">
                     <div class="scenario-card">
-                        <div class="scenario-label">Conservative</div>
-                        <div class="scenario-revenue">$133,440 revenue &middot; $73,800 expenses</div>
-                        <div class="scenario-profit">$59,640</div>
-                        <div class="scenario-sub">net profit / month</div>
+                        <div class="scenario-label">Conservative Year</div>
+                        <div class="scenario-profit">$715,680</div>
+                        <div class="scenario-sub">Annual Net Profit</div>
                     </div>
                     <div class="scenario-card featured">
-                        <div class="scenario-label">Base Case</div>
-                        <div class="scenario-revenue">$185,000 revenue &middot; $67,000 expenses</div>
-                        <div class="scenario-profit">$118,000</div>
-                        <div class="scenario-sub">net profit / month</div>
+                        <div class="scenario-label">Base Case Year</div>
+                        <div class="scenario-profit">$1,416,000</div>
+                        <div class="scenario-sub">Annual Net Profit</div>
                     </div>
                     <div class="scenario-card">
-                        <div class="scenario-label">Strong Month</div>
-                        <div class="scenario-revenue">$250,940 revenue &middot; $67,000 expenses</div>
-                        <div class="scenario-profit">$183,940</div>
-                        <div class="scenario-sub">net profit / month</div>
+                        <div class="scenario-label">Strong Year</div>
+                        <div class="scenario-profit">$2,207,280</div>
+                        <div class="scenario-sub">Annual Net Profit</div>
                     </div>
                 </div>
 
-                <div style="margin-top: 40px;">
+                <div style="margin-top: 32px;">
                     <h3 style="font-size: 16px; margin-bottom: 20px;">Key Metrics</h3>
                     <div class="metric-row">
                         <div class="metric-header">
-                            <span class="metric-label">Investment Payback</span>
-                            <span class="metric-value">6&ndash;9 months</span>
+                            <span class="metric-label">Investment Payback (Conservative)</span>
+                            <span class="metric-value">9&ndash;12 months</span>
                         </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 75%"></div></div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 70%"></div></div>
                     </div>
                     <div class="metric-row">
                         <div class="metric-header">
-                            <span class="metric-label">Annual Net (Conservative)</span>
-                            <span class="metric-value">$715,680</span>
+                            <span class="metric-label">Annual Net (Base Case)</span>
+                            <span class="metric-value">$1.4M</span>
                         </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 33%"></div></div>
+                        <div class="metric-bar"><div class="metric-fill" style="width: 65%"></div></div>
                     </div>
                     <div class="metric-row">
                         <div class="metric-header">
@@ -834,13 +1037,6 @@
                         </div>
                         <div class="metric-bar"><div class="metric-fill" style="width: 95%"></div></div>
                     </div>
-                    <div class="metric-row">
-                        <div class="metric-header">
-                            <span class="metric-label">Existing Members (zero marketing)</span>
-                            <span class="metric-value">16 active</span>
-                        </div>
-                        <div class="metric-bar"><div class="metric-fill" style="width: 20%"></div></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -848,90 +1044,12 @@
 
     <div class="divider"></div>
 
-    <!-- Market -->
-    <section class="section" id="market">
-        <div class="section-label">Market Opportunity</div>
-        <h2>Three Explosive Growth Markets</h2>
-        <p class="section-desc">
-            AWKN Ranch sits at the intersection of wellness tourism, psychedelic therapy, and experiential hospitality &mdash; with surging demand in the Austin metro area.
-        </p>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-stat">$1.4T</div>
-                <h3>Wellness Tourism</h3>
-                <p>Global wellness tourism market projected to exceed $1.4 trillion by 2027. Immersive retreat experiences are the fastest-growing segment.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">&#x1f4c8;</div>
-                <h3>Psychedelic Therapy</h3>
-                <p>Psychedelic-assisted therapy is rapidly gaining mainstream acceptance and legal access, creating enormous demand for safe, supervised settings.</p>
-            </div>
-            <div class="card">
-                <div class="card-stat">ATX</div>
-                <h3>Austin Demand</h3>
-                <p>Austin is a magnet for health-conscious, experience-driven consumers. Limited luxury wellness resort options in the region position us to capture significant market share.</p>
-            </div>
-        </div>
-
-        <div style="margin-top: 48px;">
-            <h3 style="font-size: 16px; margin-bottom: 16px;">Target Markets</h3>
-            <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
-                <div class="feature-item"><div class="feature-dot"></div>Wellness travelers &amp; retreat-seekers</div>
-                <div class="feature-item"><div class="feature-dot"></div>Couples, families &amp; friend groups</div>
-                <div class="feature-item"><div class="feature-dot"></div>Corporate offsites &amp; leadership retreats</div>
-                <div class="feature-item"><div class="feature-dot"></div>Retreat facilitators &amp; ceremony holders</div>
-                <div class="feature-item"><div class="feature-dot"></div>Outpatient ketamine / psychedelic clients</div>
-                <div class="feature-item"><div class="feature-dot"></div>Austin locals seeking wellness membership</div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- Operations -->
-    <section class="section">
-        <div class="section-label">Operations &amp; Staffing</div>
-        <h2>Lean, Inspired Team + AI Backbone</h2>
-        <p class="section-desc">
-            The old model required $50,000/month in payroll to serve 3&ndash;7 clients. The new model is built around a small, empowered team supported by AI automation.
-        </p>
-        <div class="two-col">
-            <div>
-                <h3 style="font-size: 16px; margin-bottom: 16px;">Team</h3>
-                <div class="features-grid" style="grid-template-columns: 1fr;">
-                    <div class="feature-item"><div class="feature-dot"></div>1 live-on-site hospitality manager</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Operations Manager &mdash; coordination &amp; oversight</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Part-time clinical / medical staff (2 days/week)</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Executive / management team</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Shannon Cohen &mdash; Executive Advisory</div>
-                    <div class="feature-item"><div class="feature-dot"></div>Contracted vendors as needed</div>
-                </div>
-            </div>
-            <div>
-                <h3 style="font-size: 16px; margin-bottom: 16px;">AI-Powered Operations</h3>
-                <div class="card">
-                    <p>We are building a fully integrated AI system to automate core administrative functions:</p>
-                    <ul style="margin-top: 12px; padding-left: 20px; color: var(--text-secondary); font-size: 14px; line-height: 2;">
-                        <li>Automated booking, availability &amp; payments</li>
-                        <li>Guest communication &amp; pre-arrival prep</li>
-                        <li>Breakfast ordering &amp; inventory</li>
-                        <li>Membership management &amp; renewal</li>
-                        <li>Outpatient scheduling &amp; follow-up</li>
-                    </ul>
-                    <p style="margin-top: 16px; font-size: 13px; color: var(--accent-gold);">One of the first wellness sanctuaries in the country operating with a fully self-sustaining AI backbone &mdash; scaling revenue without scaling headcount.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- Use of Funds -->
+    <!-- Investment Ask / Use of Funds -->
     <section class="section" id="funds">
-        <div class="section-label">Use of Funds</div>
-        <h2>$300,000 Capital Deployment</h2>
+        <div class="section-label">Investment Ask</div>
+        <h2>$500,000 Tranche Release at $8M Valuation</h2>
         <p class="section-desc">
-            Capital is allocated across three strategic pillars &mdash; each designed to generate revenue, reduce risk, and accelerate our path to profitability.
+            This capital directly funds the infrastructure to bring AWKN Ranch to full operational capacity and activate all six revenue streams simultaneously. At conservative projections, the investment is recovered within 9&ndash;12 months.
         </p>
 
         <div class="funds-layout">
@@ -940,20 +1058,19 @@
                 <div class="donut-wrap">
                     <div class="donut-chart">
                         <svg viewBox="0 0 280 280">
-                            <!-- Revenue Infrastructure: $95K = 31.7% → stroke-dasharray: 691 * 0.317 = 219, gap = 472 -->
-                            <circle stroke="var(--accent-gold)" stroke-dasharray="219 472" stroke-dashoffset="0" r="110" cx="140" cy="140" />
-                            <!-- Growth & Marketing: $64K = 21.3% → 147, gap = 544 -->
-                            <circle stroke="var(--accent-green)" stroke-dasharray="147 544" stroke-dashoffset="-219" r="110" cx="140" cy="140" />
-                            <!-- Operations & Reserves: $141K = 47% → 325, gap = 366 -->
-                            <circle stroke="var(--accent-purple)" stroke-dasharray="325 366" stroke-dashoffset="-366" r="110" cx="140" cy="140" />
+                            <!-- Revenue Infrastructure: $95K = 19% -->
+                            <circle stroke="var(--accent-gold)" stroke-dasharray="131 560" stroke-dashoffset="0" r="110" cx="140" cy="140" />
+                            <!-- Growth & Marketing: $82K = 16.4% -->
+                            <circle stroke="var(--accent-green)" stroke-dasharray="113 578" stroke-dashoffset="-131" r="110" cx="140" cy="140" />
+                            <!-- Operations & Reserves: $323K = 64.6% -->
+                            <circle stroke="var(--accent-purple)" stroke-dasharray="447 244" stroke-dashoffset="-244" r="110" cx="140" cy="140" />
                         </svg>
                         <div class="donut-center">
-                            <div class="donut-center-amount">$300K</div>
-                            <div class="donut-center-label">Total Raise</div>
+                            <div class="donut-center-amount">$500K</div>
+                            <div class="donut-center-label">Tranche</div>
                         </div>
                     </div>
                 </div>
-                <!-- Quick legend under donut -->
                 <div style="display: flex; justify-content: center; gap: 20px; margin-top: 24px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
                         <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-gold);"></div>
@@ -961,244 +1078,356 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
                         <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-green);"></div>
-                        Growth
+                        Growth &amp; Marketing
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted);">
                         <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent-purple);"></div>
-                        Operations
+                        Operations &amp; Reserves
                     </div>
                 </div>
             </div>
 
-            <!-- Category Breakdown -->
-            <div class="funds-categories">
-
-                <!-- Category 1: Revenue Infrastructure -->
-                <div class="funds-category">
-                    <div class="funds-cat-header">
-                        <div class="funds-cat-label">
-                            <div class="funds-cat-icon" style="background: var(--accent-gold-dim);">&#x1f3d7;</div>
-                            <div>
-                                <div class="funds-cat-title">Revenue-Generating Assets</div>
-                                <div class="funds-cat-subtitle">Direct capacity expansion &amp; property upgrades</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="funds-cat-total" style="color: var(--accent-gold);">$95,000</div>
-                            <div class="funds-cat-pct">31.7% of raise</div>
-                        </div>
-                    </div>
-                    <div class="funds-items">
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
-                                <div class="funds-item-name">Maloka Dome &mdash; install &amp; furnish</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$50,000</div>
-                                <div class="funds-item-roi">&#x2191; $32K&ndash;$58K/mo &bull; &lt;2 mo payback</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
-                                <div class="funds-item-name">Retreat house upgrades (10-bed capacity)</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$20,000</div>
-                                <div class="funds-item-roi">&#x2191; Unlocks $15K&ndash;$22K/mo</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
-                                <div class="funds-item-name">Landscaping, lighting &amp; guest experience</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$20,000</div>
-                                <div class="funds-item-roi">&#x2191; Premium pricing support</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-gold);"></div>
-                                <div class="funds-item-name">Ranch signage &amp; wayfinding</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$5,000</div>
-                                <div class="funds-item-roi">&#x2191; Brand presence</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 95%; background: linear-gradient(90deg, var(--accent-gold), #C9A032);"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
-                        <span>Revenue Impact</span>
-                        <span style="color: var(--accent-gold);">&#x2605; Highest ROI</span>
-                    </div>
-                </div>
-
-                <!-- Category 2: Growth & Marketing -->
-                <div class="funds-category">
-                    <div class="funds-cat-header">
-                        <div class="funds-cat-label">
-                            <div class="funds-cat-icon" style="background: var(--accent-green-dim);">&#x1f4c8;</div>
-                            <div>
-                                <div class="funds-cat-title">Growth &amp; Marketing</div>
-                                <div class="funds-cat-subtitle">Demand generation, content &amp; technology</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="funds-cat-total" style="color: var(--accent-green);">$64,000</div>
-                            <div class="funds-cat-pct">21.3% of raise</div>
-                        </div>
-                    </div>
-                    <div class="funds-items">
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
-                                <div class="funds-item-name">Marketing, content &amp; brand repositioning</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$30,000</div>
-                                <div class="funds-item-roi">&#x2191; Direct booking pipeline</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
-                                <div class="funds-item-name">Google &amp; Meta Ads (3-month launch)</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$24,000</div>
-                                <div class="funds-item-roi">&#x2191; $8K/mo &rarr; occupancy ramp</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-green);"></div>
-                                <div class="funds-item-name">AI system build-out &amp; automation</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$10,000</div>
-                                <div class="funds-item-roi">&#x2191; Reduces headcount cost</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 75%; background: linear-gradient(90deg, var(--accent-green), #3D7A50);"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
-                        <span>Revenue Impact</span>
-                        <span style="color: var(--accent-green);">Demand Multiplier</span>
-                    </div>
-                </div>
-
-                <!-- Category 3: Operations & Reserves -->
-                <div class="funds-category">
-                    <div class="funds-cat-header">
-                        <div class="funds-cat-label">
-                            <div class="funds-cat-icon" style="background: var(--accent-purple-dim);">&#x1f6e1;</div>
-                            <div>
-                                <div class="funds-cat-title">Operations &amp; Reserves</div>
-                                <div class="funds-cat-subtitle">People, advisory &amp; working capital runway</div>
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="funds-cat-total" style="color: var(--accent-purple);">$141,000</div>
-                            <div class="funds-cat-pct">47% of raise</div>
-                        </div>
-                    </div>
-                    <div class="funds-items">
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
-                                <div class="funds-item-name">Working capital &amp; 3-month operating reserve</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$105,000</div>
-                                <div class="funds-item-roi">Runway through ramp-up</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
-                                <div class="funds-item-name">Shannon Cohen &mdash; Executive Advisory (6 mo)</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$18,000</div>
-                                <div class="funds-item-roi">Strategic guidance</div>
-                            </div>
-                        </div>
-                        <div class="funds-item">
-                            <div class="funds-item-left">
-                                <div class="funds-item-dot" style="background: var(--accent-purple);"></div>
-                                <div class="funds-item-name">Sales / BD rep in Austin</div>
-                            </div>
-                            <div class="funds-item-right">
-                                <div class="funds-item-amount">$18,000</div>
-                                <div class="funds-item-roi">&#x2191; Local pipeline</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="funds-impact-bar">
-                        <div class="funds-impact-fill" style="width: 50%; background: linear-gradient(90deg, var(--accent-purple), #B8907A);"></div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-muted);">
-                        <span>Revenue Impact</span>
-                        <span style="color: var(--accent-purple);">Risk Mitigation</span>
-                    </div>
-                </div>
-
+            <!-- Detailed Use of Funds Table -->
+            <div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Use of Funds</th>
+                            <th style="text-align: right;">Amount</th>
+                            <th style="text-align: right;">What It Unlocks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Maloka Dome &mdash; Installed &amp; Furnished</td>
+                            <td style="text-align: right;">$50,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">$32K&ndash;$58K/mo venue + lodging</td>
+                        </tr>
+                        <tr>
+                            <td>Retreat House Upgrades</td>
+                            <td style="text-align: right;">$20,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Full 10-bed capacity</td>
+                        </tr>
+                        <tr>
+                            <td>Landscaping &amp; Lighting</td>
+                            <td style="text-align: right;">$20,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Premium guest experience</td>
+                        </tr>
+                        <tr>
+                            <td>Ranch Signage &amp; Wayfinding</td>
+                            <td style="text-align: right;">$5,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Brand presence + arrival experience</td>
+                        </tr>
+                        <tr>
+                            <td>Google Ads &mdash; 3-Month Launch Campaign</td>
+                            <td style="text-align: right;">$24,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Direct booking pipeline</td>
+                        </tr>
+                        <tr>
+                            <td>Shannon Cohen &mdash; Advisory (6 months)</td>
+                            <td style="text-align: right;">$18,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Strategic guidance + network access</td>
+                        </tr>
+                        <tr>
+                            <td>Sales / Business Development (Austin)</td>
+                            <td style="text-align: right;">$18,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Local presence &amp; direct sales</td>
+                        </tr>
+                        <tr>
+                            <td>AI System Build-Out (Claude Integration)</td>
+                            <td style="text-align: right;">$10,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Automated operations backbone</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing, Content &amp; Brand Launch</td>
+                            <td style="text-align: right;">$30,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Website, photography, repositioning</td>
+                        </tr>
+                        <tr>
+                            <td>3-Month Operating Reserve</td>
+                            <td style="text-align: right;">$105,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Runway through occupancy ramp-up</td>
+                        </tr>
+                        <tr>
+                            <td>Growth Buffer</td>
+                            <td style="text-align: right;">$200,000</td>
+                            <td style="text-align: right; font-weight: 400; font-size: 12px; color: var(--text-muted);">Accelerated expansion capacity</td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total</td>
+                            <td style="text-align: right;">$500,000</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Summary callout -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px;">
-            <div class="card" style="text-align: center; border-color: rgba(184, 134, 11, 0.15);">
-                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Revenue Assets</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--accent-gold);">$95K</div>
-                <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Projected $47K&ndash;$80K/mo return</div>
-            </div>
-            <div class="card" style="text-align: center; border-color: rgba(45, 90, 61, 0.15);">
-                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Growth Engine</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--accent-green);">$64K</div>
-                <div style="font-size: 12px; color: var(--accent-green); margin-top: 4px;">Fills occupancy to 70&ndash;80%</div>
-            </div>
-            <div class="card" style="text-align: center; border-color: rgba(155, 107, 90, 0.15);">
-                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">Runway</div>
-                <div style="font-size: 28px; font-weight: 800; color: var(--accent-purple);">$141K</div>
-                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">3-month buffer + key hires</div>
-            </div>
+        <div class="quote-block-highlight" style="margin-top: 48px;">
+            <p>At conservative projections &mdash; $500K recovered in 9&ndash;12 months. Base case: $1.4M annual net. Strong year: $2.2M+.</p>
         </div>
     </section>
 
     <div class="divider"></div>
 
-    <!-- Why Now -->
-    <section class="section">
-        <div class="section-label">Why Now</div>
-        <h2>We Are Not Starting Over. We Are Finally Starting Right.</h2>
+    <!-- Market & Why Now -->
+    <section class="section" id="market">
+        <div class="section-label">Market &amp; Why Now</div>
+        <h2>The Property Is Ready. The Brands Are Proven. The Market Is Waiting.</h2>
         <p class="section-desc">
-            We have deposit revenue coming in, a four-year-old clinical brand with five-star reviews, a 12-acre property that is fully operational, and a clear path to $1M+ in annual net revenue within 6&ndash;9 months.
+            Austin is one of the fastest-growing cities in the United States &mdash; a magnet for health-conscious, experience-driven, spiritually curious people. The city's culture of wellness, entrepreneurship, and human potential aligns exactly with what AWKN Ranch and Within Center offer.
         </p>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-icon gold">&#x2705;</div>
-                <h3>Proven Clinical Brand</h3>
-                <p>Within Center: 4-year-old business with an all-five-star Google rating and a robust lead generation stream.</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px;">
+            <div class="card" style="text-align: center;">
+                <div class="card-stat">$1.4T+</div>
+                <h3>Wellness Tourism</h3>
+                <p>Global market by 2027</p>
             </div>
-            <div class="card">
-                <div class="card-icon green">&#x1f4b0;</div>
-                <h3>Revenue Already Coming In</h3>
-                <p>$40,000 in Maloka Dome deposits secured from a single client. 16 active memberships with zero marketing. Property is operational now.</p>
+            <div class="card" style="text-align: center;">
+                <div class="card-stat" style="font-size: 22px;">Explosive</div>
+                <h3>Psychedelic Therapy</h3>
+                <p>Mainstream acceptance accelerating</p>
             </div>
-            <div class="card">
-                <div class="card-icon purple">&#x1f3af;</div>
-                <h3>Catalyst Model</h3>
-                <p>Every facilitator who hosts a retreat brings their community. Every community that gathers carries our name forward. AWKN Ranch grows beyond a destination &mdash; into a movement.</p>
+            <div class="card" style="text-align: center;">
+                <div class="card-stat" style="font-size: 22px;">Surging</div>
+                <h3>Experiential Retreats</h3>
+                <p>Demand outpacing supply in Austin</p>
             </div>
+        </div>
+
+        <!-- What Has Been Proven vs What This Round Unlocks -->
+        <div class="proven-grid">
+            <div class="proven-col what-proven">
+                <h4 style="color: var(--accent-sage);">What Has Been Proven</h4>
+                <ul>
+                    <li>4.5 years of Within Center operating history</li>
+                    <li>1,500+ sessions &mdash; every one five-star rated</li>
+                    <li>AWKN Ranch &mdash; Austin community staple in Year 1</li>
+                    <li>16 memberships with zero marketing spend</li>
+                    <li>$40,000 in Maloka deposits already secured</li>
+                    <li>Hundreds of weekly visitors to the property</li>
+                    <li>$5,000/week in AWKN ranch venue rentals</li>
+                    <li>$20,000+/week in Within psychedelic therapy and integration sales</li>
+                </ul>
+            </div>
+            <div class="proven-col what-unlocks">
+                <h4 style="color: var(--accent-gold);">What This Round Unlocks</h4>
+                <ul>
+                    <li>Unlimited potential and flow of the wellness ranch with right pricing and cohesive energetic flow</li>
+                    <li>All services as add-ons (food, therapy, IV drips, integration, etc.)</li>
+                    <li>Maloka Dome &mdash; $32K&ndash;$58K/mo in venue and lodging revenue</li>
+                    <li>Full 10-bed retreat house at capacity</li>
+                    <li>Professional marketing and brand launch</li>
+                    <li>AI operations backbone &mdash; automated revenue</li>
+                    <li>Sales presence in the Austin market</li>
+                    <li>3-month reserve &mdash; clear path to profitability</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="quote-block-highlight" style="margin-top: 48px;">
+            <p>"We are not starting over. We are finally starting right."</p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== PHASE 2 ===== -->
+    <div class="phase2-hero" id="phase2">
+        <div class="phase2-badge">Phase 2 &mdash; Investor Memorandum</div>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(32px, 4.5vw, 56px); font-weight: 700; margin-bottom: 12px; color: var(--text-primary);">Austin Dome Collective</h1>
+        <p style="font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; color: var(--text-secondary); margin-bottom: 8px;">An Intentional Wellness Living Village</p>
+        <p style="font-size: 15px; color: var(--text-muted); margin-bottom: 8px;">Adjacent 9-Acre Expansion &middot; Austin, Texas</p>
+        <p style="font-size: 14px; color: var(--text-muted);">103 Geodesic Dome Residences &middot; Construction Underway</p>
+
+        <div style="display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; margin-top: 48px;">
+            <div style="text-align: center;">
+                <div style="font-size: 38px; font-weight: 800; color: var(--accent-gold);">408</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;">Waitlist Today</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 38px; font-weight: 800; color: var(--accent-gold);">$275,511</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;">Gross Monthly Revenue</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 38px; font-weight: 800; color: var(--accent-gold);">$2.4M+</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;">Annualized Net</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="section-label">Phase 2 Overview</div>
+        <h2>The Next Chapter of the AWKN Ecosystem</h2>
+        <p class="section-desc">
+            Phase 1 proves the model. Phase 2 builds the village.
+        </p>
+        <div style="max-width: 700px; margin-bottom: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7;">
+                The Austin Dome Collective is a purpose-built intentional living community of 103 geodesic dome residences on the adjacent 9-acre parcel &mdash; directly connected to the AWKN Ranch ecosystem. Construction is already underway on the first 25 Honeycomb Domes. Designed for creatives, entrepreneurs, and practitioners who want daily immersion in a space built for regulation, expansion, and human flourishing.
+            </p>
+        </div>
+
+        <div class="quote-block-highlight" style="border-color: rgba(196, 131, 106, 0.25); background: linear-gradient(135deg, rgba(196, 131, 106, 0.08), rgba(212, 160, 85, 0.06));">
+            <p style="color: var(--accent-terracotta); font-size: 14px;">One marketing post. 250,000 views. 4,000 shares. 4,000 likes. Matthew McConaughey and Terrence Howard both followed the page. 408 people on the waitlist &mdash; before a single dome was finished.</p>
+        </div>
+
+        <div style="max-width: 700px; margin-top: 32px; margin-bottom: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7;">
+                Residents aren't just renting a dome. They are joining a living, breathing wellness ecosystem with full access to everything AWKN has built:
+            </p>
+        </div>
+
+        <div class="features-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 48px;">
+            <div class="feature-item"><div class="feature-dot"></div>Natural pool, fitness dome, sauna, cold plunge, hot tub</div>
+            <div class="feature-item"><div class="feature-dot"></div>IV therapy and functional wellness center (Within Center)</div>
+            <div class="feature-item"><div class="feature-dot"></div>Meditation and yoga spaces</div>
+            <div class="feature-item"><div class="feature-dot"></div>Dome Cafe &mdash; community gathering and daily nourishment</div>
+            <div class="feature-item"><div class="feature-dot"></div>Podcast and recording studio</div>
+            <div class="feature-item"><div class="feature-dot"></div>Rotating retreats, workshops, and facilitated experiences</div>
+            <div class="feature-item"><div class="feature-dot"></div>Maloka &mdash; 50-foot ceremony dome for 150+ person gatherings</div>
+        </div>
+
+        <p style="font-size: 15px; color: var(--text-muted); font-style: italic; max-width: 700px; margin-bottom: 48px;">
+            Leases run on rolling 3-month terms with an application process &mdash; preserving community selectivity and quality. Residents can extend every quarter. This is not just a place to live. It is a place to become.
+        </p>
+
+        <!-- Dome Collective Revenue Model -->
+        <h3 style="font-size: 20px; margin-bottom: 8px; color: var(--accent-green);">Dome Collective Revenue Model</h3>
+        <p style="font-size: 14px; color: var(--accent-gold); margin-bottom: 24px;">Three Streams. One Village. $275K+ Gross Per Month.</p>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Revenue Stream</th>
+                        <th>Detail</th>
+                        <th style="text-align: right;">Monthly Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>50 Residential Domes &mdash; Tier 1</td>
+                        <td style="font-weight: 400;">$1,900/mo lease + $122 HOA = $2,022 x 50 domes</td>
+                        <td>$101,100</td>
+                    </tr>
+                    <tr>
+                        <td>40 Residential Domes &mdash; Tier 2</td>
+                        <td style="font-weight: 400;">$2,200/mo lease + $122 HOA = $2,322 x 40 domes</td>
+                        <td>$92,880</td>
+                    </tr>
+                    <tr>
+                        <td>13 Short-Term Rental Domes</td>
+                        <td style="font-weight: 400;">$299/night x 70% occ. x 30 days x 13 domes</td>
+                        <td>$81,531</td>
+                    </tr>
+                    <tr>
+                        <td>Dome Cafe</td>
+                        <td style="font-weight: 400;">Community cafe &mdash; projections finalized at Series A</td>
+                        <td>TBD</td>
+                    </tr>
+                    <tr class="total">
+                        <td>Total Gross Monthly</td>
+                        <td></td>
+                        <td>$275,511</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Dome Collective summary stats -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 32px; margin-bottom: 48px;">
+            <div class="card" style="text-align: center; border-color: rgba(212, 160, 85, 0.15);">
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-gold);">$275,511</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Gross Monthly</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(122, 158, 109, 0.15);">
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-green);">~$200,000</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Est. Net Monthly</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(212, 160, 85, 0.15);">
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-gold);">$2.4M+</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Annualized Net</div>
+            </div>
+            <div class="card" style="text-align: center; border-color: rgba(196, 154, 124, 0.15);">
+                <div style="font-size: 28px; font-weight: 800; color: var(--accent-purple);">103</div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;">Total Domes</div>
+            </div>
+        </div>
+
+        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; max-width: 700px; font-style: italic;">
+            The Maloka Dome &mdash; a 50-foot ceremony and retreat venue for 150+ people &mdash; generates significant additional revenue through venue rentals and booked retreat contracts already in place, compounding returns beyond the residential lease model.
+        </p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Valuation & Series A -->
+    <section class="section" id="valuation">
+        <div class="section-label">Valuation &amp; The Series A Opportunity</div>
+        <h2>Enter at $8M. Watch It Grow.</h2>
+        <p class="section-desc">
+            Investors who entered in Phase 1 at the $8M SAFE cap are positioned at the ground floor of an ecosystem whose valuation grows substantially as the Dome Collective stabilizes. The Series A &mdash; targeted in 9&ndash;12 months &mdash; will be raised at a materially higher valuation, creating a significant return for early investors.
+        </p>
+
+        <div class="two-col">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--accent-green);">Ecosystem Valuation</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Asset</th><th>Basis</th><th style="text-align: right;">Value</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dome Collective</td>
+                            <td style="font-weight: 400;">9x conservative stabilized net multiple ($200K/mo)</td>
+                            <td>~$21,600,000</td>
+                        </tr>
+                        <tr>
+                            <td>Land (9-acre parcel)</td>
+                            <td style="font-weight: 400;">Acquisition target ~$10M, market value</td>
+                            <td>~$12,000,000</td>
+                        </tr>
+                        <tr>
+                            <td>AWKN Ranch + Within Center</td>
+                            <td style="font-weight: 400;">Combined operating asset value</td>
+                            <td>~$7,000,000</td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total Ecosystem Value</td>
+                            <td></td>
+                            <td>~$40,600,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--accent-gold);">Series A Structure</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Detail</th><th style="text-align: right;">Value</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Target Raise</td><td>$16,000,000</td></tr>
+                        <tr><td>Timeline</td><td>9&ndash;12 months from Phase 1 close</td></tr>
+                        <tr><td>Land Acquisition &mdash; 9-Acre Parcel</td><td>$10,000,000</td></tr>
+                        <tr><td>Dome Build-Out &amp; Full Expansion</td><td>$6,000,000</td></tr>
+                        <tr><td>Phase 1 Entry Valuation Cap (SAFE)</td><td>$8,000,000</td></tr>
+                        <tr><td>Projected Series A Valuation</td><td style="font-weight: 400; font-size: 13px;">Materially higher &mdash; reflecting stabilized operations</td></tr>
+                        <tr style="background: rgba(122, 158, 109, 0.06);"><td><strong>Projected Return for Phase 1 Investors</strong></td><td style="color: var(--accent-gold);"><strong>2&ndash;4x (200&ndash;400%)</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="quote-block-highlight" style="margin-top: 48px; border-color: rgba(212, 160, 85, 0.3); background: linear-gradient(135deg, rgba(212, 160, 85, 0.1), rgba(122, 158, 109, 0.06));">
+            <p style="font-size: 15px;">Enter now at $8M. The Dome Collective alone projects to $21.6M+ in value at stabilization. Total ecosystem target: $40.6M. This is a rare, low-cap entry into a mission-driven, revenue-generating ecosystem with real operations and massive upside.</p>
+        </div>
+
+        <div style="max-width: 700px; margin-top: 32px;">
+            <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7;">
+                This is not a speculative bet. The waitlist exists. The deposits are coming in. The land is adjacent and the infrastructure is shared. The Dome Collective is the natural next step for everything AWKN Ranch and Within Center have already built &mdash; and the numbers speak for themselves.
+            </p>
         </div>
     </section>
 
@@ -1207,20 +1436,21 @@
     <!-- CTA -->
     <section class="cta-section">
         <div class="section-label">Investment Opportunity</div>
-        <h2>$300,000 &mdash; Next Phase Growth</h2>
+        <h2>$500,000 Tranche &mdash; $8M Valuation Cap</h2>
         <p>
             The ranch is awake. It is time to let it fly.<br>
-            <span style="color: var(--text-muted); font-size: 14px;">$300K investment projected to be recovered within 6&ndash;9 months of full operations.</span>
+            <span style="color: var(--text-muted); font-size: 14px;">Phase 1 investment recovered within 9&ndash;12 months at conservative projections. Phase 2 projects 2&ndash;4x return.</span>
         </p>
         <a href="mailto:william@within.center" class="cta-btn">Contact Us</a>
-        <p style="color: var(--text-muted); font-size: 12px; margin-top: 20px; margin-bottom: 0;">
-            Within Center / AWKN Ranch &bull; Austin, Texas &bull; www.withincenter.com
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 24px; margin-bottom: 0;">
+            Within Center / AWKN Ranch | Dome Collective<br>
+            <span style="color: var(--accent-gold);">Austin, Texas</span>
         </p>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>This document is confidential and intended solely for the use of authorized investors. March 2026.</p>
+        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>This document is confidential and intended solely for the use of authorized investors. Prepared for Aaron &amp; Alex. March 2026.</p>
     </footer>
 </div>
 
@@ -1295,7 +1525,6 @@
 
     function initSlideshow() {
         if (!slides.length) return;
-        // Create dots
         slides.forEach((_, i) => {
             const dot = document.createElement('button');
             dot.className = 'slideshow-dot' + (i === 0 ? ' active' : '');
