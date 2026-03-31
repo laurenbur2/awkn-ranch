@@ -1,12 +1,12 @@
 {
-  "version": "v260331.06 7:25p",
-  "release": 6,
-  "sha": "1ec5da6",
-  "fullSha": "1ec5da67761e53eecd1d01e9c1d3b41ed7914dde",
+  "version": "v260331.07 7:49p",
+  "release": 7,
+  "sha": "31a2b3b",
+  "fullSha": "31a2b3b6daf52ece3db522f3c34bb37bd73484eb",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-31T14:25:13-05:00",
-  "commits": [{"sha":"1ec5da6","message":"Comprehensive mobile responsive overhaul for investor page","author":"Lauren Burandt"}]
+  "pushedAt": "2026-03-31T14:49:32-05:00",
+  "commits": [{"sha":"31a2b3b","message":"Change SAFE to Tranche throughout investor presentation","author":"Lauren Burandt"}]
 }
