@@ -1,12 +1,12 @@
 {
-  "version": "v260331.01 3:45p",
-  "release": 1,
-  "sha": "4f6bb3a",
-  "fullSha": "4f6bb3a03534985326f89d45a37bbc9ff44d18d0",
+  "version": "v260331.02 5:07p",
+  "release": 2,
+  "sha": "0e45122",
+  "fullSha": "0e45122c921b134d836a787a5d4d0fa2a40fe379",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-31T10:45:18-05:00",
-  "commits": [{"sha":"4f6bb3a","message":"feat: add operations & logistics plan page","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-03-31T12:07:10-05:00",
+  "commits": [{"sha":"0e45122","message":"refactor: rewrite operations page with hospitality-first focus","author":"Justin DeLaCruz"}]
 }
