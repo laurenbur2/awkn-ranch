@@ -1,12 +1,12 @@
 {
-  "version": "v260331.02 5:04p",
-  "release": 2,
-  "sha": "c1eeeda",
-  "fullSha": "c1eeedab84073c1eeea04c8a7b7468c75b72a5f4",
+  "version": "v260331.03 5:11p",
+  "release": 3,
+  "sha": "d23cb44",
+  "fullSha": "d23cb447beffec5371d8c95c975639495db7d457",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-31T12:03:36-05:00",
-  "commits": [{"sha":"c1eeeda","message":"Add investor presentation page aligned with updated business plan","author":"Lauren Burandt"}]
+  "pushedAt": "2026-03-31T12:10:53-05:00",
+  "commits": [{"sha":"d23cb44","message":"Redesign investor page: SVG icons, tighter typography, premium polish","author":"Lauren Burandt"}]
 }
