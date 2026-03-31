@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-AWKN Ranch is a 12-acre wellness sanctuary in Austin, Texas, seeking $500,000 via SAFE note at an $8M valuation cap. The organization projects reaching profitability within 6-9 months, with conservative annual net profit of $823,500, base case of $1.536M, and strong year projections exceeding $2.3M.
+AWKN Ranch is a 12-acre wellness sanctuary in Austin, Texas, seeking $500,000 via SAFE note at an $8M valuation cap. The organization projects reaching profitability within 6-9 months, with conservative annual net profit of $679,716, base case of $1.536M, and strong year projections exceeding $2.1M.
 
 The business represents a strategic pivot from Within Center's original 30-day inpatient model to a diversified ecosystem combining nightly lodging, outpatient therapy, venue rentals, and membership programs across four revenue pillars: Wellness, Retreats & Events, Residential, and Memberships.
 
@@ -87,8 +87,8 @@ The property offers **18 total beds** across tiered accommodation types:
 | Accommodation | Beds | Rate | Occupancy | Monthly Projection |
 |--------------|------|------|-----------|-------------------|
 | Retreat House | 10 | $349–$499/night | 80% | $15,000–$22,000 |
-| Yurts (2 units) | — | $699/night | 50% | $20,970 |
-| HoneyComb Dome | — | $599/night | 50% | $8,985 |
+| Yurts (2 units) | — | $699/night | 30% (weekends) | $12,582 |
+| HoneyComb Dome | — | $599/night | 30% | $5,391 |
 | Lodging Domes (2 units, 8 beds) | 8 | $599/night | 50% | $17,970 |
 
 **Extended-stay discounts:** 5% for 3-day stays · 10% for week-long stays
@@ -108,6 +108,14 @@ Lean à la carte model for premium services — no fixed staffing or inventory c
 
 > Pool access included with all nightly rates. Other wellness services scale with demand.
 
+### Revenue Split Structure
+
+| Category | Facilitator | AWKN Ranch | Notes |
+|----------|------------|------------|-------|
+| **Services** (massage, somatic, readings, clinical, ceremonies) | 70% | 30% | Facilitator takes majority — they bring the skilled work |
+| **Events** (hosted retreats, facilitator-led programs) | 80% | 20% | Facilitator brings their own community; AWKN captures real revenue on the back end through lodging bookings from attendees |
+| **Recovery Amenities** (sauna, cold plunge, hot tub) | — | 100% | Pure property revenue — no facilitator involved |
+
 ---
 
 ## Six-Stream Revenue Model
@@ -115,8 +123,8 @@ Lean à la carte model for premium services — no fixed staffing or inventory c
 | Stream | Monthly Range | Details |
 |--------|---------------|---------|
 | Retreat house lodging | $15,000–$22,000 | Primary accommodation capacity |
-| Yurt lodging | $20,970 | Two ceremonial structures |
-| HoneyComb Dome | $8,985 | Premium single-unit accommodation |
+| Yurt lodging | $12,582 | Two ceremonial structures (weekend-focused, 30% occupancy) |
+| HoneyComb Dome | $5,391 | Premium single-unit accommodation (30% occupancy) |
 | Premium lodging domes | $17,970 | New glamping-style builds |
 | Maloka venue rental | $20,000–$40,000 | Large-format ceremony and event space |
 | Maloka overnight capacity | $12,000–$18,000 | Group lodging within venue |
@@ -124,7 +132,7 @@ Lean à la carte model for premium services — no fixed staffing or inventory c
 | Within Center outpatient services | $16,500–$33,000 | Ketamine therapy and integration |
 | Hosted retreats | $20,000–$75,000 | Curated multi-day immersion experiences |
 | Memberships | $3,000–$8,000 | Monthly access, 16 current members with zero marketing |
-| **Combined Monthly Total** | **$142,425–$259,925** | |
+| **Combined Monthly Total** | **$130,443–$247,943** | |
 
 ---
 
@@ -153,9 +161,9 @@ Lean à la carte model for premium services — no fixed staffing or inventory c
 
 | Scenario | Revenue | Expenses | Net Monthly | Annualized |
 |----------|---------|----------|-------------|------------|
-| Conservative | $142,425 | $73,800 | $68,625 | $823,500 |
+| Conservative | $130,443 | $73,800 | $56,643 | $679,716 |
 | Base Case | $195,000 | $67,000 | $128,000 | $1,536,000 |
-| Strong Month | $259,925 | $67,000 | $192,925 | $2,315,100 |
+| Strong Month | $247,943 | $67,000 | $180,943 | $2,171,316 |
 
 ---
 
@@ -202,13 +210,13 @@ Austin represents significant expansion opportunity as a rapidly growing city wi
 
 ---
 
-## Phase 2: Austin Dome Collective
+## Phase 2: Austin AWKN Dome Collective
 
 103 geodesic dome residences on an adjacent 9-acre parcel — an intentional living community directly integrated with AWKN Ranch ecosystems.
 
 > One marketing post achieved **250,000 views** with 4,000 shares and 4,000 likes, generating a **waitlist of 408 interested residents** before construction commenced.
 
-### Dome Collective Revenue Model
+### AWKN Dome Collective Revenue Model
 
 | Unit Type | Count | Rate | Occupancy | Monthly Revenue |
 |-----------|-------|------|-----------|----------------|
@@ -226,7 +234,7 @@ Residential leases operate on rolling 6-month terms with application-based selec
 
 | Asset | Projected Value |
 |-------|----------------|
-| Dome Collective | ~$21.6M (9x conservative net) |
+| AWKN Dome Collective | ~$21.6M (9x conservative net) |
 | Adjacent 9-acre land | ~$12M market value |
 | AWKN Ranch + Within Center operating asset | ~$7M |
 | **Total Ecosystem Value** | **~$40.6M** |
