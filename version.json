@@ -1,12 +1,12 @@
 {
-  "version": "v260331.04 8:48p",
-  "release": 4,
-  "sha": "d8f982c",
-  "fullSha": "d8f982c7760a729a4a340f1d53158b5399efa830",
+  "version": "v260331.05 8:53p",
+  "release": 5,
+  "sha": "2b4125b",
+  "fullSha": "2b4125bde62a80923d8cdfbd8c96ae44cec9dbde",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-31T15:47:54-05:00",
-  "commits": [{"sha":"1a29cf4","message":"feat: add Ranch House as main rental space with 7 rooms and 10 beds","author":"Justin DeLaCruz"},{"sha":"968a6b4","message":"feat: add min_nights column and show nightly rates on spaces page","author":"Justin DeLaCruz"},{"sha":"d8f982c","message":"feat: add 10-year financial projections page for investors","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-03-31T15:52:51-05:00",
+  "commits": [{"sha":"32258d7","message":"feat: add Ranch House as main rental space with 7 rooms and 10 beds","author":"Justin DeLaCruz"},{"sha":"f5801a9","message":"feat: add min_nights column and show nightly rates on spaces page","author":"Justin DeLaCruz"},{"sha":"eb31e22","message":"feat: add 10-year financial projections page for investors","author":"Justin DeLaCruz"},{"sha":"f5c5f6b","message":"fix: remove Google auth from projections page","author":"Justin DeLaCruz"},{"sha":"2b4125b","message":"merge: use latest projections page without auth","author":"Justin DeLaCruz"}]
 }
