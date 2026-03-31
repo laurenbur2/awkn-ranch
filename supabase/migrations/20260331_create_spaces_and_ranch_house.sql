@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS spaces (
   is_micro BOOLEAN DEFAULT false,
   can_be_dwelling BOOLEAN DEFAULT false,
   can_be_event BOOLEAN DEFAULT false,
+  min_nights INTEGER DEFAULT 1,
   is_archived BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -64,11 +65,11 @@ CREATE POLICY IF NOT EXISTS "spaces_auth_delete" ON spaces
   FOR DELETE TO authenticated USING (true);
 
 -- Step 3: Create the Ranch House as parent space
-INSERT INTO spaces (name, slug, description, location, can_be_dwelling, can_be_event, is_listed, is_secret, max_residents, nightly_rate)
+INSERT INTO spaces (name, slug, description, location, can_be_dwelling, can_be_event, is_listed, is_secret, max_residents, nightly_rate, min_nights)
 SELECT 'Ranch House', 'ranch-house',
   'The main house on the property with 7 rooms and 10 beds. Perfect for overnight retreats, team offsites, and group getaways. Full kitchen, common areas, backyard access, and all the amenities of ranch living.',
   'Main Property',
-  true, true, true, false, 10, 295
+  true, true, true, false, 10, 295, 2
 WHERE NOT EXISTS (SELECT 1 FROM spaces WHERE name = 'Ranch House');
 
 -- Step 4: Add the 7 rooms as child spaces

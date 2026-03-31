@@ -138,7 +138,7 @@ async function loadData(retryCount = 0) {
     const { data: spacesData, error: spacesError } = await supabase
       .from('spaces')
       .select(`
-        id, name, slug, description, location, monthly_rate,
+        id, name, slug, description, location, monthly_rate, nightly_rate, min_nights,
         sq_footage, bath_privacy, bath_fixture,
         beds_king, beds_queen, beds_double, beds_twin, beds_folding,
         min_residents, max_residents, is_listed, is_secret, is_micro, can_be_dwelling, can_be_event,
@@ -564,7 +564,7 @@ function renderCards(spacesToRender) {
             ${bathText ? `<span class="detail-item"><span class="detail-icon">🚿</span>${bathText} bath</span>` : ''}
           </div>
           <div class="card-footer">
-            ${space.monthly_rate ? `<div class="card-price">$${space.monthly_rate}<span>/mo</span></div>` : ''}
+            ${space.monthly_rate ? `<div class="card-price">$${space.monthly_rate}<span>/mo</span></div>` : space.nightly_rate ? `<div class="card-price">$${space.nightly_rate}<span>/night</span>${space.min_nights > 1 ? `<span class="min-stay">${space.min_nights}-night min</span>` : ''}</div>` : ''}
             ${space.amenities.length ? `
               <div class="card-amenities">
                 ${space.amenities.slice(0, 3).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
@@ -615,7 +615,7 @@ function renderTable(spacesToRender) {
         <td class="td-thumbnail">${thumbnail}</td>
         <td>${space.parent?.name ? `<a href="?${getParentUrlParam(space.parent)}" class="table-parent-link" onclick="event.stopPropagation();">${space.parent.name} /</a> ` : ''}<strong>${space.name}</strong></td>
         <td class="td-description">${description}</td>
-        <td>${space.monthly_rate ? `$${space.monthly_rate}/mo` : '-'}</td>
+        <td>${space.monthly_rate ? `$${space.monthly_rate}/mo` : space.nightly_rate ? `$${space.nightly_rate}/night${space.min_nights > 1 ? ` (${space.min_nights}-night min)` : ''}` : '-'}</td>
         <td class="td-hide-mobile">${space.sq_footage || '-'}</td>
         <td>${beds || '-'}</td>
         <td class="td-hide-mobile">${(space.can_be_dwelling && space.bath_privacy && space.bath_privacy !== 'none') ? space.bath_privacy : '-'}</td>
@@ -670,7 +670,7 @@ async function fetchAndShowSpace(spaceId) {
     const { data: space, error } = await supabase
       .from('spaces')
       .select(`
-        id, name, slug, description, location, monthly_rate,
+        id, name, slug, description, location, monthly_rate, nightly_rate, min_nights,
         sq_footage, bath_privacy, bath_fixture,
         beds_king, beds_queen, beds_double, beds_twin, beds_folding,
         min_residents, max_residents, is_listed, is_secret, is_micro, can_be_dwelling, can_be_event,
@@ -821,7 +821,7 @@ function displaySpaceDetail(space) {
     <div class="detail-grid">
       <div class="detail-section">
         <h3>Details</h3>
-        ${space.monthly_rate ? `<p><strong>Rate:</strong> $${space.monthly_rate}/mo</p>` : ''}
+        ${space.monthly_rate ? `<p><strong>Rate:</strong> $${space.monthly_rate}/mo</p>` : space.nightly_rate ? `<p><strong>Rate:</strong> $${space.nightly_rate}/night${space.min_nights > 1 ? ` (${space.min_nights}-night minimum)` : ''}</p>` : ''}
         <p><strong>Size:</strong> ${space.sq_footage ? `${space.sq_footage} sq ft` : 'N/A'}</p>
         <p><strong>Beds:</strong> ${getBedSummary(space) || 'N/A'}</p>
         ${space.can_be_dwelling && ((space.bath_privacy && space.bath_privacy !== 'none') || space.bath_fixture) ? `<p><strong>Bathroom:</strong> ${(space.bath_privacy && space.bath_privacy !== 'none') ? space.bath_privacy : ''}${space.bath_fixture ? ` (${space.bath_fixture})` : ''}</p>` : ''}
