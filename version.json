@@ -1,12 +1,12 @@
 {
-  "version": "v260401.11 6:09p",
-  "release": 11,
-  "sha": "808420b",
-  "fullSha": "808420b2d848ef6223e7e87d22808f8d45441436",
+  "version": "v260401.12 6:22p",
+  "release": 12,
+  "sha": "c063192",
+  "fullSha": "c0631926168fd113ad4526d1b1a520614867a6b5",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T13:09:26-05:00",
-  "commits": [{"sha":"808420b","message":"Fix login page blank screen: remove CSS gate that hides page on JS failure","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T13:22:32-05:00",
+  "commits": [{"sha":"c063192","message":"Replace favicons with AWKN wordmark logo","author":"Lauren Burandt"}]
 }
