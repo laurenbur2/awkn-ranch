@@ -1,12 +1,12 @@
 {
-  "version": "v260401.02 3:14p",
-  "release": 2,
-  "sha": "5f9bac3",
-  "fullSha": "5f9bac369875b3c39b6e151b4a3f8d7dba9a6b79",
+  "version": "v260401.03 3:18p",
+  "release": 3,
+  "sha": "b042f3d",
+  "fullSha": "b042f3d56c3cb342cef5d4e9a25c3d5cdf548d47",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T10:14:11-05:00",
-  "commits": [{"sha":"5f9bac3","message":"Update date from March to April 2026","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T10:18:12-05:00",
+  "commits": [{"sha":"b042f3d","message":"Tighten all copy throughout investor presentation for directness","author":"Lauren Burandt"}]
 }
