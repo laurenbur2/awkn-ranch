@@ -557,6 +557,7 @@
       .phase2-banner { padding: 2rem 1.5rem; }
       .phase2-banner h3 { font-size: 1.3rem; }
       .card { padding: 1.5rem 1.25rem; }
+      .card > div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
 
       /* Hide wide tables, show card layout on mobile */
       .desktop-table { display: none; }
@@ -1209,6 +1210,52 @@
     </div>
 
     <div class="callout">The Maloka Dome already demonstrates market demand: <strong>$40,000 in 20% deposits</strong> for November from a single client booking two weekends &mdash; before construction commenced.</div>
+
+    <!-- Maloka ROI Case Study -->
+    <div class="card" style="margin-top:2.5rem;">
+      <h3>Capital Efficiency: The Maloka</h3>
+      <p style="font-size:0.88rem;color:var(--grey);line-height:1.7;margin-bottom:1.25rem;">A single infrastructure investment that pays for itself in under 45 days.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+        <div>
+          <img src="https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/maloka-site.jpg" alt="Maloka build site at AWKN Ranch" style="width:100%;border-radius:8px;object-fit:cover;aspect-ratio:4/3;">
+          <p style="font-size:0.75rem;color:var(--grey);margin-top:0.5rem;text-align:center;">Future Maloka site — 50-foot ceremony and retreat dome</p>
+        </div>
+        <div>
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);margin-bottom:0.5rem;">Total Investment</div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--gold-dark);margin-bottom:0.25rem;">$60,000</div>
+            <div style="font-size:0.82rem;color:var(--text-light);line-height:1.6;">$50K build, deliver &amp; install<br>$10K landscaping, trails &amp; lighting</div>
+          </div>
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);margin-bottom:0.5rem;">Added Monthly Expense</div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--brown);margin-bottom:0.25rem;">$1,000/mo</div>
+            <div style="font-size:0.82rem;color:var(--text-light);">Additional rent for expanded footprint</div>
+          </div>
+          <div style="border-top:2px solid var(--gold);padding-top:1rem;">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);margin-bottom:0.5rem;">Monthly Revenue Generated</div>
+            <div style="font-size:1.5rem;font-weight:700;color:var(--green);margin-bottom:0.25rem;">$44,000/mo</div>
+            <table style="width:100%;font-size:0.82rem;">
+              <tr><td style="padding:0.25rem 0;color:var(--text-light);">Venue rentals (4 weekends × $5K)</td><td style="text-align:right;font-weight:600;color:var(--green);">$20,000</td></tr>
+              <tr><td style="padding:0.25rem 0;color:var(--text-light);">Lodging driven by events (15 beds × 4 wkds × $400)</td><td style="text-align:right;font-weight:600;color:var(--green);">$24,000</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.5rem;">
+        <div style="text-align:center;background:var(--cream);padding:1rem;border-radius:8px;">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--gold-dark);">$43,000</div>
+          <div style="font-size:0.75rem;color:var(--grey);">Net Monthly Profit</div>
+        </div>
+        <div style="text-align:center;background:var(--cream);padding:1rem;border-radius:8px;">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--green);">~45 Days</div>
+          <div style="font-size:0.75rem;color:var(--grey);">Payback Period</div>
+        </div>
+        <div style="text-align:center;background:var(--cream);padding:1rem;border-radius:8px;">
+          <div style="font-size:1.2rem;font-weight:700;color:var(--brown);">8.6x</div>
+          <div style="font-size:0.75rem;color:var(--grey);">Annual ROI</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
