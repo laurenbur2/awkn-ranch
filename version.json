@@ -1,12 +1,12 @@
 {
-  "version": "v260401.07 5:31p",
-  "release": 7,
-  "sha": "6530609",
-  "fullSha": "65306091ef1a6b536e63012d4671f34359cc52bc",
+  "version": "v260401.08 5:55p",
+  "release": 8,
+  "sha": "ace0d73",
+  "fullSha": "ace0d73c539935567d982ed9ce1438ee7b0dd748",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T12:30:55-05:00",
-  "commits": [{"sha":"6530609","message":"Add actual maloka site photo (was empty before)","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T12:54:44-05:00",
+  "commits": [{"sha":"ace0d73","message":"Update day pass button to translucent white background","author":"Lauren Burandt"}]
 }
