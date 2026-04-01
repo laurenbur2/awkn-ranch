@@ -46,81 +46,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== LOGIN SCREEN ===== */
-        #login-screen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(ellipse at 30% 20%, rgba(122, 158, 109, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 70% 80%, rgba(212, 160, 85, 0.06) 0%, transparent 50%),
-                        var(--bg-primary);
-        }
-
-        .login-container {
-            text-align: center;
-            max-width: 440px;
-            padding: 56px 44px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
-        }
-
-        .login-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--accent-green);
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 36px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .login-tagline {
-            color: var(--text-secondary);
-            font-size: 15px;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .google-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 36px;
-            background: rgba(240, 235, 227, 0.08);
-            color: var(--text-primary);
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        .google-btn:hover {
-            background: rgba(240, 235, 227, 0.14);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .google-btn svg { width: 20px; height: 20px; }
-
-        .login-note { color: var(--text-muted); font-size: 12px; margin-top: 24px; }
-        .login-error { color: var(--accent-terracotta); font-size: 13px; margin-top: 16px; display: none; }
-
         /* ===== MAIN CONTENT ===== */
-        #app { display: none; }
-        #app.visible { display: block; }
-        #login-screen.hidden { display: none; }
 
         .topbar {
             position: sticky; top: 0; z-index: 100;
@@ -473,26 +399,7 @@
 </head>
 <body>
 
-<!-- Login Screen -->
-<div id="login-screen">
-    <div class="login-container">
-        <div class="login-logo">AWKN Ranch</div>
-        <div class="login-subtitle">& Within Center</div>
-        <div class="login-tagline">
-            A Transformative Wellness Ecosystem<br>
-            Austin, Texas &bull; 12-Acre Healing Sanctuary
-        </div>
-        <button class="google-btn" onclick="signInWithGoogle()">
-            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            Sign in with Google
-        </button>
-        <div class="login-error" id="login-error"></div>
-        <div class="login-note">Prepared for Aaron &amp; Alex &bull; Strictly Confidential</div>
-    </div>
-</div>
-
-<!-- Main App -->
-<div id="app">
+<div id="app" style="display:block;">
     <div class="watermark">Confidential &mdash; Prepared for Aaron &amp; Alex</div>
 
     <!-- Top Bar -->
@@ -511,11 +418,6 @@
                 <li><a href="#market">Market</a></li>
                 <li><a href="#phase2">Phase 2</a></li>
             </ul>
-            <div class="topbar-user">
-                <img class="topbar-avatar" id="user-avatar" src="" alt="">
-                <span class="topbar-email" id="user-email"></span>
-                <button class="btn-signout" onclick="signOut()">Sign Out</button>
-            </div>
         </div>
     </nav>
 
@@ -1454,61 +1356,7 @@
     </footer>
 </div>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-    const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
-
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    sb.auth.onAuthStateChange((event, session) => {
-        if (session && session.user) {
-            showApp(session.user);
-        } else {
-            showLogin();
-        }
-    });
-
-    async function signInWithGoogle() {
-        const { error } = await sb.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin + window.location.pathname
-            }
-        });
-        if (error) {
-            document.getElementById('login-error').textContent = error.message;
-            document.getElementById('login-error').style.display = 'block';
-        }
-    }
-
-    async function signOut() {
-        await sb.auth.signOut();
-        showLogin();
-    }
-
-    function showApp(user) {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app').classList.add('visible');
-
-        const avatar = user.user_metadata?.avatar_url || '';
-        const name = user.user_metadata?.full_name || user.email || '';
-
-        if (avatar) {
-            document.getElementById('user-avatar').src = avatar;
-            document.getElementById('user-avatar').style.display = 'block';
-        } else {
-            document.getElementById('user-avatar').style.display = 'none';
-        }
-        document.getElementById('user-email').textContent = name;
-    }
-
-    function showLogin() {
-        document.getElementById('login-screen').classList.remove('hidden');
-        document.getElementById('app').classList.remove('visible');
-    }
-
     document.querySelectorAll('.topbar-nav a').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
