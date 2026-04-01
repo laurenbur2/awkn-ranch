@@ -1,12 +1,12 @@
 {
-  "version": "v260331.08 8:00p",
-  "release": 8,
-  "sha": "6f83ada",
-  "fullSha": "6f83ada6c1423db32159ccd6f33cb69b7e9f5f4d",
+  "version": "v260401.01 3:13p",
+  "release": 1,
+  "sha": "1b25c2a",
+  "fullSha": "1b25c2aae9a216f2b64ca7c1bfbfec404e69fe28",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-03-31T15:00:00-05:00",
-  "commits": [{"sha":"6f83ada","message":"Recalculate retreat house at 10 beds x rate x 50% occupancy","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T10:13:03-05:00",
+  "commits": [{"sha":"1b25c2a","message":"Add corporate structure, valuation breakdown, exit strategy, and tech overhaul","author":"Lauren Burandt"}]
 }
