@@ -15,7 +15,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 2rem;
+      padding: 1rem 2rem;
       background: #2d3024;
       color: white;
     }
@@ -23,25 +23,23 @@
     .site-nav__logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 14px;
       text-decoration: none;
       color: white;
     }
 
     .site-nav__icon {
-      height: 32px;
+      height: 44px;
       width: auto;
     }
 
-    .site-nav__wordmark {
-      height: 18px;
-      width: auto;
-    }
-
-    .site-nav__logo span {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-      font-size: 1.1rem;
-      font-weight: 500;
+    .site-nav__title {
+      font-family: 'Ovo', serif;
+      font-size: 1.65rem;
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: 1.5px;
+      line-height: 1;
     }
 
     .site-nav__version {
@@ -1527,10 +1525,10 @@
   <div id="sandboxBanner" class="sandbox-banner">SANDBOX MODE — Payments use Square test credentials</div>
   <!-- Site-wide Navigation -->
   <nav class="site-nav">
-    <a href="/awkn-ranch/" class="site-nav__logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-      <img src="/awkn-ranch/assets/branding/logo-white-transparent.png" alt="AWKN Ranch" class="site-nav__icon" style="height:32px;width:auto;">
-      <span style="font-family:'Ovo',serif;font-size:1.25rem;font-weight:400;color:#fff;letter-spacing:1px;">AWKN Ranch</span>
-      <span title="Site version" class="site-nav__version">v260401.25 7:38p</span>
+    <a href="/awkn-ranch/" class="site-nav__logo">
+      <img src="/awkn-ranch/assets/branding/logo-white-transparent.png" alt="AWKN Ranch" class="site-nav__icon">
+      <span class="site-nav__title">AWKN Ranch</span>
+      <span title="Site version" class="site-nav__version">v260401.23 7:32p</span>
     </a>
     <ul class="site-nav__links">
       <li><a href="/visiting/">Visiting</a></li>
