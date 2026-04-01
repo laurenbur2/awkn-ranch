@@ -1,12 +1,12 @@
 {
-  "version": "v260401.18 7:18p",
-  "release": 18,
-  "sha": "ddcc775",
-  "fullSha": "ddcc775e40d587a36d3cd368824beb8b8edf127b",
-  "actor": "laurenbur2",
+  "version": "v260401.19 7:19p",
+  "release": 19,
+  "sha": "e84f690",
+  "fullSha": "e84f69051665b628bc40acdb5e0540000b71cfcd",
+  "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:18:14-05:00",
-  "commits": [{"sha":"ddcc775","message":"Update valuation: Dome Collective $19.2M, Functional Wellness $9.6M, total $40.8M+","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T14:19:18-05:00",
+  "commits": [{"sha":"e84f690","message":"feat: add AWKN wordmark logo to spaces landing page header","author":"Justin DeLaCruz"}]
 }
