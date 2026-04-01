@@ -1,12 +1,12 @@
 {
-  "version": "v260401.22 7:31p",
-  "release": 22,
-  "sha": "b60ad7f",
-  "fullSha": "b60ad7f08f405e00d4d3bad283a898428ffd6791",
+  "version": "v260401.23 7:32p",
+  "release": 23,
+  "sha": "491cbb4",
+  "fullSha": "491cbb4e1af2e96681ac5814a6c57c302ae964a3",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:30:39-05:00",
-  "commits": [{"sha":"b60ad7f","message":"Fix spaces header: one AWKN logo + text, remove duplicate wordmark","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T14:32:17-05:00",
+  "commits": [{"sha":"491cbb4","message":"Fix dual-logo header on apply and hostevent pages: one logo + Ovo text","author":"Lauren Burandt"}]
 }
