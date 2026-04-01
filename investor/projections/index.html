@@ -445,9 +445,9 @@
 
     // Monthly steady-state figures from investor deck
     const scenarios = {
-        conservative: { label: 'Conservative', revenue: 133440, expenses: 73800 },
-        base:         { label: 'Base Case',    revenue: 185000, expenses: 67000 },
-        strong:       { label: 'Strong',       revenue: 250940, expenses: 60800 }
+        conservative: { label: 'Conservative', revenue: 133440, expenses: 72300 },
+        base:         { label: 'Base Case',    revenue: 185000, expenses: 65500 },
+        strong:       { label: 'Strong',       revenue: 250940, expenses: 59300 }
     };
 
     // Monthly ramp multipliers for Year 1
@@ -461,7 +461,7 @@
         { name: 'Executive / Management', low: 10000, high: 12000, rampStart: 1 },
         { name: 'Shannon Cohen — Advisory', low: 3000, high: 3000, rampStart: 1 },
         { name: 'Property Lease', low: 12800, high: 12800, rampStart: 1 },
-        { name: 'RV Relocation + Additional Acre', low: 1500, high: 1500, rampStart: 1 },
+        { name: 'RV Relocation (one-time)', low: 1500, high: 1500, rampStart: 1, oneTime: 1 },
         { name: 'Maintenance & Utilities', low: 4000, high: 6000, rampStart: 1 },
         { name: 'Breakfast & Guest Supplies', low: 2500, high: 3500, rampStart: 2 },
         { name: 'Insurance, Licensing & Compliance', low: 1500, high: 2500, rampStart: 1 },
@@ -573,9 +573,12 @@
             let annualTotal = 0;
             const monthlyCells = months.map((m, i) => {
                 const monthNum = i + 1;
-                // Items ramp in: 0 before rampStart, partial months 1-3, full after
                 let val = 0;
-                if (monthNum >= item.rampStart) {
+                if (item.oneTime) {
+                    // One-time expense: only charged in the specified month
+                    if (monthNum === item.oneTime) val = steadyState;
+                } else if (monthNum >= item.rampStart) {
+                    // Recurring: ramp in during months 1-3, full after
                     if (monthNum <= 2) val = Math.round(steadyState * 0.6);
                     else if (monthNum === 3) val = Math.round(steadyState * 0.8);
                     else val = steadyState;
