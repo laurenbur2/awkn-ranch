@@ -1,12 +1,12 @@
 {
-  "version": "v260401.24 7:37p",
-  "release": 24,
-  "sha": "cd229a2",
-  "fullSha": "cd229a25b33aeaacb872a076b19b68fee4c05047",
-  "actor": "laurenbur2",
+  "version": "v260401.25 7:38p",
+  "release": 25,
+  "sha": "32d88c1",
+  "fullSha": "32d88c1ce73b9ddf35ad389689a73368188f8aa3",
+  "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:37:05-05:00",
-  "commits": [{"sha":"cd229a2","message":"Add standalone PlanList todo page, extract from devcontrol","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T14:38:48-05:00",
+  "commits": [{"sha":"32d88c1","message":"feat: sync with alpacapps-infra template — new docs, admin tabs, update checker","author":"Justin DeLaCruz"}]
 }
