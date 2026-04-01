@@ -1,12 +1,12 @@
 {
-  "version": "v260401.13 6:26p",
-  "release": 13,
-  "sha": "999c3d1",
-  "fullSha": "999c3d1cddcf253702c2cd9fc7085da6203e82ba",
+  "version": "v260401.14 6:41p",
+  "release": 14,
+  "sha": "b970d09",
+  "fullSha": "b970d09e2b0157847bbe6fd1e70282af9bc0d71b",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T13:25:48-05:00",
-  "commits": [{"sha":"999c3d1","message":"Fix OAuth redirect path to include /awkn-ranch/ prefix","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T13:41:21-05:00",
+  "commits": [{"sha":"b970d09","message":"Fix all redirect paths to include /awkn-ranch/ prefix for GitHub Pages","author":"Lauren Burandt"}]
 }
