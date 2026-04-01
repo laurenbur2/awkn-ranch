@@ -286,7 +286,7 @@ googleSignInBtn.addEventListener('click', async () => {
     const isCapacitor = window.Capacitor?.isNativePlatform?.() ?? false;
     const loginRedirect = isCapacitor
       ? 'com.yourorg.app://login/'
-      : window.location.origin + '/login/';
+      : window.location.origin + '/awkn-ranch/login/';
     console.log('[LOGIN]', 'Calling signInWithGoogle()', { loginRedirect, storedRedirect: redirectUrl, isCapacitor });
     await signInWithGoogle(loginRedirect);
     // Note: signInWithGoogle redirects to Google, so this line won't execute
