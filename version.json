@@ -1,12 +1,12 @@
 {
-  "version": "v260401.27 7:56p",
-  "release": 27,
-  "sha": "46fabd0",
-  "fullSha": "46fabd05d4641c511fda3b106ce1e5d4ac004081",
+  "version": "v260401.28 8:16p",
+  "release": 28,
+  "sha": "5a30d49",
+  "fullSha": "5a30d497251f6b535e98df702b2fbc930e41cd30",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:56:46-05:00",
-  "commits": [{"sha":"46fabd0","message":"Make PlanList accessible to all authenticated users","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T15:16:27-05:00",
+  "commits": [{"sha":"5a30d49","message":"Update lodging domes: 8 beds × $299/night × 30% occ, add dome photos","author":"Lauren Burandt"}]
 }
