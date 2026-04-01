@@ -1,12 +1,12 @@
 {
-  "version": "v260401.15 6:53p",
-  "release": 15,
-  "sha": "ee7d250",
-  "fullSha": "ee7d250d43e3bafb3013b891ef1caab7d246d340",
+  "version": "v260401.16 7:04p",
+  "release": 16,
+  "sha": "28aea61",
+  "fullSha": "28aea618745354cd03cd04108b7b0c9abcbba5d3",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T13:53:23-05:00",
-  "commits": [{"sha":"ee7d250","message":"Add self-healing script to clear stale auth cache on login page","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T14:04:37-05:00",
+  "commits": [{"sha":"28aea61","message":"Regenerate favicons as proper ICO with multiple sizes from AWKN wordmark","author":"Lauren Burandt"}]
 }
