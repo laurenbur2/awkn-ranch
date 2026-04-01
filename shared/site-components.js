@@ -81,9 +81,9 @@ function renderHeader(options = {}) {
   return `
     <header class="aap-header ${headerClass} ${colorClass}" id="aap-header">
       <div class="aap-header__inner">
-        <a href="${BASE_PATH}/" class="aap-header__logo">
-          <img src="${light ? IMAGES.iconInverted : IMAGES.icon}" alt="AWKN Ranch Austin" class="aap-header__icon" width="21" height="30" data-light-src="${IMAGES.iconInverted}" data-dark-src="${IMAGES.icon}" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
-          <img src="${light ? IMAGES.wordmarkInverted : IMAGES.wordmark}" alt="AWKN Ranch Austin" class="aap-header__wordmark" width="22" height="22" data-light-src="${IMAGES.wordmarkInverted}" data-dark-src="${IMAGES.wordmark}" onerror="this.onerror=null;this.src='${ALPACA_WORDMARK_FALLBACK}'">
+        <a href="${BASE_PATH}/" class="aap-header__logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+          <img src="${light ? IMAGES.iconInverted : IMAGES.icon}" alt="AWKN Ranch" class="aap-header__icon" width="36" height="36" data-light-src="${IMAGES.iconInverted}" data-dark-src="${IMAGES.icon}" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
+          <span style="font-family:'Ovo',serif;font-size:1.25rem;font-weight:400;color:${light ? '#fff' : '#3a2a1a'};letter-spacing:1px;">AWKN Ranch</span>
           <span title="Site version" class="aap-header__version">${version || ''}</span>
         </a>
         <nav class="aap-nav" id="aap-nav">
@@ -249,7 +249,7 @@ function loadGoogleFonts() {
   const link = document.createElement('link');
   link.id = fontId;
   link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Ovo&display=swap';
   document.head.appendChild(link);
 }
 
