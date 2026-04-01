@@ -444,6 +444,22 @@
     </div>
   </div>
 
+  <script>
+    // Self-healing: clear stale cached auth that redirects to wrong paths
+    try {
+      var raw = localStorage.getItem('awkn-ranch-cached-auth');
+      if (raw) {
+        var cached = JSON.parse(raw);
+        // If cache exists but was set before the /awkn-ranch/ prefix fix, clear it
+        if (cached.timestamp && cached.timestamp < 1743550000000) {
+          localStorage.removeItem('awkn-ranch-cached-auth');
+          localStorage.removeItem('awkn-ranch-auth');
+          localStorage.removeItem('your-project-login-redirect');
+          console.log('[LOGIN] Cleared stale pre-fix cached auth');
+        }
+      }
+    } catch(e) {}
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script type="module" src="app.js"></script>
   <script type="module" src="../shared/version-info.js"></script>
