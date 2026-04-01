@@ -1,12 +1,12 @@
 {
-  "version": "v260401.28 8:16p",
-  "release": 28,
-  "sha": "5a30d49",
-  "fullSha": "5a30d497251f6b535e98df702b2fbc930e41cd30",
+  "version": "v260401.29 10:54p",
+  "release": 29,
+  "sha": "ab57880",
+  "fullSha": "ab5788003ea6ed55f3197b97095865da806d3964",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T15:16:27-05:00",
-  "commits": [{"sha":"5a30d49","message":"Update lodging domes: 8 beds × $299/night × 30% occ, add dome photos","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T17:53:59-05:00",
+  "commits": [{"sha":"ab57880","message":"Replace chicken coop photos with actual dome renders","author":"Lauren Burandt"}]
 }
