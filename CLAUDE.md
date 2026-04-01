@@ -8,9 +8,15 @@
 > - `docs/DEPLOY.md` — **load for:** pushing, deploying, version questions
 > - `docs/INTEGRATIONS.md` — **load for:** external APIs, vendor setup, pricing
 > - `docs/CHANGELOG.md` — **load for:** understanding recent changes, migration context
+> - `docs/SECRETS-BITWARDEN.md` — **load for:** Bitwarden CLI, secrets management, vault organization, sharing credentials
+> - `docs/OPEN-BRAIN-SETUP.md` — **load for:** Open Brain session dashboard, AI memory, embeddings
 
 > **IMPORTANT: First-time setup!**
 > Run `/setup-alpacapps-infra` to set up the full infrastructure interactively.
+
+> **Upgrading from the template?**
+> Read `infra/infra-upgrade-guide.md` for step-by-step instructions to sync new features from
+> the alpacapps-infra template repo. Machine-readable feature index: `infra/updates.json`
 
 ## Mandatory Behaviors
 
@@ -32,3 +38,5 @@
 - **Tech:** Vanilla HTML/JS + Tailwind v4 | Supabase | GitHub Pages
 - **Live:** https://USERNAME.github.io/REPO/
 - **Architecture:** Browser → GitHub Pages → Supabase (no server-side code)
+- **Template repo:** https://github.com/rsonnad/alpacapps-infra
+- **Upgrade guide:** `infra/infra-upgrade-guide.md`
