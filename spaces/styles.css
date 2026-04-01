@@ -339,6 +339,12 @@ header {
   gap: 1rem;
 }
 
+.header-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
 h1 {
   font-family: var(--font-body);
   font-size: 1.25rem;
