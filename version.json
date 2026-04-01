@@ -1,12 +1,12 @@
 {
-  "version": "v260401.19 7:19p",
-  "release": 19,
-  "sha": "e84f690",
-  "fullSha": "e84f69051665b628bc40acdb5e0540000b71cfcd",
-  "actor": "justinadelacruz",
+  "version": "v260401.20 7:20p",
+  "release": 20,
+  "sha": "adba7b4",
+  "fullSha": "adba7b4807330a849bbb397c3f1c2f5f1bbfc893",
+  "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:19:18-05:00",
-  "commits": [{"sha":"e84f690","message":"feat: add AWKN wordmark logo to spaces landing page header","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-01T14:20:46-05:00",
+  "commits": [{"sha":"adba7b4","message":"Replace alpaca branding images with AWKN wordmark logo","author":"Lauren Burandt"}]
 }
