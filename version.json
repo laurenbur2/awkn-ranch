@@ -1,12 +1,12 @@
 {
-  "version": "v260401.03 3:18p",
-  "release": 3,
-  "sha": "b042f3d",
-  "fullSha": "b042f3d56c3cb342cef5d4e9a25c3d5cdf548d47",
+  "version": "v260401.04 4:17p",
+  "release": 4,
+  "sha": "a83c923",
+  "fullSha": "a83c9238bad1a088601fa2770f7dea1ecb17192a",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T10:18:12-05:00",
-  "commits": [{"sha":"b042f3d","message":"Tighten all copy throughout investor presentation for directness","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-01T11:17:36-05:00",
+  "commits": [{"sha":"a83c923","message":"Fix valuation table: show full ecosystem value (M+) with M as conservative entry","author":"Lauren Burandt"}]
 }
