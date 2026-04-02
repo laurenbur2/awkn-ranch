@@ -155,27 +155,7 @@
     </div>
   </div>
 
-  <!-- Debug: catch and display any JS errors preventing page load -->
-  <script>
-    window.addEventListener('error', function(e) {
-      var msg = e.message + ' at ' + (e.filename || '?') + ':' + (e.lineno || '?');
-      console.error('PAGE ERROR:', msg);
-      var d = document.createElement('div');
-      d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#c53030;color:#fff;padding:12px 16px;font:13px/1.4 monospace;z-index:9999;max-height:40vh;overflow:auto';
-      d.textContent = 'JS Error: ' + msg;
-      document.body.appendChild(d);
-    });
-    // Safety net: if still loading after 8s, show content anyway
-    setTimeout(function() {
-      var overlay = document.getElementById('loadingOverlay');
-      var content = document.getElementById('appContent');
-      if (overlay && !overlay.classList.contains('hidden')) {
-        overlay.classList.add('hidden');
-        if (content) content.classList.remove('hidden');
-        console.warn('Loading timeout — forced overlay removal');
-      }
-    }, 8000);
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script type="module" src="reservations.js"></script>
 </body>
 </html>
