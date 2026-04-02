@@ -36,7 +36,7 @@ let activityBookings = [];
 
 // Calendar state
 let currentDate = getAustinToday();
-let currentView = 'week'; // day | week | month
+let currentView = 'day'; // day | week | month
 let currentTab = 'house';
 let editingBooking = null; // { type, data } when editing
 
@@ -587,27 +587,205 @@ function attachTimeGridHandlers(container, mode) {
 
 function renderCombinedCalendar() {
   const container = document.getElementById('calCombined');
+
+  if (currentView === 'day') {
+    // DAY VIEW: Full time grid with all columns (rental spaces + staff)
+    // Plus a compact house stays bar at the top
+    renderCombinedDayView(container);
+  } else {
+    // WEEK/MONTH VIEW: Unified timeline grid (date columns, entity rows)
+    renderCombinedTimelineView(container);
+  }
+}
+
+function renderCombinedDayView(container) {
+  const dateStr = toDateStr(currentDate);
+
+  // Build all columns: rental spaces + wellness rooms + staff members
+  const columns = [];
+  for (const s of [...allRentalSpaces, ...allWellnessSpaces]) {
+    columns.push({
+      id: s.id,
+      booking_name: s.booking_name || s.name,
+      staff_only: s.staff_only,
+      _mode: 'rental',
+    });
+  }
+  for (const s of allStaffMembers) {
+    columns.push({
+      id: `staff-${s.id}`,
+      _staffId: s.id,
+      booking_name: s.display_name,
+      _isStaff: true,
+      _mode: 'activity',
+      color: s.color,
+    });
+  }
+
+  // House stays compact bar at top
+  const todayRoomBookings = roomBookings.filter(b => b.check_in <= dateStr && b.check_out > dateStr);
+  let houseHtml = `<div class="combined-house-bar">`;
+  houseHtml += `<div class="combined-house-bar-title">🏠 House Stays Today</div>`;
+  houseHtml += `<div class="combined-house-chips">`;
+  if (todayRoomBookings.length === 0) {
+    houseHtml += `<span class="combined-house-chip combined-house-chip--empty">No house guests today</span>`;
+  } else {
+    for (const bk of todayRoomBookings) {
+      const color = bookingService.ROOM_STATUS_COLORS[bk.status] || '#d4883a';
+      const roomName = bk.space?.booking_name || bk.space?.name || 'Room';
+      houseHtml += `<span class="combined-house-chip" style="background:${color}" data-booking-id="${bk.id}" data-booking-type="room">${roomName}: ${bk.guest_name || 'Guest'}</span>`;
+    }
+  }
+  // Show vacancy
+  const occupiedCount = todayRoomBookings.length;
+  const totalBeds = allHouseSpaces.length;
+  houseHtml += `<span class="combined-house-chip combined-house-chip--vacancy">${occupiedCount}/${totalBeds} beds occupied</span>`;
+  houseHtml += `</div></div>`;
+
+  // Time grid for spaces + activities
+  const startHour = 6;
+  const endHour = 22;
+  const totalSlots = (endHour - startHour) * 2;
+  const slotHeight = 28;
+
+  const gridCols = `minmax(55px, auto) repeat(${columns.length}, minmax(100px, 1fr))`;
+  let html = houseHtml;
+  html += `<div class="tg-grid" style="grid-template-columns: ${gridCols}; grid-template-rows: auto repeat(${totalSlots}, ${slotHeight}px);">`;
+
+  // Header row
+  html += `<div class="tg-corner"></div>`;
+  for (const col of columns) {
+    const dot = col._isStaff ? `<span class="tg-col-header-sub" style="color:${col.color}">●</span>` : '';
+    const staffTag = col.staff_only ? '<span class="tg-col-header-sub">Staff</span>' : '';
+    html += `<div class="tg-col-header">${col.booking_name}${dot}${staffTag}</div>`;
+  }
+
+  // Time rows
+  for (let slot = 0; slot < totalSlots; slot++) {
+    const hour = startHour + Math.floor(slot / 2);
+    const isHour = slot % 2 === 0;
+    const cls = isHour ? 'tg-hour' : 'tg-half';
+
+    // Time label
+    if (isHour) {
+      const label = hour <= 12 ? `${hour}${hour < 12 ? 'a' : 'p'}` : `${hour - 12}p`;
+      html += `<div class="tg-time-label ${cls}">${label}</div>`;
+    } else {
+      html += `<div class="tg-time-label ${cls}"></div>`;
+    }
+
+    // Column cells
+    for (const col of columns) {
+      const colId = col._isStaff ? col._staffId : col.id;
+      const mode = col._mode;
+      const staffOnly = col.staff_only ? ' tg-staff-only' : '';
+      const slotTime = `${String(hour).padStart(2,'0')}:${isHour ? '00' : '30'}`;
+
+      html += `<div class="tg-cell ${cls}${staffOnly}" data-col="${colId}" data-date="${dateStr}" data-time="${slotTime}" data-mode="${mode}" data-slot="${slot}">`;
+
+      // Find bookings starting at this slot
+      const slotStart = new Date(currentDate);
+      slotStart.setHours(hour, isHour ? 0 : 30, 0, 0);
+
+      const allBookingsForCol = mode === 'activity'
+        ? activityBookings.filter(b => b.staff_member_id === colId && b.start_datetime && b.start_datetime.startsWith(dateStr))
+        : spaceBookings.filter(b => b.space_id === colId && b.start_datetime && b.start_datetime.startsWith(dateStr));
+
+      const matchBookings = allBookingsForCol.filter(b => {
+        const bStart = new Date(b.start_datetime);
+        return bStart.getHours() === slotStart.getHours() && bStart.getMinutes() === slotStart.getMinutes();
+      });
+
+      for (const bk of matchBookings) {
+        const bStart = new Date(bk.start_datetime);
+        const bEnd = new Date(bk.end_datetime);
+        const durationMin = (bEnd - bStart) / 60000;
+        const blockHeight = (durationMin / 30) * slotHeight;
+
+        let color, title, sub;
+        if (mode === 'activity') {
+          color = bk.activity_type?.color || '#8B5CF6';
+          title = bk.activity_type?.name || 'Activity';
+          sub = `${bk.client_name || 'Client'} · ${bk.space?.booking_name || ''}`;
+        } else {
+          color = bookingService.SPACE_STATUS_COLORS[bk.status] || '#2563EB';
+          title = bk.client_name || 'Client';
+          sub = `${bk.booking_type} · $${bk.total_amount}`;
+        }
+
+        html += `<div class="tg-booking" style="background:${color}; height:${blockHeight}px;" data-booking-id="${bk.id}" data-booking-type="${mode === 'activity' ? 'activity' : 'space'}">
+          <span class="tg-booking-title">${title}</span>
+          <span class="tg-booking-sub">${sub}</span>
+        </div>`;
+
+        // Buffer zone for activities
+        if (mode === 'activity' && bk.buffer_end) {
+          const bufferMin = (new Date(bk.buffer_end) - bEnd) / 60000;
+          if (bufferMin > 0) {
+            const bufferHeight = (bufferMin / 30) * slotHeight;
+            html += `<div class="tg-buffer" style="top:${blockHeight}px; height:${bufferHeight}px;">clean</div>`;
+          }
+        }
+      }
+
+      html += `</div>`;
+    }
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  // Click handlers
+  container.querySelectorAll('.combined-house-chip[data-booking-id]').forEach(el => {
+    el.addEventListener('click', () => {
+      const bk = roomBookings.find(b => b.id === el.dataset.bookingId);
+      if (bk) openRoomBookingModal(bk);
+    });
+  });
+
+  container.querySelectorAll('.tg-booking').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.bookingId;
+      const type = el.dataset.bookingType;
+      let booking;
+      if (type === 'activity') booking = activityBookings.find(b => b.id === id);
+      else booking = spaceBookings.find(b => b.id === id);
+      if (booking) {
+        if (type === 'activity') openActivityBookingModal(booking);
+        else openSpaceBookingModal(booking);
+      }
+    });
+  });
+
+  container.querySelectorAll('.tg-cell').forEach(el => {
+    el.addEventListener('click', () => {
+      const colId = el.dataset.col;
+      const date = el.dataset.date;
+      const time = el.dataset.time;
+      const mode = el.dataset.mode;
+      if (mode === 'activity') openActivityBookingModal(null, null, date, time);
+      else openSpaceBookingModal(null, colId, date, time);
+    });
+  });
+}
+
+function renderCombinedTimelineView(container) {
   const { start, end } = getDateRange();
   const days = getDaysArray(start, end);
   const rentalSpaces = [...allRentalSpaces, ...allWellnessSpaces];
 
   // Build unified row list with section headers
   const rows = [];
-
-  // Section: House Rooms
   rows.push({ _section: true, label: 'House Stays', icon: '🏠' });
   for (const s of allHouseSpaces) {
     rows.push({ ...s, _type: 'house', _label: s.booking_name || s.name, _sub: `$${s.nightly_rate}/night` });
   }
-
-  // Section: Rental Spaces
   rows.push({ _section: true, label: 'Rental Spaces', icon: '🏕️' });
   for (const s of rentalSpaces) {
     const rate = s.hourly_rate ? `$${s.hourly_rate}/hr` : (s.staff_only ? 'Staff' : '');
     rows.push({ ...s, _type: 'rental', _label: s.booking_name || s.name, _sub: rate });
   }
-
-  // Section: Staff / Activities
   rows.push({ _section: true, label: 'Activities', icon: '🧘' });
   for (const s of allStaffMembers) {
     rows.push({ ...s, _type: 'activity', _staffId: s.id, _label: s.display_name, _sub: '', _color: s.color });
@@ -616,9 +794,8 @@ function renderCombinedCalendar() {
   const gridCols = `minmax(140px, auto) repeat(${days.length}, minmax(36px, 1fr))`;
   let html = `<div class="tl-grid tl-grid--combined" style="grid-template-columns: ${gridCols};">`;
 
-  // Header row
-  html += `<div class="tl-header-row">`;
-  html += `<div class="tl-label-cell" style="border-bottom:1px solid var(--border)"></div>`;
+  // Header
+  html += `<div class="tl-header-row"><div class="tl-label-cell" style="border-bottom:1px solid var(--border)"></div>`;
   for (const day of days) {
     const todayCls = isToday(day) ? ' tl-today' : '';
     const weekendCls = (day.getDay() === 0 || day.getDay() === 6) ? ' tl-weekend' : '';
@@ -630,68 +807,49 @@ function renderCombinedCalendar() {
   }
   html += `</div>`;
 
-  // Render rows
   for (const row of rows) {
-    // Section header row
     if (row._section) {
       html += `<div class="tl-section-header" style="grid-column: 1 / -1;">${row.icon} ${row.label}</div>`;
       continue;
     }
 
     html += `<div class="tl-row">`;
-
-    // Label cell
     const colorDot = row._color ? `<span style="width:8px;height:8px;border-radius:50%;background:${row._color};display:inline-block;flex-shrink:0"></span>` : '';
-    html += `<div class="tl-label-cell">
-      <div style="display:flex;align-items:center;gap:5px">${colorDot}${row._label}</div>
-      ${row._sub ? `<div class="tl-label-rate">${row._sub}</div>` : ''}
-    </div>`;
+    html += `<div class="tl-label-cell"><div style="display:flex;align-items:center;gap:5px">${colorDot}${row._label}</div>${row._sub ? `<div class="tl-label-rate">${row._sub}</div>` : ''}</div>`;
 
-    // Day cells
     for (let i = 0; i < days.length; i++) {
       const day = days[i];
       const dateStr = toDateStr(day);
       const todayCls = isToday(day) ? ' tl-today' : '';
       const weekendCls = (day.getDay() === 0 || day.getDay() === 6) ? ' tl-weekend' : '';
-
       html += `<div class="tl-cell${todayCls}${weekendCls}" data-space="${row.id}" data-date="${dateStr}" data-row-type="${row._type}" data-staff-id="${row._staffId || ''}">`;
 
       if (row._type === 'house') {
-        // Room bookings — multi-day bars
         const bookingsHere = roomBookings.filter(b => b.space_id === row.id && b.check_in === dateStr);
         for (const bk of bookingsHere) {
           const nights = Math.ceil((new Date(bk.check_out) - new Date(bk.check_in)) / 86400000);
           const spanDays = Math.min(nights, days.length - i);
-          const widthPct = (spanDays * 100);
           const color = bookingService.ROOM_STATUS_COLORS[bk.status] || '#d4883a';
           const holdCls = bk.status === 'hold' ? ' tl-booking--hold' : '';
-          const label = bk.guest_name || 'Guest';
-          html += `<div class="tl-booking${holdCls}" style="background:${color}; width:calc(${widthPct}% - 4px); left:2px;" data-booking-id="${bk.id}" data-booking-type="room" title="${label}: ${bk.check_in} to ${bk.check_out}">${label}</div>`;
+          html += `<div class="tl-booking${holdCls}" style="background:${color}; width:calc(${spanDays * 100}% - 4px); left:2px;" data-booking-id="${bk.id}" data-booking-type="room" title="${bk.guest_name || 'Guest'}: ${bk.check_in} to ${bk.check_out}">${bk.guest_name || 'Guest'}</div>`;
         }
       } else if (row._type === 'rental') {
-        // Space bookings — show as blocks on their day
-        const dayBookings = spaceBookings.filter(b => b.space_id === row.id && b.start_datetime && b.start_datetime.startsWith(dateStr));
-        for (const bk of dayBookings) {
+        const dayBk = spaceBookings.filter(b => b.space_id === row.id && b.start_datetime?.startsWith(dateStr));
+        for (const bk of dayBk) {
           const color = bookingService.SPACE_STATUS_COLORS[bk.status] || '#2563EB';
-          const startTime = new Date(bk.start_datetime);
-          const timeStr = `${startTime.getHours() % 12 || 12}${startTime.getHours() < 12 ? 'a' : 'p'}`;
-          const label = bk.client_name || bk.booking_type || 'Booked';
-          html += `<div class="tl-booking" style="background:${color}; width:calc(100% - 4px); left:2px;" data-booking-id="${bk.id}" data-booking-type="space" title="${label} · ${timeStr}">${label}</div>`;
+          const t = new Date(bk.start_datetime);
+          const timeStr = `${t.getHours() % 12 || 12}${t.getHours() < 12 ? 'a' : 'p'}`;
+          html += `<div class="tl-booking" style="background:${color}; width:calc(100% - 4px); left:2px;" data-booking-id="${bk.id}" data-booking-type="space" title="${bk.client_name || 'Client'} · ${timeStr}">${timeStr} ${bk.client_name || ''}</div>`;
         }
       } else if (row._type === 'activity') {
-        // Activity bookings for this staff member
-        const dayBookings = activityBookings.filter(b => b.staff_member_id === row._staffId && b.start_datetime && b.start_datetime.startsWith(dateStr));
-        if (dayBookings.length > 0) {
-          for (const bk of dayBookings) {
-            const color = bk.activity_type?.color || '#8B5CF6';
-            const label = bk.activity_type?.name || 'Activity';
-            const startTime = new Date(bk.start_datetime);
-            const timeStr = `${startTime.getHours() % 12 || 12}${startTime.getHours() < 12 ? 'a' : 'p'}`;
-            html += `<div class="tl-booking" style="background:${color}; width:calc(100% - 4px); left:2px; font-size:0.55rem;" data-booking-id="${bk.id}" data-booking-type="activity" title="${label} · ${bk.client_name || ''} · ${timeStr}">${label}</div>`;
-          }
+        const dayBk = activityBookings.filter(b => b.staff_member_id === row._staffId && b.start_datetime?.startsWith(dateStr));
+        for (const bk of dayBk) {
+          const color = bk.activity_type?.color || '#8B5CF6';
+          const t = new Date(bk.start_datetime);
+          const timeStr = `${t.getHours() % 12 || 12}${t.getHours() < 12 ? 'a' : 'p'}`;
+          html += `<div class="tl-booking" style="background:${color}; width:calc(100% - 4px); left:2px; font-size:0.55rem;" data-booking-id="${bk.id}" data-booking-type="activity" title="${bk.activity_type?.name || 'Activity'} · ${timeStr}">${timeStr} ${bk.activity_type?.name || ''}</div>`;
         }
       }
-
       html += `</div>`;
     }
     html += `</div>`;
@@ -700,7 +858,7 @@ function renderCombinedCalendar() {
   html += `</div>`;
   container.innerHTML = html;
 
-  // Click handlers for bookings
+  // Click handlers
   container.querySelectorAll('.tl-booking').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -709,7 +867,7 @@ function renderCombinedCalendar() {
       let booking;
       if (type === 'room') booking = roomBookings.find(b => b.id === id);
       else if (type === 'space') booking = spaceBookings.find(b => b.id === id);
-      else if (type === 'activity') booking = activityBookings.find(b => b.id === id);
+      else booking = activityBookings.find(b => b.id === id);
       if (booking) {
         if (type === 'room') openRoomBookingModal(booking);
         else if (type === 'space') openSpaceBookingModal(booking);
@@ -718,16 +876,14 @@ function renderCombinedCalendar() {
     });
   });
 
-  // Click handlers for empty cells
   container.querySelectorAll('.tl-cell').forEach(el => {
     el.addEventListener('click', () => {
+      const rowType = el.dataset.rowType;
       const spaceId = el.dataset.space;
       const date = el.dataset.date;
-      const rowType = el.dataset.rowType;
-      const staffId = el.dataset.staffId;
       if (rowType === 'house') openRoomBookingModal(null, spaceId, date);
       else if (rowType === 'rental') openSpaceBookingModal(null, spaceId, date, '10:00');
-      else if (rowType === 'activity') openActivityBookingModal(null, null, date, '10:00');
+      else openActivityBookingModal(null, null, date, '10:00');
     });
   });
 }

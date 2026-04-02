@@ -514,6 +514,68 @@
   min-height: 16px;
 }
 
+/* Combined day view — house stays bar */
+.combined-house-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.combined-house-bar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.combined-house-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.combined-house-chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.combined-house-chip:hover {
+  opacity: 0.85;
+}
+
+.combined-house-chip--empty {
+  background: transparent;
+  color: var(--text-muted);
+  cursor: default;
+  font-weight: 400;
+}
+
+.combined-house-chip--empty:hover {
+  opacity: 1;
+}
+
+.combined-house-chip--vacancy {
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: default;
+  font-weight: 500;
+}
+
+.combined-house-chip--vacancy:hover {
+  opacity: 1;
+}
+
 /* =============================================
    MODAL
    ============================================= */
