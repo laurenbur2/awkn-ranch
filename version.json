@@ -1,12 +1,12 @@
 {
-  "version": "v260402.10 9:30p",
-  "release": 10,
-  "sha": "4d6c553",
-  "fullSha": "4d6c553d349aa9f2c8df78626a77a46437d5d914",
+  "version": "v260402.11 9:34p",
+  "release": 11,
+  "sha": "cf31184",
+  "fullSha": "cf3118482994aad4e6f9011128d3a1f5fdbb1b30",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T16:30:25-05:00",
-  "commits": [{"sha":"4d6c553","message":"Rebrand all admin page titles from AlpacAPPs to AWKN Dashboard","author":"Lauren Burandt"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-02T16:34:31-05:00",
+  "commits": [{"sha":"cf31184","message":"Rename Clients tab to Memberships","author":"Lauren Burandt"}]
 }
