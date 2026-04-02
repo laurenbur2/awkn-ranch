@@ -1,12 +1,12 @@
 {
-  "version": "v260402.01 5:19p",
-  "release": 1,
-  "sha": "460f383",
-  "fullSha": "460f3831455a0afd1b8e557dba7d6af08d22d1a6",
+  "version": "v260402.02 5:24p",
+  "release": 2,
+  "sha": "16c92b6",
+  "fullSha": "16c92b65b3adaf55309201771618660876a14d0e",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T12:18:47-05:00",
-  "commits": [{"sha":"460f383","message":"Make PlanList fully public — no login required","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-02T12:24:15-05:00",
+  "commits": [{"sha":"16c92b6","message":"Move PlanList to /planlist/ root path for public access","author":"Lauren Burandt"}]
 }
