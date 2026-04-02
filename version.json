@@ -1,12 +1,12 @@
 {
-  "version": "v260402.07 9:00p",
-  "release": 7,
-  "sha": "0d0c88a",
-  "fullSha": "0d0c88a2bb49030c98116f62c7249bf0f7866610",
+  "version": "v260402.08 9:09p",
+  "release": 8,
+  "sha": "c4d9910",
+  "fullSha": "c4d99108aa4b073999edc97f48569604db8b715c",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-02T16:00:32-05:00",
-  "commits": [{"sha":"0d0c88a","message":"Add time grid to all calendar views — default to Day view","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-02T16:09:42-05:00",
+  "commits": [{"sha":"c4d9910","message":"Add Mindbody-style provider dropdown and staff manager to Activities tab","author":"Lauren Burandt"}]
 }
