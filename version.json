@@ -1,12 +1,12 @@
 {
-  "version": "v260402.08 9:09p",
-  "release": 8,
-  "sha": "c4d9910",
-  "fullSha": "c4d99108aa4b073999edc97f48569604db8b715c",
+  "version": "v260402.09 9:19p",
+  "release": 9,
+  "sha": "b054afc",
+  "fullSha": "b054afcda93624f6ac1cfe2c035facfc4cdb9b3a",
   "actor": "laurenbur2",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-02T16:09:42-05:00",
-  "commits": [{"sha":"c4d9910","message":"Add Mindbody-style provider dropdown and staff manager to Activities tab","author":"Lauren Burandt"}]
+  "pushedAt": "2026-04-02T16:19:17-05:00",
+  "commits": [{"sha":"b054afc","message":"Clean up admin dashboard — Mindbody-style layout","author":"Lauren Burandt"}]
 }
