@@ -1,5 +1,9 @@
 /* Admin-specific styles */
 
+/* Hide public site navigation on admin pages — admin tabs replace it */
+.aap-nav { display: none !important; }
+.aap-menu-toggle { display: none !important; }
+
 /* Danger button */
 .btn-danger {
   background: #dc2626;

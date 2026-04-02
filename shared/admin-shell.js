@@ -59,21 +59,22 @@ const TAB_ICONS = {
 // When property_config.features exists, tabs whose feature is disabled are hidden.
 // When property_config.features is NOT set, all tabs show (backward compatible).
 export const ALL_ADMIN_TABS = [
-  // Staff section
-  { id: 'spaces', label: 'Spaces', href: 'spaces.html', permission: 'view_spaces', section: 'staff' },
-  { id: 'rentals', label: 'Rentals', href: 'rentals.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
-  { id: 'reservations', label: 'Reservations', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
+  // Staff section — primary admin tabs (Mindbody-style)
+  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
+  { id: 'rentals', label: 'Clients', href: 'rentals.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events' },
-  { id: 'media', label: 'Media', href: 'media.html', permission: 'view_media', section: 'staff' },
+  { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
+  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
+  // Hidden but still accessible via direct URL
+  { id: 'spaces', label: 'Spaces', href: 'spaces.html', permission: 'view_spaces', section: 'staff', feature: '_hidden' },
+  { id: 'media', label: 'Media', href: 'media.html', permission: 'view_media', section: 'staff', feature: '_hidden' },
   { id: 'sms', label: 'SMS', href: 'sms-messages.html', permission: 'view_sms', section: 'staff', feature: 'sms' },
-  { id: 'purchases', label: 'Purchases', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
   { id: 'hours', label: 'Workstuff', href: 'worktracking.html', permission: 'view_hours', section: 'staff', feature: 'associates' },
   { id: 'faq', label: 'FAQ/AI', href: 'faq.html', permission: 'view_faq', section: 'staff', feature: 'pai' },
   { id: 'voice', label: 'Concierge', href: 'voice.html', permission: 'view_voice', section: 'staff', feature: 'voice' },
-  { id: 'todo', label: 'Todo', href: 'planlist.html', section: 'staff' },
-  { id: 'phyprop', label: 'PhyProp', href: 'phyprop.html', permission: 'view_spaces', section: 'staff' },
-  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
-  { id: 'appdev', label: 'App Dev', href: 'appdev.html', permission: 'view_appdev', section: 'staff' },
+  { id: 'todo', label: 'Todo', href: 'planlist.html', section: 'staff', feature: '_hidden' },
+  { id: 'phyprop', label: 'PhyProp', href: 'phyprop.html', permission: 'view_spaces', section: 'staff', feature: '_hidden' },
+  { id: 'appdev', label: 'App Dev', href: 'appdev.html', permission: 'view_appdev', section: 'staff', feature: '_hidden' },
   // Admin section
   { id: 'users', label: 'Users', href: 'users.html', permission: 'view_users', section: 'admin' },
   { id: 'passwords', label: 'Passwords', href: 'passwords.html', permission: 'view_passwords', section: 'admin' },
