@@ -1,12 +1,12 @@
 {
-  "version": "v260401.04 7:34p",
-  "release": 4,
-  "sha": "ecc1b82",
-  "fullSha": "ecc1b82583ed6b59933866d347ebdb5604b9d4b4",
+  "version": "v260403.01 3:00a",
+  "release": 1,
+  "sha": "c02cb4f",
+  "fullSha": "c02cb4f8e3ef7f91dbdeed73e69b98856938ae63",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-01T14:34:26-05:00",
-  "commits": [{"sha":"ecc1b82","message":"feat: sync with alpacapps-infra template — new docs, admin tabs, update checker","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-02T21:59:51-05:00",
+  "commits": [{"sha":"c02cb4f","message":"Redesign projections page with light professional theme","author":"Justin DeLaCruz"}]
 }
