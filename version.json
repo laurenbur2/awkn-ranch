@@ -1,12 +1,12 @@
 {
-  "version": "v260403.07 3:45a",
-  "release": 7,
-  "sha": "3fffda6",
-  "fullSha": "3fffda675aea7cf578199d885ec71d2f755631ce",
+  "version": "v260403.08 3:55a",
+  "release": 8,
+  "sha": "1ee9699",
+  "fullSha": "1ee9699d1e35b68fdb04cc98a704aad3245accb7",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T22:45:11-05:00",
-  "commits": [{"sha":"3fffda6","message":"Update Dome Collective projections: $135K/mo Y1 ramping to $225K/mo Y10","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-02T22:54:51-05:00",
+  "commits": [{"sha":"1ee9699","message":"Add comprehensive Year 5 refinance exit strategy and update Phase 1 growth","author":"Justin DeLaCruz"}]
 }
