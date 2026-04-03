@@ -1,12 +1,12 @@
 {
-  "version": "v260403.13 5:02p",
-  "release": 13,
-  "sha": "46168d9",
-  "fullSha": "46168d9003be096772a3f496f582fe2b0ebaf7ee",
+  "version": "v260403.14 5:08p",
+  "release": 14,
+  "sha": "40a4cfb",
+  "fullSha": "40a4cfbf3060d666e9722d685a2c610d9e6b6dbc",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-03T12:02:27-05:00",
-  "commits": [{"sha":"46168d9","message":"feat: Year 4 refinance exit, 10% income reduction, add Admissions/Sales, remove RV cost","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-03T12:08:07-05:00",
+  "commits": [{"sha":"40a4cfb","message":"feat: CFO-grade refinance exit with $16.5M capital stack, IRR, MOIC, DSCR","author":"Justin DeLaCruz"}]
 }
