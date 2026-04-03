@@ -261,8 +261,8 @@
         </p>
 
         <div class="scenario-tabs">
-            <button class="scenario-tab active" onclick="setScenario('conservative')">Conservative</button>
-            <button class="scenario-tab" onclick="setScenario('base')">Base Case</button>
+            <button class="scenario-tab" onclick="setScenario('conservative')">Conservative</button>
+            <button class="scenario-tab active" onclick="setScenario('base')">Base Case</button>
             <button class="scenario-tab" onclick="setScenario('strong')">Strong</button>
         </div>
 
@@ -514,7 +514,7 @@
         { name: 'Miscellaneous / Contingency', low: 1000, high: 2000, rampStart: 1 },
     ];
 
-    let currentScenario = 'conservative';
+    let currentScenario = 'base';
 
     function setScenario(s) {
         currentScenario = s;
