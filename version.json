@@ -1,12 +1,12 @@
 {
-  "version": "v260403.03 3:22a",
-  "release": 3,
-  "sha": "9b20ca2",
-  "fullSha": "9b20ca2375f517eb1178661bc6c8470443d5a682",
+  "version": "v260403.04 3:30a",
+  "release": 4,
+  "sha": "17d2847",
+  "fullSha": "17d2847af4ad89f0afa8da90712714bc503dff75",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T22:22:25-05:00",
-  "commits": [{"sha":"9b20ca2","message":"Remove RV relocation expense from monthly expense breakdown","author":"Justin DeLaCruz"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-02T22:30:05-05:00",
+  "commits": [{"sha":"17d2847","message":"Fix property lease to show $12,800 flat in all months including ramp","author":"Justin DeLaCruz"}]
 }
