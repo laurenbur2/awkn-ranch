@@ -26,7 +26,10 @@
       --radius: 14px;
     }
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: clip; }
     body {
+      overflow-x: clip;
+      max-width: 100%;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--dark);
       background: var(--cream);
@@ -564,8 +567,15 @@
       div[style*="repeat(3,1fr)"] { grid-template-columns: 1fr !important; }
       table { font-size: 0.78rem; }
       td, th { padding: 0.5rem 0.4rem; word-break: break-word; }
-      body { overflow-x: hidden; }
-      .container { overflow-x: hidden; }
+      html, body { overflow-x: clip !important; max-width: 100%; }
+      .container { overflow-x: clip; max-width: 100%; }
+      section { overflow-x: clip; max-width: 100%; }
+      .card { overflow-x: clip !important; }
+      img { max-width: 100%; height: auto; }
+      table { max-width: 100%; table-layout: fixed; }
+      /* Force ALL inline 3-col grids to 1-col on mobile */
+      div[style*="1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+      .bar-fill { overflow: hidden; }
 
       /* Hide wide tables, show card layout on mobile */
       .desktop-table { display: none; }
@@ -1308,7 +1318,7 @@
       <p style="font-size:0.88rem;color:var(--grey);line-height:1.7;margin-bottom:1.25rem;">A single infrastructure investment that pays for itself in under 45 days.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
         <div>
-          <img src="https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/maloka-site.jpg" alt="Maloka build site at AWKN Ranch" style="width:100%;border-radius:8px;object-fit:cover;aspect-ratio:4/3;">
+          <img src="https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/maloka-rendering.png" alt="Maloka dome rendering at AWKN Ranch" style="width:100%;border-radius:8px;object-fit:cover;aspect-ratio:4/3;">
           <p style="font-size:0.75rem;color:var(--grey);margin-top:0.5rem;text-align:center;">Future Maloka site — 50-foot ceremony and retreat dome</p>
         </div>
         <div>
