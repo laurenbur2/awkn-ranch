@@ -1,12 +1,12 @@
 {
-  "version": "v260403.17 8:27p",
-  "release": 17,
-  "sha": "29b0ad3",
-  "fullSha": "29b0ad3839d52bab0a7faa089d0bc42e7ac4ec20",
+  "version": "v260403.18 8:28p",
+  "release": 18,
+  "sha": "7e9d812",
+  "fullSha": "7e9d812a6af1cc416e8036be48fb411baf19db40",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-03T15:27:15-05:00",
-  "commits": [{"sha":"29b0ad3","message":"fix: full expense from month 1 for ops, medical, lease, supplies, ads, admissions","author":"Justin DeLaCruz"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-03T15:28:44-05:00",
+  "commits": [{"sha":"7e9d812","message":"fix: Breakfast & Supplies starts month 1","author":"Justin DeLaCruz"}]
 }
