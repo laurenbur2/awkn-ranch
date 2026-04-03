@@ -967,9 +967,9 @@
         const p1Growth = 1.05;
         const expGrowth = 1.03;
 
-        const p2FullGross = 275511 * 12;
-        const p2Ramp = [0, 0.30, 0.80, 1.0, 1.0];
-        const p2Growth = 1.03;
+        // Phase 2 monthly net: $135K Y1 ramping to $225K Y10, ~$2.8M/yr then slow gains
+        const p2MonthlyNet = [135000, 155000, 180000, 200000, 215000, 220000, 222000, 224000, 225000, 225000];
+        const p2ExpRatio = 0.27; // expense ratio to back into gross
 
         let cumulative = 0;
         const data = [];
@@ -986,10 +986,9 @@
             }
             const p1Net = p1Rev - p1Exp;
 
-            const p2Rev = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(p2Growth, y - 2) : 1);
-            const p2ExpRatio = 0.27;
-            const p2Exp = p2Rev * p2ExpRatio;
-            const p2Net = p2Rev - p2Exp;
+            const p2Net = p2MonthlyNet[y] * 12;
+            const p2Rev = p2Net / (1 - p2ExpRatio); // back into gross from net
+            const p2Exp = p2Rev - p2Net;
 
             const totalRev = p1Rev + p2Rev;
             const totalExp = p1Exp + p2Exp;
@@ -1045,9 +1044,9 @@
         const p1Growth = 1.05;
         const expGrowth = 1.03;
 
-        const p2FullGross = 275511 * 12;
-        const p2Ramp = [0, 0.30, 0.80, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
-        const p2Growth = 1.03;
+        // Phase 2 monthly net: $135K Y1 ramping to $225K Y10, ~$2.8M/yr then slow gains
+        const p2MonthlyNet10 = [135000, 155000, 180000, 200000, 215000, 220000, 222000, 224000, 225000, 225000];
+        const p2ExpRatio10 = 0.27;
 
         let cumulative = 0;
         const data = [];
@@ -1064,9 +1063,9 @@
             }
             const p1Net = p1Rev - p1Exp;
 
-            const p2Rev = p2FullGross * p2Ramp[y] * (y > 2 ? Math.pow(p2Growth, y - 2) : 1);
-            const p2Exp = p2Rev * 0.27;
-            const p2Net = p2Rev - p2Exp;
+            const p2Net = p2MonthlyNet10[y] * 12;
+            const p2Rev = p2Net / (1 - p2ExpRatio10);
+            const p2Exp = p2Rev - p2Net;
 
             const totalRev = p1Rev + p2Rev;
             const totalNet = p1Net + p2Net;
