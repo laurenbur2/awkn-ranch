@@ -1,12 +1,12 @@
 {
-  "version": "v260403.08 3:55a",
-  "release": 8,
-  "sha": "1ee9699",
-  "fullSha": "1ee9699d1e35b68fdb04cc98a704aad3245accb7",
+  "version": "v260403.09 4:00a",
+  "release": 9,
+  "sha": "4f66de0",
+  "fullSha": "4f66de02fac80395d740df3a536888e49a2d2694",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T22:54:51-05:00",
-  "commits": [{"sha":"1ee9699","message":"Add comprehensive Year 5 refinance exit strategy and update Phase 1 growth","author":"Justin DeLaCruz"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-02T23:00:43-05:00",
+  "commits": [{"sha":"4f66de0","message":"Update exit strategy to combined Phase 1 + Phase 2 refinance at Year 5","author":"Justin DeLaCruz"}]
 }
