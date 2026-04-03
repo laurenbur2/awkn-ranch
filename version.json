@@ -1,12 +1,12 @@
 {
-  "version": "v260403.11 4:13a",
-  "release": 11,
-  "sha": "bb2d93e",
-  "fullSha": "bb2d93e5140876d2d17b36e6db6773af64f6adce",
+  "version": "v260403.12 4:56p",
+  "release": 12,
+  "sha": "77c2f61",
+  "fullSha": "77c2f6197ef97ef15e3fa73b206e5ac7c2cc493b",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-02T23:13:31-05:00",
-  "commits": [{"sha":"bb2d93e","message":"Update exit strategy to 9% cap rate and fix auth base path for GitHub Pages","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-03T11:56:04-05:00",
+  "commits": [{"sha":"cbbe8d5","message":"feat: change exit strategy to Year 4 refinance, reduce all income projections 10%","author":"Justin DeLaCruz"},{"sha":"77c2f61","message":"feat: add Admissions/Corporate Sales at $4K/mo, fund first 5 months from capital raise","author":"Justin DeLaCruz"}]
 }
