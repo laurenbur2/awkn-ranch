@@ -1,12 +1,12 @@
 {
-  "version": "v260403.14 5:08p",
-  "release": 14,
-  "sha": "40a4cfb",
-  "fullSha": "40a4cfbf3060d666e9722d685a2c610d9e6b6dbc",
+  "version": "v260403.15 5:20p",
+  "release": 15,
+  "sha": "36dcf5a",
+  "fullSha": "36dcf5ae3206b30e467b911403a8b5dc29676111",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-03T12:08:07-05:00",
-  "commits": [{"sha":"40a4cfb","message":"feat: CFO-grade refinance exit with $16.5M capital stack, IRR, MOIC, DSCR","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-03T12:20:05-05:00",
+  "commits": [{"sha":"36dcf5a","message":"feat: reframe projections for Aaron & Alex's $500K — payback timeline + returns","author":"Justin DeLaCruz"}]
 }
