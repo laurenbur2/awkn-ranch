@@ -1,12 +1,12 @@
 {
-  "version": "v260403.01 3:00a",
-  "release": 1,
-  "sha": "c02cb4f",
-  "fullSha": "c02cb4f8e3ef7f91dbdeed73e69b98856938ae63",
+  "version": "v260403.02 3:18a",
+  "release": 2,
+  "sha": "172aa97",
+  "fullSha": "172aa97bbb2a714cf3eec5fcbeda691418947e87",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T21:59:51-05:00",
-  "commits": [{"sha":"c02cb4f","message":"Redesign projections page with light professional theme","author":"Justin DeLaCruz"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-02T22:18:08-05:00",
+  "commits": [{"sha":"172aa97","message":"Rebuild projections page with updated investor data and CFO-grade presentation","author":"Justin DeLaCruz"}]
 }
