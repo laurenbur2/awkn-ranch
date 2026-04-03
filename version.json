@@ -1,12 +1,12 @@
 {
-  "version": "v260403.05 3:31a",
-  "release": 5,
-  "sha": "5c23c58",
-  "fullSha": "5c23c58d21749005d1b339f930e8683826c2fde9",
+  "version": "v260403.06 3:37a",
+  "release": 6,
+  "sha": "ad8ddf4",
+  "fullSha": "ad8ddf4c55becb66175729219ec90ca5e54d1da7",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervm727z3",
-  "pushedAt": "2026-04-02T22:31:07-05:00",
-  "commits": [{"sha":"5c23c58","message":"Fix medical staff ($4K flat) and Google Ads ($9K flat) as fixed monthly costs","author":"Justin DeLaCruz"}]
+  "machine": "runnervmrg6be",
+  "pushedAt": "2026-04-02T22:36:53-05:00",
+  "commits": [{"sha":"ad8ddf4","message":"Update property lease to $13,800/mo starting June (month 3)","author":"Justin DeLaCruz"}]
 }
