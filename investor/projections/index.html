@@ -22,14 +22,10 @@
             --accent-gold-dim: rgba(184, 134, 11, 0.08);
             --accent-green: #2d6a4f;
             --accent-green-dim: rgba(45, 106, 79, 0.06);
-            --accent-purple: #8b6f5c;
-            --accent-purple-dim: rgba(139, 111, 92, 0.06);
             --accent-blue: #4a7c6b;
             --accent-blue-dim: rgba(74, 124, 107, 0.06);
             --accent-terracotta: #c0392b;
             --accent-terracotta-dim: rgba(192, 57, 43, 0.06);
-            --accent-sage: #527a3e;
-            --accent-sage-dim: rgba(82, 122, 62, 0.06);
             --border: rgba(0, 0, 0, 0.06);
             --border-light: rgba(0, 0, 0, 0.1);
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
@@ -62,11 +58,7 @@
         .topbar-nav { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; }
         .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
         .topbar-nav a:hover { color: var(--accent-green); }
-        .topbar-user { display: flex; align-items: center; gap: 12px; }
-        .topbar-user img { width: 32px; height: 32px; border-radius: 50%; display: none; }
-        .topbar-user span { font-size: 13px; color: var(--text-muted); }
-        .signout-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
-        .signout-btn:hover { color: var(--accent-terracotta); }
+        .topbar-tag { font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; }
 
         /* ===== SECTIONS ===== */
         .section { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
@@ -100,7 +92,6 @@
         .hero-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
 
         /* ===== TABLES ===== */
-        .table-wrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
         .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
         .data-table thead { border-bottom: 2px solid var(--border-light); background: var(--bg-secondary); }
         .data-table th { padding: 14px 16px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: left; }
@@ -121,7 +112,6 @@
         .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 320px; padding-bottom: 40px; position: relative; }
         .bar-chart-wide { gap: 4px; }
 
-        /* Y-axis gridlines */
         .bar-chart::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 40px; border-bottom: 1px solid var(--border); }
 
         .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; height: 100%; justify-content: flex-end; }
@@ -168,6 +158,37 @@
         .summary-card-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
         .summary-card.green .summary-card-value { color: var(--accent-green); }
 
+        /* ===== REVENUE BREAKDOWN GRID ===== */
+        .rev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 48px; }
+        .rev-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 24px; box-shadow: var(--shadow-sm);
+        }
+        .rev-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .rev-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .rev-card-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rev-card-badge.lodging { background: var(--accent-green-dim); color: var(--accent-green); }
+        .rev-card-badge.venue { background: var(--accent-gold-dim); color: var(--accent-gold); }
+        .rev-card-badge.clinical { background: var(--accent-blue-dim); color: var(--accent-blue); }
+        .rev-card-badge.program { background: rgba(120, 80, 150, 0.08); color: #6a4c93; }
+        .rev-card-range { font-size: 20px; font-weight: 700; color: var(--accent-green); margin-bottom: 4px; }
+        .rev-card-detail { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        /* ===== CAPITAL ALLOCATION ===== */
+        .alloc-bar { display: flex; height: 32px; border-radius: 6px; overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+        .alloc-segment { display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; transition: flex 0.3s; }
+        .alloc-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .alloc-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .alloc-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .alloc-item-value { font-weight: 700; margin-left: auto; }
+
+        /* ===== VALUATION TABLE ===== */
+        .val-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .val-table th { padding: 14px 16px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: left; background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); }
+        .val-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
+        .val-table tr.total-row td { border-top: 2px solid var(--border-light); font-weight: 700; background: var(--bg-secondary); }
+        .val-table tr.entry-row td { background: var(--accent-gold-dim); font-weight: 700; color: var(--accent-gold); }
+
         /* ===== ASSUMPTIONS ===== */
         .assumptions { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-top: 48px; box-shadow: var(--shadow-sm); }
         .assumptions h3 { font-size: 16px; margin-bottom: 16px; color: var(--text-secondary); }
@@ -179,8 +200,22 @@
         .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
         .back-link:hover { color: var(--accent-green); }
 
+        /* ===== KPI ROW ===== */
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 32px; }
+        .kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; box-shadow: var(--shadow-sm); }
+        .kpi-value { font-size: 22px; font-weight: 800; }
+        .kpi-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
         /* ===== FOOTER ===== */
         .footer { text-align: center; padding: 48px 40px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); background: #ffffff; }
+        .footer-disclaimer { max-width: 700px; margin: 0 auto; line-height: 1.8; }
+
+        /* ===== PRINT ===== */
+        @media print {
+            .topbar { position: static; box-shadow: none; }
+            .summary-card, .chart-container, .assumptions, .rev-card { break-inside: avoid; }
+            body { background: #fff; }
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
@@ -191,6 +226,8 @@
             .bar-value { font-size: 8px; }
             .bar-label { font-size: 8px; }
             .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-stats { gap: 24px; }
+            .rev-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -199,39 +236,109 @@
 <div id="app">
     <nav class="topbar">
         <div class="topbar-inner">
-            <a href="/investor/" class="topbar-brand">AWKN Ranch</a>
+            <a href="../" class="topbar-brand">AWKN Ranch</a>
             <ul class="topbar-nav">
+                <li><a href="#executive-summary">Summary</a></li>
+                <li><a href="#revenue-detail">Revenue</a></li>
                 <li><a href="#year1">Year 1</a></li>
                 <li><a href="#year5">5-Year</a></li>
                 <li><a href="#year10">10-Year</a></li>
+                <li><a href="#capital">Capital</a></li>
+                <li><a href="#valuation-section">Valuation</a></li>
                 <li><a href="#assumptions-section">Assumptions</a></li>
             </ul>
+            <span class="topbar-tag">Confidential</span>
         </div>
     </nav>
 
     <!-- Hero -->
     <div class="hero">
-        <a href="/investor/" class="back-link" style="margin-bottom: 24px; display: inline-flex;">&larr; Back to Investor Overview</a>
-        <div class="hero-badge">Financial Projections</div>
+        <a href="../" class="back-link" style="margin-bottom: 24px; display: inline-flex;">&larr; Back to Investor Overview</a>
+        <div class="hero-badge">Financial Projections &amp; Valuation Model</div>
         <h1>AWKN Ranch &amp; Within Center<br><span class="gold">10-Year Financial Model</span></h1>
         <p class="hero-sub">
-            Monthly breakdown for Year 1. Annual projections through Year 10. Conservative, base, and strong scenarios with Phase 2 Dome Collective integration.
+            Comprehensive financial model across three scenarios. Monthly Year 1 breakdown with ramp assumptions. Annual projections through Year 10 including Phase 2 Dome Collective integration.
         </p>
         <div class="hero-stats">
             <div class="hero-stat">
-                <div class="hero-stat-value">$715K</div>
-                <div class="hero-stat-label">Year 1 Net (Conservative)</div>
+                <div class="hero-stat-value">$500K</div>
+                <div class="hero-stat-label">Tranche Size</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">$7.1M</div>
-                <div class="hero-stat-label">5-Year Cumulative Net</div>
+                <div class="hero-stat-value">$8M</div>
+                <div class="hero-stat-label">Valuation Cap</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">$26M+</div>
-                <div class="hero-stat-label">10-Year Cumulative Net</div>
+                <div class="hero-stat-value">$2M+</div>
+                <div class="hero-stat-label">Projected Annual Net</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">6&ndash;9 mo</div>
+                <div class="hero-stat-label">To Profitability</div>
             </div>
         </div>
     </div>
+
+    <div class="divider"></div>
+
+    <!-- ===== EXECUTIVE SUMMARY ===== -->
+    <section class="section" id="executive-summary">
+        <div class="section-label">Executive Summary</div>
+        <h2>Monthly Operating Performance by Scenario</h2>
+        <p class="section-desc">
+            Three-scenario model based on current pricing, signed agreements, and 4.5 years of Within Center operating history. 1,500+ sessions delivered with a perfect 5-star rating across all platforms.
+        </p>
+
+        <div class="scenario-tabs" id="exec-tabs">
+            <button class="scenario-tab active" onclick="setExecScenario('conservative')">Conservative</button>
+            <button class="scenario-tab" onclick="setExecScenario('base')">Base Case</button>
+            <button class="scenario-tab" onclick="setExecScenario('strong')">Strong</button>
+        </div>
+
+        <div class="kpi-row" id="exec-kpis"></div>
+
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+            <table class="data-table" id="exec-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th style="text-align:right">Conservative</th>
+                        <th style="text-align:right">Base Case</th>
+                        <th style="text-align:right">Strong</th>
+                    </tr>
+                </thead>
+                <tbody id="exec-tbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== REVENUE DETAIL ===== -->
+    <section class="section" id="revenue-detail">
+        <div class="section-label">Revenue Streams</div>
+        <h2>10 Diversified Revenue Channels</h2>
+        <p class="section-desc">
+            Revenue is distributed across lodging, venue rental, clinical services, hosted retreats, and memberships &mdash; reducing single-source dependency and enabling multiple growth vectors.
+        </p>
+
+        <div class="rev-grid" id="rev-cards"></div>
+
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Revenue Stream</th>
+                        <th style="text-align:right">Monthly Low</th>
+                        <th style="text-align:right">Monthly High</th>
+                        <th style="text-align:right">Annual Low</th>
+                        <th style="text-align:right">Annual High</th>
+                    </tr>
+                </thead>
+                <tbody id="rev-tbody"></tbody>
+            </table>
+        </div>
+    </section>
 
     <div class="divider"></div>
 
@@ -240,7 +347,7 @@
         <div class="section-label">Year 1 &mdash; Monthly Projections</div>
         <h2>Ramp-Up to Full Operations</h2>
         <p class="section-desc">
-            Months 1&ndash;3 are ramp-up as infrastructure comes online. By Month 4, all six revenue streams are active. By Month 6, occupancy stabilizes. Conservative scenario shown &mdash; toggle to see base and strong cases.
+            Months 1&ndash;3 are ramp-up as infrastructure comes online. By Month 4, all revenue streams are active. By Month 7, steady-state occupancy is achieved. Conservative scenario shown &mdash; toggle to see base and strong cases.
         </p>
 
         <div class="scenario-tabs">
@@ -249,23 +356,21 @@
             <button class="scenario-tab" onclick="setScenario('strong')">Strong</button>
         </div>
 
-        <!-- Summary cards for selected scenario -->
         <div class="summary-grid" id="year1-summary"></div>
 
         <!-- Monthly bar chart -->
         <div class="chart-container">
-            <div class="chart-title">Monthly Revenue vs. Expenses &mdash; Year 1</div>
+            <div class="chart-title">Monthly Revenue vs. Net Profit &mdash; Year 1</div>
             <div class="chart-subtitle" id="chart-scenario-label">Conservative Scenario</div>
             <div class="bar-chart" id="year1-chart"></div>
             <div class="chart-legend">
                 <div class="chart-legend-item"><div class="chart-legend-dot bar-revenue"></div> Revenue</div>
-                <div class="chart-legend-item"><div class="chart-legend-dot bar-expense"></div> Expenses</div>
                 <div class="chart-legend-item"><div class="chart-legend-dot bar-net"></div> Net Profit</div>
             </div>
         </div>
 
         <!-- Monthly table -->
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
             <table class="data-table" id="year1-table">
                 <thead>
                     <tr>
@@ -273,6 +378,7 @@
                         <th style="text-align:right">Revenue</th>
                         <th style="text-align:right">Expenses</th>
                         <th style="text-align:right">Net Profit</th>
+                        <th style="text-align:right">Margin</th>
                         <th style="text-align:right">Cumulative</th>
                     </tr>
                 </thead>
@@ -285,7 +391,7 @@
             <h3 style="font-size: 20px; margin-bottom: 8px;">Monthly Expense Breakdown</h3>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Line-item operating costs by month. Ramp-up months (1&ndash;3) show reduced costs as staffing and marketing scale up.</p>
 
-            <div style="overflow-x: auto;">
+            <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
                 <table class="data-table" id="expense-detail-table">
                     <thead>
                         <tr>
@@ -318,7 +424,7 @@
         <div class="section-label">5-Year Projections</div>
         <h2>Phase 1 + Phase 2 &mdash; Compounding Growth</h2>
         <p class="section-desc">
-            Year 1 is AWKN Ranch + Within Center. Phase 2 (Dome Collective) begins generating revenue in Year 2 as construction completes and leases begin. By Year 3, the full ecosystem is operational.
+            Year 1 is AWKN Ranch + Within Center (Phase 1). Phase 2 (Dome Collective &mdash; 103 geodesic dome residences on adjacent 9 acres) begins generating revenue in Year 2 as construction completes and leases begin. By Year 4, the full ecosystem is operational.
         </p>
 
         <div class="summary-grid" id="year5-summary"></div>
@@ -334,7 +440,7 @@
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -344,6 +450,7 @@
                         <th style="text-align:right">Total Revenue</th>
                         <th style="text-align:right">Total Expenses</th>
                         <th style="text-align:right">Net Profit</th>
+                        <th style="text-align:right">Margin</th>
                         <th style="text-align:right">Cumulative</th>
                     </tr>
                 </thead>
@@ -375,7 +482,7 @@
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -383,11 +490,116 @@
                         <th style="text-align:right">Phase 1 Net</th>
                         <th style="text-align:right">Phase 2 Net</th>
                         <th style="text-align:right">Combined Net</th>
+                        <th style="text-align:right">Margin</th>
                         <th style="text-align:right">Cumulative</th>
                     </tr>
                 </thead>
                 <tbody id="year10-tbody"></tbody>
             </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== CAPITAL ALLOCATION ===== -->
+    <section class="section" id="capital">
+        <div class="section-label">Capital Allocation</div>
+        <h2>Use of $500,000 Investment</h2>
+        <p class="section-desc">
+            Capital is allocated across infrastructure buildout, marketing launch, operations, legal compliance, and a 39% reserve buffer &mdash; ensuring runway through ramp-up to profitability.
+        </p>
+
+        <div class="chart-container">
+            <div class="chart-title">Allocation Overview</div>
+            <div class="chart-subtitle">39% held in reserve for operating runway and growth buffer</div>
+            <div class="alloc-bar" id="alloc-bar"></div>
+            <div class="alloc-legend" id="alloc-legend"></div>
+        </div>
+
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+            <table class="data-table" id="capital-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Line Item</th>
+                        <th style="text-align:right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="capital-tbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== VALUATION ===== -->
+    <section class="section" id="valuation-section">
+        <div class="section-label">Valuation Analysis</div>
+        <h2>Asset-Based Ecosystem Valuation</h2>
+        <p class="section-desc">
+            Valuation derived from stabilized EBITDA multiples across the two operating entities plus real estate market comparables for the adjacent 9-acre parcel. Investor entry at a conservative $8M cap provides significant upside.
+        </p>
+
+        <div class="summary-grid">
+            <div class="summary-card"><div class="summary-card-value">$8M</div><div class="summary-card-label">Entry Valuation Cap</div></div>
+            <div class="summary-card green"><div class="summary-card-value">$40.8M</div><div class="summary-card-label">Full Ecosystem Value</div></div>
+            <div class="summary-card"><div class="summary-card-value">5.1x</div><div class="summary-card-label">Implied Multiple</div></div>
+            <div class="summary-card"><div class="summary-card-value">8x</div><div class="summary-card-label">EBITDA Multiple Used</div></div>
+        </div>
+
+        <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+            <table class="val-table">
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>Basis</th>
+                        <th style="text-align:right">Annual Net</th>
+                        <th style="text-align:right">Multiple</th>
+                        <th style="text-align:right">Implied Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Dome Collective</strong> (Real Estate Co.)</td>
+                        <td>Stabilized lease + STR income</td>
+                        <td style="text-align:right">$2,400,000</td>
+                        <td style="text-align:right">8x EBITDA</td>
+                        <td style="text-align:right; font-weight:700;">$19,200,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Functional Wellness</strong> (Medical Co.)</td>
+                        <td>Clinical + retreat + lodging</td>
+                        <td style="text-align:right">$1,200,000</td>
+                        <td style="text-align:right">8x EBITDA</td>
+                        <td style="text-align:right; font-weight:700;">$9,600,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Adjacent 9-Acre Land</strong></td>
+                        <td>Market comparable sales</td>
+                        <td style="text-align:right; color: var(--text-muted);">&mdash;</td>
+                        <td style="text-align:right; color: var(--text-muted);">Comp</td>
+                        <td style="text-align:right; font-weight:700;">$12,000,000</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="4"><strong>Total Ecosystem Value</strong></td>
+                        <td style="text-align:right; font-size: 18px;">$40,800,000</td>
+                    </tr>
+                    <tr class="entry-row">
+                        <td colspan="4"><strong>Investor Entry Valuation (Conservative)</strong></td>
+                        <td style="text-align:right; font-size: 18px;">$8,000,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="assumptions" style="margin-top: 32px;">
+            <h3>Exit Strategy &mdash; Debt Refinance Model</h3>
+            <ul>
+                <li>Build to profitability within 6&ndash;9 months</li>
+                <li>Refinance with commercial debt at stabilized cash flow</li>
+                <li>Return investor capital through refinance proceeds</li>
+                <li>Projected return multiple: 2&ndash;4x (200&ndash;400% appreciation)</li>
+            </ul>
         </div>
     </section>
 
@@ -401,30 +613,38 @@
         <div class="assumptions">
             <h3>Phase 1 &mdash; AWKN Ranch + Within Center</h3>
             <ul>
-                <li>Retreat House nightly rate: $349 (shared) &ndash; $499 (private) &middot; 10 beds &middot; 2-night minimum</li>
-                <li>Yurts x2: $699/night each &middot; 50% base occupancy</li>
-                <li>HoneyComb Dome + Model Dome: $599/night each &middot; 50% base occupancy</li>
-                <li>Maloka Dome: $20K&ndash;$40K/mo venue rental + $12K&ndash;$18K/mo nightly lodging</li>
-                <li>Within Center: $16.5K&ndash;$33K/mo from outpatient ketamine therapy packages</li>
+                <li>Retreat House: 10 beds, $349 (shared) &ndash; $499 (private)/night, 50% target occupancy, 2-night minimum</li>
+                <li>Yurts x2: $699/night each, 30% base occupancy</li>
+                <li>HoneyComb Dome: $599/night, 30% base occupancy</li>
+                <li>Lodging Domes x2: 8 beds total, $299/bed/night, 30&ndash;50% occupancy</li>
+                <li>Maloka Dome: $20K&ndash;$40K/mo venue rental + $12K&ndash;$18K/mo overnight capacity</li>
+                <li>Additional Venue Rentals: $8K&ndash;$16K/mo from temple, grounds, and event spaces</li>
+                <li>Within Center: $16.5K&ndash;$33K/mo from outpatient ketamine therapy (AWKN/HEAL/DISCOVER packages)</li>
                 <li>AWKN Hosted Retreats: $20K&ndash;$75K/mo curated multi-day immersions</li>
-                <li>Monthly operating expenses: $60.8K (low) &ndash; $73.8K (high)</li>
-                <li>Months 1&ndash;3: 40% revenue ramp (infrastructure build-out, marketing launch)</li>
-                <li>Months 4&ndash;6: 70% of steady-state revenue (occupancy growing)</li>
+                <li>Memberships: $3K&ndash;$8K/mo (16 members secured pre-marketing)</li>
+                <li>Monthly operating expenses: $60,800 (low) &ndash; $73,800 (high)</li>
+                <li>Months 1&ndash;3: 25&ndash;50% revenue ramp (infrastructure build-out, marketing launch)</li>
+                <li>Months 4&ndash;6: 65&ndash;85% of steady-state revenue (occupancy growing)</li>
                 <li>Months 7+: 100% steady-state revenue</li>
                 <li>Annual growth rate: 5% (rate increases + occupancy optimization)</li>
+                <li>Experience economy split: 30% to AWKN on facilitator services, 20% on events</li>
             </ul>
         </div>
 
         <div class="assumptions" style="margin-top: 24px;">
-            <h3>Phase 2 &mdash; Dome Collective</h3>
+            <h3>Phase 2 &mdash; AWKN Dome Collective</h3>
             <ul>
-                <li>103 domes total: 50 Tier 1 ($2,022/mo) + 40 Tier 2 ($2,322/mo) + 13 STR ($299/night at 70% occ.)</li>
+                <li>Adjacent 9-acre parcel, 103 geodesic dome residences total</li>
+                <li>50 Tier 1 domes: $1,900/mo + $122 HOA = $2,022/mo each</li>
+                <li>40 Tier 2 domes: $2,200/mo + $122 HOA = $2,322/mo each</li>
+                <li>13 Short-term rental domes: $299/night at 70% occupancy</li>
                 <li>Gross monthly revenue at full occupancy: $275,511</li>
-                <li>Estimated net monthly: ~$200,000</li>
+                <li>Estimated net monthly: ~$200,000 (27% expense ratio)</li>
                 <li>Year 2: 30% of domes operational (construction ramp)</li>
                 <li>Year 3: 80% operational</li>
                 <li>Year 4+: 100% operational</li>
                 <li>Annual growth rate: 3% (lease renewals + rate increases)</li>
+                <li>Waitlist: 408 interested residents</li>
                 <li>Series A ($16M) funds land acquisition ($10M) + build-out ($6M)</li>
             </ul>
         </div>
@@ -438,15 +658,17 @@
                 <li>Conservative scenario uses low-end revenue and high-end expenses throughout</li>
                 <li>Base case uses midpoint revenue and midpoint expenses</li>
                 <li>Strong scenario uses high-end revenue and low-end expenses</li>
+                <li>Historical validation: Within Center has operated for 4.5 years, 1,500+ sessions, weekly sales of $20K+</li>
             </ul>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>
-        This document is confidential and intended solely for the use of authorized investors.<br>
-        Projections are estimates based on current operating data and are not guarantees of future performance.</p>
+        <p class="footer-disclaimer">&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>
+        This document is confidential and intended solely for the use of authorized investors and their advisors.<br>
+        Financial projections are forward-looking estimates based on current operating data, signed agreements, and management assumptions. They are not guarantees of future performance.<br>
+        Prepared for qualified investors under applicable securities exemptions.</p>
     </footer>
 </div>
 
@@ -454,26 +676,42 @@
     // ===== FINANCIAL MODEL =====
     const fmt = (n) => '$' + Math.round(n).toLocaleString();
     const fmtM = (n) => '$' + (n / 1000000).toFixed(1) + 'M';
+    const fmtK = (n) => n >= 1000 ? '$' + (n/1000).toFixed(1) + 'K' : '$' + n.toLocaleString();
+    const fmtPct = (n) => Math.round(n * 100) + '%';
 
-    // Monthly steady-state figures from investor deck
+    // Updated monthly steady-state figures from investor deck
     const scenarios = {
-        conservative: { label: 'Conservative', revenue: 133440, expenses: 72300 },
-        base:         { label: 'Base Case',    revenue: 185000, expenses: 65500 },
-        strong:       { label: 'Strong',       revenue: 250940, expenses: 59300 }
+        conservative: { label: 'Conservative', revenue: 171000, expenses: 73800 },
+        base:         { label: 'Base Case',    revenue: 235000, expenses: 67300 },
+        strong:       { label: 'Strong',       revenue: 304000, expenses: 60800 }
     };
 
     // Monthly ramp multipliers for Year 1
     const ramp = [0.25, 0.35, 0.50, 0.65, 0.75, 0.85, 0.90, 0.95, 1.0, 1.0, 1.0, 1.0];
 
-    // Detailed expense line items (low / high steady-state from investor deck)
+    // Revenue streams (monthly low/high)
+    const revenueStreams = [
+        { name: 'Retreat House Lodging', low: 52350, high: 74850, badge: 'lodging', detail: '10 beds, $349-$499/night, 50% occ, 2-night min' },
+        { name: 'Yurt Lodging (2 units)', low: 12582, high: 12582, badge: 'lodging', detail: '$699/night each, 30% occupancy' },
+        { name: 'HoneyComb Dome', low: 5391, high: 5391, badge: 'lodging', detail: '$599/night, 30% occupancy' },
+        { name: 'Lodging Domes (8 beds)', low: 21528, high: 35880, badge: 'lodging', detail: '$299/bed/night, 30-50% occ' },
+        { name: 'Maloka Venue Rental', low: 20000, high: 40000, badge: 'venue', detail: '50-ft ceremony & retreat dome' },
+        { name: 'Maloka Overnight Capacity', low: 12000, high: 18000, badge: 'venue', detail: 'Event lodging overflow' },
+        { name: 'Additional Venue Rentals', low: 8000, high: 16000, badge: 'venue', detail: 'Temple, grounds, event spaces' },
+        { name: 'Within Center Outpatient', low: 16500, high: 33000, badge: 'clinical', detail: 'AWKN/HEAL/DISCOVER packages' },
+        { name: 'AWKN Hosted Retreats', low: 20000, high: 75000, badge: 'program', detail: 'Curated multi-day immersions' },
+        { name: 'Memberships', low: 3000, high: 8000, badge: 'program', detail: '16 members pre-marketing' },
+    ];
+
+    // Detailed expense line items
     const expenseItems = [
-        { name: 'Hospitality Manager (live-in, FT)', low: 4000, high: 5000, rampStart: 1 },
+        { name: 'On-site Hospitality Manager', low: 4000, high: 5000, rampStart: 1 },
         { name: 'Operations Manager', low: 4000, high: 4000, rampStart: 1 },
         { name: 'Medical / Clinical Staff (2 days/wk)', low: 3000, high: 5000, rampStart: 3 },
-        { name: 'Executive / Management', low: 10000, high: 12000, rampStart: 1 },
-        { name: 'Shannon Cohen — Advisory', low: 3000, high: 3000, rampStart: 1 },
+        { name: 'Executive / Management Team', low: 10000, high: 12000, rampStart: 1 },
+        { name: 'Executive Advisory', low: 3000, high: 3000, rampStart: 1 },
         { name: 'Property Lease', low: 12800, high: 12800, rampStart: 1 },
-        { name: 'RV Relocation (one-time)', low: 1500, high: 1500, rampStart: 1, oneTime: 1 },
+        { name: 'RV Relocation + Expansion', low: 1500, high: 1500, rampStart: 1, oneTime: 1 },
         { name: 'Maintenance & Utilities', low: 4000, high: 6000, rampStart: 1 },
         { name: 'Breakfast & Guest Supplies', low: 2500, high: 3500, rampStart: 2 },
         { name: 'Insurance, Licensing & Compliance', low: 1500, high: 2500, rampStart: 1 },
@@ -482,12 +720,117 @@
         { name: 'Miscellaneous / Contingency', low: 1000, high: 2000, rampStart: 1 },
     ];
 
+    // Capital allocation
+    const capitalAllocation = [
+        { category: 'Infrastructure', items: [
+            { name: 'Maloka Dome Build', amount: 50000 },
+            { name: 'Lodging Domes (2) — Build & Furnish', amount: 75000 },
+            { name: 'Retreat House Upgrades', amount: 24000 },
+        ], color: '#2d6a4f', total: 149000 },
+        { category: 'Marketing & Sales', items: [
+            { name: 'Google Ads (3-month campaign)', amount: 24000 },
+            { name: 'Brand Launch', amount: 30000 },
+            { name: 'Website & Booking Platform', amount: 5000 },
+            { name: 'Landscaping & Signage', amount: 25000 },
+            { name: 'Local Business Development', amount: 3000 },
+        ], color: '#b8860b', total: 87000 },
+        { category: 'Operations', items: [
+            { name: 'Executive Advisory (6 months)', amount: 18000 },
+            { name: 'AI Systems Development', amount: 10000 },
+            { name: 'Temple & Pool Improvements', amount: 5000 },
+            { name: 'Local Sales', amount: 15000 },
+        ], color: '#4a7c6b', total: 48000 },
+        { category: 'Legal & Licensing', items: [
+            { name: 'Legal, Compliance & Licensing', amount: 20000 },
+        ], color: '#6a4c93', total: 20000 },
+        { category: 'Reserves', items: [
+            { name: 'Three-Month Operating Reserve', amount: 105000 },
+            { name: 'Growth Buffer', amount: 91000 },
+        ], color: '#8a8a8a', total: 196000 },
+    ];
+
     let currentScenario = 'conservative';
 
+    // ===== EXECUTIVE SUMMARY =====
+    function renderExecSummary(active) {
+        const s = scenarios[active || 'conservative'];
+        const monthly = s.revenue - s.expenses;
+        const annual = monthly * 12;
+        const margin = monthly / s.revenue;
+
+        document.getElementById('exec-kpis').innerHTML = `
+            <div class="kpi"><div class="kpi-value" style="color:var(--accent-green)">${fmtK(s.revenue)}</div><div class="kpi-label">Monthly Revenue</div></div>
+            <div class="kpi"><div class="kpi-value" style="color:var(--accent-terracotta)">${fmtK(s.expenses)}</div><div class="kpi-label">Monthly Expenses</div></div>
+            <div class="kpi"><div class="kpi-value" style="color:var(--accent-gold)">${fmtK(monthly)}</div><div class="kpi-label">Monthly Net Profit</div></div>
+            <div class="kpi"><div class="kpi-value" style="color:var(--accent-green)">${fmtPct(margin)}</div><div class="kpi-label">Net Margin</div></div>
+            <div class="kpi"><div class="kpi-value" style="color:var(--accent-gold)">${fmtM(annual)}</div><div class="kpi-label">Annualized Net</div></div>
+        `;
+
+        const rows = [
+            ['Monthly Revenue', fmt(scenarios.conservative.revenue), fmt(scenarios.base.revenue), fmt(scenarios.strong.revenue)],
+            ['Monthly Expenses', fmt(scenarios.conservative.expenses), fmt(scenarios.base.expenses), fmt(scenarios.strong.expenses)],
+            ['Monthly Net Profit', fmt(scenarios.conservative.revenue - scenarios.conservative.expenses), fmt(scenarios.base.revenue - scenarios.base.expenses), fmt(scenarios.strong.revenue - scenarios.strong.expenses)],
+            ['Annualized Net Profit', fmtM((scenarios.conservative.revenue - scenarios.conservative.expenses) * 12), fmtM((scenarios.base.revenue - scenarios.base.expenses) * 12), fmtM((scenarios.strong.revenue - scenarios.strong.expenses) * 12)],
+            ['Net Margin', fmtPct((scenarios.conservative.revenue - scenarios.conservative.expenses) / scenarios.conservative.revenue), fmtPct((scenarios.base.revenue - scenarios.base.expenses) / scenarios.base.revenue), fmtPct((scenarios.strong.revenue - scenarios.strong.expenses) / scenarios.strong.revenue)],
+            ['Payroll (% of Revenue)', fmtPct(29000 / scenarios.conservative.revenue), fmtPct(26000 / scenarios.base.revenue), fmtPct(24000 / scenarios.strong.revenue)],
+        ];
+
+        document.getElementById('exec-tbody').innerHTML = rows.map((r, i) => `
+            <tr${i === 2 ? ' class="highlight"' : ''}${i === 3 ? ' class="total"' : ''}>
+                <td><strong>${r[0]}</strong></td>
+                <td style="text-align:right">${r[1]}</td>
+                <td style="text-align:right">${r[2]}</td>
+                <td style="text-align:right">${r[3]}</td>
+            </tr>
+        `).join('');
+    }
+
+    function setExecScenario(s) {
+        document.querySelectorAll('#exec-tabs .scenario-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`#exec-tabs .scenario-tab[onclick="setExecScenario('${s}')"]`).classList.add('active');
+        renderExecSummary(s);
+    }
+
+    // ===== REVENUE STREAMS =====
+    function renderRevenueStreams() {
+        document.getElementById('rev-cards').innerHTML = revenueStreams.map(r => `
+            <div class="rev-card">
+                <div class="rev-card-header">
+                    <div class="rev-card-title">${r.name}</div>
+                    <div class="rev-card-badge ${r.badge}">${r.badge}</div>
+                </div>
+                <div class="rev-card-range">${fmtK(r.low)}${r.high !== r.low ? ' &ndash; ' + fmtK(r.high) : ''}<span style="font-size:12px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+                <div class="rev-card-detail">${r.detail}</div>
+            </div>
+        `).join('');
+
+        const totalLow = revenueStreams.reduce((s, r) => s + r.low, 0);
+        const totalHigh = revenueStreams.reduce((s, r) => s + r.high, 0);
+
+        document.getElementById('rev-tbody').innerHTML = revenueStreams.map(r => `
+            <tr>
+                <td>${r.name}</td>
+                <td style="text-align:right">${fmt(r.low)}</td>
+                <td style="text-align:right">${fmt(r.high)}</td>
+                <td style="text-align:right">${fmt(r.low * 12)}</td>
+                <td style="text-align:right">${fmt(r.high * 12)}</td>
+            </tr>
+        `).join('') + `
+            <tr class="total">
+                <td><strong>Total</strong></td>
+                <td style="text-align:right">${fmt(totalLow)}</td>
+                <td style="text-align:right">${fmt(totalHigh)}</td>
+                <td style="text-align:right">${fmt(totalLow * 12)}</td>
+                <td style="text-align:right">${fmt(totalHigh * 12)}</td>
+            </tr>
+        `;
+    }
+
+    // ===== YEAR 1 MONTHLY =====
     function setScenario(s) {
         currentScenario = s;
         document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`.scenario-tab[onclick="setScenario('${s}')"]`).classList.add('active');
+        document.querySelectorAll(`.scenario-tab[onclick="setScenario('${s}')"]`).forEach(t => t.classList.add('active'));
         renderYear1();
     }
 
@@ -498,31 +841,29 @@
         let totalRev = 0, totalExp = 0, totalNet = 0;
         const data = months.map((m, i) => {
             const rev = Math.round(s.revenue * ramp[i]);
-            const exp = Math.round(s.expenses * (i < 3 ? 0.85 : 1)); // Lower expenses during ramp
+            const exp = Math.round(s.expenses * (i < 3 ? 0.85 : 1));
             const net = rev - exp;
             cumulative += net;
             totalRev += rev; totalExp += exp; totalNet += net;
-            return { month: m, rev, exp, net, cumulative };
+            return { month: m, rev, exp, net, cumulative, margin: net / rev };
         });
 
-        // Summary cards
         document.getElementById('year1-summary').innerHTML = `
             <div class="summary-card"><div class="summary-card-value">${fmt(totalRev)}</div><div class="summary-card-label">Year 1 Revenue</div></div>
             <div class="summary-card"><div class="summary-card-value">${fmt(totalExp)}</div><div class="summary-card-label">Year 1 Expenses</div></div>
             <div class="summary-card green"><div class="summary-card-value">${fmt(totalNet)}</div><div class="summary-card-label">Year 1 Net Profit</div></div>
-            <div class="summary-card"><div class="summary-card-value">${Math.round(totalNet / totalRev * 100)}%</div><div class="summary-card-label">Net Margin</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtPct(totalNet / totalRev)}</div><div class="summary-card-label">Avg Net Margin</div></div>
         `;
 
         document.getElementById('chart-scenario-label').textContent = s.label + ' Scenario';
 
-        // Bar chart
         const maxVal = Math.max(...data.map(d => Math.max(d.rev, d.exp)));
         const chartHeight = 280;
         document.getElementById('year1-chart').innerHTML = data.map(d => `
             <div class="bar-group">
                 <div class="bar-stack" style="height: ${(d.rev / maxVal) * chartHeight}px;">
                     <div class="bar-segment bar-revenue" style="height: 100%;">
-                        <div class="bar-value">${fmt(d.rev)}</div>
+                        <div class="bar-value">${fmtK(d.rev)}</div>
                     </div>
                 </div>
                 <div class="bar-label">${d.month}</div>
@@ -535,13 +876,13 @@
             </div>
         `).join('');
 
-        // Table
         document.getElementById('year1-tbody').innerHTML = data.map((d, i) => `
             <tr${i >= 9 ? ' class="highlight"' : ''}>
                 <td>${d.month} ${i < 9 ? '2026' : '2027'}</td>
                 <td style="text-align:right">${fmt(d.rev)}</td>
                 <td style="text-align:right">${fmt(d.exp)}</td>
                 <td style="text-align:right; color: ${d.net >= 0 ? 'var(--accent-green)' : 'var(--accent-terracotta)'};">${fmt(d.net)}</td>
+                <td style="text-align:right">${fmtPct(d.margin)}</td>
                 <td style="text-align:right; color: ${d.cumulative >= 0 ? 'var(--accent-gold)' : 'var(--accent-terracotta)'};">${fmt(d.cumulative)}</td>
             </tr>
         `).join('') + `
@@ -550,11 +891,11 @@
                 <td style="text-align:right">${fmt(totalRev)}</td>
                 <td style="text-align:right">${fmt(totalExp)}</td>
                 <td style="text-align:right">${fmt(totalNet)}</td>
+                <td style="text-align:right">${fmtPct(totalNet / totalRev)}</td>
                 <td style="text-align:right">${fmt(cumulative)}</td>
             </tr>
         `;
 
-        // Expense detail table
         renderExpenseDetail();
     }
 
@@ -562,21 +903,15 @@
         const scenario = currentScenario;
         const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
 
-        // Update month headers
         months.forEach((m, i) => {
             const el = document.getElementById(`exp-m${i+1}`);
             if (el) el.textContent = m;
         });
 
-        // For each expense, determine monthly value based on scenario + ramp
-        const fmtK = (n) => n >= 1000 ? '$' + (n/1000).toFixed(1) + 'K' : '$' + n.toLocaleString();
-        const fmtS = (n) => '$' + Math.round(n).toLocaleString();
-
         let monthTotals = new Array(12).fill(0);
         let grandTotal = 0;
 
         const rows = expenseItems.map(item => {
-            // Pick value based on scenario
             let steadyState;
             if (scenario === 'conservative') steadyState = item.high;
             else if (scenario === 'strong') steadyState = item.low;
@@ -587,10 +922,8 @@
                 const monthNum = i + 1;
                 let val = 0;
                 if (item.oneTime) {
-                    // One-time expense: only charged in the specified month
                     if (monthNum === item.oneTime) val = steadyState;
                 } else if (monthNum >= item.rampStart) {
-                    // Recurring: ramp in during months 1-3, full after
                     if (monthNum <= 2) val = Math.round(steadyState * 0.6);
                     else if (monthNum === 3) val = Math.round(steadyState * 0.8);
                     else val = steadyState;
@@ -609,13 +942,13 @@
                 <tr>
                     <td style="font-size:12px; white-space:nowrap;">${r.name}</td>
                     ${r.monthlyCells.map(v => `<td style="text-align:right; font-size:11px; color: ${v === 0 ? 'var(--text-muted)' : 'var(--text-secondary)'};">${v === 0 ? '&mdash;' : fmtK(v)}</td>`).join('')}
-                    <td style="text-align:right; font-weight:600; font-size:12px;">${fmtS(r.annualTotal)}</td>
+                    <td style="text-align:right; font-weight:600; font-size:12px;">${fmt(r.annualTotal)}</td>
                 </tr>
             `).join('') + `
                 <tr class="total">
                     <td>Monthly Total</td>
                     ${monthTotals.map(t => `<td style="text-align:right; font-size:11px;">${fmtK(t)}</td>`).join('')}
-                    <td style="text-align:right;">${fmtS(grandTotal)}</td>
+                    <td style="text-align:right;">${fmt(grandTotal)}</td>
                 </tr>
             `;
     }
@@ -628,21 +961,16 @@
         const p1Growth = 1.05;
         const expGrowth = 1.03;
 
-        // Phase 2: $200K/mo net at full capacity
-        const p2FullNet = 200000 * 12; // $2.4M/yr
         const p2FullGross = 275511 * 12;
-        const p2Ramp = [0, 0.30, 0.80, 1.0, 1.0]; // Year 1 = 0 (still building)
+        const p2Ramp = [0, 0.30, 0.80, 1.0, 1.0];
         const p2Growth = 1.03;
 
         let cumulative = 0;
         const data = [];
 
         for (let y = 0; y < 5; y++) {
-            const yr = y + 1;
-            // Year 1 uses ramp-adjusted figure
             let p1Rev, p1Exp;
             if (y === 0) {
-                // Match the Year 1 monthly model total
                 p1Rev = 0;
                 ramp.forEach(r => p1Rev += p1Base.revenue * r);
                 p1Exp = p1Base.expenses * 9 + p1Base.expenses * 0.85 * 3;
@@ -653,7 +981,7 @@
             const p1Net = p1Rev - p1Exp;
 
             const p2Rev = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(p2Growth, y - 2) : 1);
-            const p2ExpRatio = 0.27; // ~27% expense ratio for dome collective
+            const p2ExpRatio = 0.27;
             const p2Exp = p2Rev * p2ExpRatio;
             const p2Net = p2Rev - p2Exp;
 
@@ -662,20 +990,18 @@
             const totalNet = p1Net + p2Net;
             cumulative += totalNet;
 
-            data.push({ year: yr, p1Rev, p1Net, p2Rev, p2Net, totalRev, totalExp, totalNet, cumulative });
+            data.push({ year: y + 1, p1Rev, p1Net, p2Rev, p2Net, totalRev, totalExp, totalNet, cumulative, margin: totalNet / totalRev });
         }
 
-        // Summary
         const y5cum = data[4].cumulative;
         const y5net = data[4].totalNet;
         document.getElementById('year5-summary').innerHTML = `
             <div class="summary-card"><div class="summary-card-value">${fmtM(y5cum)}</div><div class="summary-card-label">5-Year Cumulative Net</div></div>
             <div class="summary-card green"><div class="summary-card-value">${fmtM(y5net)}</div><div class="summary-card-label">Year 5 Annual Net</div></div>
             <div class="summary-card"><div class="summary-card-value">${fmtM(data[4].totalRev)}</div><div class="summary-card-label">Year 5 Annual Revenue</div></div>
-            <div class="summary-card"><div class="summary-card-value">${Math.round(data.reduce((s,d) => s + d.totalRev, 0) / 1000000)}M+</div><div class="summary-card-label">5-Year Total Revenue</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtPct(data[4].margin)}</div><div class="summary-card-label">Year 5 Net Margin</div></div>
         `;
 
-        // Chart
         const maxVal = Math.max(...data.map(d => d.totalNet));
         const chartHeight = 280;
         document.getElementById('year5-chart').innerHTML = data.map(d => `
@@ -689,7 +1015,6 @@
             </div>
         `).join('');
 
-        // Table
         document.getElementById('year5-tbody').innerHTML = data.map(d => `
             <tr${d.year === 5 ? ' class="highlight"' : ''}>
                 <td><strong>Year ${d.year}</strong></td>
@@ -698,6 +1023,7 @@
                 <td style="text-align:right">${fmt(d.totalRev)}</td>
                 <td style="text-align:right">${fmt(d.totalExp)}</td>
                 <td style="text-align:right; color: var(--accent-green);">${fmt(d.totalNet)}</td>
+                <td style="text-align:right">${fmtPct(d.margin)}</td>
                 <td style="text-align:right; color: var(--accent-gold);">${fmtM(d.cumulative)}</td>
             </tr>
         `).join('');
@@ -736,20 +1062,19 @@
             const p2Exp = p2Rev * 0.27;
             const p2Net = p2Rev - p2Exp;
 
+            const totalRev = p1Rev + p2Rev;
             const totalNet = p1Net + p2Net;
             cumulative += totalNet;
-            data.push({ year: y + 1, p1Net, p2Net, totalNet, cumulative });
+            data.push({ year: y + 1, p1Net, p1Rev, p2Net, p2Rev, totalRev, totalNet, cumulative, margin: totalNet / totalRev });
         }
 
-        // Summary
         document.getElementById('year10-summary').innerHTML = `
             <div class="summary-card"><div class="summary-card-value">${fmtM(data[9].cumulative)}</div><div class="summary-card-label">10-Year Cumulative Net</div></div>
             <div class="summary-card green"><div class="summary-card-value">${fmtM(data[9].totalNet)}</div><div class="summary-card-label">Year 10 Annual Net</div></div>
             <div class="summary-card"><div class="summary-card-value">${Math.round(data[9].cumulative / 500000)}x</div><div class="summary-card-label">Return on $500K</div></div>
-            <div class="summary-card"><div class="summary-card-value">${fmtM(data[4].cumulative)}</div><div class="summary-card-label">Breakeven by Year 1</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtPct(data[9].margin)}</div><div class="summary-card-label">Year 10 Net Margin</div></div>
         `;
 
-        // Chart
         const maxVal = Math.max(...data.map(d => d.totalNet));
         const chartHeight = 280;
         document.getElementById('year10-chart').innerHTML = data.map(d => `
@@ -763,22 +1088,53 @@
             </div>
         `).join('');
 
-        // Table
         document.getElementById('year10-tbody').innerHTML = data.map((d, i) => `
             <tr${i === 4 || i === 9 ? ' class="highlight"' : ''}>
                 <td><strong>Year ${d.year}</strong></td>
                 <td style="text-align:right">${fmt(d.p1Net)}</td>
                 <td style="text-align:right">${d.p2Net > 0 ? fmt(d.p2Net) : '&mdash;'}</td>
                 <td style="text-align:right; color: var(--accent-green);">${fmt(d.totalNet)}</td>
+                <td style="text-align:right">${fmtPct(d.margin)}</td>
                 <td style="text-align:right; color: var(--accent-gold);">${fmtM(d.cumulative)}</td>
             </tr>
         `).join('');
     }
 
+    // ===== CAPITAL ALLOCATION =====
+    function renderCapital() {
+        const total = 500000;
+        const colors = capitalAllocation.map(c => c.color);
+
+        document.getElementById('alloc-bar').innerHTML = capitalAllocation.map((c, i) => `
+            <div class="alloc-segment" style="flex: ${c.total / total}; background: ${c.color};">${Math.round(c.total / total * 100)}%</div>
+        `).join('');
+
+        document.getElementById('alloc-legend').innerHTML = capitalAllocation.map(c => `
+            <div class="alloc-item">
+                <div class="alloc-dot" style="background:${c.color}"></div>
+                <span>${c.category}</span>
+                <span class="alloc-item-value">${fmt(c.total)}</span>
+            </div>
+        `).join('');
+
+        let rows = '';
+        capitalAllocation.forEach(cat => {
+            rows += `<tr style="background: var(--bg-secondary);"><td colspan="2" style="font-weight:700;">${cat.category}</td><td style="text-align:right; font-weight:700;">${fmt(cat.total)}</td></tr>`;
+            cat.items.forEach(item => {
+                rows += `<tr><td></td><td>${item.name}</td><td style="text-align:right">${fmt(item.amount)}</td></tr>`;
+            });
+        });
+        rows += `<tr class="total"><td colspan="2"><strong>Total</strong></td><td style="text-align:right">${fmt(total)}</td></tr>`;
+        document.getElementById('capital-tbody').innerHTML = rows;
+    }
+
     // ===== INIT =====
+    renderExecSummary('conservative');
+    renderRevenueStreams();
     renderYear1();
     render5Year();
     render10Year();
+    renderCapital();
 
     // Smooth nav
     document.querySelectorAll('.topbar-nav a').forEach(a => {
