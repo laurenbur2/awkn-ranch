@@ -1,12 +1,12 @@
 {
-  "version": "v260403.02 3:18a",
-  "release": 2,
-  "sha": "172aa97",
-  "fullSha": "172aa97bbb2a714cf3eec5fcbeda691418947e87",
+  "version": "v260403.03 3:22a",
+  "release": 3,
+  "sha": "9b20ca2",
+  "fullSha": "9b20ca2375f517eb1178661bc6c8470443d5a682",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervm727z3",
-  "pushedAt": "2026-04-02T22:18:08-05:00",
-  "commits": [{"sha":"172aa97","message":"Rebuild projections page with updated investor data and CFO-grade presentation","author":"Justin DeLaCruz"}]
+  "machine": "runnervmrg6be",
+  "pushedAt": "2026-04-02T22:22:25-05:00",
+  "commits": [{"sha":"9b20ca2","message":"Remove RV relocation expense from monthly expense breakdown","author":"Justin DeLaCruz"}]
 }
