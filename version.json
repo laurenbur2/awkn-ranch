@@ -1,12 +1,12 @@
 {
-  "version": "v260403.10 4:06a",
-  "release": 10,
-  "sha": "2dfc39c",
-  "fullSha": "2dfc39c1e69201f4b2755a1f99f264a30bbc11d7",
+  "version": "v260403.11 4:13a",
+  "release": 11,
+  "sha": "bb2d93e",
+  "fullSha": "bb2d93e5140876d2d17b36e6db6773af64f6adce",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
-  "machine": "runnervmrg6be",
-  "pushedAt": "2026-04-02T23:06:28-05:00",
-  "commits": [{"sha":"2dfc39c","message":"Shift exit strategy from Year 5 to Year 10 combined refinance","author":"Justin DeLaCruz"}]
+  "machine": "runnervm727z3",
+  "pushedAt": "2026-04-02T23:13:31-05:00",
+  "commits": [{"sha":"bb2d93e","message":"Update exit strategy to 9% cap rate and fix auth base path for GitHub Pages","author":"Justin DeLaCruz"}]
 }
