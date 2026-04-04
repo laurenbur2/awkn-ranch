@@ -1,12 +1,12 @@
 {
-  "version": "v260403.18 8:28p",
-  "release": 18,
-  "sha": "7e9d812",
-  "fullSha": "7e9d812a6af1cc416e8036be48fb411baf19db40",
+  "version": "v260404.01 3:37a",
+  "release": 1,
+  "sha": "064dfb5",
+  "fullSha": "064dfb555c5d6d51f74a46c83d2eb4d5791223c8",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-03T15:28:44-05:00",
-  "commits": [{"sha":"7e9d812","message":"fix: Breakfast & Supplies starts month 1","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-03T22:36:48-05:00",
+  "commits": [{"sha":"0a013da","message":"fix: move payback timeline to Year 4 refinance instead of Year 1","author":"Justin DeLaCruz"},{"sha":"5b42083","message":"style: switch projections page to light theme matching awknranch.com","author":"Justin DeLaCruz"},{"sha":"97bd1f0","message":"style: lighten card and secondary backgrounds to pure white","author":"Justin DeLaCruz"},{"sha":"064dfb5","message":"Merge branch 'claude/exciting-kepler'","author":"Justin DeLaCruz"}]
 }
