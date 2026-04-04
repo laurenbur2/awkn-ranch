@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "projections",
-      "runtimeExecutable": "/Users/justindelacruz/.nvm/versions/node/v24.14.0/bin/node",
-      "runtimeArgs": ["/Users/justindelacruz/.nvm/versions/node/v24.14.0/bin/npx", "serve", "-l", "8090"],
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["-e", "const h=require('http'),f=require('fs'),p=require('path'),m={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};h.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]),fp=p.join(process.cwd(),u);if(f.existsSync(fp)&&f.statSync(fp).isDirectory())fp=p.join(fp,'index.html');if(!f.existsSync(fp)){r.writeHead(404);r.end('Not found');return}r.writeHead(200,{'Content-Type':m[p.extname(fp)]||'application/octet-stream'});f.createReadStream(fp).pipe(r)}).listen(8090,()=>console.log('Serving on 8090'))"],
       "port": 8090
     }
   ]

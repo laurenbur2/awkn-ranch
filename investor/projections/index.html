@@ -193,7 +193,7 @@
                 <li><a href="#payback">Payback Timeline</a></li>
                 <li><a href="#year1">Year 1 Detail</a></li>
                 <li><a href="#year4">4-Year Growth</a></li>
-                <li><a href="#exit">Your Returns</a></li>
+                <li><a href="#exit">Exit Strategy</a></li>
                 <li><a href="#assumptions-section">Assumptions</a></li>
             </ul>
         </div>
@@ -202,10 +202,10 @@
     <!-- Hero -->
     <div class="hero">
         <a href="/investor/" class="back-link" style="margin-bottom: 24px; display: inline-flex;">&larr; Back to Investor Overview</a>
-        <div class="hero-badge">Prepared for Aaron &amp; Alex</div>
-        <h1>Your <span class="gold">$500K Investment</span><br>Return Timeline</h1>
+        <div class="hero-badge">Financial Projections</div>
+        <h1><span class="gold">4-Year Financial Model</span><br>&amp; Exit Strategy</h1>
         <p class="hero-sub">
-            This page answers one question: how and when does your $500,000 come back? Below you'll find the month-by-month path to payback, what happens at the Year 4 refinance, and exactly what your capital generates across every scenario.
+            Revenue projections, operating cash flow, and a clear path to capital return. Below you'll find month-by-month financials across three scenarios, the 4-year growth trajectory, and the refinance-based exit that returns invested capital while retaining full equity ownership.
         </p>
         <div class="hero-stats" id="hero-stats"></div>
     </div>
@@ -372,42 +372,42 @@
 
     <div class="divider"></div>
 
-    <!-- ===== YOUR RETURNS ===== -->
+    <!-- ===== EXIT STRATEGY ===== -->
     <section class="section" id="exit">
-        <div class="section-label">Your Returns</div>
-        <h2>What Your $500K Generates Over 4 Years</h2>
+        <div class="section-label">Exit Strategy</div>
+        <h2>Year 4 Refinance &amp; Valuation</h2>
         <p class="section-desc">
-            Your investment is returned through two channels: (1) operating cash flow distributions during Years 1&ndash;4, and (2) a lump-sum return at the Year 4 refinance. Here's the full picture.
+            Capital is returned through a debt refinance at Year 4 &mdash; not a sale, not an IPO. By Year 4, the ecosystem is fully stabilized, generating predictable cash flow, and valued on institutional lending metrics. All invested equity is returned while ownership is retained.
         </p>
 
-        <!-- Your Investment KPIs -->
+        <!-- Refinance KPIs -->
         <div class="summary-grid" id="exit-investor-kpis"></div>
 
-        <!-- How You Get Paid -->
+        <!-- Return Waterfall -->
         <div class="chart-container" style="margin-top: 32px;">
-            <div class="chart-title">How Your $500K Comes Back</div>
-            <div class="chart-subtitle">Two return channels: operating distributions + Year 4 refinance proceeds</div>
+            <div class="chart-title">Capital Return Waterfall</div>
+            <div class="chart-subtitle">Operating cash flow through Year 4 + lump-sum return at refinance</div>
             <table class="data-table" id="exit-your-returns" style="margin-top: 24px;"></table>
         </div>
 
         <!-- Year 4 Refinance Detail -->
         <div class="chart-container" style="margin-top: 24px;">
-            <div class="chart-title">Year 4 Refinance &mdash; Full Capital Stack</div>
-            <div class="chart-subtitle">Your $500K seed sits alongside a $16M Series A &middot; here's how the refinance covers everyone</div>
+            <div class="chart-title">Refinance Mechanics &mdash; Full Capital Stack</div>
+            <div class="chart-subtitle">Stabilized NOI drives appraised value &middot; cash-out refinance returns all invested equity</div>
             <div class="summary-grid" id="exit-kpis" style="margin-bottom: 24px;"></div>
             <table class="data-table" id="exit-waterfall"></table>
         </div>
 
         <!-- Post-Refi Ongoing -->
         <div class="chart-container" style="margin-top: 24px;">
-            <div class="chart-title">After the Refinance: Ongoing Cash Flow</div>
+            <div class="chart-title">Post-Refinance: Ongoing Cash Flow</div>
             <div class="chart-subtitle">Ownership is retained &mdash; the business keeps generating income after debt service</div>
             <table class="data-table" id="exit-dscr" style="margin-top: 24px;"></table>
         </div>
 
         <!-- Key Assumptions -->
         <div class="assumptions" style="margin-top: 24px;">
-            <h3>Assumptions Behind These Numbers</h3>
+            <h3>Refinance Assumptions</h3>
             <ul id="exit-assumptions"></ul>
         </div>
     </section>
@@ -909,27 +909,26 @@
 
         // ===== RENDER =====
 
-        // Investor KPIs — focused on their $500K
+        // Refinance KPIs
         document.getElementById('exit-investor-kpis').innerHTML = `
-            <div class="summary-card green"><div class="summary-card-value">${fmt(investment)}</div><div class="summary-card-label">Your Investment</div></div>
-            <div class="summary-card"><div class="summary-card-value">${fmt(cumCashFlow)}</div><div class="summary-card-label">4-Year Operating Cash Flow</div></div>
-            <div class="summary-card"><div class="summary-card-value">${fmtM(refiProceeds)}</div><div class="summary-card-label">Year 4 Refi Proceeds (Total)</div></div>
-            <div class="summary-card green"><div class="summary-card-value">${(cumCashFlow / investment).toFixed(1)}x</div><div class="summary-card-label">Cash Flow Alone vs. Your $500K</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtM(appraisedValue)}</div><div class="summary-card-label">Year 4 Appraised Value</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(refiProceeds)}</div><div class="summary-card-label">Cash-Out Refi Proceeds</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtM(totalNOI)}</div><div class="summary-card-label">Stabilized Annual NOI</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(postRefiCashFlow)}/yr</div><div class="summary-card-label">Post-Refi Free Cash Flow</div></div>
         `;
 
-        // How you get paid table
+        // Capital return waterfall
         document.getElementById('exit-your-returns').innerHTML = `
-            <tr><td style="font-weight:600;">Your $500K Investment</td><td style="text-align:right; color: var(--accent-terracotta); font-weight:600;">(${fmt(investment)})</td></tr>
-            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Channel 1: Operating Cash Flow (Years 1&ndash;4)</td></tr>
-            <tr><td>&nbsp;&nbsp;&nbsp;Total operating cash flow (Years 1&ndash;4)</td><td style="text-align:right; font-weight:600;">${fmt(cumCashFlow)}</td></tr>
-            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Channel 2: Year 4 Refinance</td></tr>
-            <tr><td>&nbsp;&nbsp;&nbsp;Property appraised at ${fmtM(appraisedValue)} (6.5% cap on ${fmtM(totalNOI)} NOI)</td><td style="text-align:right">&mdash;</td></tr>
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Operating Cash Flow (Years 1&ndash;4)</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Cumulative operating cash flow</td><td style="text-align:right; font-weight:600;">${fmt(cumCashFlow)}</td></tr>
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Year 4 Refinance</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Stabilized NOI (${fmtM(totalNOI)}) &rarr; ${fmtM(appraisedValue)} appraised value at 6.5% cap</td><td style="text-align:right">&mdash;</td></tr>
             <tr><td>&nbsp;&nbsp;&nbsp;Cash-out refinance at 65% LTV</td><td style="text-align:right; font-weight:600;">${fmtM(refiProceeds)}</td></tr>
-            <tr><td>&nbsp;&nbsp;&nbsp;Refi proceeds return all $16.5M invested equity</td><td style="text-align:right; color: var(--accent-green);">&#10003;</td></tr>
-            <tr class="highlight"><td>&nbsp;&nbsp;&nbsp;<strong>Payback at Year 4 refinance &mdash; capital returned to all investors</strong></td><td style="text-align:right; color: var(--accent-green); font-weight:700;">&#10003;</td></tr>
-            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">After the Refinance</td></tr>
-            <tr><td>&nbsp;&nbsp;&nbsp;You still own equity &mdash; ongoing annual cash flow continues</td><td style="text-align:right; font-weight:600;">${fmtM(postRefiCashFlow)}/yr</td></tr>
-            <tr class="total"><td>Net result: $500K back at refinance + equity retained + ongoing income</td><td style="text-align:right; color: var(--accent-gold); font-weight:700;">Capital returned, ownership kept</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Total invested equity ($16.5M) returned from refi proceeds</td><td style="text-align:right; color: var(--accent-green);">&#10003;</td></tr>
+            <tr class="highlight"><td>&nbsp;&nbsp;&nbsp;<strong>All investor capital returned at Year 4 refinance</strong></td><td style="text-align:right; color: var(--accent-green); font-weight:700;">&#10003;</td></tr>
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Post-Refinance</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Full equity ownership retained &mdash; ongoing free cash flow</td><td style="text-align:right; font-weight:600;">${fmtM(postRefiCashFlow)}/yr</td></tr>
+            <tr class="total"><td>Net result: capital returned + equity retained + ongoing income</td><td style="text-align:right; color: var(--accent-gold); font-weight:700;">Capital returned, ownership kept</td></tr>
         `;
 
         // Full capital stack refinance detail
@@ -943,8 +942,8 @@
 
         document.getElementById('exit-waterfall').innerHTML = `
             <tr><td>Gross Refinance Proceeds</td><td style="text-align:right; font-weight:600;">${fmt(refiProceeds)}</td></tr>
-            <tr><td>Less: Your $500K seed return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(investment)})</td></tr>
-            <tr><td>Less: Series A $16M return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(seriesAEquity)})</td></tr>
+            <tr><td>Less: Seed equity return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(investment)})</td></tr>
+            <tr><td>Less: Series A equity return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(seriesAEquity)})</td></tr>
             <tr class="total"><td>Surplus / (Shortfall)</td><td style="text-align:right; color: var(${surplusAfterCapReturn >= 0 ? '--accent-green' : '--accent-terracotta'}); font-weight:700;">${fmt(surplusAfterCapReturn)}</td></tr>
         `;
 
@@ -963,7 +962,7 @@
 
         // Assumptions
         document.getElementById('exit-assumptions').innerHTML = `
-            <li>Your $500K is returned at the Year 4 refinance along with the full $16.5M capital stack</li>
+            <li>Full $16.5M capital stack returned at Year 4 refinance</li>
             <li>Cap rate: 6.5% on stabilized NOI &rarr; ${fmtM(appraisedValue)} appraised value</li>
             <li>Refinance at 65% LTV &rarr; ${fmtM(refiProceeds)} in proceeds</li>
             <li>Loan: ${(loanRate*100).toFixed(1)}% fixed, ${loanTermYears}-year amortization &rarr; ${fmt(annualDebtService)}/yr debt service</li>
@@ -975,20 +974,19 @@
 
     // ===== HERO STATS =====
     function renderHeroStats() {
-        // Base case payback month
         const s = scenarios.base;
-        const investment = 500000;
-        let cum = 0, paybackMonth = 0;
-        ramp.forEach((r, i) => {
-            const rev = Math.round(s.revenue * r);
-            const exp = Math.round(s.expenses * (i < 3 ? 0.85 : 1));
-            cum += (rev - exp);
-            if (!paybackMonth && cum >= investment) paybackMonth = i + 1;
-        });
 
-        // 4-year cumulative
+        // Stabilized annual NOI (Year 2+)
         const p1AnnualRev = s.revenue * 12;
         const p1AnnualExp = s.expenses * 12;
+        const stabilizedNOI = p1AnnualRev - p1AnnualExp;
+
+        // Year 4 appraised value
+        const capRate = 0.08;
+        const yr4NOI = stabilizedNOI * Math.pow(1.02, 3);
+        const appraisedValue = yr4NOI / capRate;
+
+        // 4-year cumulative cash flow
         const p2FullGross = Math.round(275511 * 0.90) * 12;
         const p2Ramp = [0, 0.30, 0.80, 1.0];
         let cum4 = 0;
@@ -1005,15 +1003,17 @@
             cum4 += (p1Rev - p1Exp) + (p2Rev - p2Rev * 0.27);
         }
 
-        const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+        const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
+        const fmtK = v => '$' + Math.round(v / 1000) + 'K';
+
         document.getElementById('hero-stats').innerHTML = `
             <div class="hero-stat">
-                <div class="hero-stat-value">Month ${paybackMonth}</div>
-                <div class="hero-stat-label">${months[paybackMonth - 1]} &mdash; Full Payback</div>
+                <div class="hero-stat-value">${fmtM(appraisedValue)}</div>
+                <div class="hero-stat-label">Year 4 Appraised Value</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">${(cum4 / investment).toFixed(1)}x</div>
-                <div class="hero-stat-label">4-Year Return on $500K</div>
+                <div class="hero-stat-value">${fmtK(yr4NOI)}</div>
+                <div class="hero-stat-label">Stabilized Annual NOI</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-value">Retained</div>
