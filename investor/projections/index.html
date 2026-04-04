@@ -202,13 +202,80 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .section { padding: 48px 20px; }
-            .hero { padding: 48px 20px 40px; }
-            .topbar { padding: 0 20px; }
-            .bar-chart { height: 240px; }
-            .bar-value { font-size: 8px; }
-            .bar-label { font-size: 8px; }
-            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            /* Layout */
+            .section { padding: 40px 16px; }
+            .topbar { padding: 0 12px; }
+            .topbar-inner { height: 56px; }
+            .topbar-nav { display: none; }
+            .topbar-brand { font-size: 17px; }
+            .back-deck-btn { padding: 6px 14px; font-size: 0.55rem; letter-spacing: 0.1em; }
+            .back-deck-btn svg { width: 10px; height: 10px; }
+            .divider { padding: 0 16px; }
+
+            /* Hero */
+            .hero { min-height: 60vh; }
+            .hero-content { padding: 60px 20px 40px; }
+            .hero h1 { font-size: 28px; }
+            .hero-badge { font-size: 0.55rem; padding: 5px 16px; margin-bottom: 1.5rem; }
+            .hero-sub { font-size: 0.9rem; margin-bottom: 32px; }
+            .hero-stats { grid-template-columns: 1fr; max-width: 280px; }
+            .hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 1rem; }
+            .hero-stat:last-child { border-bottom: none; }
+            .hero-stat-value { font-size: 1.4rem; }
+
+            /* Section headings */
+            .section h2 { font-size: 22px; }
+            .section-desc { font-size: 14px; margin-bottom: 32px; }
+            .section-label { font-size: 10px; letter-spacing: 2px; }
+
+            /* Summary cards */
+            .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 32px; }
+            .summary-card { padding: 16px 12px; }
+            .summary-card-value { font-size: 20px; }
+            .summary-card-label { font-size: 9px; letter-spacing: 0.5px; }
+
+            /* Charts */
+            .chart-container { padding: 20px 12px; margin-bottom: 32px; }
+            .chart-title { font-size: 15px; }
+            .chart-subtitle { font-size: 11px; margin-bottom: 20px; }
+            .bar-chart { height: 200px; gap: 4px; }
+            .bar-value { font-size: 7px; top: -18px; }
+            .bar-label { font-size: 7px; }
+            .bar-stack { max-width: 36px; }
+            .chart-legend { gap: 12px; }
+            .chart-legend-item { font-size: 10px; }
+
+            /* Scenario tabs */
+            .scenario-tabs { width: 100%; }
+            .scenario-tab { padding: 8px 16px; font-size: 12px; flex: 1; text-align: center; }
+
+            /* Tables */
+            .data-table { font-size: 12px; }
+            .data-table th { padding: 8px 6px; font-size: 9px; letter-spacing: 0.5px; }
+            .data-table td { padding: 8px 6px; font-size: 12px; }
+
+            /* Expense detail table */
+            #expense-detail-table { table-layout: auto; }
+            #expense-detail-table th, #expense-detail-table td { padding: 6px 3px; font-size: 9px; }
+            #expense-detail-table td:first-child { white-space: normal; font-size: 10px; }
+
+            /* Assumptions */
+            .assumptions { padding: 20px 16px; margin-top: 32px; }
+            .assumptions li { font-size: 12px; }
+
+            /* Footer */
+            .footer { padding: 32px 16px; font-size: 11px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 24px; }
+            .hero-stats { max-width: 240px; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .summary-card-value { font-size: 22px; }
+            .bar-chart { height: 180px; }
+            .bar-value { font-size: 6px; }
+            .scenario-tab { padding: 8px 10px; font-size: 11px; }
+            .back-deck-btn span.btn-text-full { display: none; }
         }
     </style>
 </head>
@@ -335,8 +402,8 @@
             <h3 style="font-size: 20px; margin-bottom: 8px;">Monthly Expense Breakdown</h3>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Line-item operating costs by month. Ramp-up months (1&ndash;3) show reduced costs as staffing and marketing scale up.</p>
 
-            <div>
-                <table class="data-table" id="expense-detail-table" style="table-layout: fixed; width: 100%;">
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="data-table" id="expense-detail-table" style="table-layout: fixed; min-width: 900px;">
                     <thead>
                         <tr>
                             <th style="width:22%; white-space:nowrap;">Expense Category</th>
