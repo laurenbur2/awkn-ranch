@@ -98,6 +98,7 @@
         .data-table thead { border-bottom: 2px solid var(--border-light); }
         .data-table th { padding: 12px 16px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: left; }
         .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
+        #expense-detail-table th, #expense-detail-table td { padding: 10px 6px; font-size: 12px; }
         .data-table tr.total td { border-top: 2px solid var(--border-light); font-weight: 700; color: var(--accent-gold); }
         .data-table tr.highlight { background: rgba(107, 143, 94, 0.06); }
 
@@ -302,11 +303,11 @@
             <h3 style="font-size: 20px; margin-bottom: 8px;">Monthly Expense Breakdown</h3>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Line-item operating costs by month. Ramp-up months (1&ndash;3) show reduced costs as staffing and marketing scale up.</p>
 
-            <div style="overflow-x: auto;">
-                <table class="data-table" id="expense-detail-table">
+            <div>
+                <table class="data-table" id="expense-detail-table" style="table-layout: fixed; width: 100%;">
                     <thead>
                         <tr>
-                            <th style="min-width:180px;">Expense Category</th>
+                            <th style="width:14%;">Expense Category</th>
                             <th style="text-align:right; font-size:10px;" id="exp-m1">M1</th>
                             <th style="text-align:right; font-size:10px;" id="exp-m2">M2</th>
                             <th style="text-align:right; font-size:10px;" id="exp-m3">M3</th>
