@@ -1,12 +1,12 @@
 {
-  "version": "v260404.14 6:12a",
-  "release": 14,
-  "sha": "258d979",
-  "fullSha": "258d9798e95b449cf069ebacee9252e2a9e00c57",
+  "version": "v260404.15 6:23a",
+  "release": 15,
+  "sha": "c2e02e7",
+  "fullSha": "c2e02e7f2f0125885b339f1be702de9d4ed02ed8",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T01:11:56-05:00",
-  "commits": [{"sha":"258d979","message":"Fix cap rate references to 8.5%","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T01:23:40-05:00",
+  "commits": [{"sha":"c2e02e7","message":"Remove logo link","author":"Justin DeLaCruz"}]
 }
