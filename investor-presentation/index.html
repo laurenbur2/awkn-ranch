@@ -633,9 +633,31 @@
       .wf-bar { width: 60px; font-size: 0.65rem; }
       .waterfall { height: 170px; gap: 0.4rem; }
     }
+    /* ── FINANCIALS BUTTON ───────────────────────────── */
+    .financials-btn {
+      position: fixed; top: 24px; right: 28px; z-index: 100;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 22px;
+      font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none;
+      color: var(--gold); border: 1px solid rgba(201,148,62,0.4);
+      border-radius: 100px; background: rgba(28,22,24,0.55);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s ease; cursor: pointer;
+    }
+    .financials-btn:hover {
+      background: var(--gold); color: #fff;
+      border-color: var(--gold); box-shadow: 0 4px 20px rgba(201,148,62,0.25);
+    }
+    .financials-btn svg { width: 14px; height: 14px; fill: currentColor; }
   </style>
 </head>
 <body>
+
+<a href="https://justinadelacruz.github.io/awkn-ranch/investor/projections/" class="financials-btn">
+  <svg viewBox="0 0 24 24"><path d="M3 3v18h18v-2H5V3H3zm4 12h2V9H7v6zm4 0h2V5h-2v10zm4 0h2V7h-2v8z"/></svg>
+  Financials
+</a>
 
 <!-- ══════════ HERO ══════════ -->
 <section class="hero">
