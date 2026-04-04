@@ -22,6 +22,8 @@
 @source "../kioskhall/**/*.js";
 @source "../community/**/*.js";
 @source "../events/**/*.js";
+@source "../within/**/*.js";
+@source "../within/**/*.html";
 
 /* =============================================
    THEME — AAP Design Tokens
