@@ -252,15 +252,22 @@
             .scenario-tabs { width: 100%; }
             .scenario-tab { padding: 8px 12px; font-size: 11px; flex: 1; text-align: center; }
 
-            /* Tables — force horizontal scroll */
-            .data-table { font-size: 11px; }
-            .data-table th { padding: 8px 6px; font-size: 8px; letter-spacing: 0.3px; }
-            .data-table td { padding: 8px 6px; font-size: 11px; }
+            /* Tables — fit to screen, no scroll */
+            div[style*="overflow-x"] { overflow-x: visible !important; }
+            .data-table { font-size: 10px; width: 100%; table-layout: auto; }
+            .data-table th { padding: 6px 3px; font-size: 7px; letter-spacing: 0.2px; white-space: normal; word-break: break-word; }
+            .data-table td { padding: 6px 3px; font-size: 10px; }
 
-            /* Expense detail table */
-            #expense-detail-table { table-layout: auto; }
-            #expense-detail-table th, #expense-detail-table td { padding: 6px 3px; font-size: 9px; }
-            #expense-detail-table td:first-child { white-space: normal; font-size: 10px; }
+            /* 4-year table: compact on mobile */
+            #year4-tbody { font-size: 9px; }
+            #year4-table-wrap th:nth-child(2),
+            #year4-table-wrap td:nth-child(2),
+            #year4-table-wrap th:nth-child(3),
+            #year4-table-wrap td:nth-child(3) { display: none; }
+
+            /* Expense detail table — hide on mobile, too many columns */
+            #expense-detail-table { display: none !important; }
+            .expense-mobile-note { display: block !important; }
 
             /* Assumptions */
             .assumptions { padding: 16px 14px; margin-top: 24px; }
@@ -411,6 +418,7 @@
             <h3 style="font-size: 20px; margin-bottom: 8px;">Monthly Expense Breakdown</h3>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Line-item operating costs by month. Ramp-up months (1&ndash;3) show reduced costs as staffing and marketing scale up.</p>
 
+            <p class="expense-mobile-note" style="display:none; padding:16px; background:var(--bg-secondary); border-radius:var(--radius); font-size:12px; color:var(--text-muted); text-align:center; line-height:1.6;">Detailed monthly expense breakdown available on desktop. Summary: operating expenses range from <strong id="exp-mobile-low"></strong> (ramp) to <strong id="exp-mobile-high"></strong> (stabilized) per month.</p>
             <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
                 <table class="data-table" id="expense-detail-table" style="table-layout: fixed; min-width: 900px;">
                     <thead>
@@ -460,15 +468,15 @@
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
+        <div id="year4-table-wrap" style="overflow-x: auto;">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Year</th>
-                        <th style="text-align:right">Phase 1 Revenue</th>
-                        <th style="text-align:right">Phase 2 Revenue</th>
-                        <th style="text-align:right">Total Revenue</th>
-                        <th style="text-align:right">Total Expenses</th>
+                        <th style="text-align:right">Phase 1 Rev</th>
+                        <th style="text-align:right">Phase 2 Rev</th>
+                        <th style="text-align:right">Total Rev</th>
+                        <th style="text-align:right">Expenses</th>
                         <th style="text-align:right">Net Profit</th>
                         <th style="text-align:right">Cumulative</th>
                     </tr>
@@ -760,6 +768,14 @@
                     <td style="text-align:right;">${fmtS(grandTotal)}</td>
                 </tr>
             `;
+
+        // Populate mobile expense summary
+        const lowExp = Math.min(...monthTotals);
+        const highExp = Math.max(...monthTotals);
+        const elLow = document.getElementById('exp-mobile-low');
+        const elHigh = document.getElementById('exp-mobile-high');
+        if (elLow) elLow.textContent = fmtS(lowExp);
+        if (elHigh) elHigh.textContent = fmtS(highExp);
     }
 
     // ===== 4-YEAR MODEL =====
