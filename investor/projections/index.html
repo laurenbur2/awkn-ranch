@@ -62,6 +62,20 @@
         .topbar-user span { font-size: 13px; color: var(--text-muted); }
         .signout-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
         .signout-btn:hover { color: var(--accent-terracotta); }
+        .back-deck-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 18px; font-family: 'Inter', sans-serif;
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em;
+            text-transform: uppercase; text-decoration: none;
+            color: var(--accent-gold); border: 1px solid rgba(196,154,92,0.35);
+            border-radius: 100px; background: transparent;
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+        .back-deck-btn:hover {
+            background: var(--accent-gold); color: #fff;
+            border-color: var(--accent-gold); box-shadow: 0 2px 12px rgba(196,154,92,0.2);
+        }
+        .back-deck-btn svg { width: 12px; height: 12px; fill: currentColor; }
 
         /* ===== SECTIONS ===== */
         .section { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
@@ -211,6 +225,10 @@
                 <li><a href="#exit">Exit Strategy</a></li>
                 <li><a href="#assumptions-section">Assumptions</a></li>
             </ul>
+            <a href="https://laurenbur2.github.io/awkn-ranch/investor-presentation/" class="back-deck-btn">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Back to Investor Deck
+            </a>
         </div>
     </nav>
 
