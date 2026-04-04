@@ -236,14 +236,13 @@
             .summary-card-label { font-size: 8px; letter-spacing: 0.3px; line-height: 1.3; }
 
             /* Charts */
-            .chart-container { padding: 16px 10px; margin-bottom: 24px; }
+            .chart-container { padding: 16px 10px; margin-bottom: 24px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
             .chart-title { font-size: 14px; margin-bottom: 4px; }
             .chart-subtitle { font-size: 10px; margin-bottom: 16px; }
-            .bar-chart { height: 220px; gap: 3px; padding-bottom: 32px; }
-            .bar-value { font-size: 0; visibility: hidden; }
-            .bar-group:nth-child(3n+1) .bar-value { font-size: 8px; visibility: visible; }
+            .bar-chart { height: 280px; gap: 4px; padding-bottom: 32px; min-width: 500px; }
+            .bar-value { font-size: 8px; visibility: visible; }
             .bar-label { font-size: 8px; bottom: -24px; }
-            .bar-stack { max-width: 30px; }
+            .bar-stack { max-width: 36px; }
             .chart-legend { gap: 10px; margin-top: 12px; }
             .chart-legend-item { font-size: 10px; }
             .chart-legend-dot { width: 8px; height: 8px; }
@@ -278,7 +277,7 @@
             .hero-stat-label { font-size: 0.45rem; }
             .summary-card-value { font-size: 17px; }
             .summary-card-label { font-size: 7.5px; }
-            .bar-chart { height: 190px; }
+            .bar-chart { height: 260px; min-width: 480px; }
             .chart-title { font-size: 13px; }
             .scenario-tab { padding: 7px 8px; font-size: 10px; }
             .section h2 { font-size: 18px; }
@@ -534,8 +533,7 @@
                 <li>Maloka Dome: $20K&ndash;$40K/mo venue rental + $12K&ndash;$18K/mo nightly lodging</li>
                 <li>Within Center: $16.5K&ndash;$33K/mo from outpatient ketamine therapy packages</li>
                 <li>AWKN Hosted Retreats: $20K&ndash;$75K/mo curated multi-day immersions</li>
-                <li>Monthly operating expenses: $67.8K (low) &ndash; $80.8K (high)</li>
-                <li>Influencer Budget: $3,000/mo &mdash; ongoing social media and influencer marketing starting Month 1</li>
+                <li>Monthly operating expenses: $64.8K (low) &ndash; $77.8K (high)</li>
                 <li>Admissions / Corporate Sales: $4,000/mo &mdash; first 5 months funded from capital raise ($20K)</li>
                 <li>Months 1&ndash;3: 40% revenue ramp (infrastructure build-out, marketing launch)</li>
                 <li>Months 4&ndash;6: 70% of steady-state revenue (occupancy growing)</li>
@@ -597,9 +595,9 @@
 
     // Monthly steady-state figures from investor deck (10% revenue reduction applied)
     const scenarios = {
-        conservative: { label: 'Conservative', revenue: Math.round(133440 * 0.90), expenses: 79300 },
-        base:         { label: 'Base Case',    revenue: Math.round(185000 * 0.90), expenses: 72500 },
-        strong:       { label: 'Strong',       revenue: Math.round(250940 * 0.90), expenses: 66300 }
+        conservative: { label: 'Conservative', revenue: Math.round(133440 * 0.90), expenses: 76300 },
+        base:         { label: 'Base Case',    revenue: Math.round(185000 * 0.90), expenses: 69500 },
+        strong:       { label: 'Strong',       revenue: Math.round(250940 * 0.90), expenses: 63300 }
     };
 
     // Monthly ramp multipliers for Year 1
@@ -619,7 +617,6 @@
         { name: 'Marketing & Booking Platform', low: 5500, high: 6500, rampStart: 1 },
         { name: 'Google / Meta / AI Advertising', low: 8000, high: 10000, rampStart: 1, fullFromStart: true },
         { name: 'Admissions / Corporate Sales', low: 4000, high: 4000, rampStart: 1, fullFromStart: true },
-        { name: 'Influencer Budget', low: 3000, high: 3000, rampStart: 1, fullFromStart: true },
         { name: 'Miscellaneous / Contingency', low: 1000, high: 2000, rampStart: 1 },
     ];
 
