@@ -1,12 +1,12 @@
 {
-  "version": "v260404.18 3:00p",
-  "release": 18,
-  "sha": "e07a7a2",
-  "fullSha": "e07a7a28f47c3a7a8f4c9d3427d285613a32adb8",
+  "version": "v260404.19 9:05p",
+  "release": 19,
+  "sha": "b91a160",
+  "fullSha": "b91a160a5a224b4f1a78af6553df7adce631da68",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T09:59:51-05:00",
-  "commits": [{"sha":"e07a7a2","message":"Add $3K/mo influencer budget to financial projections","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T16:05:13-05:00",
+  "commits": [{"sha":"b91a160","message":"Improve mobile chart readability — horizontally scrollable with larger bars and all values visible","author":"Justin DeLaCruz"}]
 }
