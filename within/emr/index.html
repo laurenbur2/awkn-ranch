@@ -208,6 +208,10 @@
               <span class="material-symbols-outlined">search</span>
               <input type="text" id="patientSearch" placeholder="Search patients...">
             </div>
+            <button class="btn-secondary" id="importPatientsBtn" style="margin-right:0.5rem;">
+              <span class="material-symbols-outlined">upload_file</span>
+              Import CSV
+            </button>
             <button class="btn-primary" id="addPatientBtn">
               <span class="material-symbols-outlined">person_add</span>
               Add Patient
@@ -711,6 +715,60 @@
       <div class="modal__footer">
         <button class="btn-secondary" data-close-modal="editStaffModal">Cancel</button>
         <button class="btn-primary" id="updateStaffBtn">Update Staff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Patients Modal -->
+  <div class="modal-overlay hidden" id="importModal">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h2>Import Patients from CSV</h2>
+        <button class="modal__close" data-close-modal="importModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <!-- Step 1: Upload -->
+        <div id="importStep1">
+          <div class="form-section">
+            <h4>Upload CSV File</h4>
+            <p style="color:var(--text-muted);font-size:0.8125rem;margin-bottom:1rem;">
+              Export your client list from Carepatron (or any EMR) as CSV, then upload it here.
+              The importer will auto-detect common column names.
+            </p>
+            <div class="import-dropzone" id="importDropzone">
+              <span class="material-symbols-outlined" style="font-size:48px;color:var(--accent);margin-bottom:0.5rem;">cloud_upload</span>
+              <p style="font-weight:500;">Drop CSV file here or click to browse</p>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Supports .csv files</p>
+              <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Map columns -->
+        <div id="importStep2" class="hidden">
+          <div class="form-section">
+            <h4>Map Columns</h4>
+            <p style="color:var(--text-muted);font-size:0.8125rem;margin-bottom:1rem;">
+              Match your CSV columns to patient fields. Auto-mapped columns are pre-selected.
+            </p>
+            <div id="importPreview" style="overflow-x:auto;margin-bottom:1rem;"></div>
+            <div class="form-grid" id="columnMappings"></div>
+          </div>
+        </div>
+
+        <!-- Step 3: Results -->
+        <div id="importStep3" class="hidden">
+          <div class="form-section">
+            <h4>Import Results</h4>
+            <div id="importResults"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="importModal">Cancel</button>
+        <button class="btn-secondary hidden" id="importBackBtn">Back</button>
+        <button class="btn-primary hidden" id="importNextBtn">Next: Map Columns</button>
+        <button class="btn-primary hidden" id="importRunBtn">Import Patients</button>
       </div>
     </div>
   </div>

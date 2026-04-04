@@ -331,6 +331,33 @@
     document.getElementById('addPatientBtn').addEventListener('click', function() { openPatientModal(); });
     document.getElementById('savePatientBtn').addEventListener('click', function() { savePatient(); });
 
+    // Import Patients
+    document.getElementById('importPatientsBtn').addEventListener('click', function() { openImportModal(); });
+    document.getElementById('importNextBtn').addEventListener('click', function() { showColumnMapping(); });
+    document.getElementById('importBackBtn').addEventListener('click', function() {
+      document.getElementById('importStep2').classList.add('hidden');
+      document.getElementById('importStep1').classList.remove('hidden');
+      document.getElementById('importNextBtn').classList.remove('hidden');
+      document.getElementById('importBackBtn').classList.add('hidden');
+      document.getElementById('importRunBtn').classList.add('hidden');
+    });
+    document.getElementById('importRunBtn').addEventListener('click', function() { runImport(); });
+
+    // CSV file input
+    var dropzone = document.getElementById('importDropzone');
+    var csvInput = document.getElementById('csvFileInput');
+    dropzone.addEventListener('click', function() { csvInput.click(); });
+    csvInput.addEventListener('change', function() {
+      if (csvInput.files.length > 0) handleCSVFile(csvInput.files[0]);
+    });
+    dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('drag-over'); });
+    dropzone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) handleCSVFile(e.dataTransfer.files[0]);
+    });
+
     // New Session
     document.getElementById('newSessionBtn').addEventListener('click', function() { openSessionModal(); });
     document.getElementById('saveSessionBtn').addEventListener('click', function() { saveSession(); });
@@ -1223,6 +1250,342 @@
         renderStaff();
       });
   };
+
+  // ============================================
+  // CSV IMPORT
+  // ============================================
+
+  var csvData = null; // parsed CSV rows
+  var csvHeaders = []; // CSV column headers
+
+  // Carepatron and common EMR column name mappings
+  var COLUMN_ALIASES = {
+    first_name: ['first name', 'first_name', 'firstname', 'given name', 'given_name', 'client first name', 'patient first name', 'name first'],
+    last_name: ['last name', 'last_name', 'lastname', 'surname', 'family name', 'family_name', 'client last name', 'patient last name', 'name last'],
+    email: ['email', 'email address', 'e-mail', 'client email', 'patient email'],
+    phone: ['phone', 'phone number', 'mobile', 'mobile phone', 'cell', 'cell phone', 'telephone', 'client phone', 'patient phone', 'primary phone'],
+    dob: ['dob', 'date of birth', 'birth date', 'birthdate', 'birthday', 'date_of_birth', 'birth_date'],
+    sex: ['sex', 'gender', 'biological sex', 'assigned sex'],
+    gender_identity: ['gender identity', 'gender_identity', 'preferred gender'],
+    pronouns: ['pronouns', 'preferred pronouns'],
+    address: ['address', 'full address', 'street address', 'home address', 'mailing address', 'address line 1'],
+    emergency_name: ['emergency contact', 'emergency contact name', 'emergency_contact', 'ice name', 'ice contact'],
+    emergency_phone: ['emergency phone', 'emergency contact phone', 'emergency_phone', 'ice phone'],
+    emergency_relationship: ['emergency relationship', 'emergency contact relationship', 'relationship', 'ice relationship'],
+    primary_diagnosis: ['diagnosis', 'primary diagnosis', 'primary_diagnosis', 'dx', 'icd-10', 'icd10'],
+    referring_provider: ['referring provider', 'referred by', 'referral', 'referring_provider', 'referral source'],
+    current_medications: ['medications', 'current medications', 'current_medications', 'meds', 'medication list'],
+    allergies: ['allergies', 'allergy', 'known allergies', 'drug allergies'],
+    medical_history: ['medical history', 'medical_history', 'past medical history', 'pmh', 'history', 'notes'],
+  };
+
+  function parseCSV(text) {
+    var lines = text.split(/\r?\n/);
+    var result = [];
+    var headers = [];
+
+    // Parse header
+    if (lines.length > 0) {
+      headers = parseCSVLine(lines[0]);
+    }
+
+    // Parse data rows
+    for (var i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '') continue;
+      var values = parseCSVLine(lines[i]);
+      var row = {};
+      for (var j = 0; j < headers.length; j++) {
+        row[headers[j]] = (values[j] || '').trim();
+      }
+      result.push(row);
+    }
+
+    return { headers: headers, rows: result };
+  }
+
+  function parseCSVLine(line) {
+    var result = [];
+    var current = '';
+    var inQuotes = false;
+
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          current += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          result.push(current);
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function autoMapColumn(header) {
+    var normalized = header.toLowerCase().trim();
+    for (var field in COLUMN_ALIASES) {
+      if (COLUMN_ALIASES[field].indexOf(normalized) !== -1) {
+        return field;
+      }
+    }
+    // Fuzzy: check if the field name is contained in the header
+    for (var field2 in COLUMN_ALIASES) {
+      if (normalized.indexOf(field2.replace(/_/g, ' ')) !== -1 || normalized.indexOf(field2) !== -1) {
+        return field2;
+      }
+    }
+    return '';
+  }
+
+  var PATIENT_FIELDS = [
+    { value: '', label: '— Skip —' },
+    { value: 'first_name', label: 'First Name' },
+    { value: 'last_name', label: 'Last Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'dob', label: 'Date of Birth' },
+    { value: 'sex', label: 'Sex' },
+    { value: 'gender_identity', label: 'Gender Identity' },
+    { value: 'pronouns', label: 'Pronouns' },
+    { value: 'address', label: 'Address' },
+    { value: 'emergency_name', label: 'Emergency Contact Name' },
+    { value: 'emergency_phone', label: 'Emergency Contact Phone' },
+    { value: 'emergency_relationship', label: 'Emergency Relationship' },
+    { value: 'primary_diagnosis', label: 'Primary Diagnosis' },
+    { value: 'referring_provider', label: 'Referring Provider' },
+    { value: 'current_medications', label: 'Current Medications' },
+    { value: 'allergies', label: 'Allergies' },
+    { value: 'medical_history', label: 'Medical History' },
+  ];
+
+  function openImportModal() {
+    csvData = null;
+    csvHeaders = [];
+    document.getElementById('importStep1').classList.remove('hidden');
+    document.getElementById('importStep2').classList.add('hidden');
+    document.getElementById('importStep3').classList.add('hidden');
+    document.getElementById('importNextBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.add('hidden');
+    document.getElementById('importRunBtn').classList.add('hidden');
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importModal').classList.remove('hidden');
+  }
+
+  function handleCSVFile(file) {
+    if (!file || !file.name.endsWith('.csv')) {
+      showToast('Please upload a .csv file', 'error');
+      return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var parsed = parseCSV(e.target.result);
+      if (parsed.rows.length === 0) {
+        showToast('CSV file is empty or could not be parsed', 'error');
+        return;
+      }
+
+      csvData = parsed.rows;
+      csvHeaders = parsed.headers;
+      console.log('[EMR]', 'Parsed CSV:', csvHeaders.length, 'columns,', csvData.length, 'rows');
+      showToast('Loaded ' + csvData.length + ' rows from CSV', 'success');
+      document.getElementById('importNextBtn').classList.remove('hidden');
+
+      // Update dropzone to show file info
+      document.getElementById('importDropzone').innerHTML =
+        '<span class="material-symbols-outlined" style="font-size:48px;color:var(--success);margin-bottom:0.5rem;">check_circle</span>' +
+        '<p style="font-weight:500;">' + file.name + '</p>' +
+        '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">' + csvData.length + ' rows &middot; ' + csvHeaders.length + ' columns</p>';
+    };
+    reader.readAsText(file);
+  }
+
+  function showColumnMapping() {
+    document.getElementById('importStep1').classList.add('hidden');
+    document.getElementById('importStep2').classList.remove('hidden');
+    document.getElementById('importNextBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.remove('hidden');
+    document.getElementById('importRunBtn').classList.remove('hidden');
+
+    // Show preview of first 3 rows
+    var previewHtml = '<table class="import-preview-table"><thead><tr>';
+    csvHeaders.forEach(function(h) { previewHtml += '<th>' + h + '</th>'; });
+    previewHtml += '</tr></thead><tbody>';
+    csvData.slice(0, 3).forEach(function(row) {
+      previewHtml += '<tr>';
+      csvHeaders.forEach(function(h) { previewHtml += '<td>' + (row[h] || '') + '</td>'; });
+      previewHtml += '</tr>';
+    });
+    previewHtml += '</tbody></table>';
+    document.getElementById('importPreview').innerHTML = previewHtml;
+
+    // Build column mapping dropdowns
+    var mappingsHtml = '';
+    csvHeaders.forEach(function(header, i) {
+      var autoMapped = autoMapColumn(header);
+      var optionsHtml = PATIENT_FIELDS.map(function(f) {
+        var selected = f.value === autoMapped ? ' selected' : '';
+        return '<option value="' + f.value + '"' + selected + '>' + f.label + '</option>';
+      }).join('');
+
+      mappingsHtml += '<div class="form-group">' +
+        '<label style="font-size:0.8125rem;">' + header +
+        (autoMapped ? ' <span style="color:var(--success);font-size:0.7rem;">AUTO</span>' : '') +
+        '</label>' +
+        '<select class="column-map" data-csv-col="' + i + '">' + optionsHtml + '</select>' +
+        '</div>';
+    });
+    document.getElementById('columnMappings').innerHTML = mappingsHtml;
+  }
+
+  function runImport() {
+    if (!csvData || csvData.length === 0) return;
+
+    // Gather mappings
+    var mappings = {};
+    document.querySelectorAll('.column-map').forEach(function(sel) {
+      var csvIdx = parseInt(sel.dataset.csvCol);
+      var field = sel.value;
+      if (field) {
+        mappings[csvHeaders[csvIdx]] = field;
+      }
+    });
+
+    // Check required fields
+    var mappedFields = Object.values ? Object.values(mappings) : Object.keys(mappings).map(function(k) { return mappings[k]; });
+    if (mappedFields.indexOf('first_name') === -1 || mappedFields.indexOf('last_name') === -1) {
+      showToast('First Name and Last Name are required mappings', 'error');
+      return;
+    }
+
+    // Build patient records
+    var patients = [];
+    var skipped = 0;
+
+    csvData.forEach(function(row) {
+      var patient = { status: 'active' };
+
+      for (var csvCol in mappings) {
+        var field = mappings[csvCol];
+        var val = (row[csvCol] || '').trim();
+        if (val) patient[field] = val;
+      }
+
+      // Skip if no name
+      if (!patient.first_name && !patient.last_name) {
+        skipped++;
+        return;
+      }
+
+      // Handle combined name field - check if first_name contains full name
+      if (patient.first_name && !patient.last_name && patient.first_name.indexOf(' ') !== -1) {
+        var parts = patient.first_name.split(' ');
+        patient.first_name = parts[0];
+        patient.last_name = parts.slice(1).join(' ');
+      }
+
+      // Normalize DOB format
+      if (patient.dob) {
+        var d = new Date(patient.dob);
+        if (!isNaN(d.getTime())) {
+          patient.dob = d.toISOString().slice(0, 10);
+        }
+      }
+
+      // Check for duplicate
+      var isDuplicate = store.patients.some(function(existing) {
+        return existing.first_name && existing.last_name &&
+          existing.first_name.toLowerCase() === (patient.first_name || '').toLowerCase() &&
+          existing.last_name.toLowerCase() === (patient.last_name || '').toLowerCase();
+      });
+
+      if (isDuplicate) {
+        skipped++;
+        return;
+      }
+
+      patients.push(patient);
+    });
+
+    if (patients.length === 0) {
+      showToast('No new patients to import (all duplicates or empty rows)', 'info');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('importRunBtn').textContent = 'Importing...';
+    document.getElementById('importRunBtn').disabled = true;
+
+    // Bulk insert
+    sb.from(EMR_TABLES.patients)
+      .insert(patients)
+      .select()
+      .then(function(result) {
+        document.getElementById('importRunBtn').textContent = 'Import Patients';
+        document.getElementById('importRunBtn').disabled = false;
+
+        if (result.error) {
+          // Fallback: insert locally
+          if (result.error.code === '42P01' || (result.error.message && result.error.message.indexOf('does not exist') !== -1)) {
+            patients.forEach(function(p) {
+              p.id = crypto.randomUUID();
+              p.created_at = new Date().toISOString();
+              store.patients.unshift(p);
+            });
+            showImportResults(patients.length, skipped, 0);
+          } else {
+            showToast('Import error: ' + result.error.message, 'error');
+          }
+          return;
+        }
+
+        // Add to store
+        if (result.data) {
+          result.data.forEach(function(p) { store.patients.unshift(p); });
+        }
+        showImportResults(result.data ? result.data.length : patients.length, skipped, 0);
+      })
+      .catch(function(e) {
+        document.getElementById('importRunBtn').textContent = 'Import Patients';
+        document.getElementById('importRunBtn').disabled = false;
+        showToast('Import failed: ' + e.message, 'error');
+      });
+  }
+
+  function showImportResults(imported, skipped, errors) {
+    document.getElementById('importStep2').classList.add('hidden');
+    document.getElementById('importStep3').classList.remove('hidden');
+    document.getElementById('importRunBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.add('hidden');
+
+    document.getElementById('importResults').innerHTML =
+      '<div style="text-align:center;padding:1rem;">' +
+      '<span class="material-symbols-outlined" style="font-size:64px;color:var(--success);margin-bottom:1rem;">check_circle</span>' +
+      '<h3 style="margin-bottom:1rem;">Import Complete</h3>' +
+      '<div style="display:flex;gap:2rem;justify-content:center;">' +
+      '<div><div style="font-size:2rem;font-weight:700;color:var(--success);">' + imported + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Imported</div></div>' +
+      '<div><div style="font-size:2rem;font-weight:700;color:var(--text-muted);">' + skipped + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Skipped</div></div>' +
+      (errors > 0 ? '<div><div style="font-size:2rem;font-weight:700;color:var(--error);">' + errors + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Errors</div></div>' : '') +
+      '</div></div>';
+
+    renderPatients();
+    renderDashboard();
+  }
 
   // ============================================
   // VITALS LOG
