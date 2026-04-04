@@ -1,12 +1,12 @@
 {
-  "version": "v260404.10 5:30a",
-  "release": 10,
-  "sha": "e6f7148",
-  "fullSha": "e6f7148d677c12f35777cf18b0138071360f80e3",
+  "version": "v260404.11 5:33a",
+  "release": 11,
+  "sha": "b3284e9",
+  "fullSha": "b3284e99be704136c1373f9776efc58ca3e1d517",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T00:30:44-05:00",
-  "commits": [{"sha":"e6f7148","message":"Show chart values in dollars","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T00:32:48-05:00",
+  "commits": [{"sha":"b3284e9","message":"5% MoM growth Dec-Mar","author":"Justin DeLaCruz"}]
 }
