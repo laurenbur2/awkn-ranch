@@ -1,12 +1,12 @@
 {
-  "version": "v260404.08 5:26a",
-  "release": 8,
-  "sha": "6305971",
-  "fullSha": "6305971c774c0fdc474c959deef3bc39b1a56563",
+  "version": "v260404.09 5:29a",
+  "release": 9,
+  "sha": "ead1e5c",
+  "fullSha": "ead1e5c31f4c140c9fd49de7ea727d9fba3974ae",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T00:26:47-05:00",
-  "commits": [{"sha":"6305971","message":"Update projections: 8% cap rate, revenue ramp, remove $500K references","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T00:29:12-05:00",
+  "commits": [{"sha":"ead1e5c","message":"Cap rate to 8.5%","author":"Justin DeLaCruz"}]
 }
