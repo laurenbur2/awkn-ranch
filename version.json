@@ -1,12 +1,12 @@
 {
-  "version": "v260404.09 5:29a",
-  "release": 9,
-  "sha": "ead1e5c",
-  "fullSha": "ead1e5c31f4c140c9fd49de7ea727d9fba3974ae",
+  "version": "v260404.10 5:30a",
+  "release": 10,
+  "sha": "e6f7148",
+  "fullSha": "e6f7148d677c12f35777cf18b0138071360f80e3",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T00:29:12-05:00",
-  "commits": [{"sha":"ead1e5c","message":"Cap rate to 8.5%","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T00:30:44-05:00",
+  "commits": [{"sha":"e6f7148","message":"Show chart values in dollars","author":"Justin DeLaCruz"}]
 }
