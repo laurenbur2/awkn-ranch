@@ -6,11 +6,14 @@
   var SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
-  var ALLOWED_EMAILS = [
+  var DEFAULT_ALLOWED_EMAILS = [
     'justin@within.center',
     'lauren@awknranch.com',
     'wdnaylor@gmail.com',
   ];
+
+  // Dynamic list built after loading staff table
+  var allowedEmails = DEFAULT_ALLOWED_EMAILS.slice();
 
   var CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
 
@@ -55,7 +58,7 @@
   }
 
   function isEmailAllowed(email) {
-    return ALLOWED_EMAILS.indexOf((email || '').toLowerCase()) !== -1;
+    return allowedEmails.indexOf((email || '').toLowerCase()) !== -1;
   }
 
   function waitForSupabase(callback) {
@@ -91,8 +94,28 @@
     return sb;
   }
 
+  // Load staff emails from Supabase to extend allowed list
+  function loadStaffEmails(callback) {
+    sb.from('within_staff')
+      .select('email, status')
+      .eq('status', 'active')
+      .then(function(result) {
+        if (result.data && !result.error) {
+          result.data.forEach(function(s) {
+            var e = (s.email || '').toLowerCase();
+            if (e && allowedEmails.indexOf(e) === -1) {
+              allowedEmails.push(e);
+            }
+          });
+          console.log('[WITHIN]', 'Loaded staff emails, total allowed:', allowedEmails.length);
+        }
+        callback();
+      })
+      .catch(function() { callback(); }); // table may not exist yet
+  }
+
   function init() {
-    // Fast path: check cached auth
+    // Fast path: check cached auth (defaults only, no staff check)
     try {
       var raw = localStorage.getItem(CACHED_AUTH_KEY);
       if (raw) {
@@ -118,31 +141,32 @@
       initSupabase();
       console.log('[WITHIN]', 'Supabase client initialized');
 
-      // Check for existing session
-      sb.auth.getSession().then(function(result) {
-        var session = result.data?.session;
-        if (session && session.user) {
-          var email = (session.user.email || '').toLowerCase();
-          console.log('[WITHIN]', 'Existing session found:', email);
-          if (isEmailAllowed(email)) {
-            // Cache and redirect
-            try {
-              localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
-                email: email,
-                timestamp: Date.now(),
-              }));
-            } catch (e) { /* ignore */ }
-            window.location.href = getBasePath() + '/within/emr/';
+      // Load staff emails first, then check session
+      loadStaffEmails(function() {
+        sb.auth.getSession().then(function(result) {
+          var session = result.data && result.data.session;
+          if (session && session.user) {
+            var email = (session.user.email || '').toLowerCase();
+            console.log('[WITHIN]', 'Existing session found:', email);
+            if (isEmailAllowed(email)) {
+              try {
+                localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
+                  email: email,
+                  timestamp: Date.now(),
+                }));
+              } catch (e) { /* ignore */ }
+              window.location.href = getBasePath() + '/within/emr/';
+            } else {
+              showState('unauthorized', email);
+            }
           } else {
-            showState('unauthorized', email);
+            console.log('[WITHIN]', 'No existing session');
+            showState('login');
           }
-        } else {
-          console.log('[WITHIN]', 'No existing session');
+        }).catch(function(error) {
+          console.error('[WITHIN]', 'Session check error:', error);
           showState('login');
-        }
-      }).catch(function(error) {
-        console.error('[WITHIN]', 'Session check error:', error);
-        showState('login');
+        });
       });
 
       // Listen for auth callback (after OAuth redirect)

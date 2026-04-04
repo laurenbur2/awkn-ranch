@@ -9,7 +9,11 @@
   // ============================================
   // CONFIG & AUTH
   // ============================================
-  var ALLOWED_EMAILS = [
+  // Admin email — only this user sees the Staff section
+  var ADMIN_EMAIL = 'justin@within.center';
+
+  // Default allowed emails (staff table extends this dynamically)
+  var DEFAULT_ALLOWED_EMAILS = [
     'justin@within.center',
     'lauren@awknranch.com',
     'wdnaylor@gmail.com',
@@ -27,6 +31,7 @@
     inventory: 'within_inventory',
     invoices: 'within_invoices',
     vitals: 'within_session_vitals',
+    staff: 'within_staff',
   };
 
   // In-memory data store (loaded from Supabase)
@@ -39,10 +44,13 @@
     consents: [],
     inventory: [],
     invoices: [],
+    staff: [],
   };
 
   var currentDate = new Date();
   var vitalsCount = 1;
+  var currentUserEmail = '';
+  var isAdmin = false;
   var sb = null; // supabase client
 
   function getBasePath() {
@@ -85,6 +93,18 @@
     return sb;
   }
 
+  // Build allowed emails list: defaults + active staff from DB
+  function getAllowedEmails() {
+    var emails = DEFAULT_ALLOWED_EMAILS.slice();
+    store.staff.forEach(function(s) {
+      var e = (s.email || '').toLowerCase();
+      if (e && s.status !== 'inactive' && emails.indexOf(e) === -1) {
+        emails.push(e);
+      }
+    });
+    return emails;
+  }
+
   // ============================================
   // INIT
   // ============================================
@@ -110,30 +130,42 @@
         }
 
         var email = (session.user.email || '').toLowerCase();
-        console.log('[WITHIN EMR]', 'Session found:', email);
+        currentUserEmail = email;
+        isAdmin = (email === ADMIN_EMAIL);
+        console.log('[WITHIN EMR]', 'Session found:', email, 'admin:', isAdmin);
 
-        if (ALLOWED_EMAILS.indexOf(email) === -1) {
-          console.log('[WITHIN EMR]', 'Unauthorized email');
-          window.location.href = getBasePath() + '/within/';
-          return;
-        }
+        // Load staff list first to build dynamic allowed emails
+        loadTable('staff').then(function() {
+          var allowedEmails = getAllowedEmails();
+          if (allowedEmails.indexOf(email) === -1) {
+            console.log('[WITHIN EMR]', 'Unauthorized email');
+            window.location.href = getBasePath() + '/within/';
+            return;
+          }
 
-        // Set user info in UI
-        var name = session.user.user_metadata && session.user.user_metadata.full_name || email;
-        document.getElementById('userName').textContent = name;
-        document.getElementById('userEmail').textContent = email;
-        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+          // Set user info in UI
+          var name = session.user.user_metadata && session.user.user_metadata.full_name || email;
+          document.getElementById('userName').textContent = name;
+          document.getElementById('userEmail').textContent = email;
+          document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
 
-        // Show app
-        document.getElementById('loadingOverlay').classList.add('hidden');
-        document.getElementById('appShell').classList.remove('hidden');
+          // Show staff nav for admin
+          if (isAdmin) {
+            document.getElementById('staffNavBtn').style.display = '';
+            document.getElementById('staffNavDivider').style.display = '';
+          }
 
-        // Load data
-        loadAllData().then(function() {
-          renderDashboard();
-          renderScheduleDate();
-          setupEventListeners();
-          console.log('[WITHIN EMR]', 'Ready');
+          // Show app
+          document.getElementById('loadingOverlay').classList.add('hidden');
+          document.getElementById('appShell').classList.remove('hidden');
+
+          // Load remaining data
+          loadAllData().then(function() {
+            renderDashboard();
+            renderScheduleDate();
+            setupEventListeners();
+            console.log('[WITHIN EMR]', 'Ready');
+          });
         });
       }).catch(function(error) {
         console.error('[WITHIN EMR]', 'Session error:', error);
@@ -219,6 +251,7 @@
     notes: ['Clinical Notes', 'SOAP notes and documentation'],
     inventory: ['Inventory', 'Controlled substance log (DEA compliance)'],
     billing: ['Billing', 'Invoices and payments'],
+    staff: ['Staff Management', 'Manage team access and permissions'],
   };
 
   function switchTab(tabName) {
@@ -249,6 +282,7 @@
       case 'notes': renderNotes(); break;
       case 'inventory': renderInventory(); break;
       case 'billing': renderBilling(); break;
+      case 'staff': renderStaff(); break;
     }
   }
 
@@ -364,6 +398,24 @@
     if (patientSearch) patientSearch.addEventListener('input', renderPatients);
     var sessionSearch = document.getElementById('sessionSearch');
     if (sessionSearch) sessionSearch.addEventListener('input', renderSessions);
+    var staffSearch = document.getElementById('staffSearch');
+    if (staffSearch) staffSearch.addEventListener('input', renderStaff);
+
+    // Staff management (admin only)
+    var addStaffBtn = document.getElementById('addStaffBtn');
+    if (addStaffBtn) addStaffBtn.addEventListener('click', function() { openStaffModal(); });
+    var saveStaffBtn = document.getElementById('saveStaffBtn');
+    if (saveStaffBtn) saveStaffBtn.addEventListener('click', function() { saveStaff(); });
+    var updateStaffBtn = document.getElementById('updateStaffBtn');
+    if (updateStaffBtn) updateStaffBtn.addEventListener('click', function() { updateStaff(); });
+
+    // Role preset permissions
+    var roleSelect = document.querySelector('[name="staff_role"]');
+    if (roleSelect) {
+      roleSelect.addEventListener('change', function() {
+        applyRolePresets(roleSelect.value, 'staffForm');
+      });
+    }
   }
 
   // ============================================
@@ -945,6 +997,232 @@
       showToast('Error saving appointment: ' + e.message, 'error');
     });
   }
+
+  // ============================================
+  // STAFF MANAGEMENT
+  // ============================================
+
+  function renderStaff() {
+    var searchEl = document.getElementById('staffSearch');
+    var search = searchEl ? searchEl.value.toLowerCase() : '';
+    var filtered = store.staff.filter(function(s) {
+      if (!search) return true;
+      return ((s.first_name || '') + ' ' + (s.last_name || '') + ' ' + (s.email || '') + ' ' + (s.role || '')).toLowerCase().indexOf(search) !== -1;
+    });
+
+    var tbody = document.getElementById('staffBody');
+    var empty = document.getElementById('staffEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('staffTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('staffTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(s) {
+      var perms = s.permissions || {};
+      var permList = Object.keys(perms).filter(function(k) { return perms[k]; });
+      var permDisplay = permList.length > 0 ? permList.length + ' sections' : 'None';
+      var statusClass = s.status === 'inactive' ? 'cancelled' : 'active';
+      var lastLogin = s.last_login_at ? new Date(s.last_login_at).toLocaleDateString() : 'Never';
+
+      return '<tr>' +
+        '<td style="font-weight:500;">' + (s.first_name || '') + ' ' + (s.last_name || '') +
+        (s.title ? '<br><span style="font-weight:400;font-size:0.75rem;color:var(--text-muted);">' + s.title + '</span>' : '') + '</td>' +
+        '<td>' + (s.email || '--') + '</td>' +
+        '<td><span class="badge badge--' + getRoleBadge(s.role) + '">' + formatRole(s.role) + '</span></td>' +
+        '<td style="font-size:0.8125rem;color:var(--text-muted);">' + permDisplay + '</td>' +
+        '<td><span class="badge badge--' + statusClass + '">' + (s.status || 'Active') + '</span></td>' +
+        '<td style="font-size:0.8125rem;color:var(--text-muted);">' + lastLogin + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button title="Edit" onclick="editStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">edit</span></button>' +
+        (s.status !== 'inactive' ? '<button title="Revoke Access" onclick="revokeStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">block</span></button>' : '<button title="Reactivate" onclick="reactivateStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">check_circle</span></button>') +
+        '</div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function formatRole(role) {
+    var map = { admin: 'Admin', provider: 'Provider', staff: 'Staff', readonly: 'Read Only' };
+    return map[role] || role || '--';
+  }
+
+  function getRoleBadge(role) {
+    var map = { admin: 'active', provider: 'completed', staff: 'sent', readonly: 'draft' };
+    return map[role] || 'draft';
+  }
+
+  function applyRolePresets(role, formId) {
+    var prefix = formId === 'staffForm' ? 'perm_' : 'edit_perm_';
+    var form = document.getElementById(formId);
+    var allPerms = ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'];
+    var presets = {
+      admin: allPerms,
+      provider: ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes'],
+      staff: ['patients', 'schedule'],
+      readonly: ['patients', 'schedule'],
+    };
+    var allowed = presets[role] || [];
+    allPerms.forEach(function(p) {
+      var cb = form.querySelector('[name="' + prefix + p + '"]');
+      if (cb) cb.checked = allowed.indexOf(p) !== -1;
+    });
+  }
+
+  function openStaffModal() {
+    document.getElementById('staffForm').reset();
+    document.getElementById('staffModalTitle').textContent = 'Add Staff Member';
+    // Apply default presets
+    applyRolePresets('', 'staffForm');
+    document.getElementById('staffModal').classList.remove('hidden');
+  }
+
+  function getPermissions(formId, prefix) {
+    var form = document.getElementById(formId);
+    var perms = {};
+    ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'].forEach(function(p) {
+      var cb = form.querySelector('[name="' + prefix + p + '"]');
+      if (cb) perms[p] = cb.checked;
+    });
+    return perms;
+  }
+
+  function saveStaff() {
+    var form = document.getElementById('staffForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var email = (fd.get('staff_email') || '').toLowerCase().trim();
+
+    // Check for duplicate
+    var existing = store.staff.find(function(s) { return (s.email || '').toLowerCase() === email; });
+    if (existing) {
+      showToast('A staff member with this email already exists', 'error');
+      return;
+    }
+
+    var data = {
+      first_name: fd.get('staff_first_name'),
+      last_name: fd.get('staff_last_name'),
+      email: email,
+      role: fd.get('staff_role'),
+      title: fd.get('staff_title'),
+      permissions: getPermissions('staffForm', 'perm_'),
+      status: 'active',
+      added_by: currentUserEmail,
+    };
+
+    saveRecord('staff', data).then(function() {
+      document.getElementById('staffModal').classList.add('hidden');
+      showToast('Staff member added — they can now sign in with Google', 'success');
+      renderStaff();
+    }).catch(function(e) {
+      showToast('Error adding staff: ' + e.message, 'error');
+    });
+  }
+
+  window.editStaff = function(id) {
+    var staff = store.staff.find(function(s) { return s.id === id; });
+    if (!staff) return;
+
+    var form = document.getElementById('editStaffForm');
+    form.querySelector('[name="edit_staff_id"]').value = staff.id;
+    form.querySelector('[name="edit_staff_first_name"]').value = staff.first_name || '';
+    form.querySelector('[name="edit_staff_last_name"]').value = staff.last_name || '';
+    form.querySelector('[name="edit_staff_email"]').value = staff.email || '';
+    form.querySelector('[name="edit_staff_role"]').value = staff.role || 'staff';
+    form.querySelector('[name="edit_staff_title"]').value = staff.title || '';
+    form.querySelector('[name="edit_staff_status"]').value = staff.status || 'active';
+
+    // Set permission checkboxes
+    var perms = staff.permissions || {};
+    ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'].forEach(function(p) {
+      var cb = form.querySelector('[name="edit_perm_' + p + '"]');
+      if (cb) cb.checked = !!perms[p];
+    });
+
+    document.getElementById('editStaffModal').classList.remove('hidden');
+  };
+
+  function updateStaff() {
+    var form = document.getElementById('editStaffForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var id = fd.get('edit_staff_id');
+
+    var updates = {
+      first_name: fd.get('edit_staff_first_name'),
+      last_name: fd.get('edit_staff_last_name'),
+      role: fd.get('edit_staff_role'),
+      title: fd.get('edit_staff_title'),
+      status: fd.get('edit_staff_status'),
+      permissions: getPermissions('editStaffForm', 'edit_perm_'),
+    };
+
+    sb.from(EMR_TABLES.staff)
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+      .then(function(result) {
+        if (result.error) throw result.error;
+        // Update in-memory store
+        var idx = store.staff.findIndex(function(s) { return s.id === id; });
+        if (idx !== -1) store.staff[idx] = result.data;
+        document.getElementById('editStaffModal').classList.add('hidden');
+        showToast('Staff member updated', 'success');
+        renderStaff();
+      }).catch(function(e) {
+        // Fallback for missing table
+        if (e.code === '42P01' || (e.message && e.message.indexOf('does not exist') !== -1)) {
+          var idx = store.staff.findIndex(function(s) { return s.id === id; });
+          if (idx !== -1) Object.assign(store.staff[idx], updates);
+          document.getElementById('editStaffModal').classList.add('hidden');
+          showToast('Staff updated locally', 'info');
+          renderStaff();
+        } else {
+          showToast('Error updating staff: ' + e.message, 'error');
+        }
+      });
+  }
+
+  window.revokeStaff = function(id) {
+    if (!confirm('Revoke access for this staff member? They will no longer be able to sign in.')) return;
+    sb.from(EMR_TABLES.staff)
+      .update({ status: 'inactive' })
+      .eq('id', id)
+      .then(function(result) {
+        if (result.error && result.error.code !== '42P01') {
+          showToast('Error: ' + result.error.message, 'error');
+          return;
+        }
+        var s = store.staff.find(function(x) { return x.id === id; });
+        if (s) s.status = 'inactive';
+        showToast('Access revoked', 'success');
+        renderStaff();
+      });
+  };
+
+  window.reactivateStaff = function(id) {
+    sb.from(EMR_TABLES.staff)
+      .update({ status: 'active' })
+      .eq('id', id)
+      .then(function(result) {
+        if (result.error && result.error.code !== '42P01') {
+          showToast('Error: ' + result.error.message, 'error');
+          return;
+        }
+        var s = store.staff.find(function(x) { return x.id === id; });
+        if (s) s.status = 'active';
+        showToast('Access reactivated', 'success');
+        renderStaff();
+      });
+  };
 
   // ============================================
   // VITALS LOG
