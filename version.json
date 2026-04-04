@@ -1,12 +1,12 @@
 {
-  "version": "v260404.17 2:31p",
-  "release": 17,
-  "sha": "b139ff5",
-  "fullSha": "b139ff504334f24d2f8d0ee988e6f3f2f8268d14",
+  "version": "v260404.18 3:00p",
+  "release": 18,
+  "sha": "e07a7a2",
+  "fullSha": "e07a7a28f47c3a7a8f4c9d3427d285613a32adb8",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T09:30:36-05:00",
-  "commits": [{"sha":"b139ff5","message":"Fix mobile layout","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T09:59:51-05:00",
+  "commits": [{"sha":"e07a7a2","message":"Add $3K/mo influencer budget to financial projections","author":"Justin DeLaCruz"}]
 }
