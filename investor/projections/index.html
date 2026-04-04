@@ -961,37 +961,29 @@
 
     // ===== HERO STATS =====
     function renderHeroStats() {
+        // Use same calculations as renderExit() so numbers match
         const s = scenarios.base;
-
-        // Stabilized annual NOI (Year 2+)
         const p1AnnualRev = s.revenue * 12;
         const p1AnnualExp = s.expenses * 12;
-        const stabilizedNOI = p1AnnualRev - p1AnnualExp;
+        const p1Growth = 1.05;
+        const expGrowth = 1.03;
 
-        // Year 4 appraised value
-        const capRate = 0.08;
-        const yr4NOI = stabilizedNOI * Math.pow(1.02, 3);
-        const appraisedValue = yr4NOI / capRate;
+        // Year 4 NOI — Phase 1 + Phase 2
+        const p1Rev4 = p1AnnualRev * Math.pow(p1Growth, 3);
+        const p1Exp4 = p1AnnualExp * Math.pow(expGrowth, 3);
+        const p1NOI4 = p1Rev4 - p1Exp4;
 
-        // 4-year cumulative cash flow
         const p2FullGross = Math.round(275511 * 0.90) * 12;
-        const p2Ramp = [0, 0.30, 0.80, 1.0];
-        let cum4 = 0;
-        for (let y = 0; y < 4; y++) {
-            let p1Rev, p1Exp;
-            if (y === 0) {
-                p1Rev = 0; ramp.forEach(r => p1Rev += s.revenue * r);
-                p1Exp = s.expenses * 9 + s.expenses * 0.85 * 3;
-            } else {
-                p1Rev = p1AnnualRev * Math.pow(1.05, y);
-                p1Exp = p1AnnualExp * Math.pow(1.03, y);
-            }
-            const p2Rev = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(1.03, y - 2) : 1);
-            cum4 += (p1Rev - p1Exp) + (p2Rev - p2Rev * 0.27);
-        }
+        const p2Rev4 = p2FullGross * 1.0 * Math.pow(1.03, 1);
+        const p2NOI4 = p2Rev4 - p2Rev4 * 0.27;
+
+        const totalNOI = p1NOI4 + p2NOI4;
+
+        // Appraised value at same cap rate as exit section
+        const capRate = 0.065;
+        const appraisedValue = totalNOI / capRate;
 
         const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
-        const fmtK = v => '$' + Math.round(v / 1000) + 'K';
 
         document.getElementById('hero-stats').innerHTML = `
             <div class="hero-stat">
@@ -999,7 +991,7 @@
                 <div class="hero-stat-label">Year 4 Appraised Value</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value">${fmtK(yr4NOI)}</div>
+                <div class="hero-stat-value">${fmtM(totalNOI)}</div>
                 <div class="hero-stat-label">Stabilized Annual NOI</div>
             </div>
             <div class="hero-stat">
