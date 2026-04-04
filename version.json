@@ -1,12 +1,12 @@
 {
-  "version": "v260404.04 5:14a",
-  "release": 4,
-  "sha": "ff9c701",
-  "fullSha": "ff9c701a26da18a09ae0a96513c8e884a2c5b89a",
+  "version": "v260404.05 5:19a",
+  "release": 5,
+  "sha": "cbd9259",
+  "fullSha": "cbd92595aff4e9a1067548e29392930f4ccc9e7d",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T00:14:05-05:00",
-  "commits": [{"sha":"5555a9a","message":"update: replace local sales with Admissions/Corporate Sales hire in capital allocation","author":"Justin DeLaCruz"},{"sha":"9b7c461","message":"style: move lodging dome images inside card grid to match column widths","author":"Justin DeLaCruz"},{"sha":"ff9c701","message":"Update projections page: generic financial model headline and exit strategy","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T00:18:56-05:00",
+  "commits": [{"sha":"cbd9259","message":"Rewrite payback section to honest revenue ramp & profitability view","author":"Justin DeLaCruz"}]
 }
