@@ -1,12 +1,12 @@
 {
-  "version": "v260404.12 5:49a",
-  "release": 12,
-  "sha": "2870e23",
-  "fullSha": "2870e23d83e68c938076c8c4c9f7869eead584b3",
+  "version": "v260404.13 6:06a",
+  "release": 13,
+  "sha": "bd1950e",
+  "fullSha": "bd1950ed0edfabe225e99ee18e7bb63ee9fbf736",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T00:49:42-05:00",
-  "commits": [{"sha":"2870e23","message":"Hero background image and style update","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T01:06:12-05:00",
+  "commits": [{"sha":"bd1950e","message":"Add Back to Investor Deck button","author":"Justin DeLaCruz"}]
 }
