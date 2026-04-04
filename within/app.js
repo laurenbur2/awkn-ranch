@@ -22,7 +22,6 @@ const retryBtn = document.getElementById('retryBtn');
 const deniedEmail = document.getElementById('deniedEmail');
 
 function showState(state, message = '') {
-  document.body.classList.add('ready');
   loginContent.classList.add('hidden');
   loadingContent.classList.add('hidden');
   errorContent.classList.add('hidden');
