@@ -453,7 +453,7 @@
         <div class="assumptions" style="margin-top: 24px;">
             <h3>Year 4 Refinance Exit</h3>
             <ul>
-                <li>Refinance at Year 4 stabilized NOI using 6.5% cap rate</li>
+                <li>Refinance at Year 4 stabilized NOI using 8% cap rate</li>
                 <li>Loan-to-value (LTV): 65% on appraised value</li>
                 <li>Refinance proceeds used to return investor capital + profit distributions</li>
                 <li>Ownership retained post-refinance &mdash; ongoing cash flow continues</li>
@@ -506,7 +506,7 @@
         { name: 'Shannon Cohen — Advisory', low: 3000, high: 3000, rampStart: 1 },
         { name: 'Property Lease', low: 12800, high: 12800, rampStart: 1, fullFromStart: true },
         { name: 'Maintenance & Utilities', low: 4000, high: 6000, rampStart: 1 },
-        { name: 'Breakfast & Guest Supplies', low: 2500, high: 3500, rampStart: 1, fullFromStart: true },
+        { name: 'Breakfast & Guest Supplies', low: 2500, high: 3500, rampStart: 2, fullFromStart: true },
         { name: 'Insurance, Licensing & Compliance', low: 1500, high: 2500, rampStart: 1 },
         { name: 'Marketing & Booking Platform', low: 5500, high: 6500, rampStart: 1 },
         { name: 'Google / Meta / AI Advertising', low: 8000, high: 10000, rampStart: 1, fullFromStart: true },
@@ -855,7 +855,7 @@
         const totalEquity = investment + seriesAEquity;
 
         // Refinance
-        const capRate = 0.065;
+        const capRate = 0.08;
         const appraisedValue = totalNOI / capRate;
         const ltv = 0.65;
         const refiProceeds = appraisedValue * ltv;
@@ -909,7 +909,7 @@
             <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Operating Cash Flow (Years 1&ndash;4)</td></tr>
             <tr><td>&nbsp;&nbsp;&nbsp;Cumulative operating cash flow</td><td style="text-align:right; font-weight:600;">${fmt(cumCashFlow)}</td></tr>
             <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Year 4 Refinance</td></tr>
-            <tr><td>&nbsp;&nbsp;&nbsp;Stabilized NOI (${fmtM(totalNOI)}) &rarr; ${fmtM(appraisedValue)} appraised value at 6.5% cap</td><td style="text-align:right">&mdash;</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Stabilized NOI (${fmtM(totalNOI)}) &rarr; ${fmtM(appraisedValue)} appraised value at 8% cap</td><td style="text-align:right">&mdash;</td></tr>
             <tr><td>&nbsp;&nbsp;&nbsp;Cash-out refinance at 65% LTV</td><td style="text-align:right; font-weight:600;">${fmtM(refiProceeds)}</td></tr>
             <tr><td>&nbsp;&nbsp;&nbsp;Total invested equity ($16.5M) returned from refi proceeds</td><td style="text-align:right; color: var(--accent-green);">&#10003;</td></tr>
             <tr class="highlight"><td>&nbsp;&nbsp;&nbsp;<strong>All investor capital returned at Year 4 refinance</strong></td><td style="text-align:right; color: var(--accent-green); font-weight:700;">&#10003;</td></tr>
@@ -980,7 +980,7 @@
         const totalNOI = p1NOI4 + p2NOI4;
 
         // Appraised value at same cap rate as exit section
-        const capRate = 0.065;
+        const capRate = 0.08;
         const appraisedValue = totalNOI / capRate;
 
         const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
