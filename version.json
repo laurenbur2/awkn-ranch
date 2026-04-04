@@ -1,12 +1,12 @@
 {
-  "version": "v260404.21 9:23p",
-  "release": 21,
-  "sha": "32d922d",
-  "fullSha": "32d922d18f2c3ad5c4a5975dff344d0cba802c0b",
+  "version": "v260404.22 9:57p",
+  "release": 22,
+  "sha": "69442e1",
+  "fullSha": "69442e12952554e6a447ec2fbbbb13ce63eb272e",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T16:21:04-05:00",
-  "commits": [{"sha":"32d922d","message":"Mobile: remove all horizontal scrolling — fit charts, tables, and content to screen","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T16:57:08-05:00",
+  "commits": [{"sha":"6fa9382","message":"Add Within EMR platform with Google auth for ketamine-assisted therapy clinic","author":"Justin DeLaCruz"},{"sha":"ed3108e","message":"Use AWKN copper wordmark logo on Within login and EMR pages","author":"Justin DeLaCruz"},{"sha":"7dd8b9d","message":"Merge remote-tracking branch 'origin/claude/mystifying-jepsen'","author":"Justin DeLaCruz"},{"sha":"69442e1","message":"Merge branch 'main' of https://github.com/justinadelacruz/awkn-ranch","author":"Justin DeLaCruz"}]
 }
