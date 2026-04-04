@@ -201,58 +201,61 @@
         .footer { text-align: center; padding: 48px 40px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
 
         /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             /* Layout */
             .section { padding: 40px 16px; }
             .topbar { padding: 0 12px; }
-            .topbar-inner { height: 56px; }
+            .topbar-inner { height: 52px; }
             .topbar-nav { display: none; }
-            .topbar-brand { font-size: 17px; }
+            .topbar-brand { font-size: 16px; }
             .back-deck-btn { padding: 6px 14px; font-size: 0.55rem; letter-spacing: 0.1em; }
             .back-deck-btn svg { width: 10px; height: 10px; }
             .divider { padding: 0 16px; }
 
             /* Hero */
-            .hero { min-height: 60vh; }
-            .hero-content { padding: 60px 20px 40px; }
-            .hero h1 { font-size: 28px; }
-            .hero-badge { font-size: 0.55rem; padding: 5px 16px; margin-bottom: 1.5rem; }
-            .hero-sub { font-size: 0.9rem; margin-bottom: 32px; }
-            .hero-stats { grid-template-columns: 1fr; max-width: 280px; }
-            .hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 1rem; }
-            .hero-stat:last-child { border-bottom: none; }
-            .hero-stat-value { font-size: 1.4rem; }
+            .hero { min-height: 55vh; }
+            .hero-content { padding: 48px 20px 36px; }
+            .hero h1 { font-size: 26px; line-height: 1.25; }
+            .hero-badge { font-size: 0.55rem; padding: 5px 16px; margin-bottom: 1.25rem; }
+            .hero-sub { font-size: 0.85rem; margin-bottom: 28px; line-height: 1.6; }
+            .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
+            .hero-stat { padding: 0.75rem 0.5rem; }
+            .hero-stat-value { font-size: 1.1rem; }
+            .hero-stat-label { font-size: 0.5rem; letter-spacing: 0.08em; }
 
             /* Section headings */
-            .section h2 { font-size: 22px; }
-            .section-desc { font-size: 14px; margin-bottom: 32px; }
+            .section h2 { font-size: 20px; }
+            .section-desc { font-size: 13px; margin-bottom: 24px; line-height: 1.6; }
             .section-label { font-size: 10px; letter-spacing: 2px; }
 
-            /* Summary cards */
-            .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 32px; }
-            .summary-card { padding: 16px 12px; }
-            .summary-card-value { font-size: 20px; }
-            .summary-card-label { font-size: 9px; letter-spacing: 0.5px; }
+            /* Summary cards — always 2x2 grid */
+            .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
+            .summary-card { padding: 14px 10px; }
+            .summary-card-value { font-size: 18px; }
+            .summary-card-label { font-size: 8px; letter-spacing: 0.3px; line-height: 1.3; }
 
             /* Charts */
-            .chart-container { padding: 20px 12px; margin-bottom: 32px; }
-            .chart-title { font-size: 15px; }
-            .chart-subtitle { font-size: 11px; margin-bottom: 20px; }
-            .bar-chart { height: 200px; gap: 4px; }
-            .bar-value { font-size: 7px; top: -18px; }
-            .bar-label { font-size: 7px; }
-            .bar-stack { max-width: 36px; }
-            .chart-legend { gap: 12px; }
+            .chart-container { padding: 16px 10px; margin-bottom: 24px; }
+            .chart-title { font-size: 14px; margin-bottom: 4px; }
+            .chart-subtitle { font-size: 10px; margin-bottom: 16px; }
+            .bar-chart { height: 220px; gap: 3px; padding-bottom: 32px; }
+            .bar-value { font-size: 0; visibility: hidden; }
+            .bar-group:nth-child(3n+1) .bar-value { font-size: 8px; visibility: visible; }
+            .bar-label { font-size: 8px; bottom: -24px; }
+            .bar-stack { max-width: 30px; }
+            .chart-legend { gap: 10px; margin-top: 12px; }
             .chart-legend-item { font-size: 10px; }
+            .chart-legend-dot { width: 8px; height: 8px; }
 
             /* Scenario tabs */
             .scenario-tabs { width: 100%; }
-            .scenario-tab { padding: 8px 16px; font-size: 12px; flex: 1; text-align: center; }
+            .scenario-tab { padding: 8px 12px; font-size: 11px; flex: 1; text-align: center; }
 
-            /* Tables */
-            .data-table { font-size: 12px; }
-            .data-table th { padding: 8px 6px; font-size: 9px; letter-spacing: 0.5px; }
-            .data-table td { padding: 8px 6px; font-size: 12px; }
+            /* Tables — force horizontal scroll */
+            .data-table { font-size: 11px; }
+            .data-table th { padding: 8px 6px; font-size: 8px; letter-spacing: 0.3px; }
+            .data-table td { padding: 8px 6px; font-size: 11px; }
 
             /* Expense detail table */
             #expense-detail-table { table-layout: auto; }
@@ -260,22 +263,26 @@
             #expense-detail-table td:first-child { white-space: normal; font-size: 10px; }
 
             /* Assumptions */
-            .assumptions { padding: 20px 16px; margin-top: 32px; }
-            .assumptions li { font-size: 12px; }
+            .assumptions { padding: 16px 14px; margin-top: 24px; }
+            .assumptions h3 { font-size: 14px; }
+            .assumptions li { font-size: 11px; padding: 6px 0; }
 
             /* Footer */
-            .footer { padding: 32px 16px; font-size: 11px; }
+            .footer { padding: 28px 16px; font-size: 10px; }
         }
 
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 24px; }
-            .hero-stats { max-width: 240px; }
-            .summary-grid { grid-template-columns: 1fr; }
-            .summary-card-value { font-size: 22px; }
-            .bar-chart { height: 180px; }
-            .bar-value { font-size: 6px; }
-            .scenario-tab { padding: 8px 10px; font-size: 11px; }
-            .back-deck-btn span.btn-text-full { display: none; }
+        @media (max-width: 420px) {
+            .hero h1 { font-size: 22px; }
+            .hero-sub { font-size: 0.8rem; }
+            .hero-stat-value { font-size: 0.95rem; }
+            .hero-stat-label { font-size: 0.45rem; }
+            .summary-card-value { font-size: 17px; }
+            .summary-card-label { font-size: 7.5px; }
+            .bar-chart { height: 190px; }
+            .chart-title { font-size: 13px; }
+            .scenario-tab { padding: 7px 8px; font-size: 10px; }
+            .section h2 { font-size: 18px; }
+            .section-desc { font-size: 12px; }
         }
     </style>
 </head>
