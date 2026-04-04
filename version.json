@@ -1,12 +1,12 @@
 {
-  "version": "v260404.20 9:10p",
-  "release": 20,
-  "sha": "51adf3e",
-  "fullSha": "51adf3e9d36acf5e973b77f3853342a204730ea0",
+  "version": "v260404.21 9:23p",
+  "release": 21,
+  "sha": "32d922d",
+  "fullSha": "32d922d18f2c3ad5c4a5975dff344d0cba802c0b",
   "actor": "justinadelacruz",
   "source": "github-main-push",
   "model": "ci",
   "machine": "runnervm727z3",
-  "pushedAt": "2026-04-04T16:10:21-05:00",
-  "commits": [{"sha":"51adf3e","message":"Mobile charts: fit to screen without scrolling, smaller labels and selective values","author":"Justin DeLaCruz"}]
+  "pushedAt": "2026-04-04T16:21:04-05:00",
+  "commits": [{"sha":"32d922d","message":"Mobile: remove all horizontal scrolling — fit charts, tables, and content to screen","author":"Justin DeLaCruz"}]
 }
