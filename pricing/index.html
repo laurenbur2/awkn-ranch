@@ -40,34 +40,39 @@
     }
 
     /* ── HERO ─────────────────────────────────────────── */
-    .hero {
-      position: relative;
-      min-height: 560px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background: url('images/dome-exterior.jpeg') center/cover no-repeat;
-      background-color: var(--dark);
+    .awknhero {
+      position: relative !important;
+      min-height: 560px !important;
+      max-height: 620px !important;
+      height: 560px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      background: url('images/dome-exterior.jpeg') center/cover no-repeat !important;
+      background-color: var(--dark) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
-    .hero::before {
+    .awknhero::before {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(180deg, rgba(28,22,24,0.55) 0%, rgba(28,22,24,0.80) 100%);
       z-index: 1;
     }
-    .hero-content {
+    .awknhero-content {
       position: relative; z-index: 2;
       max-width: 720px; padding: 2rem;
     }
-    .hero-logo {
+    .awknhero-logo {
       width: 220px;
       max-width: 50vw;
       margin-bottom: 2rem;
       opacity: 0.92;
     }
-    .hero-eyebrow {
+    .awknhero-eyebrow {
       display: inline-block;
       font-size: 0.6rem;
       letter-spacing: 0.3em;
@@ -78,7 +83,7 @@
       border-radius: 100px;
       margin-bottom: 1.5rem;
     }
-    .hero h1 {
+    .awknhero h1 {
       font-family: 'Playfair Display', serif;
       font-size: clamp(2.2rem, 5vw, 3.4rem);
       color: #fff;
@@ -86,7 +91,7 @@
       letter-spacing: 0.03em;
       margin-bottom: 1rem;
     }
-    .hero p {
+    .awknhero p {
       font-size: 1rem;
       color: rgba(255,255,255,0.6);
       max-width: 540px;
@@ -94,7 +99,7 @@
       line-height: 1.8;
       font-weight: 300;
     }
-    .hero-cta {
+    .awknhero-cta {
       display: inline-block;
       background: var(--gold);
       color: #fff;
@@ -107,8 +112,8 @@
       text-decoration: none;
       transition: background 0.25s, transform 0.2s;
     }
-    .hero-cta:hover { background: var(--gold-dark); transform: translateY(-1px); }
-    .hero-cta-outline {
+    .awknhero-cta:hover { background: var(--gold-dark); transform: translateY(-1px); }
+    .awknhero-cta-outline {
       display: inline-block;
       border: 1px solid rgba(255,255,255,0.3);
       color: rgba(255,255,255,0.8);
@@ -122,7 +127,7 @@
       margin-left: 0.75rem;
       transition: border-color 0.25s, color 0.25s;
     }
-    .hero-cta-outline:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+    .awknhero-cta-outline:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
     .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
@@ -529,7 +534,7 @@
       margin: 0 auto 2rem;
       line-height: 1.7;
     }
-    .cta-section .hero-cta { font-size: 0.7rem; }
+    .cta-section .awknhero-cta { font-size: 0.7rem; }
 
     /* ── CONTACT STRIP ───────────────────────────────── */
     .contact-strip {
@@ -585,9 +590,9 @@
       .room-grid { grid-template-columns: 1fr; }
       .process-steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
       .ranch-grid { grid-template-columns: 1fr; }
-      .hero { min-height: 480px; }
+      .awknhero { min-height: 480px; }
       .retreat-header, .retreat-body { padding: 2rem 1.5rem; }
-      .hero-cta-outline { margin-left: 0; margin-top: 0.75rem; display: block; }
+      .awknhero-cta-outline { margin-left: 0; margin-top: 0.75rem; display: block; }
       .contact-row { gap: 2rem; }
     }
     @media (max-width: 480px) {
@@ -652,7 +657,7 @@
 
     @media print {
       body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .hero { min-height: auto; padding: 3rem 2rem; }
+      .awknhero { min-height: auto; padding: 3rem 2rem; }
       .pkg:hover, .specialty-card:hover { transform: none; }
     }
   </style>
@@ -660,14 +665,14 @@
 <body>
 
   <!-- ══ HERO ════════════════════════════════════════ -->
-  <header class="hero">
-    <div class="hero-content">
-      <img src="images/wordmark-white.png" alt="AWKN Ranch" class="hero-logo">
-      <div class="hero-eyebrow">Within Center &middot; Psychedelic Therapy &middot; Austin, TX</div>
+  <header class="awknhero">
+    <div class="awknhero-content">
+      <img src="images/wordmark-white.png" alt="AWKN Ranch" class="awknhero-logo">
+      <div class="awknhero-eyebrow">Within Center &middot; Psychedelic Therapy &middot; Austin, TX</div>
       <h1>Guided Ceremonial Healing</h1>
       <p>Designed to support insight, integration, and lasting transformation. Ketamine therapy held within a complete healing container.</p>
-      <a href="#packages" class="hero-cta">View Packages</a>
-      <a href="#contact" class="hero-cta-outline">Schedule a Call</a>
+      <a href="#packages" class="awknhero-cta">View Packages</a>
+      <a href="#contact" class="awknhero-cta-outline">Schedule a Call</a>
     </div>
   </header>
 
@@ -924,7 +929,7 @@
   <section class="cta-section">
     <h2>Begin Your Healing Journey</h2>
     <p>Schedule a free consultation to learn which package is right for you. Our team is here to guide you every step of the way.</p>
-    <a href="tel:5129692399" class="hero-cta">Call 512-969-2399</a>
+    <a href="tel:5129692399" class="awknhero-cta">Call 512-969-2399</a>
   </section>
 
   <!-- ══ CONTACT STRIP ═══════════════════════════════ -->
