@@ -115,67 +115,81 @@
     /* ── HERO ─────────────────────────────────────────── */
     .awknhero {
       position: relative;
-      min-height: 100vh;
+      min-height: 110vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: url('../pricing/images/dome-exterior.jpeg') center/cover no-repeat;
       background-color: var(--dark);
       overflow: hidden;
+    }
+    .awknhero-bg {
+      position: absolute; inset: 0;
+      background: url('../pricing/images/temple-interior.jpeg') center/cover no-repeat;
+      transform: scale(1.08);
+      animation: kenburns 24s ease-out forwards;
+      will-change: transform;
+    }
+    @keyframes kenburns {
+      0%   { transform: scale(1.08) translateY(0); }
+      100% { transform: scale(1.18) translateY(-1.5%); }
     }
     .awknhero::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.55) 0%, rgba(28,22,24,0.85) 100%);
+      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.55) 50%, rgba(28,22,24,0.88) 100%);
       z-index: 1;
     }
     .awknhero-content {
       position: relative; z-index: 2;
-      max-width: 760px;
-      padding: 7rem 2rem 3rem;
+      max-width: 900px;
+      padding: 7rem 2rem 4rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeup 1.8s 0.4s ease-out forwards;
     }
-    .awknhero-eyebrow {
-      display: inline-block;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
+    @keyframes fadeup {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .awknhero-place {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.42em;
       text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid rgba(201,148,62,0.35);
-      padding: 6px 20px;
-      border-radius: 100px;
-      margin-bottom: 1.75rem;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 3rem;
+      font-weight: 400;
     }
     .awknhero h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+      font-size: clamp(3rem, 8vw, 6rem);
       color: #fff;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1.15;
-      margin-bottom: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      margin: 0;
     }
-    .awknhero p {
-      font-size: 1rem;
-      color: rgba(255,255,255,0.7);
-      max-width: 540px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.85;
-      font-weight: 300;
+    .awknhero h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: rgba(255,255,255,0.85);
     }
-    .awknhero-cta {
+    .awknhero-scroll {
       display: inline-block;
-      background: var(--gold);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
+      margin-top: 4.5rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      padding: 14px 36px;
-      border-radius: 100px;
-      transition: background 0.25s, transform 0.2s;
+      color: rgba(255,255,255,0.6);
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      transition: color 0.3s, border-color 0.3s, letter-spacing 0.3s;
     }
-    .awknhero-cta:hover { background: var(--gold-dark); transform: translateY(-1px); }
+    .awknhero-scroll:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      letter-spacing: 0.38em;
+    }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
     .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
@@ -404,16 +418,16 @@
 
   <!-- ══ HERO ═══════════════════════════════════════════ -->
   <header class="awknhero">
+    <div class="awknhero-bg"></div>
     <div class="awknhero-content">
-      <div class="awknhero-eyebrow">Within Center &middot; Ceremonial Ketamine &middot; Austin, TX</div>
-      <h1>A Sacred Space<br>for Going Within</h1>
-      <p>Ceremonial, guided ketamine therapy held with intention &mdash; offered in an outpatient setting and supported by a complete healing container.</p>
-      <a href="#contact" class="awknhero-cta">Begin the Conversation</a>
+      <span class="awknhero-place">Austin, Texas</span>
+      <h1>Go <em>within.</em></h1>
+      <a href="#welcome" class="awknhero-scroll">Enter</a>
     </div>
   </header>
 
   <!-- ══ PHILOSOPHY ═══════════════════════════════════ -->
-  <section class="philosophy">
+  <section class="philosophy" id="welcome">
     <div class="philosophy-inner">
       <div class="s-eyebrow">Welcome</div>
       <div class="s-title">Healing Requires Space</div>
