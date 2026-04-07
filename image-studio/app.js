@@ -203,9 +203,27 @@
     label.textContent = 'Generating...';
     showStatus('Calling Gemini... this can take 10-30 seconds', 'loading');
 
-    sb.functions.invoke('gemini-image', {
-      body: { prompt: prompt, style: style, aspect_ratio: aspectRatio, tags: tags }
+    // Explicitly grab the session JWT and pass it both as header and in body
+    sb.auth.getSession().then(function(sessRes) {
+      var token = sessRes && sessRes.data && sessRes.data.session && sessRes.data.session.access_token;
+      if (!token) {
+        btn.disabled = false;
+        label.textContent = 'Generate Image';
+        showStatus('No active session — please sign in again', 'error');
+        return;
+      }
+      return sb.functions.invoke('gemini-image', {
+        headers: { Authorization: 'Bearer ' + token },
+        body: {
+          prompt: prompt,
+          style: style,
+          aspect_ratio: aspectRatio,
+          tags: tags,
+          access_token: token
+        }
+      });
     }).then(function(res) {
+      if (!res) return;
       btn.disabled = false;
       label.textContent = 'Generate Image';
 
