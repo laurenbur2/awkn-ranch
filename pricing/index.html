@@ -204,6 +204,22 @@
       border-color: var(--gold);
       box-shadow: var(--shadow-lg), 0 0 0 1px var(--gold);
     }
+    .pkg.special {
+      border-color: #c8472b;
+      box-shadow: var(--shadow-lg), 0 0 0 2px #c8472b;
+      background: linear-gradient(180deg, #fff7f3 0%, #fff 35%);
+    }
+    .pkg-badge.special-badge {
+      background: linear-gradient(135deg, #c8472b, #e8693f);
+    }
+    .pkg-price-old {
+      font-size: 1.3rem;
+      color: var(--grey);
+      text-decoration: line-through;
+      font-weight: 400;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
     .pkg-badge {
       position: absolute;
       top: -11px; left: 50%;
@@ -692,12 +708,13 @@
       <div class="packages">
 
         <!-- DISCOVER -->
-        <div class="pkg">
+        <div class="pkg special">
+          <div class="pkg-badge special-badge">April Special</div>
           <div class="pkg-name">Discover</div>
           <div class="pkg-tagline">Expand your consciousness</div>
           <p class="pkg-desc">A guided introductory experience designed to open new perspectives and begin a deeper journey of insight and self-discovery.</p>
-          <div class="pkg-price">$1,250</div>
-          <div class="pkg-per">Package Investment</div>
+          <div class="pkg-price"><span class="pkg-price-old">$1,250</span> $799</div>
+          <div class="pkg-per">April Special &mdash; Limited Time</div>
           <div class="pkg-divider"></div>
           <ul class="pkg-features">
             <li><strong>1</strong> private guided ketamine ceremony</li>
@@ -713,13 +730,12 @@
           <div class="pkg-name">Heal</div>
           <div class="pkg-tagline">Heal your nervous system</div>
           <p class="pkg-desc">A supportive ceremonial series designed to calm the nervous system, process emotions, and begin the work of meaningful healing.</p>
-          <div class="pkg-price">$2,200</div>
+          <div class="pkg-price">$3,300</div>
           <div class="pkg-per">Package Investment</div>
           <div class="pkg-divider"></div>
           <ul class="pkg-features">
             <li><strong>3</strong> private guided ketamine ceremonies</li>
             <li><strong>3</strong> integration coaching sessions</li>
-            <li><strong>2</strong> IV vitamin infusions</li>
             <li><strong>1 month</strong> AWKN Ranch membership</li>
           </ul>
         </div>
