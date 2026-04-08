@@ -24,64 +24,76 @@
     .book-wrap {
       position: relative;
       z-index: 1;
-      max-width: 1180px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 10rem 3rem 6rem;
+      padding: 7rem 2.5rem 4rem;
     }
-    /* ── EDITORIAL HEADER ──────────────────────── */
+    /* ── COMPACT HEADER ──────────────────────── */
     .book-header {
       text-align: center;
-      margin-bottom: 6rem;
-      padding-bottom: 4rem;
-      border-bottom: 1px solid rgba(28,22,24,0.09);
+      margin-bottom: 2.2rem;
     }
     .book-eyebrow {
       font-family: 'Inter', sans-serif;
-      font-size: 0.66rem;
-      letter-spacing: 0.34em;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 2rem;
+      margin-bottom: 0.6rem;
       display: inline-flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.9rem;
     }
     .book-eyebrow::before, .book-eyebrow::after {
       content: '';
-      width: 28px;
+      width: 22px;
       height: 1px;
       background: var(--gold);
       opacity: 0.6;
     }
     .book-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
       color: var(--dark);
       font-weight: 400;
-      letter-spacing: -0.01em;
-      line-height: 1.05;
-      margin-bottom: 1.2rem;
+      letter-spacing: -0.005em;
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
     }
     .book-title em { font-style: italic; color: var(--gold); font-weight: 300; }
     .book-sub {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
-      font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+      font-size: 0.98rem;
       color: var(--brown);
-      max-width: 560px;
+      max-width: 540px;
       margin: 0 auto;
-      line-height: 1.55;
+      line-height: 1.5;
     }
 
-    /* ── CENTERED PRICING PANEL ──────────────── */
-    .price-panel {
-      max-width: 560px;
+    /* ── TWO-COLUMN ABOVE THE FOLD ─────────── */
+    .book-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      max-width: 1080px;
       margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .book-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .book-wrap { padding: 6rem 1.25rem 3rem; }
+    }
+
+    /* ── COMPACT PRICING PANEL ──────────────── */
+    .price-panel {
+      max-width: none;
+      margin: 0;
       padding: 0;
       background: #fff;
       border: 1px solid rgba(28,22,24,0.09);
       position: relative;
-      box-shadow: 0 30px 80px -30px rgba(28,22,24,0.18), 0 4px 24px rgba(28,22,24,0.05);
+      box-shadow: 0 20px 60px -25px rgba(28,22,24,0.18), 0 4px 18px rgba(28,22,24,0.05);
     }
     .price-panel::before {
       content: '';
@@ -92,40 +104,40 @@
     }
     .panel-pkg-label {
       text-align: center;
-      padding: 2.4rem 2rem 1.6rem;
+      padding: 1.3rem 1.5rem 1.1rem;
       border-bottom: 1px solid rgba(28,22,24,0.08);
       background: #fbf8f2;
     }
     .panel-pkg-label .eyebrow {
       font-family: 'Inter', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.32em;
+      font-size: 0.56rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--grey);
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
     }
     .panel-pkg-label .name {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       color: var(--dark);
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: 0.01em;
     }
     .panel-pkg-label .tagline {
       display: block;
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       color: var(--brown);
-      margin-top: 0.3rem;
+      margin-top: 0.15rem;
     }
 
     /* The hero deposit — the thing we want to draw the eye */
     .deposit-hero {
       position: relative;
       text-align: center;
-      padding: 3.2rem 2rem 2.8rem;
+      padding: 1.8rem 1.5rem 1.6rem;
       background:
         radial-gradient(ellipse at center top, rgba(201,148,62,0.14), transparent 70%),
         #fff;
@@ -133,18 +145,18 @@
     .deposit-hero .tag {
       display: inline-block;
       font-family: 'Inter', sans-serif;
-      font-size: 0.58rem;
-      letter-spacing: 0.28em;
+      font-size: 0.54rem;
+      letter-spacing: 0.26em;
       text-transform: uppercase;
       color: var(--gold);
       background: rgba(201,148,62,0.1);
-      padding: 0.5rem 1.1rem;
+      padding: 0.4rem 0.95rem;
       border-radius: 999px;
-      margin-bottom: 1.4rem;
+      margin-bottom: 0.7rem;
     }
     .deposit-hero .amount {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(4.4rem, 9vw, 6.4rem);
+      font-size: clamp(3rem, 5.5vw, 3.8rem);
       color: var(--gold);
       font-weight: 400;
       line-height: 0.95;
@@ -152,46 +164,46 @@
       display: block;
     }
     .deposit-hero .amount .dollar {
-      font-size: 0.45em;
+      font-size: 0.48em;
       vertical-align: super;
       color: var(--gold);
-      margin-right: 0.12em;
+      margin-right: 0.1em;
       font-weight: 300;
     }
     .deposit-hero .caption {
       font-family: 'Inter', sans-serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.26em;
+      font-size: 0.56rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--dark);
-      margin-top: 1.2rem;
+      margin-top: 0.5rem;
       display: block;
     }
     .deposit-hero .refundable-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-top: 1.2rem;
-      padding: 0.55rem 1rem;
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+      padding: 0.4rem 0.85rem;
       background: rgba(28,22,24,0.04);
       border: 1px solid rgba(28,22,24,0.08);
       border-radius: 999px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
+      font-size: 0.54rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--brown);
     }
     .deposit-hero .refundable-pill::before {
       content: '↻';
       color: var(--gold);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
     }
 
     /* Secondary breakdown — muted, smaller, context only */
     .breakdown {
-      padding: 1.8rem 2.5rem;
+      padding: 1rem 1.75rem;
       border-top: 1px solid rgba(28,22,24,0.08);
       background: #fbf8f2;
     }
@@ -199,16 +211,16 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 0.55rem 0;
+      padding: 0.4rem 0;
       font-family: 'Inter', sans-serif;
-      font-size: 0.64rem;
-      letter-spacing: 0.18em;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
     .breakdown-row .lbl { color: rgba(28,22,24,0.5); }
     .breakdown-row .val {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1rem;
+      font-size: 0.92rem;
       letter-spacing: 0;
       text-transform: none;
       color: rgba(28,22,24,0.55);
@@ -218,26 +230,24 @@
       text-decoration: line-through;
       color: rgba(28,22,24,0.28);
       margin-right: 0.4rem;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
     .breakdown-row.highlight {
-      border-top: 1px dashed rgba(201,148,62,0.4);
-      padding-top: 0.9rem;
-      margin-top: 0.4rem;
-    }
-    .breakdown-row.highlight .lbl {
-      color: var(--dark);
-      font-weight: 500;
-    }
-    .breakdown-row.highlight .val {
-      font-size: 1.3rem;
-      color: var(--gold);
-      font-weight: 500;
+      display: none;
     }
 
     /* Pay button + secure line */
     .pay-btn-wrap {
-      padding: 2rem 2.5rem 2.5rem;
+      padding: 1.2rem 1.75rem 1.75rem;
+    }
+    .pay-btn {
+      padding: 1.15rem 1rem !important;
+      font-size: 0.64rem !important;
+      letter-spacing: 0.22em !important;
+    }
+    .secure-line {
+      font-size: 0.56rem !important;
+      margin-top: 0.9rem !important;
     }
 
     .pay-btn {
@@ -276,66 +286,54 @@
     }
     .secure-line::before { content: '◆ '; color: var(--gold); }
 
-    /* ── PROCESS / TIMELINE ──────────────────── */
+    /* ── COMPACT PROCESS TIMELINE (LEFT COLUMN) ─ */
     .process-section {
-      max-width: 920px;
-      margin: 6rem auto 0;
-      padding-top: 5rem;
-      border-top: 1px solid rgba(28,22,24,0.09);
+      margin: 0;
+      padding: 0;
+      border: none;
     }
     .process-section .section-eyebrow {
       font-family: 'Inter', sans-serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.32em;
+      font-size: 0.56rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--gold);
-      text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.4rem;
     }
     .process-section h2 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+      font-size: 1.35rem;
       color: var(--dark);
-      text-align: center;
-      font-weight: 400;
-      margin-bottom: 0.8rem;
-      line-height: 1.15;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
     }
-    .process-section .section-sub {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: var(--brown);
-      text-align: center;
-      max-width: 520px;
-      margin: 0 auto 4rem;
-      line-height: 1.55;
-    }
+    .process-section .section-sub { display: none; }
+
     .timeline {
       position: relative;
-      max-width: 720px;
-      margin: 0 auto;
+      margin: 0;
     }
     .timeline::before {
       content: '';
       position: absolute;
-      left: 28px;
-      top: 20px;
-      bottom: 20px;
+      left: 18px;
+      top: 16px;
+      bottom: 16px;
       width: 1px;
       background: linear-gradient(to bottom, var(--gold) 0%, rgba(201,148,62,0.3) 100%);
     }
     .step {
       position: relative;
-      padding: 0 0 2.8rem 5rem;
+      padding: 0 0 1.2rem 3rem;
     }
     .step:last-child { padding-bottom: 0; }
     .step .num-circle {
       position: absolute;
       left: 0;
-      top: 0;
-      width: 56px;
-      height: 56px;
+      top: -2px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: #fff;
       border: 1px solid rgba(201,148,62,0.4);
@@ -343,22 +341,22 @@
       align-items: center;
       justify-content: center;
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.4rem;
+      font-size: 0.88rem;
       color: var(--gold);
       font-weight: 500;
-      box-shadow: 0 4px 14px rgba(201,148,62,0.12);
+      box-shadow: 0 3px 10px rgba(201,148,62,0.12);
     }
     .step.refund .num-circle {
-      background: rgba(201,148,62,0.06);
+      background: rgba(201,148,62,0.08);
       border-color: var(--gold);
     }
     .step h3 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.4rem;
+      font-size: 1rem;
       color: var(--dark);
       font-weight: 500;
-      margin-bottom: 0.4rem;
-      line-height: 1.2;
+      margin-bottom: 0.15rem;
+      line-height: 1.25;
     }
     .step h3 .amt {
       color: var(--gold);
@@ -367,17 +365,20 @@
     }
     .step p {
       font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.74rem;
       color: var(--grey);
-      line-height: 1.75;
+      line-height: 1.6;
       margin: 0;
     }
     .step.refund {
-      margin-top: 1rem;
-      padding-top: 2rem;
-      border-top: 1px dashed rgba(201,148,62,0.3);
+      margin-top: 0.8rem;
+      padding-top: 1rem;
+      border-top: 1px dashed rgba(201,148,62,0.35);
     }
-    .step.refund h3 { color: var(--gold-dark); }
+    .step.refund::before {
+      /* hide timeline line through refund */
+    }
+    .step.refund h3 { color: var(--gold-dark); font-size: 0.95rem; }
     .step.refund p { color: var(--brown); }
 
     .back-link {
@@ -502,86 +503,80 @@
         '<header class="book-header">' +
           '<div class="book-eyebrow">Reserve Your Container</div>' +
           '<h1 class="book-title">' + pkg.name + ' <em>Package</em></h1>' +
-          '<p class="book-sub">A ten-percent deposit holds your place while we confirm medical clearance. It is fully refundable if you are not a fit.</p>' +
+          '<p class="book-sub">A ten-percent deposit holds your place while we confirm medical clearance. Fully refundable if you are not a fit.</p>' +
         '</header>' +
 
-        // ── Centered pricing panel ─────────────
-        '<aside class="price-panel">' +
-          '<div class="panel-pkg-label">' +
-            '<span class="eyebrow">The Offering</span>' +
-            '<span class="name">' + pkg.name + '</span>' +
-            '<span class="tagline">' + pkg.tagline + '</span>' +
-          '</div>' +
+        '<div class="book-grid">' +
 
-          '<div class="deposit-hero">' +
-            '<span class="tag">Deposit Due Today</span>' +
-            '<span class="amount"><span class="dollar">$</span>' + depositFormatted + '</span>' +
-            '<span class="caption">Ten Percent to Reserve</span>' +
-            '<div class="refundable-pill">Fully Refundable</div>' +
-          '</div>' +
-
-          '<div class="breakdown">' +
-            '<div class="breakdown-row">' +
-              '<span class="lbl">Package Total</span>' +
-              '<span class="val">' + strikeHtml + window.formatCurrency(pkg.price) + '</span>' +
+          // ── LEFT: Compact process timeline ──
+          '<section class="process-section">' +
+            '<div class="section-eyebrow">How It Works</div>' +
+            '<h2>The path to your ' + pkg.name + ' journey</h2>' +
+            '<div class="timeline">' +
+              '<div class="step">' +
+                '<div class="num-circle">i</div>' +
+                '<h3>Place your <span class="amt">' + window.formatCurrency(deposit) + '</span> deposit today</h3>' +
+                '<p>A ten-percent reservation holds your place. Nothing else is charged until you are medically cleared.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">ii</div>' +
+                '<h3>Book a medical consultation</h3>' +
+                '<p>Schedule a confidential screening with our MAPS-trained nurse practitioner to confirm fit.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">iii</div>' +
+                '<h3>Complete the <span class="amt">' + window.formatCurrency(remaining) + '</span> balance</h3>' +
+                '<p>Once cleared, pay the remaining investment and we begin preparing your container.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">iv</div>' +
+                '<h3>Reserve your ceremony dates</h3>' +
+                '<p>Together we choose the dates for your ceremonies and integration sessions. Your journey begins.</p>' +
+              '</div>' +
+              '<div class="step refund">' +
+                '<div class="num-circle">↻</div>' +
+                '<h3>Not cleared? Deposit returned in full</h3>' +
+                '<p>Your ' + window.formatCurrency(deposit) + ' is refunded within 3&ndash;5 business days. No friction, no questions.</p>' +
+              '</div>' +
             '</div>' +
-            '<div class="breakdown-row">' +
-              '<span class="lbl">Balance After Qualification</span>' +
-              '<span class="val">' + window.formatCurrency(remaining) + '</span>' +
-            '</div>' +
-            '<div class="breakdown-row highlight">' +
-              '<span class="lbl">Due Today</span>' +
-              '<span class="val">' + window.formatCurrency(deposit) + '</span>' +
-            '</div>' +
-          '</div>' +
+          '</section>' +
 
-          '<div class="pay-btn-wrap">' +
-            '<button class="pay-btn" id="payBtn">Reserve with ' + window.formatCurrency(deposit) + '</button>' +
-            '<div class="secure-line">Secured by Stripe</div>' +
-            '<div class="status-banner" id="statusBanner" style="display:none;"></div>' +
-          '</div>' +
-        '</aside>' +
-
-        // ── Process timeline ───────────────────
-        '<section class="process-section">' +
-          '<div class="section-eyebrow">How It Works</div>' +
-          '<h2>The Path to Your ' + pkg.name + ' Journey</h2>' +
-          '<p class="section-sub">Four steps from reservation to ceremony. We confirm medical fit before a single dollar beyond your deposit is charged.</p>' +
-
-          '<div class="timeline">' +
-            '<div class="step">' +
-              '<div class="num-circle">i</div>' +
-              '<h3>Place Your <span class="amt">' + window.formatCurrency(deposit) + '</span> Deposit</h3>' +
-              '<p>Secure your spot today with a ten-percent reservation. This holds your place on our calendar and begins the intake process. You will not be charged anything beyond this amount until you are medically cleared and have chosen your dates.</p>' +
+          // ── RIGHT: Compact pricing panel ──
+          '<aside class="price-panel">' +
+            '<div class="panel-pkg-label">' +
+              '<span class="eyebrow">The Offering</span>' +
+              '<span class="name">' + pkg.name + '</span>' +
+              '<span class="tagline">' + pkg.tagline + '</span>' +
             '</div>' +
 
-            '<div class="step">' +
-              '<div class="num-circle">ii</div>' +
-              '<h3>Book a Medical Consultation</h3>' +
-              '<p>Immediately after your deposit, you will schedule a confidential consultation with our MAPS-trained nurse practitioner. She will review your health history, answer your questions, and determine whether ceremonial ketamine work is safe and appropriate for you.</p>' +
+            '<div class="deposit-hero">' +
+              '<span class="tag">Deposit Due Today</span>' +
+              '<span class="amount"><span class="dollar">$</span>' + depositFormatted + '</span>' +
+              '<span class="caption">Ten Percent to Reserve</span>' +
+              '<div class="refundable-pill">Fully Refundable</div>' +
             '</div>' +
 
-            '<div class="step">' +
-              '<div class="num-circle">iii</div>' +
-              '<h3>Complete the <span class="amt">' + window.formatCurrency(remaining) + '</span> Balance</h3>' +
-              '<p>If you are cleared, you will complete the remaining package investment. At this point you are officially a Within Center client and we begin preparing your container.</p>' +
+            '<div class="breakdown">' +
+              '<div class="breakdown-row">' +
+                '<span class="lbl">Package Total</span>' +
+                '<span class="val">' + strikeHtml + window.formatCurrency(pkg.price) + '</span>' +
+              '</div>' +
+              '<div class="breakdown-row">' +
+                '<span class="lbl">Balance After Qualification</span>' +
+                '<span class="val">' + window.formatCurrency(remaining) + '</span>' +
+              '</div>' +
             '</div>' +
 
-            '<div class="step">' +
-              '<div class="num-circle">iv</div>' +
-              '<h3>Reserve Your Ceremony Dates</h3>' +
-              '<p>Together we choose the dates for your ceremonies and integration sessions. Your journey begins.</p>' +
+            '<div class="pay-btn-wrap">' +
+              '<button class="pay-btn" id="payBtn">Reserve with ' + window.formatCurrency(deposit) + '</button>' +
+              '<div class="secure-line">Secured by Stripe</div>' +
+              '<div class="status-banner" id="statusBanner" style="display:none;"></div>' +
             '</div>' +
+          '</aside>' +
 
-            '<div class="step refund">' +
-              '<div class="num-circle">↻</div>' +
-              '<h3>Not Cleared? Deposit Returned in Full</h3>' +
-              '<p>If our clinician determines during your consultation that this work is not a medical fit for you, your ' + window.formatCurrency(deposit) + ' deposit is refunded in full within three to five business days. No friction, no questions. Your wellbeing is the only thing that matters.</p>' +
-            '</div>' +
-          '</div>' +
-        '</section>' +
+        '</div>' +
 
-        '<div style="text-align:center;">' +
+        '<div style="text-align:center;margin-top:2.5rem;">' +
           '<a href="../ceremonial-ketamine/' + slug + '/" class="back-link">&larr; Return to ' + pkg.name + '</a>' +
         '</div>';
 
