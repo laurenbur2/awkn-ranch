@@ -572,8 +572,12 @@
     .site-footer a { color: var(--gold); }
 
     /* ── RESPONSIVE ───────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .three-col[style] { grid-template-columns: repeat(2, 1fr) !important; }
+    }
     @media (max-width: 900px) {
-      .three-col { grid-template-columns: 1fr; gap: 1.5rem; }
+      .three-col,
+      .three-col[style] { grid-template-columns: 1fr !important; gap: 1.5rem; }
       .split-block, .split-block.reverse { grid-template-columns: 1fr; }
       .split-img { height: 320px; }
       .split-text { padding: 2.5rem 2rem; }
@@ -661,9 +665,9 @@
       <div style="text-align:center;">
         <div class="s-eyebrow">The Journey</div>
         <div class="s-title">How It Works</div>
-        <p class="s-desc centered">A thoughtful, four-step path from first conversation to lasting integration.</p>
+        <p class="s-desc centered">A thoughtful, five-step path from first conversation to lasting integration.</p>
       </div>
-      <div class="three-col" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="three-col" style="grid-template-columns: repeat(5, 1fr);">
         <div class="col-card">
           <div class="col-num">01</div>
           <h3>Consultation</h3>
@@ -681,8 +685,13 @@
         </div>
         <div class="col-card">
           <div class="col-num">04</div>
-          <h3>Ceremony &amp; Integration</h3>
-          <p>Guided ceremony in a sacred container, followed by coaching to translate insight into lasting change.</p>
+          <h3>Ceremony</h3>
+          <p>A guided ketamine journey held in a sacred container &mdash; intentional, safe, and deeply supported.</p>
+        </div>
+        <div class="col-card">
+          <div class="col-num">05</div>
+          <h3>Integration</h3>
+          <p>Coaching and reflection to translate insight into embodied, lasting change long after the ceremony ends.</p>
         </div>
       </div>
     </div>
