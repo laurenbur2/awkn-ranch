@@ -104,7 +104,7 @@
     }
     .panel-pkg-label {
       text-align: center;
-      padding: 1.3rem 1.5rem 1.1rem;
+      padding: 1rem 1.5rem 0.85rem;
       border-bottom: 1px solid rgba(28,22,24,0.08);
       background: #fbf8f2;
     }
@@ -137,7 +137,7 @@
     .deposit-hero {
       position: relative;
       text-align: center;
-      padding: 1.8rem 1.5rem 1.6rem;
+      padding: 1.3rem 1.5rem 1.2rem;
       background:
         radial-gradient(ellipse at center top, rgba(201,148,62,0.14), transparent 70%),
         #fff;
@@ -203,7 +203,7 @@
 
     /* Secondary breakdown — muted, smaller, context only */
     .breakdown {
-      padding: 1rem 1.75rem;
+      padding: 0.7rem 1.75rem;
       border-top: 1px solid rgba(28,22,24,0.08);
       background: #fbf8f2;
     }
@@ -211,7 +211,7 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 0.4rem 0;
+      padding: 0.28rem 0;
       font-family: 'Inter', sans-serif;
       font-size: 0.58rem;
       letter-spacing: 0.16em;
@@ -238,7 +238,7 @@
 
     /* ── STAY QUESTION (compact) ─────────────── */
     .stay-question {
-      padding: 1rem 1.75rem 1rem;
+      padding: 0.75rem 1.75rem;
       border-top: 1px solid rgba(28,22,24,0.08);
       background: #fff;
       display: flex;
@@ -322,42 +322,40 @@
       .stay-question { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     }
 
-    /* ── CONTACT FIELDS ──────────────────────── */
+    /* ── CONTACT FIELDS (compact 2x2 grid) ───── */
     .contact-fields {
-      padding: 1.1rem 1.75rem 0.5rem;
+      padding: 0.85rem 1.75rem 0.4rem;
       border-top: 1px solid rgba(28,22,24,0.08);
       background: #fff;
     }
     .contact-fields .ct-eyebrow {
       display: block;
       font-family: 'Inter', sans-serif;
-      font-size: 0.56rem;
+      font-size: 0.54rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 0.7rem;
+      margin-bottom: 0.55rem;
     }
-    .contact-fields .ct-row {
+    .contact-fields .ct-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.7rem;
-      margin-bottom: 0.6rem;
+      gap: 0.5rem 0.6rem;
     }
-    .contact-fields .ct-row.single { grid-template-columns: 1fr; }
     .contact-fields label {
       display: block;
       font-family: 'Inter', sans-serif;
-      font-size: 0.55rem;
+      font-size: 0.5rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--grey);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.18rem;
     }
     .contact-fields input {
       width: 100%;
-      padding: 0.65rem 0.75rem;
+      padding: 0.5rem 0.65rem;
       font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       color: var(--dark);
       background: #fafaf7;
       border: 1px solid rgba(28,22,24,0.12);
@@ -375,21 +373,21 @@
       background: #fff7f5;
     }
     @media (max-width: 520px) {
-      .contact-fields .ct-row { grid-template-columns: 1fr; }
+      .contact-fields .ct-grid { grid-template-columns: 1fr; }
     }
 
     /* Pay button + secure line */
     .pay-btn-wrap {
-      padding: 1.2rem 1.75rem 1.75rem;
+      padding: 0.95rem 1.75rem 1.4rem;
     }
     .pay-btn {
-      padding: 1.15rem 1rem !important;
+      padding: 1rem 1rem !important;
       font-size: 0.64rem !important;
       letter-spacing: 0.22em !important;
     }
     .secure-line {
       font-size: 0.56rem !important;
-      margin-top: 0.9rem !important;
+      margin-top: 0.7rem !important;
     }
 
     .pay-btn {
@@ -722,14 +720,10 @@
 
             '<div class="contact-fields">' +
               '<span class="ct-eyebrow">Your Information</span>' +
-              '<div class="ct-row">' +
+              '<div class="ct-grid">' +
                 '<div><label for="ct-first">First Name</label><input id="ct-first" type="text" autocomplete="given-name" required></div>' +
                 '<div><label for="ct-last">Last Name</label><input id="ct-last" type="text" autocomplete="family-name" required></div>' +
-              '</div>' +
-              '<div class="ct-row single">' +
                 '<div><label for="ct-email">Email</label><input id="ct-email" type="email" autocomplete="email" required></div>' +
-              '</div>' +
-              '<div class="ct-row single">' +
                 '<div><label for="ct-phone">Phone</label><input id="ct-phone" type="tel" autocomplete="tel" required></div>' +
               '</div>' +
             '</div>' +
