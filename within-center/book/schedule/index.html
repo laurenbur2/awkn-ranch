@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Complete Your Patient Application | Within Center</title>
-  <meta name="description" content="Complete your patient application to begin your work with Within Center.">
+  <title>Schedule Your Medical Consultation | Within Center</title>
+  <meta name="description" content="Book your medical consultation to begin your work with Within Center.">
   <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../css/within.css">
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
   <style>
     body { background: var(--cream); }
     .schedule-wrap {
@@ -172,17 +174,14 @@
       background: #fff;
       border: 2px solid var(--gold);
       border-radius: 6px;
-      padding: 2rem 1.5rem;
+      padding: 1.4rem 1rem 1rem;
       box-shadow: 0 8px 48px rgba(201,148,62,0.18), 0 2px 12px rgba(28,22,24,0.06);
-      min-height: 380px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      min-height: 700px;
       position: relative;
     }
+    .calendly-inline-widget { min-width: 320px; height: 680px; }
     .scheduler-frame::before {
-      content: 'PATIENT APPLICATION';
+      content: 'BOOK YOUR CONSULTATION';
       position: absolute;
       top: -11px;
       left: 50%;
@@ -314,24 +313,20 @@
         // Hero — action required
         '<div class="hero-block">' +
           '<div class="action-required">Action Required &middot; Final Step</div>' +
-          '<h1 class="hero-title">Complete Your Patient Application</h1>' +
-          '<p class="hero-sub">Before we can confirm your container, we need a complete picture of your history. Our intake coordinators will review your application and reach out within 1&ndash;2 business days to schedule your medical consultation.</p>' +
+          '<h1 class="hero-title">Book Your Medical Consultation</h1>' +
+          '<p class="hero-sub">Choose a time below for a 30-minute screening with our MAPS-trained nurse practitioner. Your spot is held until you book &mdash; please schedule within 7 days.</p>' +
         '</div>' +
 
         // Three quick steps
         '<div class="scheduler-steps">' +
-          '<div class="step"><span class="num">1</span>Complete the application below</div>' +
-          '<div class="step"><span class="num">2</span>Our team reviews &amp; reaches out</div>' +
-          '<div class="step"><span class="num">3</span>Medical consultation &amp; clearance</div>' +
+          '<div class="step"><span class="num">1</span>Pick a time below</div>' +
+          '<div class="step"><span class="num">2</span>30-min video call</div>' +
+          '<div class="step"><span class="num">3</span>Begin your work</div>' +
         '</div>' +
 
-        // Big bordered patient application frame
+        // Big bordered Calendly scheduling frame
         '<div class="scheduler-frame">' +
-          '<div class="scheduler-placeholder">' +
-            '<div class="icon">&#128221;</div>' +
-            '<strong>Patient Application</strong>' +
-            'A confidential intake form covering personal information, medical history, current medications, and your goals for this work. This is the same depth of clinical screening used by leading ketamine therapy programs &mdash; it ensures the work is safe and the right fit for you.' +
-          '</div>' +
+          '<div class="calendly-inline-widget" data-url="https://calendly.com/lauren-awknranch/30min?hide_gdpr_banner=1&primary_color=c9943e"></div>' +
         '</div>' +
 
         '<div class="refund-note">' +
