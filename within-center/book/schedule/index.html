@@ -256,7 +256,7 @@
     <ul>
       <li class="has-sub"><a href="../../ceremonial-ketamine/" data-submenu-toggle>Ceremonial Ketamine</a></li>
       <li><a href="../../#about" data-menu-link>About Us</a></li>
-      <li><a href="https://awknranch.com" data-menu-link>Immersive Retreat</a></li>
+      <li><a href="../../immersive-retreat/" data-menu-link>Immersive Retreat</a></li>
     </ul>
     <div class="menu-panel-foot">
       A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
@@ -283,7 +283,7 @@
 
   <script src="../js/packages.js"></script>
   <script>
-    (function () {
+    (async function () {
       var params = new URLSearchParams(window.location.search);
       var slug = params.get('pkg');
       var sessionId = params.get('session_id');
@@ -298,12 +298,22 @@
 
       var deposit = Math.round(pkg.price * pkg.depositPct);
 
-      // TODO: When Stripe is wired up, fetch the session from your Supabase edge function
-      // to verify the payment actually succeeded before showing this success state:
-      //
-      // const res = await fetch('https://<project>.supabase.co/functions/v1/verify-deposit-session?session_id=' + sessionId);
-      // const { paid, customer_email } = await res.json();
-      // if (!paid) { /* show error */ return; }
+      // Verify the Stripe session actually completed before showing the success state.
+      // (Demo mode skips this for legacy/test links.)
+      if (sessionId && !isDemo) {
+        root.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:var(--ink-soft);font-family:Inter,sans-serif;">Confirming your payment&hellip;</div>';
+        try {
+          var verifyRes = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/verify-deposit-session?session_id=' + encodeURIComponent(sessionId));
+          var verifyData = await verifyRes.json();
+          if (!verifyRes.ok || !verifyData.paid) {
+            root.innerHTML = '<div style="text-align:center;padding:3rem 1rem;"><h2 style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold-dark);">Payment not confirmed</h2><p>We could not verify your deposit. If you believe this is an error, please call us at <a href="tel:5129692399" style="color:var(--gold);">512-969-2399</a>.</p><p style="margin-top:1rem;"><a href="../?pkg=' + slug + '" style="color:var(--gold);">Return to booking</a></p></div>';
+            return;
+          }
+        } catch (err) {
+          root.innerHTML = '<div style="text-align:center;padding:3rem 1rem;"><h2 style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--gold-dark);">Could not verify payment</h2><p>' + (err.message || err) + '</p><p>Please call us at <a href="tel:5129692399" style="color:var(--gold);">512-969-2399</a>.</p></div>';
+          return;
+        }
+      }
 
       root.innerHTML = '' +
         // Compact deposit confirmation card
