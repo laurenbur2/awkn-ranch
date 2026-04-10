@@ -225,7 +225,7 @@ img { display: block; max-width: 100%; }
   font-size: 0.68rem;
   font-style: normal;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--dark);
 }
 .menu-sub a::after {
   content: '›';
