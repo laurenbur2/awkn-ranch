@@ -693,6 +693,59 @@
     .retreat-cta:hover { color: var(--gold-dark); }
     .retreat-cta:hover::after { transform: translateX(4px); }
 
+    /* ── RETREAT DETAILS ─────────────────────────────── */
+    .retreat-details {
+      background: var(--cream);
+      padding: 4rem 2rem;
+    }
+    .retreat-stats {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-bottom: 2.5rem;
+    }
+    .retreat-stat {
+      text-align: center;
+    }
+    .retreat-stat-num {
+      display: block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.8rem;
+      font-weight: 500;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .retreat-stat-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--grey);
+      font-weight: 600;
+    }
+    .retreat-includes {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.5rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .retreat-includes span {
+      font-size: 0.78rem;
+      color: var(--brown);
+      line-height: 1.6;
+    }
+    .retreat-includes span + span::before {
+      content: '·';
+      color: var(--gold);
+      margin-right: 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .retreat-stats { gap: 2rem; }
+      .retreat-stat-num { font-size: 2.2rem; }
+    }
+
     /* ── CTA BANNER ──────────────────────────────────── */
     .cta-section {
       background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
@@ -935,6 +988,37 @@
       <a href="immersive-retreat/" class="retreat-cta">Explore Immersive Retreats</a>
     </div>
   </div>
+
+  <!-- ══ RETREAT DETAILS ═════════════════════════════ -->
+  <section class="retreat-details">
+    <div class="container">
+      <div class="retreat-stats">
+        <div class="retreat-stat">
+          <span class="retreat-stat-num">7</span>
+          <span class="retreat-stat-label">Nights on Ranch</span>
+        </div>
+        <div class="retreat-stat">
+          <span class="retreat-stat-num">2</span>
+          <span class="retreat-stat-label">Guided Ceremonies</span>
+        </div>
+        <div class="retreat-stat">
+          <span class="retreat-stat-num">12</span>
+          <span class="retreat-stat-label">Private Acres</span>
+        </div>
+      </div>
+      <div class="retreat-includes">
+        <span>Integration coaching</span>
+        <span>Sauna &amp; cold plunge</span>
+        <span>Private rooms</span>
+        <span>Continental breakfast</span>
+        <span>Live-in concierge</span>
+        <span>Resort pool &amp; hot tub</span>
+      </div>
+      <div style="text-align:center; margin-top:2rem;">
+        <a href="immersive-retreat/" class="retreat-cta">See Full Retreat Details</a>
+      </div>
+    </div>
+  </section>
 
   <!-- ══ CTA + CONTACT ═══════════════════════════════ -->
   <section class="cta-section" id="contact">
