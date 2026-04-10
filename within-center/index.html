@@ -390,7 +390,7 @@
     }
     .awknhero-bg {
       position: absolute; inset: 0;
-      background: url('images/ceremony-space.jpg') center/cover no-repeat;
+      background: url('images/hero.jpg') center/cover no-repeat;
       transform: scale(1.08);
       animation: kenburns 24s ease-out forwards;
       will-change: transform;
@@ -593,6 +593,56 @@
       line-height: 1.7;
     }
 
+    /* ── PACKAGE CARDS ───────────────────────────────── */
+    .pkg-card {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .pkg-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
+    }
+    .pkg-sessions {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .pkg-card p {
+      flex: 1;
+    }
+    .pkg-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-top: 1.25rem;
+    }
+    .pkg-strike {
+      font-size: 1rem;
+      color: var(--grey);
+      text-decoration: line-through;
+      font-weight: 400;
+      margin-right: 0.4rem;
+    }
+    .pkg-label {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
     /* ── CTA BANNER ──────────────────────────────────── */
     .cta-section {
       background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
@@ -782,40 +832,40 @@
     </div>
   </div>
 
-  <!-- ══ HOW IT WORKS ════════════════════════════════ -->
+  <!-- ══ PACKAGES ════════════════════════════════════ -->
   <section class="bg-white">
     <div class="container">
       <div style="text-align:center;">
-        <div class="s-eyebrow">The Journey</div>
-        <div class="s-title">How It Works</div>
-        <p class="s-desc centered">A thoughtful, five-step path from first conversation to lasting integration.</p>
+        <div class="s-eyebrow">Our Packages</div>
+        <div class="s-title">Find the Right Path for You</div>
+        <p class="s-desc centered">Each package includes preparation, guided ceremony, and integration support.</p>
       </div>
-      <div class="three-col" style="grid-template-columns: repeat(5, 1fr);">
-        <div class="col-card">
-          <div class="col-num">01</div>
-          <h3>Consultation</h3>
-          <p>A free conversation with our team to understand your goals and whether this work is right for you.</p>
-        </div>
-        <div class="col-card">
-          <div class="col-num">02</div>
-          <h3>Medical Clearance</h3>
-          <p>Intake and screening with our MAPS-trained nurse practitioner to ensure safe, personalized care.</p>
-        </div>
-        <div class="col-card">
-          <div class="col-num">03</div>
-          <h3>Preparation</h3>
-          <p>A dedicated session to set intention, establish safety, and prepare for the ceremonial experience.</p>
-        </div>
-        <div class="col-card">
-          <div class="col-num">04</div>
-          <h3>Ceremony</h3>
-          <p>A guided ketamine journey held in a sacred container &mdash; intentional, safe, and deeply supported.</p>
-        </div>
-        <div class="col-card">
-          <div class="col-num">05</div>
-          <h3>Integration</h3>
-          <p>Coaching and reflection to translate insight into embodied, lasting change long after the ceremony ends.</p>
-        </div>
+      <div class="three-col" style="grid-template-columns: repeat(4, 1fr);">
+        <a href="ceremonial-ketamine/discover/" class="col-card pkg-card">
+          <div class="pkg-name">Discover</div>
+          <div class="pkg-sessions">One guided ceremony</div>
+          <p>A gentle first step into the medicine. Includes preparation, ceremony, and an integration coaching session.</p>
+          <div class="pkg-price"><span class="pkg-strike">$1,250</span> $799</div>
+          <span class="pkg-label">April Special</span>
+        </a>
+        <a href="ceremonial-ketamine/heal/" class="col-card pkg-card">
+          <div class="pkg-name">Heal</div>
+          <div class="pkg-sessions">Three guided ceremonies</div>
+          <p>A three-ceremony arc to calm the nervous system, spaced across 6&ndash;8 weeks with full support throughout.</p>
+          <div class="pkg-price">$3,300</div>
+        </a>
+        <a href="ceremonial-ketamine/awkn/" class="col-card pkg-card">
+          <div class="pkg-name">AWKN</div>
+          <div class="pkg-sessions">Six guided ceremonies</div>
+          <p>Our deepest offering &mdash; six private guided ceremonies over three to six months, with full preparation and integration.</p>
+          <div class="pkg-price">$5,500</div>
+        </a>
+        <a href="ceremonial-ketamine/twin-flame/" class="col-card pkg-card">
+          <div class="pkg-name">Couples Reset</div>
+          <div class="pkg-sessions">One shared couples ceremony</div>
+          <p>A couples journey designed to restore connection &mdash; shared ceremony, joint integration, and private reflection.</p>
+          <div class="pkg-price">$1,650</div>
+        </a>
       </div>
     </div>
   </section>
