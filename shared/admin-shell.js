@@ -55,6 +55,7 @@ const TAB_ICONS = {
   openclaw:   _i('<path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/>'),
   devcontrol: _i('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'),
   crm:        _i('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'),
+  scheduling: _i('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/>'),
 };
 
 // Tab definitions with optional `feature` key for config-driven visibility.
@@ -66,6 +67,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff' },
+  { id: 'scheduling', label: 'Scheduling', href: 'scheduling.html', permission: 'view_crm', section: 'staff' },
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events' },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
