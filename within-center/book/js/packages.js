@@ -31,7 +31,7 @@ window.WITHIN_PACKAGES = {
     depositPct: 0.10,
   },
   'twin-flame': {
-    name: 'Twin Flame',
+    name: 'Couples Reset',
     tagline: 'A shared arc for partners healing together',
     description: 'A couples journey designed to restore connection — shared ceremony, joint integration, and private reflection time for each partner.',
     price: 1650,
