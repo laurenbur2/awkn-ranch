@@ -302,6 +302,13 @@
 .crm-picker-item-name { font-weight: 600; margin-bottom: 2px; }
 .crm-picker-item-price { color: var(--accent, #d4883a); font-weight: 700; }
 .crm-picker-item-desc { color: var(--text-muted, #888); font-size: 11px; }
+.crm-picker-item--promo { border-color: #22c55e; background: #f0fdf4; }
+.crm-picker-item--promo:hover { border-color: #16a34a; background: #dcfce7; }
+.crm-picker-item-strike { text-decoration: line-through; color: var(--text-muted, #aaa); font-weight: 400; font-size: 11px; }
+.crm-picker-item-badge {
+  display: inline-block; margin-top: 4px; padding: 1px 6px; border-radius: 8px;
+  font-size: 10px; font-weight: 700; background: #22c55e; color: #fff; text-transform: uppercase;
+}
 
 /* Dashboard */
 .crm-dashboard-card {

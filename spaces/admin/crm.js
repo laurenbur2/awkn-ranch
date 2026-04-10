@@ -1316,9 +1316,9 @@ async function openInvoiceModal(invoice = null, lead = null) {
     const catalog = bl === 'awkn_ranch' ? venueCatalog : servicePackages.filter(p => p.business_line === bl);
     showCatalogPicker(catalog, (item) => {
       addInvoiceLineItem({
-        description: item.name || item.description,
+        description: item._selectedLabel || item.name || item.description,
         quantity: 1,
-        unit_price: item.price_regular || item.unit_price || 0,
+        unit_price: item._selectedPrice || item.price_regular || item.unit_price || 0,
         service_package_id: item.id || null,
       });
     });
@@ -1484,6 +1484,21 @@ async function saveInvoice(existingInvoice, status) {
 }
 
 function showCatalogPicker(items, onSelect) {
+  // Build picker rows — for service packages with a promo price, show both options
+  const pickerRows = [];
+  for (const item of items) {
+    const price = item.price_regular || item.unit_price || 0;
+    pickerRows.push({ item, price, label: item.name || item.description, promo: false });
+    if (item.price_promo && parseFloat(item.price_promo) > 0 && parseFloat(item.price_promo) !== parseFloat(price)) {
+      pickerRows.push({
+        item,
+        price: parseFloat(item.price_promo),
+        label: (item.name || item.description) + ' (Promo)',
+        promo: true,
+      });
+    }
+  }
+
   const pickerOverlay = document.createElement('div');
   pickerOverlay.className = 'crm-picker-overlay';
   pickerOverlay.innerHTML = `
@@ -1493,11 +1508,14 @@ function showCatalogPicker(items, onSelect) {
         <button class="crm-modal-close crm-picker-close">&times;</button>
       </div>
       <div class="crm-picker-list">
-        ${items.length === 0 ? '<div class="crm-empty">No catalog items available</div>' : ''}
-        ${items.map(item => `
-          <div class="crm-picker-item" data-item-id="${item.id}">
-            <div class="crm-picker-item-name">${escapeHtml(item.name || item.description)}</div>
-            <div class="crm-picker-item-price">${formatCurrency(item.price_regular || item.unit_price || 0)}</div>
+        ${pickerRows.length === 0 ? '<div class="crm-empty">No catalog items available</div>' : ''}
+        ${pickerRows.map((row, idx) => `
+          <div class="crm-picker-item ${row.promo ? 'crm-picker-item--promo' : ''}" data-picker-idx="${idx}">
+            <div class="crm-picker-item-name">${escapeHtml(row.label)}</div>
+            <div class="crm-picker-item-price">
+              ${row.promo ? `<span class="crm-picker-item-strike">${formatCurrency(row.item.price_regular)}</span> ` : ''}${formatCurrency(row.price)}
+            </div>
+            ${row.promo ? '<div class="crm-picker-item-badge">April Special</div>' : ''}
           </div>
         `).join('')}
       </div>
@@ -1513,10 +1531,11 @@ function showCatalogPicker(items, onSelect) {
 
   pickerOverlay.querySelectorAll('.crm-picker-item').forEach(el => {
     el.addEventListener('click', () => {
-      const itemId = el.dataset.itemId;
-      const item = items.find(i => i.id === itemId);
-      if (item) {
-        onSelect(item);
+      const row = pickerRows[parseInt(el.dataset.pickerIdx)];
+      if (row) {
+        // Override the item price with the selected row price
+        const selected = { ...row.item, _selectedPrice: row.price, _selectedLabel: row.label };
+        onSelect(selected);
         pickerOverlay.remove();
       }
     });
