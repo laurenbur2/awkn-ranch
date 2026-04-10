@@ -21,25 +21,6 @@
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
-    .about-hero {
-      text-align: center;
-      padding: 9rem 2rem 3.5rem;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .about-headline {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2rem, 4.5vw, 3rem);
-      font-weight: 400;
-      color: var(--dark);
-      line-height: 1.2;
-      margin: 0 0 1.5rem;
-    }
-    .about-subtitle {
-      font-size: 1.05rem;
-      color: var(--grey);
-      line-height: 1.85;
-    }
 
     /* Split blocks */
     .about-split {
@@ -169,11 +150,14 @@
   </aside>
 
   <!-- ── HERO ──────────────────────────────────────── -->
-  <div class="about-hero">
-    <div class="section-eyebrow">About Us</div>
-    <h1 class="about-headline">A space for real healing,<br>held with care.</h1>
-    <p class="about-subtitle">Within Center was founded in 2021 in a home in central Austin, with a simple intention: to create a space where people could be deeply supported through real healing.</p>
-  </div>
+  <header class="page-hero" style="background-color:var(--dark);">
+    <div class="page-hero-bg" style="background-image:url('../images/hero.jpg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">About Us</span>
+      <h1>A space for real healing,<br>held with care.</h1>
+      <p class="lead">Within Center was founded in 2021 in a home in central Austin, with a simple intention: to create a space where people could be deeply supported through real healing.</p>
+    </div>
+  </header>
 
   <!-- ── ORIGIN — image left ──────────────────────── -->
   <div class="about-split">
