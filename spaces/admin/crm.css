@@ -160,7 +160,7 @@
 }
 .crm-kanban-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
 .crm-kanban-card.dragging { opacity: .5; transform: rotate(2deg); }
-.crm-kanban-card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.crm-kanban-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .crm-kanban-card-name { font-size: 13px; font-weight: 600; color: var(--text, #2a1f23); }
 .crm-kanban-card-meta { font-size: 11px; color: var(--text-muted, #888); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .crm-card-value { font-weight: 600; color: var(--accent, #d4883a); }
@@ -176,8 +176,8 @@
 .crm-kanban-card-space { font-size: 11px; color: var(--text-muted, #888); margin-bottom: 4px; }
 
 /* Business line indicators (All view) */
-.crm-card-biz-within { border-left: 3px solid #0d9488; }
-.crm-card-biz-ranch { border-left: 3px solid #d4883a; }
+.crm-card-biz-within { }
+.crm-card-biz-ranch { }
 .crm-biz-tag {
   display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 10px;
   font-weight: 700; text-transform: uppercase; letter-spacing: .3px;

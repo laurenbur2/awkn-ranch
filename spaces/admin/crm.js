@@ -437,7 +437,7 @@ function renderKanbanCard(lead) {
 
   return `
     <div class="crm-kanban-card crm-card-biz-${bizTag}" draggable="true" data-lead-id="${lead.id}">
-      <div class="crm-kanban-card-top">${currentBizLine === 'all' ? `<span class="crm-biz-tag crm-biz-tag-${bizTag}">${bizLabel}</span>` : ''}<span class="crm-kanban-card-name">${name}</span></div>
+      <div class="crm-kanban-card-top"><span class="crm-kanban-card-name">${name}</span>${currentBizLine === 'all' ? `<span class="crm-biz-tag crm-biz-tag-${bizTag}">${bizLabel}</span>` : ''}</div>
       ${spaceName ? `<div class="crm-kanban-card-space"><span class="crm-space-tag">${escapeHtml(spaceName)}</span>${eventInfo ? ` · ${eventInfo}` : ''}</div>` : ''}
       <div class="crm-kanban-card-meta">
         ${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}
