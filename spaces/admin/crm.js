@@ -357,7 +357,10 @@ function renderPipeline() {
     html += `
       <div class="crm-kanban-col" data-stage-id="${stage.id}">
         <div class="crm-kanban-header" style="border-bottom: 3px solid ${escapeHtml(stage.color || '#6b7280')}">
-          <span class="crm-kanban-title">${escapeHtml(stage.name)}</span>
+          <div>
+            ${currentBizLine === 'all' ? `<span class="crm-biz-tag crm-biz-tag-${stage.business_line === 'within' ? 'within' : 'ranch'}" style="margin-bottom:2px">${stage.business_line === 'within' ? 'Within' : 'Ranch'}</span><br>` : ''}
+            <span class="crm-kanban-title">${escapeHtml(stage.name)}</span>
+          </div>
           <span class="crm-kanban-count">${stageLeads.length}</span>
         </div>
         <div class="crm-kanban-cards" data-stage-id="${stage.id}">
@@ -381,8 +384,10 @@ function renderKanbanCard(lead) {
   const value = lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : '';
   const eventInfo = lead.event_date ? formatDate(lead.event_date) : '';
 
+  const bizTag = lead.business_line === 'within' ? 'within' : 'ranch';
+
   return `
-    <div class="crm-kanban-card" draggable="true" data-lead-id="${lead.id}">
+    <div class="crm-kanban-card crm-card-biz-${bizTag}" draggable="true" data-lead-id="${lead.id}">
       <div class="crm-kanban-card-name">${name}</div>
       ${spaceName ? `<div class="crm-kanban-card-space"><span class="crm-space-tag">${escapeHtml(spaceName)}</span>${eventInfo ? ` · ${eventInfo}` : ''}</div>` : ''}
       <div class="crm-kanban-card-meta">
@@ -572,6 +577,7 @@ function renderLeadsTable() {
       <table class="crm-table">
         <thead>
           <tr>
+            ${currentBizLine === 'all' ? '<th></th>' : ''}
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
@@ -586,8 +592,9 @@ function renderLeadsTable() {
         <tbody>
   `;
 
+  const colCount = currentBizLine === 'all' ? 10 : 9;
   if (filtered.length === 0) {
-    html += '<tr><td colspan="9" class="crm-empty-row">No leads found</td></tr>';
+    html += `<tr><td colspan="${colCount}" class="crm-empty-row">No leads found</td></tr>`;
   } else {
     for (const lead of filtered) {
       const name = escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed');
@@ -596,9 +603,11 @@ function renderLeadsTable() {
       const sourceName = lead.source?.name || '';
       const ownerName = lead.owner?.display_name || lead.owner?.email || '';
       const statusClass = lead.status === 'won' ? 'crm-status-won' : lead.status === 'lost' ? 'crm-status-lost' : 'crm-status-open';
+      const bizTag = lead.business_line === 'within' ? 'within' : 'ranch';
 
       html += `
         <tr class="crm-lead-row" data-lead-id="${lead.id}">
+          ${currentBizLine === 'all' ? `<td><span class="crm-biz-tag crm-biz-tag-${bizTag}">${bizTag === 'within' ? 'Within' : 'Ranch'}</span></td>` : ''}
           <td class="crm-lead-name">${name}</td>
           <td>${escapeHtml(lead.email || '')}</td>
           <td>${escapeHtml(lead.phone || '')}</td>
