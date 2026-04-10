@@ -672,59 +672,52 @@
       .package-grid { grid-template-columns: 1fr; }
     }
 
-    /* ── RETREAT HERO BAND ──────────────────────────── */
-    .retreat-hero-band {
+    /* ── RETREAT SPLIT ────────────────────────────────── */
+    .retreat-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .retreat-split-img {
       position: relative;
-      min-height: 320px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
       overflow: hidden;
     }
-    .retreat-hero-bg {
-      position: absolute; inset: 0;
-      background-size: cover;
-      background-position: center 40%;
+    .retreat-split-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
     }
-    .retreat-hero-band::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.45) 0%, rgba(28,22,24,0.7) 100%);
-      z-index: 1;
-    }
-    .retreat-hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 700px;
-      padding: 2.5rem 2rem;
+    .retreat-split-content {
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 3.5rem;
     }
     .retreat-hero-eyebrow {
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 600;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
     .retreat-hero-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
       font-weight: 400;
       color: #fff;
-      line-height: 1.2;
-      margin-bottom: 1rem;
+      line-height: 1.25;
+      margin-bottom: 1.25rem;
     }
     .retreat-hero-title em {
       font-style: italic;
       color: var(--gold);
     }
     .retreat-hero-desc {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-      line-height: 1.7;
-      max-width: 500px;
-      margin: 0 auto 1.5rem;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.8;
+      margin-bottom: 2rem;
     }
     .retreat-hero-btn {
       display: inline-block;
@@ -738,10 +731,16 @@
       border-radius: 999px;
       text-decoration: none;
       transition: background 0.3s, transform 0.3s;
+      align-self: flex-start;
     }
     .retreat-hero-btn:hover {
       background: #fff;
       transform: translateY(-2px);
+    }
+    @media (max-width: 900px) {
+      .retreat-split { grid-template-columns: 1fr; }
+      .retreat-split-img { height: 360px; }
+      .retreat-split-content { padding: 3rem 2rem; }
     }
 
     /* ── CTA BANNER ──────────────────────────────────── */
@@ -976,24 +975,16 @@
     </div>
   </section>
 
-  <!-- ══ RETREAT BAND ════════════════════════════════ -->
-  <section class="retreat-hero-band">
-    <div class="retreat-hero-bg" style="background-image:url('../pricing/images/dome-exterior.jpeg');"></div>
-    <div class="retreat-hero-content">
-      <div class="retreat-hero-eyebrow">Immersive Retreat at AWKN Ranch</div>
-      <h2 class="retreat-hero-title">Seven nights. Two ceremonies.<br><em>One threshold.</em></h2>
-      <p class="retreat-hero-desc">Leave the world behind. Stay on twelve private acres with a live-in team, sauna, cold plunge, and the space to let the medicine do its work. Any package can become a retreat.</p>
-      <a href="immersive-retreat/" class="retreat-hero-btn">Explore the Retreat</a>
+  <!-- ══ IMMERSIVE RETREAT ════════════════════════════ -->
+  <div class="retreat-split">
+    <div class="retreat-split-img">
+      <img src="images/about.jpg" alt="Client during a guided ketamine ceremony with eye mask and practitioner support">
     </div>
-  </section>
-
-  <!-- ══ IMMERSIVE RETREAT (split) ═══════════════════ -->
-  <div class="split-block">
-    <img src="images/about.jpg" alt="Client during a guided ketamine ceremony with eye mask and practitioner support" class="split-img">
-    <div class="split-text">
-      <div class="s-eyebrow">Stay on the Land</div>
-      <div class="s-title">Turn Your Healing Into a Retreat</div>
-      <p>Any of our packages can be experienced as a live-in retreat at AWKN Ranch &mdash; twelve private acres on the western edge of Austin. Stay on the property, and let the land hold your process between ceremonies.</p>
+    <div class="retreat-split-content">
+      <div class="retreat-hero-eyebrow">Immersive Retreat at AWKN Ranch</div>
+      <h2 class="retreat-hero-title">Seven nights.<br>Two ceremonies.<br><em>One threshold.</em></h2>
+      <p class="retreat-hero-desc">Leave the world behind. Stay on twelve private acres with a live-in team, sauna, cold plunge, and the space to let the medicine do its work.</p>
+      <a href="immersive-retreat/" class="retreat-hero-btn">Explore the Retreat</a>
     </div>
   </div>
 
