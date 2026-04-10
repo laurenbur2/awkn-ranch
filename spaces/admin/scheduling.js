@@ -6,8 +6,9 @@ let authState = null;
 let profile = null;
 let bookings = [];
 
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const DAY_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const BOOKING_URL_PREFIX = 'https://laurenbur2.github.io/awkn-ranch/schedule/?staff=';
 const GOOGLE_AUTH_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/google-calendar-auth';
@@ -145,18 +146,28 @@ function renderAvailabilityForm() {
 
   hoursGrid.innerHTML = DAYS.map((day, i) => {
     const dayData = availableHours[day] || { enabled: false, start: '09:00', end: '17:00' };
-    const checked = dayData.enabled ? 'checked' : '';
-    const disabled = dayData.enabled ? '' : 'disabled';
+    const isEnabled = !!dayData.enabled;
+    const checked = isEnabled ? 'checked' : '';
+    const disabled = isEnabled ? '' : 'disabled';
+    const activeClass = isEnabled ? 'sch-day-circle--active' : '';
     return `
-      <div class="sch-day-row">
+      <div class="sch-day-row ${isEnabled ? '' : 'sch-day-row--off'}">
         <div class="sch-day-toggle">
-          <input type="checkbox" id="day_${day}" data-day="${day}" ${checked}>
-          <span class="sch-day-name">${escapeHtml(DAY_LABELS[i])}</span>
+          <input type="checkbox" id="day_${day}" data-day="${day}" ${checked} class="sch-day-check">
+          <span class="sch-day-circle ${activeClass}">${escapeHtml(DAY_LABELS[i])}</span>
         </div>
         <div class="sch-day-times">
-          <input type="time" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}" ${disabled}>
-          <span class="sch-day-sep">to</span>
-          <input type="time" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}" ${disabled}>
+          ${isEnabled ? `
+            <input type="time" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}" ${disabled}>
+            <span class="sch-day-sep">-</span>
+            <input type="time" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}" ${disabled}>
+            <button class="sch-day-remove" data-day="${day}" title="Remove">&times;</button>
+          ` : `
+            <input type="time" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}" disabled style="display:none">
+            <input type="time" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}" disabled style="display:none">
+            <span class="sch-day-unavailable">Unavailable</span>
+            <button class="sch-day-add" data-day="${day}" title="Add hours">+</button>
+          `}
         </div>
       </div>
     `;
@@ -225,14 +236,25 @@ function setupEventListeners() {
     }
   });
 
-  // Day toggle → enable/disable time inputs
+  // Day toggle, add/remove buttons
+  document.getElementById('hoursGrid').addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.sch-day-add');
+    const removeBtn = e.target.closest('.sch-day-remove');
+    if (addBtn) {
+      const day = addBtn.dataset.day;
+      const checkbox = document.getElementById(`day_${day}`);
+      if (checkbox) { checkbox.checked = true; renderAvailabilityForm(); }
+    }
+    if (removeBtn) {
+      const day = removeBtn.dataset.day;
+      const checkbox = document.getElementById(`day_${day}`);
+      if (checkbox) { checkbox.checked = false; renderAvailabilityForm(); }
+    }
+  });
+
   document.getElementById('hoursGrid').addEventListener('change', (e) => {
-    if (e.target.type === 'checkbox' && e.target.dataset.day) {
-      const day = e.target.dataset.day;
-      const startInput = document.getElementById(`start_${day}`);
-      const endInput = document.getElementById(`end_${day}`);
-      startInput.disabled = !e.target.checked;
-      endInput.disabled = !e.target.checked;
+    if (e.target.classList.contains('sch-day-check')) {
+      renderAvailabilityForm();
     }
   });
 
