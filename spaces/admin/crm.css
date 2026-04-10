@@ -164,6 +164,10 @@
 .crm-kanban-card-meta { font-size: 11px; color: var(--text-muted, #888); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .crm-card-value { font-weight: 600; color: var(--accent, #d4883a); }
 .crm-kanban-card-age { font-size: 10px; color: var(--text-muted, #aaa); margin-top: 4px; }
+.crm-owner-tag {
+  display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 11px;
+  font-weight: 500; background: #f3e8ff; color: #7c3aed;
+}
 
 /* Modal System */
 #crm-modal { position: fixed; inset: 0; z-index: 1000; }

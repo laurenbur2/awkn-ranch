@@ -33,6 +33,7 @@ let invoiceSearchText = '';
 let invoiceFilterStatus = '';
 let proposalSearchText = '';
 let proposalFilterStatus = '';
+let leadFilterOwner = '';
 
 // =============================================
 // UTILITIES
@@ -135,7 +136,7 @@ async function loadAllData() {
       venueRes,
       adSpendRes,
     ] = await Promise.all([
-      supabase.from('crm_leads').select('*, stage:crm_pipeline_stages(*), source:crm_lead_sources(*)').order('created_at', { ascending: false }),
+      supabase.from('crm_leads').select('*, stage:crm_pipeline_stages(*), source:crm_lead_sources(*), owner:app_users!crm_leads_assigned_to_fkey(id, display_name, email)').order('created_at', { ascending: false }),
       supabase.from('crm_pipeline_stages').select('*').order('sort_order'),
       supabase.from('crm_lead_sources').select('*').order('sort_order'),
       supabase.from('crm_service_packages').select('*').eq('is_active', true).order('sort_order'),
@@ -169,6 +170,7 @@ function getFilteredLeads() {
     if (leadFilterSource && l.source_id !== leadFilterSource) return false;
     if (leadFilterStage && l.stage_id !== leadFilterStage) return false;
     if (leadFilterStatus && l.status !== leadFilterStatus) return false;
+    if (leadFilterOwner && l.assigned_to !== leadFilterOwner) return false;
     if (leadSearchText) {
       const q = leadSearchText.toLowerCase();
       const name = `${l.first_name || ''} ${l.last_name || ''}`.toLowerCase();
@@ -369,6 +371,7 @@ function renderPipeline() {
 function renderKanbanCard(lead) {
   const name = escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed');
   const sourceName = lead.source?.name || '';
+  const ownerName = lead.owner?.display_name || lead.owner?.email || '';
   const days = daysAgo(lead.created_at);
   const value = lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : '';
 
@@ -379,7 +382,9 @@ function renderKanbanCard(lead) {
         ${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}
         ${value ? `<span class="crm-card-value">${value}</span>` : ''}
       </div>
-      <div class="crm-kanban-card-age">${days}d ago</div>
+      <div class="crm-kanban-card-age">
+        ${ownerName ? `<span class="crm-owner-tag">${escapeHtml(ownerName)}</span> · ` : ''}${days}d ago
+      </div>
     </div>
   `;
 }
@@ -474,6 +479,17 @@ function renderLeadsTable() {
     .map(s => `<option value="${s.id}" ${leadFilterStage === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`)
     .join('');
 
+  // Build owner options from unique lead owners
+  const ownerMap = new Map();
+  leads.forEach(l => {
+    if (l.assigned_to && l.owner) {
+      ownerMap.set(l.assigned_to, l.owner.display_name || l.owner.email || l.assigned_to);
+    }
+  });
+  const ownerOptions = Array.from(ownerMap.entries())
+    .map(([id, name]) => `<option value="${id}" ${leadFilterOwner === id ? 'selected' : ''}>${escapeHtml(name)}</option>`)
+    .join('');
+
   let html = `
     <div class="crm-table-toolbar">
       <div class="crm-filters">
@@ -492,6 +508,10 @@ function renderLeadsTable() {
           <option value="won" ${leadFilterStatus === 'won' ? 'selected' : ''}>Won</option>
           <option value="lost" ${leadFilterStatus === 'lost' ? 'selected' : ''}>Lost</option>
         </select>
+        <select class="crm-select" id="lead-filter-owner">
+          <option value="">All Owners</option>
+          ${ownerOptions}
+        </select>
       </div>
       <button class="crm-btn crm-btn-primary" id="btn-new-lead-table">+ New Lead</button>
     </div>
@@ -504,6 +524,7 @@ function renderLeadsTable() {
             <th>Phone</th>
             <th>Source</th>
             <th>Stage</th>
+            <th>Owner</th>
             <th>Status</th>
             <th>Value</th>
             <th>Created</th>
@@ -513,13 +534,14 @@ function renderLeadsTable() {
   `;
 
   if (filtered.length === 0) {
-    html += '<tr><td colspan="8" class="crm-empty-row">No leads found</td></tr>';
+    html += '<tr><td colspan="9" class="crm-empty-row">No leads found</td></tr>';
   } else {
     for (const lead of filtered) {
       const name = escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed');
       const stageColor = lead.stage?.color || '#6b7280';
       const stageName = lead.stage?.name || '';
       const sourceName = lead.source?.name || '';
+      const ownerName = lead.owner?.display_name || lead.owner?.email || '';
       const statusClass = lead.status === 'won' ? 'crm-status-won' : lead.status === 'lost' ? 'crm-status-lost' : 'crm-status-open';
 
       html += `
@@ -529,6 +551,7 @@ function renderLeadsTable() {
           <td>${escapeHtml(lead.phone || '')}</td>
           <td>${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}</td>
           <td><span class="crm-stage-badge" style="background:${escapeHtml(stageColor)}20;color:${escapeHtml(stageColor)};border:1px solid ${escapeHtml(stageColor)}40">${escapeHtml(stageName)}</span></td>
+          <td>${ownerName ? `<span class="crm-owner-tag">${escapeHtml(ownerName)}</span>` : ''}</td>
           <td><span class="crm-status-badge ${statusClass}">${escapeHtml(lead.status || 'open')}</span></td>
           <td>${lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : ''}</td>
           <td>${formatDate(lead.created_at)}</td>
@@ -612,6 +635,10 @@ async function openLeadDetail(leadId) {
             <div class="crm-detail-field">
               <label>Source</label>
               <div>${escapeHtml(lead.source?.name || 'N/A')}</div>
+            </div>
+            <div class="crm-detail-field">
+              <label>Owner</label>
+              <div>${escapeHtml(lead.owner?.display_name || lead.owner?.email || 'Unassigned')}</div>
             </div>
             ${lead.utm_source ? `<div class="crm-detail-field"><label>UTM</label><div>${escapeHtml(lead.utm_source)}${lead.utm_medium ? ' / ' + escapeHtml(lead.utm_medium) : ''}${lead.utm_campaign ? ' / ' + escapeHtml(lead.utm_campaign) : ''}</div></div>` : ''}
 
@@ -952,6 +979,7 @@ function openLeadModal(lead = null) {
       } else {
         payload.status = 'open';
         payload.created_at = new Date().toISOString();
+        payload.assigned_to = authState?.appUser?.id || null;
         const { data, error } = await supabase.from('crm_leads').insert(payload).select().single();
         if (error) throw error;
         // Add initial note if provided
@@ -2206,6 +2234,13 @@ function handlePanelChanges(e) {
   // Lead filter status
   if (target.id === 'lead-filter-status') {
     leadFilterStatus = target.value;
+    renderLeadsTable();
+    return;
+  }
+
+  // Lead filter owner
+  if (target.id === 'lead-filter-owner') {
+    leadFilterOwner = target.value;
     renderLeadsTable();
     return;
   }
