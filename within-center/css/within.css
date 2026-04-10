@@ -246,7 +246,7 @@ img { display: block; max-width: 100%; }
 .menu-sub a:hover::after { color: var(--gold); transform: translateY(-50%) translateX(5px); }
 .menu-sub .sub-header {
   display: block;
-  padding: 0 3rem 0.75rem;
+  padding: 1rem 3rem;
   font-size: 0.55rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
