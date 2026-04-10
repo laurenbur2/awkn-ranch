@@ -531,6 +531,86 @@
       margin-bottom: 1rem;
     }
 
+    /* ── ABOUT SECTION ────────────────────────── */
+    .about-section { background: var(--white); }
+    .about-hero {
+      text-align: center;
+      padding: 5rem 2rem 3rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .about-headline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 400;
+      color: var(--dark);
+      line-height: 1.2;
+      margin: 0 0 1.5rem;
+    }
+    .about-subtitle {
+      font-size: 1.05rem;
+      color: var(--grey);
+      line-height: 1.85;
+    }
+    .about-philosophy {
+      background: var(--cream);
+      padding: 5rem 2rem;
+    }
+    .about-philosophy-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .about-philosophy-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 400;
+      color: var(--dark);
+      text-align: center;
+      margin: 0 0 2.5rem;
+      line-height: 1.25;
+    }
+    .about-philosophy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 3rem;
+    }
+    .about-philosophy-text p {
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+    .about-stats {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      padding: 3.5rem 2rem;
+      background: var(--dark);
+    }
+    .about-stat {
+      text-align: center;
+    }
+    .about-stat-num {
+      display: block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.4rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .about-stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    @media (max-width: 640px) {
+      .about-philosophy-grid { grid-template-columns: 1fr; }
+      .about-stats { gap: 2rem; flex-wrap: wrap; }
+      .about-stat-num { font-size: 1.8rem; }
+    }
+
     /* ── PROCESS / 3-COL ──────────────────────── */
     .three-col {
       display: grid;
@@ -793,16 +873,71 @@
     </div>
   </section>
 
-  <!-- ══ ABOUT (split) ════════════════════════════════ -->
-  <div class="split-block" id="about">
-    <img src="images/about.jpg" alt="A client in ceremony at Within Center, held by a trained guide" class="split-img">
-    <div class="split-text">
-      <div class="s-eyebrow">About Us</div>
-      <div class="s-title">Sacred Medicine, Met with Rigor</div>
-      <p>Within Center was built by people who believe medicine and meaning belong in the same room. We hold ketamine as the sacred tool it is &mdash; and we hold the people in our care with the discernment, training, and intention that the work deserves.</p>
-      <p>We are a sister practice to AWKN Ranch, sharing values of intentional living, embodied healing, and quiet reverence for the inner journey. Clients may choose to extend their experience by staying at the ranch &mdash; not as treatment, but as a supportive environment for integration, regulation, and reflection.</p>
+  <!-- ══ ABOUT ════════════════════════════════════════ -->
+  <section class="about-section" id="about">
+
+    <!-- Intro -->
+    <div class="about-hero">
+      <div class="s-eyebrow" style="text-align:center;">About Us</div>
+      <h2 class="about-headline">A space for real healing,<br>held with care.</h2>
+      <p class="about-subtitle">Within Center was founded in 2021 in a home in central Austin, with a simple intention: to create a space where people could be deeply supported through real healing.</p>
     </div>
-  </div>
+
+    <!-- Origin story — image left -->
+    <div class="split-block">
+      <img src="images/about.jpg" alt="The original Within Center home in central Austin" class="split-img">
+      <div class="split-text">
+        <div class="s-eyebrow">Where We Started</div>
+        <div class="s-title">A Home in Central Austin</div>
+        <p>Since 2021, we&rsquo;ve worked with over 1,500 individuals navigating stress, pain, and major life transitions. What began in a single room grew into something we couldn&rsquo;t have planned &mdash; a practice shaped entirely by the people who walked through the door.</p>
+      </div>
+    </div>
+
+    <!-- Expansion — image right -->
+    <div class="split-block reverse">
+      <img src="images/ceremony-space.jpg" alt="The ceremony space at AWKN Ranch" class="split-img">
+      <div class="split-text">
+        <div class="s-eyebrow">The Expansion</div>
+        <div class="s-title">AWKN Ranch, 2024</div>
+        <p>In 2024, we expanded to AWKN Ranch &mdash; twelve private acres on the western edge of Austin. A more intentional and immersive environment for this work: a honeycomb ceremony dome, private rooms, sauna, cold plunge, and the quiet that deep healing requires.</p>
+      </div>
+    </div>
+
+    <!-- Philosophy — full width -->
+    <div class="about-philosophy">
+      <div class="about-philosophy-inner">
+        <div class="s-eyebrow" style="text-align:center;">Our Approach</div>
+        <h2 class="about-philosophy-title">What We Mean by &ldquo;Ceremonial&rdquo;</h2>
+        <div class="about-philosophy-grid">
+          <div class="about-philosophy-text">
+            <p>We provide outpatient ketamine-assisted therapy, guided by medical professionals and grounded in safety and clinical integrity. At the same time, each session is held in a ceremonial setting.</p>
+            <p>To us, &ldquo;ceremonial&rdquo; means the experience is approached with care, presence, and intention. The space is thoughtfully designed to feel safe and grounding. We may incorporate elements like breathwork, music, energy clearing, and guided preparation to help clients settle their nervous system and enter the experience with clarity.</p>
+          </div>
+          <div class="about-philosophy-text">
+            <p>It&rsquo;s not rushed or clinical in feeling. It&rsquo;s something you&rsquo;re guided through and held in.</p>
+            <p>We believe healing happens when people feel safe enough to fully experience what&rsquo;s coming up. Our role is to hold that process with skill, attention, and respect &mdash; so each person can move through what they need to and come out with greater clarity and connection to themselves.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="about-stats">
+      <div class="about-stat">
+        <span class="about-stat-num">1,500+</span>
+        <span class="about-stat-label">Clients Served</span>
+      </div>
+      <div class="about-stat">
+        <span class="about-stat-num">2021</span>
+        <span class="about-stat-label">Year Founded</span>
+      </div>
+      <div class="about-stat">
+        <span class="about-stat-num">12</span>
+        <span class="about-stat-label">Private Acres</span>
+      </div>
+    </div>
+
+  </section>
 
   <!-- ══ CTA + CONTACT ═══════════════════════════════ -->
   <section class="cta-section" id="contact">
