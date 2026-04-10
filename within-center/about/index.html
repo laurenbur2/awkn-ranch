@@ -11,22 +11,35 @@
   <meta property="og:title" content="About Us | Within Center">
   <meta property="og:description" content="Within Center was founded in 2021 in Austin, TX. Ceremonial ketamine therapy grounded in safety and intention.">
   <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "Within Center",
+    "description": "Ceremonial, guided ketamine therapy in an outpatient setting in Austin, Texas.",
+    "url": "https://within.center",
+    "telephone": "+1-512-969-2399",
+    "email": "intake@within.center",
+    "foundingDate": "2021",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "7600 Stillridge Dr",
+      "addressLocality": "Austin",
+      "addressRegion": "TX",
+      "postalCode": "78736",
+      "addressCountry": "US"
+    },
+    "medicalSpecialty": "Psychiatry"
+  }
+  </script>
   <style>
     /* ── ABOUT PAGE ──────────────────────────── */
-    .section-eyebrow {
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
 
     /* Split blocks */
     .about-split {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: 460px;
+      min-height: 520px;
       background: var(--white);
     }
     .about-split.reverse { direction: rtl; }
@@ -40,19 +53,26 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 4rem 3.5rem;
+      padding: 4.5rem 4rem;
     }
-    .about-split-text .section-eyebrow { margin-bottom: 0.5rem; }
+    .about-split-text .section-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
     .about-split-text h2 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.8rem, 3.8vw, 2.4rem);
+      font-size: clamp(1.8rem, 3.8vw, 2.6rem);
       color: var(--dark);
-      margin-bottom: 1rem;
-      line-height: 1.25;
-      font-weight: 700;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+      font-weight: 400;
     }
     .about-split-text p {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       color: var(--grey);
       line-height: 1.85;
       margin-bottom: 1rem;
@@ -61,28 +81,36 @@
     /* Philosophy */
     .about-philosophy {
       background: var(--cream);
-      padding: 5rem 2rem;
+      padding: 6rem 2rem;
     }
     .about-philosophy-inner {
       max-width: 960px;
       margin: 0 auto;
     }
+    .about-philosophy .section-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
     .about-philosophy-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-size: clamp(1.8rem, 3.8vw, 2.6rem);
       font-weight: 400;
       color: var(--dark);
       text-align: center;
-      margin: 0 0 2.5rem;
-      line-height: 1.25;
+      margin: 0 0 3rem;
+      line-height: 1.2;
     }
     .about-philosophy-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2rem 3rem;
+      gap: 2.5rem 3.5rem;
     }
     .about-philosophy-grid p {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       color: var(--grey);
       line-height: 1.85;
       margin-bottom: 1rem;
@@ -96,17 +124,56 @@
     }
     .about-images img {
       width: 100%;
-      height: 280px;
+      height: 320px;
       object-fit: cover;
+    }
+
+    /* Quote */
+    .about-quote {
+      background: var(--white);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    .about-quote blockquote {
+      max-width: 720px;
+      margin: 0 auto;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--dark);
+      line-height: 1.5;
+    }
+    .about-quote cite {
+      display: block;
+      margin-top: 1.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-style: normal;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     @media (max-width: 768px) {
       .about-split, .about-split.reverse { grid-template-columns: 1fr; }
-      .about-split-img { height: 320px; }
-      .about-split-text { padding: 2.5rem 2rem; }
+      .about-split-img { height: 360px; }
+      .about-split-text { padding: 3rem 2rem; }
       .about-philosophy-grid { grid-template-columns: 1fr; }
       .about-images { grid-template-columns: 1fr; }
-      .about-images img { height: 240px; }
+      .about-images img { height: 260px; }
     }
   </style>
 </head>
@@ -160,7 +227,7 @@
   </header>
 
   <!-- ── ORIGIN — image left ──────────────────────── -->
-  <div class="about-split">
+  <div class="about-split reveal">
     <img src="../images/about.jpg" alt="The original Within Center home in central Austin" class="about-split-img">
     <div class="about-split-text">
       <div class="section-eyebrow">Where We Started</div>
@@ -170,7 +237,7 @@
   </div>
 
   <!-- ── EXPANSION — image right ──────────────────── -->
-  <div class="about-split reverse">
+  <div class="about-split reverse reveal">
     <img src="../images/ceremony-space.jpg" alt="The ceremony space at AWKN Ranch" class="about-split-img">
     <div class="about-split-text">
       <div class="section-eyebrow">The Expansion</div>
@@ -179,8 +246,16 @@
     </div>
   </div>
 
+  <!-- ── QUOTE ────────────────────────────────────── -->
+  <div class="about-quote reveal">
+    <blockquote>
+      &ldquo;Within a sacred container of support and integration, insight becomes embodied and transformation becomes lasting.&rdquo;
+      <cite>Within Center</cite>
+    </blockquote>
+  </div>
+
   <!-- ── PHILOSOPHY ───────────────────────────────── -->
-  <div class="about-philosophy">
+  <div class="about-philosophy reveal">
     <div class="about-philosophy-inner">
       <div class="section-eyebrow" style="text-align:center;">Our Approach</div>
       <h2 class="about-philosophy-title">What We Mean by &ldquo;Ceremonial&rdquo;</h2>
@@ -198,8 +273,8 @@
   </div>
 
   <!-- ── IMAGE ROW ────────────────────────────────── -->
-  <div class="about-images">
-    <img src="../images/hero.jpg" alt="AWKN Ranch grounds" >
+  <div class="about-images reveal">
+    <img src="../images/hero.jpg" alt="AWKN Ranch grounds">
     <img src="../images/ceremony-space.jpg" alt="Ceremony dome interior">
     <img src="../images/about.jpg" alt="Within Center session">
   </div>
@@ -233,9 +308,48 @@
     <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
     <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
   </footer>
+
   <script>
-    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
-    (function(){var n=document.getElementById('siteNav'),t=document.getElementById('menuToggle'),p=document.getElementById('menuPanel'),s=document.getElementById('menuSub'),b=document.getElementById('menuBackdrop');function o(){return p.classList.contains('open');}function cs(){if(s)s.classList.remove('open');document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}function os(){if(!s)return;s.classList.add('open');var f=p.querySelector('.has-sub');if(f)f.classList.add('active');}function op(){p.classList.add('open');b.classList.add('open');n.classList.add('menu-is-open');p.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}function cl(){p.classList.remove('open');b.classList.remove('open');n.classList.remove('menu-is-open');p.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');cs();}t.addEventListener('click',function(){o()?cl():op();});b.addEventListener('click',cl);document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',os);});if(s)s.addEventListener('mouseleave',cs);document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',cs);});document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active'))cs();else os();});});document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',cl);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&o())cl();});})();
+    /* Nav scroll state */
+    (function(){
+      var n=document.getElementById('siteNav');
+      function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}
+      window.addEventListener('scroll',u);u();
+    })();
+
+    /* Menu panel + submenu */
+    (function(){
+      var n=document.getElementById('siteNav'),
+          t=document.getElementById('menuToggle'),
+          p=document.getElementById('menuPanel'),
+          s=document.getElementById('menuSub'),
+          b=document.getElementById('menuBackdrop');
+      function o(){return p.classList.contains('open');}
+      function cs(){if(s)s.classList.remove('open');document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}
+      function os(){if(!s)return;s.classList.add('open');var f=p.querySelector('.has-sub');if(f)f.classList.add('active');}
+      function op(){p.classList.add('open');b.classList.add('open');n.classList.add('menu-is-open');p.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function cl(){p.classList.remove('open');b.classList.remove('open');n.classList.remove('menu-is-open');p.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');cs();}
+      t.addEventListener('click',function(){o()?cl():op();});
+      b.addEventListener('click',cl);
+      document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',os);});
+      if(s)s.addEventListener('mouseleave',cs);
+      document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',cs);});
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active'))cs();else os();});});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',cl);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&o())cl();});
+    })();
+
+    /* Scroll reveal */
+    (function(){
+      var els=document.querySelectorAll('.reveal');
+      if(!els.length)return;
+      var io=new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+        });
+      },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+      els.forEach(function(el){io.observe(el);});
+    })();
   </script>
 </body>
 </html>
