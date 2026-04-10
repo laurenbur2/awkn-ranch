@@ -44,262 +44,28 @@
     <div class="manage-tabs"></div>
 
     <div class="crm-page">
-      <!-- Business Line Switcher -->
-      <div class="crm-biz-switcher">
-        <button class="crm-biz-btn active" data-biz="within">Within</button>
-        <button class="crm-biz-btn" data-biz="awkn_ranch">AWKN Ranch</button>
-        <button class="crm-biz-btn" data-biz="all">All</button>
-      </div>
+      <!-- Business Line Switcher — JS populates buttons -->
+      <div class="crm-biz-switcher" id="crm-biz-switcher"></div>
 
-      <!-- Stats Bar -->
-      <div class="crm-stats">
-        <div class="crm-stat">
-          <div class="crm-stat-value" id="statOpen">0</div>
-          <div class="crm-stat-label">Open Leads</div>
-        </div>
-        <div class="crm-stat">
-          <div class="crm-stat-value" id="statNew">0</div>
-          <div class="crm-stat-label">New This Month</div>
-        </div>
-        <div class="crm-stat">
-          <div class="crm-stat-value" id="statConversion">0%</div>
-          <div class="crm-stat-label">Conversion Rate</div>
-        </div>
-        <div class="crm-stat">
-          <div class="crm-stat-value" id="statRevenue">$0</div>
-          <div class="crm-stat-label">Revenue This Month</div>
-        </div>
-      </div>
+      <!-- Stats Bar — JS populates stat cards -->
+      <div class="crm-stats" id="crm-stats"></div>
 
-      <!-- Sub-tabs -->
-      <div class="crm-subtabs">
-        <button class="crm-subtab active" data-panel="pipeline">Pipeline</button>
-        <button class="crm-subtab" data-panel="leads">Leads</button>
-        <button class="crm-subtab" data-panel="invoices">Invoices</button>
-        <button class="crm-subtab" data-panel="proposals">Proposals</button>
-        <button class="crm-subtab" data-panel="dashboard">Dashboard</button>
-      </div>
+      <!-- Sub-tabs — JS populates tab buttons -->
+      <div class="crm-subtabs" id="crm-subtabs"></div>
 
-      <!-- Pipeline Panel (Kanban) -->
-      <div class="crm-panel active" id="panelPipeline">
-        <div class="crm-pipeline-actions">
-          <button class="crm-btn crm-btn--primary" id="btnNewLead">+ New Lead</button>
-        </div>
-        <div class="crm-kanban" id="kanbanBoard"></div>
-      </div>
-
-      <!-- Leads Panel (Table) -->
-      <div class="crm-panel" id="panelLeads">
-        <div class="crm-filter-bar">
-          <input type="text" class="crm-search" id="leadSearch" placeholder="Search leads...">
-          <select class="crm-filter-select" id="sourceFilter">
-            <option value="all">All Sources</option>
-          </select>
-          <select class="crm-filter-select" id="stageFilter">
-            <option value="all">All Stages</option>
-          </select>
-          <select class="crm-filter-select" id="statusFilter">
-            <option value="all">All Statuses</option>
-            <option value="open">Open</option>
-            <option value="won">Won</option>
-            <option value="lost">Lost</option>
-          </select>
-          <button class="crm-btn crm-btn--primary" id="btnNewLeadTable">+ New Lead</button>
-        </div>
-        <div class="crm-table-wrap">
-          <table class="crm-table" id="leadsTable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Source</th>
-                <th>Stage</th>
-                <th>Status</th>
-                <th>Value</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody id="leadsTableBody"></tbody>
-          </table>
-          <div class="crm-empty hidden" id="leadsEmpty">No leads found</div>
-        </div>
-      </div>
-
-      <!-- Invoices Panel -->
-      <div class="crm-panel" id="panelInvoices">
-        <div class="crm-filter-bar">
-          <input type="text" class="crm-search" id="invoiceSearch" placeholder="Search invoices...">
-          <select class="crm-filter-select" id="invoiceStatusFilter">
-            <option value="all">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="sent">Sent</option>
-            <option value="paid">Paid</option>
-            <option value="void">Void</option>
-          </select>
-          <button class="crm-btn crm-btn--primary" id="btnNewInvoice">+ New Invoice</button>
-        </div>
-        <div class="crm-table-wrap">
-          <table class="crm-table" id="invoicesTable">
-            <thead>
-              <tr>
-                <th>Invoice #</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="invoicesTableBody"></tbody>
-          </table>
-          <div class="crm-empty hidden" id="invoicesEmpty">No invoices found</div>
-        </div>
-      </div>
-
-      <!-- Proposals Panel -->
-      <div class="crm-panel" id="panelProposals">
-        <div class="crm-filter-bar">
-          <input type="text" class="crm-search" id="proposalSearch" placeholder="Search proposals...">
-          <select class="crm-filter-select" id="proposalStatusFilter">
-            <option value="all">All Statuses</option>
-            <option value="draft">Draft</option>
-            <option value="sent">Sent</option>
-            <option value="accepted">Accepted</option>
-            <option value="declined">Declined</option>
-          </select>
-          <button class="crm-btn crm-btn--primary" id="btnNewProposal">+ New Proposal</button>
-        </div>
-        <div class="crm-table-wrap">
-          <table class="crm-table" id="proposalsTable">
-            <thead>
-              <tr>
-                <th>Proposal #</th>
-                <th>Title</th>
-                <th>Client</th>
-                <th>Event Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="proposalsTableBody"></tbody>
-          </table>
-          <div class="crm-empty hidden" id="proposalsEmpty">No proposals found</div>
-        </div>
-      </div>
-
-      <!-- Dashboard Panel -->
-      <div class="crm-panel" id="panelDashboard">
-        <div class="crm-dash-period">
-          <button class="crm-period-btn active" data-period="month">This Month</button>
-          <button class="crm-period-btn" data-period="quarter">This Quarter</button>
-          <button class="crm-period-btn" data-period="year">This Year</button>
-          <button class="crm-period-btn" data-period="all">All Time</button>
-        </div>
-
-        <div class="crm-dash-section">
-          <h3 class="crm-dash-title">Conversion Funnel</h3>
-          <div class="crm-funnel" id="funnelChart"></div>
-        </div>
-
-        <div class="crm-dash-grid">
-          <div class="crm-dash-section">
-            <h3 class="crm-dash-title">Lead Volume by Source</h3>
-            <div id="sourceChart"></div>
-          </div>
-          <div class="crm-dash-section">
-            <h3 class="crm-dash-title">Won vs Lost</h3>
-            <div id="winLossChart"></div>
-          </div>
-        </div>
-
-        <div class="crm-dash-section">
-          <h3 class="crm-dash-title">Revenue by Source</h3>
-          <div class="crm-table-wrap">
-            <table class="crm-table" id="revenueTable">
-              <thead>
-                <tr>
-                  <th>Source</th>
-                  <th>Leads</th>
-                  <th>Won</th>
-                  <th>Revenue</th>
-                  <th>Avg Deal</th>
-                  <th>Ad Spend</th>
-                  <th>CPL</th>
-                  <th>ROAS</th>
-                </tr>
-              </thead>
-              <tbody id="revenueTableBody"></tbody>
-            </table>
-          </div>
-        </div>
+      <!-- All panels — wrapped for delegated event listeners -->
+      <div id="crm-panels">
+        <div class="crm-panel active" id="crm-panel-pipeline"></div>
+        <div class="crm-panel" id="crm-panel-leads"></div>
+        <div class="crm-panel" id="crm-panel-invoices"></div>
+        <div class="crm-panel" id="crm-panel-proposals"></div>
+        <div class="crm-panel" id="crm-panel-dashboard"></div>
       </div>
     </div>
   </main>
 
-  <!-- Lead Modal -->
-  <div class="crm-modal-overlay hidden" id="leadModalOverlay">
-    <div class="crm-modal crm-modal--lg">
-      <div class="crm-modal-header">
-        <h3 class="crm-modal-title" id="leadModalTitle">New Lead</h3>
-        <button class="crm-modal-close" id="leadModalClose">&times;</button>
-      </div>
-      <div class="crm-modal-body" id="leadModalBody"></div>
-      <div class="crm-modal-footer">
-        <button class="crm-btn" id="leadModalCancel">Cancel</button>
-        <button class="crm-btn crm-btn--danger hidden" id="leadModalDelete">Delete</button>
-        <button class="crm-btn crm-btn--primary" id="leadModalSave">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Invoice Modal -->
-  <div class="crm-modal-overlay hidden" id="invoiceModalOverlay">
-    <div class="crm-modal crm-modal--xl">
-      <div class="crm-modal-header">
-        <h3 class="crm-modal-title" id="invoiceModalTitle">New Invoice</h3>
-        <button class="crm-modal-close" id="invoiceModalClose">&times;</button>
-      </div>
-      <div class="crm-modal-body" id="invoiceModalBody"></div>
-      <div class="crm-modal-footer">
-        <button class="crm-btn" id="invoiceModalCancel">Cancel</button>
-        <button class="crm-btn crm-btn--primary" id="invoiceModalSave">Save Draft</button>
-        <button class="crm-btn crm-btn--success" id="invoiceModalSend">Send Invoice</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Proposal Modal -->
-  <div class="crm-modal-overlay hidden" id="proposalModalOverlay">
-    <div class="crm-modal crm-modal--xl">
-      <div class="crm-modal-header">
-        <h3 class="crm-modal-title" id="proposalModalTitle">New Proposal</h3>
-        <button class="crm-modal-close" id="proposalModalClose">&times;</button>
-      </div>
-      <div class="crm-modal-body" id="proposalModalBody"></div>
-      <div class="crm-modal-footer">
-        <button class="crm-btn" id="proposalModalCancel">Cancel</button>
-        <button class="crm-btn crm-btn--primary" id="proposalModalSave">Save Draft</button>
-        <button class="crm-btn crm-btn--success" id="proposalModalSend">Send Proposal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lead Detail Modal -->
-  <div class="crm-modal-overlay hidden" id="leadDetailOverlay">
-    <div class="crm-modal crm-modal--xl">
-      <div class="crm-modal-header">
-        <h3 class="crm-modal-title" id="leadDetailTitle">Lead Details</h3>
-        <button class="crm-modal-close" id="leadDetailClose">&times;</button>
-      </div>
-      <div class="crm-modal-body" id="leadDetailBody"></div>
-      <div class="crm-modal-footer">
-        <button class="crm-btn" id="leadDetailCancel">Close</button>
-        <button class="crm-btn crm-btn--primary" id="leadDetailEdit">Edit Lead</button>
-      </div>
-    </div>
-  </div>
+  <!-- Single modal container — JS generates all modal content dynamically -->
+  <div id="crm-modal" style="display:none;"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script type="module" src="crm.js"></script>
