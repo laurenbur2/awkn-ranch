@@ -23,6 +23,7 @@ let invoices = [];
 let proposals = [];
 let venueCatalog = [];
 let adSpend = [];
+let rentalSpaces = [];
 
 // Search / filter state
 let leadSearchText = '';
@@ -135,8 +136,9 @@ async function loadAllData() {
       proposalsRes,
       venueRes,
       adSpendRes,
+      spacesRes,
     ] = await Promise.all([
-      supabase.from('crm_leads').select('*, stage:crm_pipeline_stages(*), source:crm_lead_sources(*), owner:app_users!crm_leads_assigned_to_fkey(id, display_name, email)').order('created_at', { ascending: false }),
+      supabase.from('crm_leads').select('*, stage:crm_pipeline_stages(*), source:crm_lead_sources(*), owner:app_users!crm_leads_assigned_to_fkey(id, display_name, email), space:spaces!crm_leads_space_id_fkey(id, name)').order('created_at', { ascending: false }),
       supabase.from('crm_pipeline_stages').select('*').order('sort_order'),
       supabase.from('crm_lead_sources').select('*').order('sort_order'),
       supabase.from('crm_service_packages').select('*').eq('is_active', true).order('sort_order'),
@@ -144,6 +146,7 @@ async function loadAllData() {
       supabase.from('crm_proposals').select('*, items:crm_proposal_items(*)').order('created_at', { ascending: false }),
       supabase.from('crm_venue_catalog').select('*').eq('is_active', true).order('sort_order'),
       supabase.from('crm_ad_spend').select('*').order('date', { ascending: false }),
+      supabase.from('spaces').select('id, name, booking_category, hourly_rate, full_day_rate, overnight_rate, cleaning_fee').eq('is_archived', false).eq('booking_category', 'rental_space').order('booking_display_order'),
     ]);
 
     leads = leadsRes.data || [];
@@ -154,6 +157,7 @@ async function loadAllData() {
     proposals = proposalsRes.data || [];
     venueCatalog = venueRes.data || [];
     adSpend = adSpendRes.data || [];
+    rentalSpaces = spacesRes.data || [];
   } catch (err) {
     console.error('CRM loadAllData error:', err);
     showToast('Error loading CRM data', 'error');
@@ -371,13 +375,16 @@ function renderPipeline() {
 function renderKanbanCard(lead) {
   const name = escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed');
   const sourceName = lead.source?.name || '';
+  const spaceName = lead.space?.name || '';
   const ownerName = lead.owner?.display_name || lead.owner?.email || '';
   const days = daysAgo(lead.created_at);
   const value = lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : '';
+  const eventInfo = lead.event_date ? formatDate(lead.event_date) : '';
 
   return `
     <div class="crm-kanban-card" draggable="true" data-lead-id="${lead.id}">
       <div class="crm-kanban-card-name">${name}</div>
+      ${spaceName ? `<div class="crm-kanban-card-space"><span class="crm-space-tag">${escapeHtml(spaceName)}</span>${eventInfo ? ` · ${eventInfo}` : ''}</div>` : ''}
       <div class="crm-kanban-card-meta">
         ${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}
         ${value ? `<span class="crm-card-value">${value}</span>` : ''}
@@ -447,6 +454,52 @@ async function moveLeadToStage(leadId, newStageId) {
       new_stage_id: newStageId,
       created_by: authState?.user?.id || null,
     });
+
+    // Auto-create calendar booking when AWKN Ranch lead reaches "Event Scheduled"
+    const newStage = stages.find(s => s.id === newStageId);
+    if (newStage?.slug === 'event_scheduled' && lead.business_line === 'awkn_ranch' && lead.space_id && lead.event_date && !lead.booking_id) {
+      try {
+        const startDT = lead.event_start_time
+          ? `${lead.event_date}T${lead.event_start_time}:00`
+          : `${lead.event_date}T09:00:00`;
+        const endDT = lead.event_end_time
+          ? `${lead.event_date}T${lead.event_end_time}:00`
+          : `${lead.event_date}T17:00:00`;
+
+        const space = rentalSpaces.find(s => s.id === lead.space_id);
+        const clientName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim();
+
+        const { data: booking, error: bookErr } = await supabase
+          .from('booking_spaces')
+          .insert({
+            space_id: lead.space_id,
+            client_name: clientName,
+            client_email: lead.email || null,
+            client_phone: lead.phone || null,
+            booking_type: 'full_day',
+            start_datetime: startDT,
+            end_datetime: endDT,
+            flat_rate: space?.full_day_rate || 0,
+            cleaning_fee: space?.cleaning_fee || 0,
+            total_amount: parseFloat(space?.full_day_rate || 0) + parseFloat(space?.cleaning_fee || 0),
+            status: 'confirmed',
+            notes: `Auto-created from CRM lead. Event type: ${lead.event_type || 'N/A'}. Guests: ${lead.guest_count || 'N/A'}.`,
+            created_by: authState?.appUser?.id || null,
+          })
+          .select('id')
+          .single();
+
+        if (!bookErr && booking) {
+          // Link booking back to lead
+          await supabase.from('crm_leads').update({ booking_id: booking.id }).eq('id', leadId);
+          await addActivity(leadId, 'system', `Calendar booking created for ${space?.name || 'space'} on ${formatDate(lead.event_date)}`);
+          showToast(`Booking added to calendar: ${space?.name || 'Space'} on ${formatDate(lead.event_date)}`, 'success');
+        }
+      } catch (bookingErr) {
+        console.error('Auto-create booking error:', bookingErr);
+        showToast('Lead moved but calendar booking failed — create manually', 'warning');
+      }
+    }
 
     showToast('Lead moved', 'success');
     await loadAllData();
@@ -643,6 +696,17 @@ async function openLeadDetail(leadId) {
               <label>Owner</label>
               <div>${escapeHtml(lead.owner?.display_name || lead.owner?.email || 'Unassigned')}</div>
             </div>
+            ${lead.business_line === 'awkn_ranch' ? `
+            <h3>Event Details</h3>
+            <div class="crm-detail-field">
+              <label>Requested Space</label>
+              <div>${lead.space?.name ? `<span class="crm-space-tag">${escapeHtml(lead.space.name)}</span>` : 'Not selected'}</div>
+            </div>
+            ${lead.event_type ? `<div class="crm-detail-field"><label>Event Type</label><div>${escapeHtml(lead.event_type)}</div></div>` : ''}
+            ${lead.event_date ? `<div class="crm-detail-field"><label>Event Date</label><div>${formatDate(lead.event_date)}</div></div>` : ''}
+            ${lead.guest_count ? `<div class="crm-detail-field"><label>Guest Count</label><div>${lead.guest_count}</div></div>` : ''}
+            ${lead.event_start_time || lead.event_end_time ? `<div class="crm-detail-field"><label>Time</label><div>${escapeHtml(lead.event_start_time || '')}${lead.event_end_time ? ' – ' + escapeHtml(lead.event_end_time) : ''}</div></div>` : ''}
+            ` : ''}
             ${lead.utm_source ? `<div class="crm-detail-field"><label>UTM</label><div>${escapeHtml(lead.utm_source)}${lead.utm_medium ? ' / ' + escapeHtml(lead.utm_medium) : ''}${lead.utm_campaign ? ' / ' + escapeHtml(lead.utm_campaign) : ''}</div></div>` : ''}
 
             <h3>Quick Actions</h3>
@@ -1026,6 +1090,50 @@ function openLeadModal(lead = null) {
               <input type="number" class="crm-input" id="lead-value" value="${lead?.estimated_value || ''}" step="0.01" min="0">
             </div>
           </div>
+
+          <!-- Venue/Event Fields (AWKN Ranch only) -->
+          <div id="lead-venue-fields" style="display:${(lead?.business_line || bizLine) === 'awkn_ranch' ? 'block' : 'none'}; margin-top:12px; padding:12px; background:var(--bg, #faf9f6); border-radius:8px; border:1px solid var(--border-color, #e5e5e5);">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:10px;">Event / Venue Details</div>
+            <div class="crm-form-grid">
+              <div class="crm-form-field">
+                <label>Requested Space</label>
+                <select class="crm-select" id="lead-space">
+                  <option value="">— Select space —</option>
+                  ${rentalSpaces.map(s => `<option value="${s.id}" ${lead?.space_id === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="crm-form-field">
+                <label>Event Type</label>
+                <select class="crm-select" id="lead-event-type">
+                  <option value="">— Select —</option>
+                  <option value="wedding" ${lead?.event_type === 'wedding' ? 'selected' : ''}>Wedding</option>
+                  <option value="corporate" ${lead?.event_type === 'corporate' ? 'selected' : ''}>Corporate</option>
+                  <option value="retreat" ${lead?.event_type === 'retreat' ? 'selected' : ''}>Retreat</option>
+                  <option value="birthday" ${lead?.event_type === 'birthday' ? 'selected' : ''}>Birthday</option>
+                  <option value="ceremony" ${lead?.event_type === 'ceremony' ? 'selected' : ''}>Ceremony</option>
+                  <option value="workshop" ${lead?.event_type === 'workshop' ? 'selected' : ''}>Workshop</option>
+                  <option value="other" ${lead?.event_type === 'other' ? 'selected' : ''}>Other</option>
+                </select>
+              </div>
+              <div class="crm-form-field">
+                <label>Event Date</label>
+                <input type="date" class="crm-input" id="lead-event-date" value="${lead?.event_date || ''}">
+              </div>
+              <div class="crm-form-field">
+                <label>Guest Count</label>
+                <input type="number" class="crm-input" id="lead-guest-count" value="${lead?.guest_count || ''}" min="1">
+              </div>
+              <div class="crm-form-field">
+                <label>Start Time</label>
+                <input type="time" class="crm-input" id="lead-event-start" value="${lead?.event_start_time || ''}">
+              </div>
+              <div class="crm-form-field">
+                <label>End Time</label>
+                <input type="time" class="crm-input" id="lead-event-end" value="${lead?.event_end_time || ''}">
+              </div>
+            </div>
+          </div>
+
           <div class="crm-form-field" style="margin-top:12px;">
             <label>Notes</label>
             <textarea class="crm-textarea" id="lead-notes" rows="3" placeholder="Initial notes...">${escapeHtml('')}</textarea>
@@ -1044,7 +1152,7 @@ function openLeadModal(lead = null) {
 
   modal.style.display = 'block';
 
-  // Update stage options when business line changes
+  // Update stage options and venue fields when business line changes
   document.getElementById('lead-biz-line').addEventListener('change', (e) => {
     const bl = e.target.value;
     const stageSelect = document.getElementById('lead-stage');
@@ -1053,6 +1161,9 @@ function openLeadModal(lead = null) {
       .map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`)
       .join('');
     stageSelect.innerHTML = newStageOpts;
+    // Show/hide venue fields
+    const venueFields = document.getElementById('lead-venue-fields');
+    if (venueFields) venueFields.style.display = bl === 'awkn_ranch' ? 'block' : 'none';
   });
 
   document.getElementById('crm-modal-close-btn').addEventListener('click', closeModal);
@@ -1065,8 +1176,9 @@ function openLeadModal(lead = null) {
     const firstName = document.getElementById('lead-first-name').value.trim();
     if (!firstName) { showToast('First name is required', 'error'); return; }
 
+    const bizLine = document.getElementById('lead-biz-line').value;
     const payload = {
-      business_line: document.getElementById('lead-biz-line').value,
+      business_line: bizLine,
       first_name: firstName,
       last_name: document.getElementById('lead-last-name').value.trim() || null,
       email: document.getElementById('lead-email').value.trim() || null,
@@ -1078,6 +1190,16 @@ function openLeadModal(lead = null) {
       estimated_value: parseFloat(document.getElementById('lead-value').value) || 0,
       updated_at: new Date().toISOString(),
     };
+
+    // Add venue/event fields for AWKN Ranch leads
+    if (bizLine === 'awkn_ranch') {
+      payload.space_id = document.getElementById('lead-space').value || null;
+      payload.event_type = document.getElementById('lead-event-type').value || null;
+      payload.event_date = document.getElementById('lead-event-date').value || null;
+      payload.guest_count = parseInt(document.getElementById('lead-guest-count').value) || null;
+      payload.event_start_time = document.getElementById('lead-event-start').value || null;
+      payload.event_end_time = document.getElementById('lead-event-end').value || null;
+    }
 
     try {
       if (isEdit) {

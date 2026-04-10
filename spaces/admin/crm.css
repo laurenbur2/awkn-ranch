@@ -168,6 +168,11 @@
   display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 11px;
   font-weight: 500; background: #f3e8ff; color: #7c3aed;
 }
+.crm-space-tag {
+  display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 11px;
+  font-weight: 600; background: #fef3c7; color: #92400e;
+}
+.crm-kanban-card-space { font-size: 11px; color: var(--text-muted, #888); margin-bottom: 4px; }
 
 /* Modal System */
 #crm-modal { position: fixed; inset: 0; z-index: 1000; }
