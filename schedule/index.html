@@ -41,12 +41,17 @@
       display: flex;
       flex-direction: column;
     }
+    .sc-logo-wrap {
+      width: 100%;
+      height: 70px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
     .sc-logo {
       width: 100%;
-      height: auto;
-      margin-bottom: 32px;
-      object-fit: contain;
-      align-self: flex-start;
+      height: 200%;
+      object-fit: cover;
+      object-position: center 42%;
     }
     .sc-staff-name {
       font-size: 14px;
@@ -390,7 +395,7 @@
         padding: 24px 20px;
       }
       .sc-right { padding: 24px 20px; }
-      .sc-logo { height: 44px; margin-bottom: 20px; }
+      .sc-logo-wrap { height: 50px; margin-bottom: 16px; }
     }
   </style>
 </head>
@@ -398,7 +403,7 @@
   <div class="sc-card" id="scCard">
     <!-- Left panel -->
     <div class="sc-left">
-      <img src="../assets/branding/logo-black-transparent.png" alt="AWKN" class="sc-logo" onerror="this.src='../assets/branding/awkn-logo.jpg'">
+      <div class="sc-logo-wrap"><img src="../assets/branding/awkn-wordmark-logo.jpg" alt="AWKN" class="sc-logo"></div>
       <div class="sc-staff-name" id="scStaffName">Loading...</div>
       <div class="sc-meeting-title" id="scMeetingTitle">Loading...</div>
       <div class="sc-meeting-meta">
