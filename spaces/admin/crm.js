@@ -648,6 +648,7 @@ async function openLeadDetail(leadId) {
               <button class="crm-btn crm-btn-sm" id="btn-log-call">Log Call</button>
               ${lead.business_line === 'within' ? '<button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
               ${lead.business_line === 'awkn_ranch' ? '<button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
+              ${lead.email ? '<button class="crm-btn crm-btn-sm" id="btn-send-feedback" style="background:#6366F1;color:#fff;border-color:#6366F1">Send Feedback Form</button>' : ''}
               ${lead.status === 'open' ? '<button class="crm-btn crm-btn-sm crm-btn-success" id="btn-mark-won">Mark Won</button>' : ''}
               ${lead.status === 'open' ? '<button class="crm-btn crm-btn-sm crm-btn-danger" id="btn-mark-lost">Mark Lost</button>' : ''}
             </div>
@@ -821,6 +822,111 @@ function setupLeadDetailListeners(lead) {
   document.getElementById('btn-create-proposal-from-lead')?.addEventListener('click', () => {
     closeModal();
     openProposalModal(null, lead);
+  });
+
+  // Send Feedback Form
+  document.getElementById('btn-send-feedback')?.addEventListener('click', () => {
+    const form = document.getElementById('crm-quick-action-form');
+    const leadName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim();
+    const bizLabel = lead.business_line === 'within' ? 'Within' : 'AWKN Ranch';
+
+    form.style.display = 'block';
+    form.innerHTML = `
+      <div class="crm-form-field">
+        <label>To</label>
+        <input type="email" class="crm-input" id="feedback-to" value="${escapeHtml(lead.email || '')}" readonly style="background:#f3f4f6">
+      </div>
+      <div class="crm-form-field">
+        <label>Subject</label>
+        <input type="text" class="crm-input" id="feedback-subject" value="We'd love your feedback — ${escapeHtml(bizLabel)}">
+      </div>
+      <div class="crm-form-field">
+        <label>Message</label>
+        <textarea id="feedback-body" class="crm-textarea" rows="8">Hi ${escapeHtml(leadName)},
+
+Thank you for choosing ${bizLabel}! We hope your experience was meaningful and transformative.
+
+We'd love to hear your thoughts so we can continue improving. Please take a moment to share your feedback by replying to this email or filling out our short form:
+
+[Feedback Form Link]
+
+Your insight means the world to us.
+
+With gratitude,
+The ${bizLabel} Team</textarea>
+      </div>
+      <div class="crm-form-actions">
+        <button class="crm-btn crm-btn-sm" style="background:#6366F1;color:#fff;border-color:#6366F1" id="btn-confirm-send-feedback">Send Email</button>
+        <button class="crm-btn crm-btn-sm" id="btn-cancel-feedback">Cancel</button>
+      </div>
+    `;
+
+    document.getElementById('btn-confirm-send-feedback').addEventListener('click', async () => {
+      const to = document.getElementById('feedback-to').value.trim();
+      const subject = document.getElementById('feedback-subject').value.trim();
+      const body = document.getElementById('feedback-body').value.trim();
+      if (!to || !subject || !body) {
+        showToast('All fields are required', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-confirm-send-feedback');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        // Convert plain text body to HTML
+        const htmlBody = '<p>' + escapeHtml(body).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+
+        const { data: session } = await supabase.auth.getSession();
+        const token = session?.session?.access_token;
+
+        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+          },
+          body: JSON.stringify({
+            type: 'custom',
+            to: to,
+            data: {
+              subject: subject,
+              html: htmlBody,
+              text: body,
+            },
+          }),
+        });
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to send email');
+        }
+
+        // Move lead to "Feedback Form Sent" stage
+        const feedbackStage = stages.find(s => s.business_line === lead.business_line && s.slug === 'feedback_form_sent');
+        if (feedbackStage && lead.stage_id !== feedbackStage.id) {
+          await moveLeadToStage(lead.id, feedbackStage.id);
+        }
+
+        await addActivity(lead.id, 'email', 'Feedback form sent to ' + to);
+        showToast('Feedback form sent!', 'success');
+        await loadAllData();
+        renderAll();
+        closeModal();
+      } catch (err) {
+        console.error('Send feedback error:', err);
+        showToast('Error sending feedback: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Send Email';
+      }
+    });
+
+    document.getElementById('btn-cancel-feedback').addEventListener('click', () => {
+      form.style.display = 'none';
+    });
   });
 }
 
