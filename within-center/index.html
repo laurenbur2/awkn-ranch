@@ -672,6 +672,92 @@
       .package-grid { grid-template-columns: 1fr; }
     }
 
+    /* ── RETREAT BANNER ───────────────────────────────── */
+    .retreat-banner {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .retreat-banner-bg {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.05);
+    }
+    .retreat-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(28,22,24,0.6) 0%, rgba(28,22,24,0.78) 50%, rgba(28,22,24,0.88) 100%);
+      z-index: 1;
+    }
+    .retreat-banner-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      padding: 5rem 2rem;
+    }
+    .retreat-banner-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    .retreat-banner-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    .retreat-banner-lead {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.8;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    .retreat-features {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .retreat-feature-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(201,148,62,0.3);
+      border-radius: 999px;
+    }
+    .retreat-banner-cta {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--dark);
+      background: var(--gold);
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .retreat-banner-cta:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+
     /* ── CTA BANNER ──────────────────────────────────── */
     .cta-section {
       background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
@@ -904,16 +990,29 @@
   </section>
 
   <!-- ══ IMMERSIVE RETREAT ════════════════════════════ -->
-  <div class="split-block">
-    <img src="images/ceremony-space.jpg" alt="Private retreat room at AWKN Ranch with floor cushions, lanterns, and soft light" class="split-img">
-    <div class="split-text">
-      <div class="s-eyebrow">Stay on the Land</div>
-      <div class="s-title">Turn Any Package Into an Immersive Retreat</div>
-      <p>Any of our packages can be experienced as a live-in retreat at AWKN Ranch &mdash; twelve private acres on the western edge of Austin. Stay on the property throughout your journey and let the land, the quiet, and the daily rhythm of the ranch hold your process between ceremonies.</p>
-      <p>Private rooms, sauna, cold plunge, and a live-in concierge create a container for deeper healing &mdash; without the disruption of going home between sessions.</p>
-      <a href="immersive-retreat/" class="package-link" style="margin-top:1.5rem;">Learn About Retreats</a>
+  <section class="retreat-banner">
+    <div class="retreat-banner-bg" style="background-image:url('images/ceremony-space.jpg');"></div>
+    <div class="retreat-banner-inner">
+      <div class="retreat-banner-eyebrow">Stay on the Land</div>
+      <h2 class="retreat-banner-title">Turn Any Package Into<br>an Immersive Retreat</h2>
+      <p class="retreat-banner-lead">Any of our packages can be experienced as a live-in retreat at AWKN Ranch &mdash; twelve private acres on the western edge of Austin. Let the land hold your process between ceremonies.</p>
+      <div class="retreat-features">
+        <div class="retreat-feature">
+          <span class="retreat-feature-label">Private Rooms</span>
+        </div>
+        <div class="retreat-feature">
+          <span class="retreat-feature-label">Sauna &amp; Cold Plunge</span>
+        </div>
+        <div class="retreat-feature">
+          <span class="retreat-feature-label">Live-in Concierge</span>
+        </div>
+        <div class="retreat-feature">
+          <span class="retreat-feature-label">12 Private Acres</span>
+        </div>
+      </div>
+      <a href="immersive-retreat/" class="retreat-banner-cta">Explore the Retreat</a>
     </div>
-  </div>
+  </section>
 
   <!-- ══ CTA + CONTACT ═══════════════════════════════ -->
   <section class="cta-section" id="contact">
