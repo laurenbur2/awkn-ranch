@@ -466,6 +466,38 @@
     }
     .retreat-footer strong { color: var(--gold-dark); font-weight: 700; }
 
+    /* Add-ons */
+    .addons-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .addons-title {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .addons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .addon-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(212,136,58,.06);
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+    .addon-name { color: var(--dark); font-weight: 500; }
+    .addon-price { color: var(--gold-dark); font-weight: 700; white-space: nowrap; }
+
     /* ── PROCESS SECTION ──────────────────────────────── */
     .process-steps {
       display: grid;
@@ -609,6 +641,7 @@
       .specialty-grid { grid-template-columns: 1fr; }
       .retreat-includes { grid-template-columns: 1fr; }
       .room-grid { grid-template-columns: 1fr; }
+      .addons-grid { grid-template-columns: 1fr; }
       .process-steps { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
       .ranch-grid { grid-template-columns: 1fr; }
       .awknhero { min-height: 480px; }
@@ -820,6 +853,36 @@
             <div class="room-option">
               <div class="room-label">Shared Room</div>
               <div class="room-price">$4,999</div>
+            </div>
+          </div>
+
+          <div class="addons-section">
+            <div class="addons-title">Add-Ons</div>
+            <div class="addons-grid">
+              <div class="addon-item">
+                <span class="addon-name">60-Minute Massage</span>
+                <span class="addon-price">$175</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Additional Integration Coaching</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Human Design Reading</span>
+                <span class="addon-price">$250</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Licensed Therapy Session</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Astrology Session</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Hap&eacute; Ceremony</span>
+                <span class="addon-price">$75</span>
+              </div>
             </div>
           </div>
 
