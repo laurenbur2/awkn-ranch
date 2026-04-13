@@ -874,19 +874,25 @@
   <div class="menu-backdrop" id="menuBackdrop"></div>
   <aside class="menu-panel" id="menuPanel" aria-hidden="true">
     <ul>
-      <li class="has-sub"><a href="ceremonial-ketamine/" data-submenu-toggle>Ceremonial Ketamine</a></li>
+      <li><a href="ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay">Day Experience</a></li>
+      <li><a href="facility/" data-menu-link>Our Facility</a></li>
       <li><a href="about/" data-menu-link>About Us</a></li>
-      <li><a href="immersive-retreat/" data-menu-link>Immersive Retreat</a></li>
     </ul>
     <div class="menu-panel-foot">
       A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
     </div>
   </aside>
-  <aside class="menu-sub" id="menuSub" aria-hidden="true">
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <span class="sub-header">All-Inclusive Retreats</span>
     <ul>
-      <li><a href="ceremonial-ketamine/" class="sub-lead" data-menu-link>What is Ceremonial Ketamine Therapy?</a></li>
+      <li><a href="immersive-retreat/" data-menu-link>7-Night Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="immersive-retreat/" data-menu-link>3-Night Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
     </ul>
-    <span class="sub-header">Packages</span>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <span class="sub-header">Our Packages</span>
     <ul>
       <li><a href="ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
       <li><a href="ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
@@ -1033,19 +1039,22 @@
       update();
     })();
 
-    // Menu: two-column panel + blurred backdrop, hamburger toggles to X
+    // Menu: multi-submenu panel + blurred backdrop
     (function () {
       var nav = document.getElementById('siteNav');
       var toggle = document.getElementById('menuToggle');
       var panel = document.getElementById('menuPanel');
-      var sub = document.getElementById('menuSub');
       var backdrop = document.getElementById('menuBackdrop');
+      var allSubs = document.querySelectorAll('.menu-sub');
       function isOpen() { return panel.classList.contains('open'); }
-      function closeSub() {
-        if (sub) sub.classList.remove('open');
-        document.querySelectorAll('.menu-panel li.has-sub').forEach(function (li) {
-          li.classList.remove('active');
-        });
+      function closeAllSubs() {
+        allSubs.forEach(function(s){s.classList.remove('open');});
+        document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});
+      }
+      function openSub(subId, li) {
+        closeAllSubs();
+        var s = document.getElementById(subId);
+        if(s){s.classList.add('open'); li.classList.add('active');}
       }
       function openMenu() {
         panel.classList.add('open');
@@ -1054,46 +1063,30 @@
         panel.setAttribute('aria-hidden', 'false');
         document.body.classList.add('menu-open');
       }
-      function openSub() {
-        if (!sub) return;
-        sub.classList.add('open');
-        var firstSub = panel.querySelector('.has-sub');
-        if (firstSub) firstSub.classList.add('active');
-      }
       function closeMenu() {
         panel.classList.remove('open');
         backdrop.classList.remove('open');
         nav.classList.remove('menu-is-open');
         panel.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('menu-open');
-        closeSub();
+        closeAllSubs();
       }
       toggle.addEventListener('click', function () {
         isOpen() ? closeMenu() : openMenu();
       });
       backdrop.addEventListener('click', closeMenu);
-      // Submenu: open on hover over "Ceremonial Ketamine", click toggles on touch
       document.querySelectorAll('.menu-panel li.has-sub').forEach(function (li) {
-        li.addEventListener('mouseenter', openSub);
+        li.addEventListener('mouseenter', function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});
       });
-      // Close sub when cursor leaves the submenu itself (but not the parent item)
-      if (sub) {
-        sub.addEventListener('mouseleave', closeSub);
-      }
-      // Close sub when hovering a non-has-sub row in the primary panel
+      allSubs.forEach(function(s){s.addEventListener('mouseleave', closeAllSubs);});
       document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function (li) {
-        li.addEventListener('mouseenter', closeSub);
+        li.addEventListener('mouseenter', closeAllSubs);
       });
-      // Touch / click fallback — toggle on tap
       document.querySelectorAll('[data-submenu-toggle]').forEach(function (a) {
         a.addEventListener('click', function (e) {
           e.preventDefault();
           var li = a.parentNode;
-          if (li.classList.contains('active')) {
-            closeSub();
-          } else {
-            openSub();
-          }
+          if (li.classList.contains('active')) { closeAllSubs(); } else { openSub(a.getAttribute('data-sub'), li); }
         });
       });
       document.querySelectorAll('[data-menu-link]').forEach(function (a) {
