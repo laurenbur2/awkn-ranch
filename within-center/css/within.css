@@ -299,7 +299,7 @@ body.menu-open { overflow: hidden; }
 /* ── PAGE HERO (smaller than homepage hero) ─────── */
 .page-hero {
   position: relative;
-  min-height: 72vh;
+  min-height: 88vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1020,7 +1020,7 @@ section { padding: 6rem 2rem; }
 /* ── RESPONSIVE ─────────────────────────────────── */
 @media (max-width: 900px) {
   section, .pkg-section { padding: 4rem 1.25rem; }
-  .page-hero { min-height: 60vh; padding: 7rem 1.5rem 4rem; }
+  .page-hero { min-height: 75vh; padding: 7rem 1.5rem 4rem; }
   .contact-row { gap: 2rem; margin-top: 3rem; padding-top: 2.25rem; }
   .medical-disclaimer p { font-size: 0.64rem; }
   .protocol-step { grid-template-columns: 50px 1fr; gap: 1rem; padding: 1.5rem 0; }
