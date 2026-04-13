@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Call | Within Center</title>
+  <meta name="description" content="Schedule a free consultation with our team to learn whether ceremonial ketamine therapy is right for you.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <style>
+    body { background: var(--cream); }
+
+    .booking-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .booking-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .booking-header .eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .booking-header h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3.8vw, 2.6rem);
+      color: var(--dark);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .booking-header p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.85;
+    }
+
+    /* Calendar embed container */
+    .calendar-embed {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      min-height: 660px;
+      overflow: hidden;
+    }
+
+    /* Placeholder shown when no embed is configured yet */
+    .calendar-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 660px;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--grey);
+    }
+    .calendar-placeholder .icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .calendar-placeholder h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .calendar-placeholder p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      max-width: 400px;
+      margin-bottom: 2rem;
+    }
+    .calendar-placeholder .cta-link {
+      display: inline-block;
+      padding: 0.85rem 2.2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #fff;
+      background: var(--gold);
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .calendar-placeholder .cta-link:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+
+    /* When a real embed (Calendly/Cal.com/etc.) is added */
+    .calendar-embed iframe {
+      width: 100%;
+      min-height: 660px;
+      border: none;
+    }
+
+    .booking-footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--grey);
+      line-height: 1.75;
+    }
+    .booking-footer a {
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .booking-wrap { padding: 7rem 1.25rem 3rem; }
+      .calendar-embed, .calendar-placeholder { min-height: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV (shared) ═══════════════════════════════════ -->
+  <nav class="site-nav">
+    <div class="nav-left">
+      <button class="menu-toggle" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Toggle menu">
+        <svg width="22" height="14" viewBox="0 0 22 14" fill="none"><line x1="0" y1="1" x2="22" y2="1" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="13" x2="22" y2="13" stroke="currentColor" stroke-width="1.5"/></svg>
+        MENU
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="brand-name">WITHIN CENTER</span>
+      <span class="brand-sub">AT AWKN RANCH &middot; AUSTIN, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../#contact" class="nav-link">CONTACT US</a>
+      <a href="../ceremonial-ketamine/" class="nav-link">CEREMONIAL KETAMINE THERAPY</a>
+    </div>
+  </nav>
+
+  <!-- ══ MOBILE MENU ═══════════════════════════════════ -->
+  <div class="mobile-menu">
+    <button class="mobile-close" onclick="this.parentElement.classList.remove('open')" aria-label="Close menu">&times;</button>
+    <a href="../">Home</a>
+    <a href="../ceremonial-ketamine/">Ceremonial Ketamine</a>
+    <a href="../immersive-retreat/">Immersive Retreat</a>
+    <a href="../about/">About</a>
+    <a href="../#contact">Contact</a>
+  </div>
+
+  <!-- ══ MAIN CONTENT ════════════════════════════════ -->
+  <div class="booking-wrap">
+    <div class="booking-header">
+      <div class="eyebrow">Free Consultation</div>
+      <h1>Book a Call</h1>
+      <p>Choose a time that works for you. We'll talk through your goals, answer questions, and help you find the right path.</p>
+    </div>
+
+    <div class="calendar-embed">
+      <!--
+        ═══════════════════════════════════════════════
+        EMBED YOUR CALENDAR HERE
+        ═══════════════════════════════════════════════
+
+        Replace the .calendar-placeholder div below with your embed code.
+
+        Calendly example:
+        <div class="calendly-inline-widget" data-url="https://calendly.com/YOUR-LINK" style="min-width:320px;height:660px;"></div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+        Cal.com example:
+        <iframe src="https://cal.com/YOUR-LINK" style="width:100%;min-height:660px;border:none;"></iframe>
+      -->
+      <div class="calendar-placeholder">
+        <div class="icon">&#128197;</div>
+        <h2>Schedule Your Consultation</h2>
+        <p>Our team is available Monday through Friday. Calls typically last 15&ndash;20 minutes.</p>
+        <a href="tel:5129692399" class="cta-link">Call Us Now &mdash; 512-969-2399</a>
+      </div>
+    </div>
+
+    <div class="booking-footer">
+      Prefer to reach out directly? Email <a href="mailto:intake@within.center">intake@within.center</a> or call <a href="tel:5129692399">512-969-2399</a>.
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════ -->
+  <footer style="background: var(--dark); padding: 2rem; text-align: center;">
+    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.8; max-width: 700px; margin: 0 auto;">
+      <strong style="color: rgba(255,255,255,0.6);">MEDICAL DISCLAIMER</strong> &middot;
+      This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.
+    </p>
+    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 0.75rem;">
+      &copy; 2026 Hearth Space Health, Inc. &middot; Within Center is a sister practice to <a href="https://awkn.ranch" style="color: rgba(255,255,255,0.55);">AWKN Ranch</a>
+    </p>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    window.addEventListener('scroll', () => {
+      document.querySelector('.site-nav').classList.toggle('scrolled', window.scrollY > 40);
+    });
+  </script>
+</body>
+</html>
