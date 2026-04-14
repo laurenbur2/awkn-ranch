@@ -491,43 +491,22 @@
       background: var(--gold);
       color: #fff;
     }
-    .schedule-modal {
+    .schedule-inline {
       display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      background: rgba(28,22,24,0.7);
-      padding: 1rem;
+      margin-top: 1rem;
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: left;
     }
-    .schedule-modal-content {
-      background: var(--white);
-      border-radius: var(--radius);
-      max-width: 540px;
-      width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 2.5rem;
-      position: relative;
-    }
-    .schedule-modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1.25rem;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--grey);
-      line-height: 1;
-    }
-    .schedule-modal-title {
+    .schedule-inline.open { display: block; }
+    .schedule-inline-title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       color: var(--dark);
+      text-align: center;
     }
     .schedule-day {
       margin-bottom: 1.25rem;
@@ -938,7 +917,34 @@
                     <div class="room-price">$3,499</div>
                   </div>
                 </div>
-                <button class="schedule-btn" onclick="document.getElementById('schedule-6day').style.display='flex'">Sample Schedule</button>
+                <button class="schedule-btn" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'Hide Schedule':'Sample Schedule'">Sample Schedule</button>
+                <div class="schedule-inline">
+                  <div class="schedule-inline-title">Sample Schedule</div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Sunday</div>
+                    <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Monday</div>
+                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Tuesday</div>
+                    <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Dinner</div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Wednesday</div>
+                    <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Thursday</div>
+                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Friday</div>
+                    <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -960,7 +966,22 @@
                     <div class="room-price">$1,499</div>
                   </div>
                 </div>
-                <button class="schedule-btn" onclick="document.getElementById('schedule-3day').style.display='flex'">Sample Schedule</button>
+                <button class="schedule-btn" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'Hide Schedule':'Sample Schedule'">Sample Schedule</button>
+                <div class="schedule-inline">
+                  <div class="schedule-inline-title">Sample Schedule</div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Sunday</div>
+                    <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Monday</div>
+                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                  </div>
+                  <div class="schedule-day">
+                    <div class="schedule-day-label">Tuesday</div>
+                    <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Departure (11am)</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1056,7 +1077,7 @@
   <section class="philosophy" style="padding: 2.5rem 2rem;">
     <div class="philosophy-inner" style="max-width: 720px;">
       <div class="s-eyebrow">Why Intramuscular (IM)</div>
-      <p class="philosophy-body" style="margin-bottom: 0;">All of our ketamine sessions are administered intramuscularly. IM delivery offers the highest bioavailability of any non-IV method, reaching the bloodstream quickly and consistently. Unlike oral lozenges or nasal sprays, IM allows for precise dosing with a more reliable onset, a deeper therapeutic window, and a fuller experience. It's the method trusted by clinical researchers and the one we believe gives our guests the best opportunity for meaningful healing.</p>
+      <p class="philosophy-body" style="margin-bottom: 0;">All of our ketamine sessions are administered intramuscularly. IM delivery offers the highest bioavailability, reaching the bloodstream quickly and consistently. Unlike oral lozenges or nasal sprays, IM allows for precise dosing with a more reliable onset, a deeper therapeutic window, and a fuller experience. It's the method trusted by clinical researchers and the one we believe gives our guests the best opportunity for meaningful healing.</p>
     </div>
   </section>
 
@@ -1305,56 +1326,6 @@
     })();
   </script>
 
-  <!-- ══ SCHEDULE MODALS ═════════════════════════════ -->
-  <div class="schedule-modal" id="schedule-6day" onclick="if(event.target===this)this.style.display='none'">
-    <div class="schedule-modal-content">
-      <button class="schedule-modal-close" onclick="this.closest('.schedule-modal').style.display='none'">&times;</button>
-      <div class="schedule-modal-title">Sample Schedule: 6 Days / 5 Nights</div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Sunday</div>
-        <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Monday</div>
-        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Tuesday</div>
-        <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching Session · Dinner</div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Wednesday</div>
-        <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Thursday</div>
-        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Friday</div>
-        <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="schedule-modal" id="schedule-3day" onclick="if(event.target===this)this.style.display='none'">
-    <div class="schedule-modal-content">
-      <button class="schedule-modal-close" onclick="this.closest('.schedule-modal').style.display='none'">&times;</button>
-      <div class="schedule-modal-title">Sample Schedule: 3 Days / 2 Nights</div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Sunday</div>
-        <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Monday</div>
-        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
-      </div>
-      <div class="schedule-day">
-        <div class="schedule-day-label">Tuesday</div>
-        <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching Session · Departure (11am)</div>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
