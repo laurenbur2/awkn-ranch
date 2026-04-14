@@ -116,31 +116,47 @@
             color: #bbb;
         }
 
-        .btn-sign-in {
+        .btn-google {
             width: 100%;
             padding: 14px;
             margin-top: 0.5rem;
             font-family: var(--font-body);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--white);
-            background: var(--brown-dark);
-            border: none;
+            letter-spacing: 1px;
+            color: var(--brown-dark);
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.12);
             border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .btn-sign-in:hover {
-            background: #2a1f14;
+        .btn-google:hover {
+            background: var(--offwhite);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .btn-sign-in:active {
+        .btn-google:active {
             transform: scale(0.99);
         }
-        .btn-sign-in:disabled {
+        .btn-google:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+        .google-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .btn-google.loading .google-icon,
+        .btn-google.loading .btn-text { display: none; }
+        .btn-google.loading .spinner {
+            display: block;
+            border-color: rgba(58,42,26,0.2);
+            border-top-color: var(--brown-dark);
         }
 
         .error-msg {
@@ -230,22 +246,16 @@
 
             <div class="error-msg" id="errorMsg"></div>
 
-            <form id="loginForm" autocomplete="on">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input class="form-input" type="email" id="email" name="email" placeholder="you@awknranch.com" autocomplete="email" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input class="form-input" type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
-                </div>
-                <button type="submit" class="btn-sign-in" id="signInBtn">
-                    <span class="btn-text">Sign In</span>
-                    <div class="spinner"></div>
-                </button>
-            </form>
-
-            <a href="login/" class="forgot-link">Forgot password?</a>
+            <button type="button" class="btn-google" id="googleSignInBtn">
+                <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                    <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                </svg>
+                <span class="btn-text">Sign in with Google</span>
+                <div class="spinner"></div>
+            </button>
         </div>
 
         <div class="tagline">Where consciousness meets community.</div>
@@ -260,59 +270,51 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
-        const REDIRECT_URL = '/awkn-ranch/spaces/admin/';
+        const REDIRECT_URL = '/awkn-ranch/spaces/admin/spaces.html';
+        const OAUTH_RETURN_URL = window.location.origin + '/awkn-ranch/';
 
-        // Check for existing session on load
+        const errorMsg = document.getElementById('errorMsg');
+        const googleBtn = document.getElementById('googleSignInBtn');
+
+        // Check for existing session on load (handles OAuth callback too)
         (async function checkSession() {
             try {
-                // Fast redirect if cached auth exists
-                const cached = localStorage.getItem(CACHED_AUTH_KEY);
-                if (cached) {
-                    const { data } = await sb.auth.getSession();
-                    if (data.session) {
-                        window.location.href = REDIRECT_URL;
-                        return;
-                    }
+                const { data } = await sb.auth.getSession();
+                if (data.session) {
+                    localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
+                        email: data.session.user.email,
+                        ts: Date.now()
+                    }));
+                    window.location.href = REDIRECT_URL;
                 }
             } catch(e) {}
         })();
 
-        const form = document.getElementById('loginForm');
-        const errorMsg = document.getElementById('errorMsg');
-        const signInBtn = document.getElementById('signInBtn');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        googleBtn.addEventListener('click', async () => {
             errorMsg.classList.remove('visible');
-            signInBtn.classList.add('loading');
-            signInBtn.disabled = true;
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+            googleBtn.classList.add('loading');
+            googleBtn.disabled = true;
 
             try {
-                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+                const { error } = await sb.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: OAUTH_RETURN_URL
+                    }
+                });
 
                 if (error) {
-                    errorMsg.textContent = error.message || 'Invalid email or password.';
+                    errorMsg.textContent = error.message || 'Unable to sign in with Google.';
                     errorMsg.classList.add('visible');
-                    signInBtn.classList.remove('loading');
-                    signInBtn.disabled = false;
-                    return;
+                    googleBtn.classList.remove('loading');
+                    googleBtn.disabled = false;
                 }
-
-                // Cache auth for fast redirect next time
-                localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
-                    email: data.user.email,
-                    ts: Date.now()
-                }));
-
-                window.location.href = REDIRECT_URL;
+                // On success, browser redirects to Google; no further handling needed
             } catch (err) {
                 errorMsg.textContent = 'Something went wrong. Please try again.';
                 errorMsg.classList.add('visible');
-                signInBtn.classList.remove('loading');
-                signInBtn.disabled = false;
+                googleBtn.classList.remove('loading');
+                googleBtn.disabled = false;
             }
         });
     </script>
