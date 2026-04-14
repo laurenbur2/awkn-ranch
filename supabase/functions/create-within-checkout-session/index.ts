@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     return json({ error: 'STRIPE_SECRET_KEY not configured' }, 500);
   }
 
-  const SITE_URL = (Deno.env.get('WITHIN_SITE_URL') || 'https://laurenburandt.github.io/awkn-ranch').replace(/\/$/, '');
+  const SITE_URL = (Deno.env.get('WITHIN_SITE_URL') || 'https://laurenbur2.github.io/awkn-ranch').replace(/\/$/, '');
 
   const depositCents = Math.round(pkg.price * pkg.depositPct * 100);
   const productName = `${pkg.name} Package — Deposit (10%)`;

@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["http-server", "./retreat", "-p", "8899", "-c-1"],
       "port": 8899
+    },
+    {
+      "name": "heather-site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/laurenburandt/heather-coaching"],
+      "port": 8765
     }
   ]
 }
