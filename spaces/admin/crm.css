@@ -269,14 +269,17 @@
 
 /* Invoice/Proposal Line Items */
 .crm-line-item {
-  display: grid; grid-template-columns: auto 2fr 70px 100px 100px 40px; gap: 8px;
+  display: grid; grid-template-columns: 2fr 70px 100px 100px 40px; gap: 8px;
   align-items: center; margin-bottom: 8px;
 }
-.crm-line-item .crm-li-cat { width: 100px; }
-.crm-line-item .crm-li-desc { }
+.crm-line-item:has(.crm-li-cat) {
+  grid-template-columns: 100px 2fr 70px 100px 100px 40px;
+}
+.crm-line-item .crm-li-cat { min-width: 0; }
+.crm-line-item .crm-li-desc { min-width: 0; }
 .crm-line-item .crm-li-qty { width: 70px; text-align: center; }
-.crm-line-item .crm-li-price { width: 100px; }
-.crm-line-item .crm-li-total { font-weight: 600; font-size: 13px; }
+.crm-line-item .crm-li-price { width: 100px; min-width: 0; }
+.crm-line-item .crm-li-total { font-weight: 600; font-size: 13px; white-space: nowrap; }
 .crm-line-item .crm-li-remove {
   background: none; border: none; color: #ef4444; cursor: pointer;
   font-size: 16px; padding: 0 4px; line-height: 1;
