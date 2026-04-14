@@ -112,6 +112,48 @@
     }
     @media (max-width: 720px) { .included-two-col { grid-template-columns: 1fr; gap: 0; } }
 
+    /* ── RETREAT OPTION CARDS ────────────────────────── */
+    .retreat-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    @media (max-width: 760px) { .retreat-options-grid { grid-template-columns: 1fr; } }
+    .retreat-option-card {
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.08);
+      border-radius: 14px;
+      padding: 2.4rem 2.2rem;
+      box-shadow: 0 1px 2px rgba(28,22,24,0.04);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .retreat-option-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,148,62,0.4);
+      box-shadow: 0 18px 40px rgba(28,22,24,0.08);
+    }
+    .retreat-option-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .retreat-option-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      color: var(--dark);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(28,22,24,0.08);
+    }
+    .retreat-option-card .included-list { margin: 0; }
+
     /* ── RANCH CONTEXT STRIP ─────────────────────────── */
     .ranch-strip {
       display: grid;
@@ -288,21 +330,39 @@
     <div class="container">
       <div style="text-align:center; margin-bottom:2.4rem;">
         <div class="section-eyebrow">What's Included</div>
-        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.8rem); margin:0;">Your Immersive Container</h2>
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.8rem); margin:0;">Choose Your Container</h2>
+        <p style="max-width:560px; margin:0.75rem auto 0; color:rgba(28,22,24,0.65); line-height:1.75; font-size:0.95rem;">Two residential options — full immersion or a condensed reset. Both held at AWKN Ranch.</p>
       </div>
-      <div class="included-two-col">
-        <ul class="included-list">
-          <li><strong>2 guided ketamine ceremonies</strong></li>
-          <li><strong>2 integration coaching sessions</strong></li>
-          <li><strong>Clinical intake &amp; medical clearance</strong></li>
-          <li><strong>Continental breakfast daily</strong></li>
-        </ul>
-        <ul class="included-list">
-          <li><strong>Live-in concierge, 7 days a week</strong></li>
-          <li><strong>Wellness Center &amp; outdoor spaces</strong></li>
-          <li><strong>Sauna, cold plunge &amp; hot tub</strong></li>
-          <li><strong>Private resort pool</strong></li>
-        </ul>
+      <div class="retreat-options-grid">
+        <div class="retreat-option-card">
+          <div class="retreat-option-eyebrow">6-Day Immersion</div>
+          <div class="retreat-option-title">Full Immersive Container</div>
+          <ul class="included-list">
+            <li><strong>2 guided ketamine ceremonies</strong></li>
+            <li><strong>2 integration coaching sessions</strong></li>
+            <li><strong>1 IV vitamin therapy session</strong></li>
+            <li><strong>Sound bath, yoga &amp; meditation classes</strong></li>
+            <li><strong>Evening ceremony &amp; ritual experiences</strong></li>
+            <li><strong>Clinical intake &amp; medical clearance</strong></li>
+            <li><strong>Meals included by onsite chef</strong></li>
+            <li><strong>Live-in concierge, 7 days a week</strong></li>
+            <li><strong>Pool, cold plunge, sauna &amp; hot tub</strong></li>
+            <li><strong>Wellness Center &amp; 12 private acres</strong></li>
+          </ul>
+        </div>
+        <div class="retreat-option-card">
+          <div class="retreat-option-eyebrow">3-Day Immersion</div>
+          <div class="retreat-option-title">Condensed Residential Reset</div>
+          <ul class="included-list">
+            <li><strong>1 ketamine session (IM)</strong></li>
+            <li><strong>1 integration coaching session</strong></li>
+            <li><strong>1 IV vitamin therapy session</strong></li>
+            <li><strong>Additional classes may vary</strong><span style="display:block;font-size:0.8rem;color:rgba(28,22,24,0.55);font-weight:400;margin-top:0.15rem;">sound bath or yoga depending on the day</span></li>
+            <li><strong>Meals included by onsite chef</strong></li>
+            <li><strong>Pool, cold plunge, sauna &amp; hot tub</strong></li>
+            <li><strong>Wellness Center &amp; 12 private acres</strong></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
