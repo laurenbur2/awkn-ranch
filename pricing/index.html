@@ -467,6 +467,85 @@
       margin-bottom: 1rem;
     }
 
+    /* ── SAMPLE SCHEDULE ──────────────────────────────── */
+    .schedule-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.7rem 1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      background: transparent;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .schedule-btn:hover {
+      background: var(--gold);
+      color: #fff;
+    }
+    .schedule-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      background: rgba(28,22,24,0.7);
+      padding: 1rem;
+    }
+    .schedule-modal-content {
+      background: var(--white);
+      border-radius: var(--radius);
+      max-width: 540px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2.5rem;
+      position: relative;
+    }
+    .schedule-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--grey);
+      line-height: 1;
+    }
+    .schedule-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+    .schedule-day {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .schedule-day:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .schedule-day-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-dark);
+      margin-bottom: 0.35rem;
+    }
+    .schedule-day-details {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+
     /* ── ROOM GALLERY ─────────────────────────────────── */
     .room-gallery {
       display: grid;
@@ -857,6 +936,7 @@
                     <div class="room-price">$3,499</div>
                   </div>
                 </div>
+                <button class="schedule-btn" onclick="document.getElementById('schedule-6day').style.display='flex'">Sample Schedule</button>
               </div>
             </div>
 
@@ -878,6 +958,7 @@
                     <div class="room-price">$1,499</div>
                   </div>
                 </div>
+                <button class="schedule-btn" onclick="document.getElementById('schedule-3day').style.display='flex'">Sample Schedule</button>
               </div>
             </div>
 
@@ -1213,6 +1294,57 @@
       });
     })();
   </script>
+
+  <!-- ══ SCHEDULE MODALS ═════════════════════════════ -->
+  <div class="schedule-modal" id="schedule-6day" onclick="if(event.target===this)this.style.display='none'">
+    <div class="schedule-modal-content">
+      <button class="schedule-modal-close" onclick="this.closest('.schedule-modal').style.display='none'">&times;</button>
+      <div class="schedule-modal-title">Sample Schedule: 6 Days / 5 Nights</div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Sunday</div>
+        <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Monday</div>
+        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Tuesday</div>
+        <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching Session · Dinner</div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Wednesday</div>
+        <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Thursday</div>
+        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Friday</div>
+        <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="schedule-modal" id="schedule-3day" onclick="if(event.target===this)this.style.display='none'">
+    <div class="schedule-modal-content">
+      <button class="schedule-modal-close" onclick="this.closest('.schedule-modal').style.display='none'">&times;</button>
+      <div class="schedule-modal-title">Sample Schedule: 3 Days / 2 Nights</div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Sunday</div>
+        <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Monday</div>
+        <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Tuesday</div>
+        <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching Session · Departure (11am)</div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
