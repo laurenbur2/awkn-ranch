@@ -605,6 +605,113 @@
       font-family: 'Inter', sans-serif;
       letter-spacing: 0.05em;
     }
+
+    /* ── RETREAT DATE PICKER ───────────────────── */
+    .retreat-dates {
+      padding: 0.9rem 1.75rem 0.8rem;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      background: #fff;
+    }
+    .retreat-dates .rd-eyebrow {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.54rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+    .retreat-dates .rd-eyebrow .req { color: var(--gold); font-weight: 600; }
+    .retreat-dates .rd-hint {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--grey);
+      margin: 0 0 0.75rem;
+      line-height: 1.4;
+    }
+    .date-scroller {
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+    .date-scroller::-webkit-scrollbar { width: 4px; }
+    .date-scroller::-webkit-scrollbar-thumb { background: rgba(201,148,62,0.35); border-radius: 2px; }
+    .date-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.85rem;
+      background: #fafaf7;
+      border: 1px solid rgba(28,22,24,0.1);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .date-option:hover {
+      border-color: rgba(201,148,62,0.5);
+      background: #fff;
+    }
+    .date-option.selected {
+      border-color: var(--gold);
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--gold) inset;
+    }
+    .date-option .dates {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .date-option .days {
+      font-size: 0.56rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+    .date-option.selected .days { color: var(--gold); }
+    .date-option .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(28,22,24,0.2);
+      margin-left: 0.75rem;
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .date-option.selected .check {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+    .date-option.selected .check::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+    .room-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      padding: 0.22rem 0.7rem;
+      border: 1px solid rgba(201,148,62,0.5);
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.54rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -670,8 +777,84 @@
     (function () {
       var params = new URLSearchParams(window.location.search);
       var slug = params.get('pkg');
+
+      // Resolve immersive retreat slug from ?pkg=immersive&room=private/shared
+      if (slug === 'immersive') {
+        var room = (params.get('room') || '').toLowerCase();
+        if (room === 'private' || room === 'shared') {
+          slug = 'immersive-' + room;
+        }
+      }
+
       var pkg = window.WITHIN_PACKAGES[slug];
       var root = document.getElementById('bookContent');
+
+      // ── Retreat date generator ──────────────────────────────
+      // For 6-day: next 12 Sundays (Sun → Fri, 5 nights)
+      // For 3-day: next 12 weeks, two slots each (Sun→Tues + Wed→Fri, 2 nights)
+      function generateRetreatDates(retreatType, weekCount) {
+        var options = [];
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        // Find the next upcoming Sunday (day 0). If today is Sunday, start next week.
+        var next = new Date(today);
+        var daysUntilSunday = (7 - today.getDay()) % 7;
+        if (daysUntilSunday === 0) daysUntilSunday = 7;
+        next.setDate(today.getDate() + daysUntilSunday);
+
+        for (var w = 0; w < weekCount; w++) {
+          var sunday = new Date(next);
+          sunday.setDate(next.getDate() + w * 7);
+
+          if (retreatType === '6day') {
+            var friday = new Date(sunday);
+            friday.setDate(sunday.getDate() + 5);
+            options.push({
+              start: sunday,
+              end: friday,
+              label: 'Sun → Fri',
+              nights: 5,
+            });
+          } else if (retreatType === '3day') {
+            var tuesday = new Date(sunday);
+            tuesday.setDate(sunday.getDate() + 2);
+            var wednesday = new Date(sunday);
+            wednesday.setDate(sunday.getDate() + 3);
+            var friday3 = new Date(sunday);
+            friday3.setDate(sunday.getDate() + 5);
+            options.push({
+              start: sunday,
+              end: tuesday,
+              label: 'Sun → Tues',
+              nights: 2,
+            });
+            options.push({
+              start: wednesday,
+              end: friday3,
+              label: 'Wed → Fri',
+              nights: 2,
+            });
+          }
+        }
+        return options;
+      }
+
+      function formatDateRange(start, end) {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var s = months[start.getMonth()] + ' ' + start.getDate();
+        var e = months[end.getMonth()] + ' ' + end.getDate();
+        return s + ' – ' + e;
+      }
+
+      function toISODate(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
+
+      // Expose for use below
+      window.__retreatDates = { generate: generateRetreatDates, format: formatDateRange, toISO: toISODate };
 
       if (!pkg) {
         root.innerHTML = '' +
@@ -691,6 +874,34 @@
       var strikeHtml = pkg.strike
         ? '<span class="strike">' + window.formatCurrency(pkg.strike) + '</span>'
         : '';
+
+      // Build retreat date picker HTML (only for immersive packages)
+      var retreatDatesHtml = '';
+      var retreatOptions = [];
+      if (pkg.retreatType) {
+        retreatOptions = window.__retreatDates.generate(pkg.retreatType, 12);
+        var optsHtml = retreatOptions.map(function(opt, i){
+          return '' +
+            '<div class="date-option" data-idx="' + i + '">' +
+              '<div>' +
+                '<div class="dates">' + window.__retreatDates.format(opt.start, opt.end) + '</div>' +
+                '<div class="days">' + opt.label + ' · ' + opt.nights + ' Nights</div>' +
+              '</div>' +
+              '<span class="check"></span>' +
+            '</div>';
+        }).join('');
+        retreatDatesHtml =
+          '<div class="retreat-dates">' +
+            '<span class="rd-eyebrow">Choose Your Retreat Dates <span class="req">*</span></span>' +
+            '<p class="rd-hint">Pick the week that calls you. Your dates are held the moment your deposit is placed.</p>' +
+            '<div class="date-scroller" id="dateScroller">' + optsHtml + '</div>' +
+          '</div>';
+      }
+
+      // Room badge (for retreats that have a room choice)
+      var roomBadgeHtml = '';
+      if (slug === 'immersive-private') roomBadgeHtml = '<span class="room-badge">Private Room</span>';
+      if (slug === 'immersive-shared')  roomBadgeHtml = '<span class="room-badge">Shared Room</span>';
 
       // Split the deposit amount into $ symbol + number for refined typography
       var depositFormatted = deposit.toLocaleString('en-US');
@@ -743,6 +954,7 @@
               '<span class="eyebrow">The Offering</span>' +
               '<span class="name">' + pkg.name + '</span>' +
               '<span class="tagline">' + pkg.tagline + '</span>' +
+              roomBadgeHtml +
             '</div>' +
 
             '<div class="deposit-hero">' +
@@ -773,6 +985,9 @@
               '</div>' +
             '</div>' +
 
+            retreatDatesHtml +
+
+            (pkg.retreatType ? '' :
             '<div class="stay-question">' +
               '<div class="q-text">' +
                 '<span class="q-label">Stay at AWKN Ranch during your sessions?</span>' +
@@ -782,7 +997,7 @@
                 '<label><input type="radio" name="stay_at_ranch" value="yes" required>Yes</label>' +
                 '<label><input type="radio" name="stay_at_ranch" value="no" required>No</label>' +
               '</div>' +
-            '</div>' +
+            '</div>') +
 
             '<div class="pay-btn-wrap">' +
               '<button class="pay-btn" id="payBtn">Reserve with ' + window.formatCurrency(deposit) + '</button>' +
@@ -799,12 +1014,27 @@
         '</div>' +
 
         '<div style="text-align:center;margin-top:2.5rem;">' +
-          '<a href="../ceremonial-ketamine/' + slug + '/" class="back-link">&larr; Return to ' + pkg.name + '</a>' +
+          '<a href="../' + (pkg.retreatReturnPath || ('ceremonial-ketamine/' + slug + '/')) + '" class="back-link">&larr; Return to ' + pkg.name + '</a>' +
         '</div>';
 
       // Wire up the pay button
       var payBtn = document.getElementById('payBtn');
       var banner = document.getElementById('statusBanner');
+
+      // Wire up retreat date selection (only present for retreat packages)
+      var selectedRetreatIdx = null;
+      if (pkg.retreatType) {
+        var scroller = document.getElementById('dateScroller');
+        if (scroller) {
+          scroller.addEventListener('click', function(e){
+            var card = e.target.closest('.date-option');
+            if (!card) return;
+            scroller.querySelectorAll('.date-option').forEach(function(el){ el.classList.remove('selected'); });
+            card.classList.add('selected');
+            selectedRetreatIdx = parseInt(card.getAttribute('data-idx'), 10);
+          });
+        }
+      }
 
       payBtn.addEventListener('click', async function () {
         // Reset previous validation state
@@ -813,15 +1043,29 @@
           if (el) el.classList.remove('invalid');
         });
 
-        // Require stay-at-ranch answer before continuing
-        var stayChoice = document.querySelector('input[name="stay_at_ranch"]:checked');
-        if (!stayChoice) {
-          banner.style.display = 'block';
-          banner.textContent = 'Please let us know if you are interested in staying at AWKN Ranch.';
-          banner.style.color = 'var(--gold-dark)';
-          var q = document.querySelector('.stay-question');
-          if (q) q.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
+        // For retreat packages, require date selection; for others, require stay-at-ranch answer
+        var stayChoice = null;
+        var chosenRetreat = null;
+        if (pkg.retreatType) {
+          if (selectedRetreatIdx === null || !retreatOptions[selectedRetreatIdx]) {
+            banner.style.display = 'block';
+            banner.textContent = 'Please choose your retreat dates.';
+            banner.style.color = 'var(--gold-dark)';
+            var rd = document.querySelector('.retreat-dates');
+            if (rd) rd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+          chosenRetreat = retreatOptions[selectedRetreatIdx];
+        } else {
+          stayChoice = document.querySelector('input[name="stay_at_ranch"]:checked');
+          if (!stayChoice) {
+            banner.style.display = 'block';
+            banner.textContent = 'Please let us know if you are interested in staying at AWKN Ranch.';
+            banner.style.color = 'var(--gold-dark)';
+            var q = document.querySelector('.stay-question');
+            if (q) q.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
         }
 
         // Validate contact fields
@@ -855,17 +1099,23 @@
         // then redirect the browser to the hosted checkout URL Stripe returns.
         var WITHIN_SUPABASE_URL = 'https://gatsnhekviqooafddzey.supabase.co';
         try {
+          var payload = {
+            package_slug: slug,
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            phone: phone,
+            stay_at_ranch: stayChoice ? stayChoice.value : 'yes',
+          };
+          if (chosenRetreat) {
+            payload.retreat_start_date = window.__retreatDates.toISO(chosenRetreat.start);
+            payload.retreat_end_date   = window.__retreatDates.toISO(chosenRetreat.end);
+            payload.retreat_nights     = String(chosenRetreat.nights);
+          }
           var res = await fetch(WITHIN_SUPABASE_URL + '/functions/v1/create-within-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              package_slug: slug,
-              first_name: firstName,
-              last_name: lastName,
-              email: email,
-              phone: phone,
-              stay_at_ranch: stayChoice.value,
-            }),
+            body: JSON.stringify(payload),
           });
           var data = await res.json();
           if (!res.ok || !data.url) {

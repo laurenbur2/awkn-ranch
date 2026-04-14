@@ -31,6 +31,9 @@ const PACKAGES: Record<string, PackageDef> = {
   heal:        { name: 'Heal',       price: 3300, depositPct: 0.10 },
   awkn:        { name: 'AWKN',       price: 5500, depositPct: 0.10 },
   'twin-flame':{ name: 'Twin Flame', price: 1650, depositPct: 0.10 },
+  'immersive-private':  { name: 'Six-Day Retreat (Private Room)', price: 4999, depositPct: 0.10 },
+  'immersive-shared':   { name: 'Six-Day Retreat (Shared Room)',  price: 3999, depositPct: 0.10 },
+  'immersive-3day':     { name: 'Three-Day Retreat',              price: 2499, depositPct: 0.10 },
 };
 
 interface CheckoutPayload {
@@ -40,6 +43,9 @@ interface CheckoutPayload {
   email?: string;
   phone?: string;
   stay_at_ranch?: string;
+  retreat_start_date?: string;
+  retreat_end_date?: string;
+  retreat_nights?: string;
 }
 
 Deno.serve(async (req) => {
@@ -68,6 +74,9 @@ Deno.serve(async (req) => {
   const email     = (body.email      || '').trim();
   const phone     = (body.phone      || '').trim();
   const stay      = (body.stay_at_ranch || '').trim();
+  const retreatStart  = (body.retreat_start_date || '').trim();
+  const retreatEnd    = (body.retreat_end_date   || '').trim();
+  const retreatNights = (body.retreat_nights     || '').trim();
 
   if (!firstName || !email) {
     return json({ error: 'first_name and email are required' }, 400);
@@ -97,7 +106,8 @@ Deno.serve(async (req) => {
   params.append('line_items[0][price_data][product_data][description]', productDesc);
 
   // success_url MUST contain {CHECKOUT_SESSION_ID} so Stripe substitutes the real id.
-  const successUrl = `${SITE_URL}/within-center/book/schedule/?pkg=${encodeURIComponent(slug)}&session_id={CHECKOUT_SESSION_ID}`;
+  const retreatQuery = retreatStart ? `&retreat_start=${encodeURIComponent(retreatStart)}&retreat_end=${encodeURIComponent(retreatEnd)}` : '';
+  const successUrl = `${SITE_URL}/within-center/book/schedule/?pkg=${encodeURIComponent(slug)}${retreatQuery}&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl  = `${SITE_URL}/within-center/book/?pkg=${encodeURIComponent(slug)}&canceled=1`;
   params.append('success_url', successUrl);
   params.append('cancel_url',  cancelUrl);
@@ -110,6 +120,9 @@ Deno.serve(async (req) => {
   params.append('metadata[last_name]',     lastName);
   params.append('metadata[phone]',         phone);
   params.append('metadata[stay_at_ranch]', stay);
+  if (retreatStart)  params.append('metadata[retreat_start_date]', retreatStart);
+  if (retreatEnd)    params.append('metadata[retreat_end_date]',   retreatEnd);
+  if (retreatNights) params.append('metadata[retreat_nights]',     retreatNights);
 
   // Also stash on payment_intent so it appears in the dashboard for the charge
   params.append('payment_intent_data[metadata][source]',       'within-deposit');

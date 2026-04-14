@@ -316,8 +316,22 @@
 
       var deposit = Math.round(pkg.price * pkg.depositPct);
       var firstName = params.get('first_name') || '';
+      var retreatStart = params.get('retreat_start') || '';
+      var retreatEnd   = params.get('retreat_end')   || '';
 
       var balance = pkg.price - deposit;
+
+      // Format retreat date range (e.g. "May 3 – May 8, 2026") if present
+      var retreatDateLine = '';
+      if (retreatStart && retreatEnd) {
+        try {
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          var s = new Date(retreatStart + 'T00:00:00');
+          var e = new Date(retreatEnd   + 'T00:00:00');
+          var line = months[s.getMonth()] + ' ' + s.getDate() + ' – ' + months[e.getMonth()] + ' ' + e.getDate() + ', ' + s.getFullYear();
+          retreatDateLine = '<div class="meta" style="color:var(--gold);font-style:italic;">Your retreat: ' + line + '</div>';
+        } catch (_) {}
+      }
 
       root.innerHTML = '' +
         // Single unified confirmation card
@@ -328,9 +342,10 @@
             '<div class="label">Deposit Received' + (isDemo ? ' (Demo)' : '') + '</div>' +
             '<div class="headline">' + (firstName ? 'Thank you, ' + firstName + ' &mdash; your spot is held' : 'Your spot is held') + '</div>' +
             '<div class="meta-row">' +
-              '<div class="meta">' + pkg.name + ' Package</div>' +
+              '<div class="meta">' + pkg.name + '</div>' +
               '<div class="amount">' + window.formatCurrency(deposit) + '</div>' +
             '</div>' +
+            retreatDateLine +
           '</div>' +
 
           // Ornamental divider

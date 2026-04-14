@@ -39,6 +39,46 @@ window.WITHIN_PACKAGES = {
     label: 'Couples Package',
     depositPct: 0.10,
   },
+
+  // ── Immersive Retreats ─────────────────────────────
+  // Each retreat has two room options. The /book/ page builds the slug as
+  // `immersive-<room>` or `immersive-3day-<room>`.
+  'immersive-private': {
+    name: 'Six-Day Retreat — Private Room',
+    tagline: 'Two ceremonies, full immersion, one threshold',
+    description: 'Six-day residential ceremonial ketamine retreat at AWKN Ranch — private room.',
+    price: 4999,
+    strike: null,
+    label: 'Retreat Investment',
+    depositPct: 0.10,
+    retreatType: '6day',
+    retreatNights: 5,
+    retreatReturnPath: 'immersive-retreat/',
+  },
+  'immersive-shared': {
+    name: 'Six-Day Retreat — Shared Room',
+    tagline: 'Two ceremonies, full immersion, one threshold',
+    description: 'Six-day residential ceremonial ketamine retreat at AWKN Ranch — shared room.',
+    price: 3999,
+    strike: null,
+    label: 'Retreat Investment',
+    depositPct: 0.10,
+    retreatType: '6day',
+    retreatNights: 5,
+    retreatReturnPath: 'immersive-retreat/',
+  },
+  'immersive-3day': {
+    name: 'Three-Day Retreat',
+    tagline: 'A condensed residential reset',
+    description: 'Three-day residential ceremonial ketamine retreat at AWKN Ranch.',
+    price: 2499,
+    strike: null,
+    label: 'Retreat Investment',
+    depositPct: 0.10,
+    retreatType: '3day',
+    retreatNights: 2,
+    retreatReturnPath: 'immersive-retreat/3-day/',
+  },
 };
 
 window.formatCurrency = function (n) {
