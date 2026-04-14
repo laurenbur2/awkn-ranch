@@ -468,6 +468,37 @@
       margin-bottom: 1rem;
     }
 
+    /* ── ROOM GALLERY ─────────────────────────────────── */
+    .room-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .room-gallery-item {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .room-gallery-item img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px 12px 0 0;
+    }
+    .room-gallery-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 0.75rem 0;
+      color: var(--dark);
+      background: var(--cream);
+      border-radius: 0 0 12px 12px;
+    }
+
     /* ── ROOM PRICING ─────────────────────────────────── */
     .room-grid {
       display: grid;
@@ -696,6 +727,7 @@
       .specialty-grid { grid-template-columns: 1fr; }
       .retreat-includes { grid-template-columns: 1fr; }
       .retreat-options-grid { grid-template-columns: 1fr; }
+      .room-gallery { grid-template-columns: 1fr; }
       .room-grid { grid-template-columns: 1fr; }
       .addons-grid { grid-template-columns: 1fr; }
       .process-steps { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
@@ -810,7 +842,6 @@
 
             <!-- 6 Day -->
             <div class="retreat-option-card">
-              <img src="images/private-room.png" alt="Private retreat bedroom with queen bed" class="room-photo">
               <div class="retreat-option-inner">
                 <div class="retreat-option-label">6 Days / 5 Nights</div>
                 <ul class="retreat-option-highlights">
@@ -832,7 +863,6 @@
 
             <!-- 3 Day -->
             <div class="retreat-option-card">
-              <img src="images/shared-room.jpg" alt="Shared retreat room with bunk beds" class="room-photo">
               <div class="retreat-option-inner">
                 <div class="retreat-option-label">3 Days / 2 Nights</div>
                 <ul class="retreat-option-highlights">
@@ -901,6 +931,18 @@
                 <span class="addon-name">Pickleball Lesson</span>
                 <span class="addon-price">$50</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Room Photos -->
+          <div class="room-gallery">
+            <div class="room-gallery-item">
+              <img src="images/private-room.png" alt="Private retreat bedroom with queen bed">
+              <div class="room-gallery-label">Private Room</div>
+            </div>
+            <div class="room-gallery-item">
+              <img src="images/shared-room.jpg" alt="Shared retreat room with bunk beds">
+              <div class="room-gallery-label">Shared Room</div>
             </div>
           </div>
 
