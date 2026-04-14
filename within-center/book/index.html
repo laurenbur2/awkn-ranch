@@ -544,6 +544,44 @@
     }
     .back-link:hover { color: var(--gold); gap: 1rem; }
 
+    .questions-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin: 4rem auto 0;
+      padding: 2.5rem 2rem;
+      max-width: 540px;
+      background: #fff;
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      text-align: center;
+    }
+    .questions-cta .q-label {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--dark);
+      letter-spacing: 0.01em;
+    }
+    .questions-cta .q-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.8rem;
+      background: var(--gold);
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: background 0.2s ease, gap 0.2s ease;
+    }
+    .questions-cta .q-btn:hover { background: var(--gold-dark, #a88520); gap: 1rem; }
+
     .error-state {
       text-align: center;
       padding: 4rem 1rem;
@@ -753,6 +791,11 @@
             '</div>' +
           '</aside>' +
 
+        '</div>' +
+
+        '<div class="questions-cta">' +
+          '<span class="q-label">Still have questions?</span>' +
+          '<a href="../book-a-call/" class="q-btn">Book a Call &rarr;</a>' +
         '</div>' +
 
         '<div style="text-align:center;margin-top:2.5rem;">' +
