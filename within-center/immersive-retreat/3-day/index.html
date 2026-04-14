@@ -48,6 +48,7 @@
     }
     @media (max-width: 640px) { .room-grid { grid-template-columns: 1fr; } }
     .room-option {
+      display: block;
       background: #fff;
       border: 1px solid rgba(28,22,24,0.08);
       border-radius: 14px;
@@ -55,12 +56,27 @@
       text-align: center;
       box-shadow: 0 1px 2px rgba(28,22,24,0.04);
       transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
     }
     .room-option:hover {
       transform: translateY(-3px);
-      border-color: rgba(201,148,62,0.4);
+      border-color: rgba(201,148,62,0.55);
       box-shadow: 0 18px 40px rgba(28,22,24,0.08);
     }
+    .room-cta {
+      display: inline-block;
+      margin-top: 1.4rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(201,148,62,0.4);
+      padding-bottom: 0.2rem;
+    }
+    .room-option:hover .room-cta { border-bottom-color: var(--gold); }
     .room-label {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 1.55rem;
@@ -267,7 +283,7 @@
       <h1>3-Day Retreat<br>at AWKN Ranch</h1>
       <p class="lead">A condensed residential reset. The same ceremonial care and twelve-acre sanctuary, in a shorter arc.</p>
       <div class="pkg-cta-buttons" style="justify-content:center; margin-top:1.8rem;">
-        <a href="../../book/?pkg=immersive-3day" class="awknhero-cta">Reserve Your Spot</a>
+        <a href="#pricing" class="awknhero-cta">Reserve Your Spot</a>
         <a href="../../book-a-call/" class="awknhero-cta secondary">Book a Call</a>
       </div>
     </div>
@@ -351,11 +367,33 @@
     </div>
   </section>
 
+  <!-- ── PRICING ───────────────────────────────────── -->
+  <section class="pkg-section bg-cream" id="pricing">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="section-eyebrow">Reserve Your Place</div>
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.8rem); margin:0;">Choose Your Room</h2>
+      </div>
+      <div class="room-grid">
+        <a href="../../book/?pkg=immersive-3day&amp;room=private" class="room-option">
+          <div class="room-label">Private Room</div>
+          <div class="room-price">$1,699</div>
+          <span class="room-cta">Reserve &rarr;</span>
+        </a>
+        <a href="../../book/?pkg=immersive-3day&amp;room=shared" class="room-option">
+          <div class="room-label">Shared Room</div>
+          <div class="room-price">$1,499</div>
+          <span class="room-cta">Reserve &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="cta-section" id="contact">
     <h2>Reserve Your 3-Day Retreat</h2>
     <p>Ceremonial ketamine therapy at AWKN Ranch. Book now or schedule a call with our team to talk it through first.</p>
     <div class="pkg-cta-buttons">
-      <a href="../../book/?pkg=immersive-3day" class="awknhero-cta">Reserve Your Spot</a>
+      <a href="#contact" class="awknhero-cta">Reserve Your Spot</a>
       <a href="../../book-a-call/" class="awknhero-cta secondary">Book a Call</a>
     </div>
     <div class="contact-row">

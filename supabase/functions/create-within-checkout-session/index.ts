@@ -31,9 +31,10 @@ const PACKAGES: Record<string, PackageDef> = {
   heal:        { name: 'Heal',       price: 3300, depositPct: 0.10 },
   awkn:        { name: 'AWKN',       price: 5500, depositPct: 0.10 },
   'twin-flame':{ name: 'Twin Flame', price: 1650, depositPct: 0.10 },
-  'immersive-private':  { name: 'Six-Day Retreat (Private Room)', price: 4999, depositPct: 0.10 },
-  'immersive-shared':   { name: 'Six-Day Retreat (Shared Room)',  price: 3999, depositPct: 0.10 },
-  'immersive-3day':     { name: 'Three-Day Retreat',              price: 2499, depositPct: 0.10 },
+  'immersive-private':       { name: 'Six-Day Retreat (Private Room)',   price: 4999, depositPct: 0.10 },
+  'immersive-shared':        { name: 'Six-Day Retreat (Shared Room)',    price: 3999, depositPct: 0.10 },
+  'immersive-3day-private':  { name: 'Three-Day Retreat (Private Room)', price: 1699, depositPct: 0.10 },
+  'immersive-3day-shared':   { name: 'Three-Day Retreat (Shared Room)',  price: 1499, depositPct: 0.10 },
 };
 
 interface CheckoutPayload {

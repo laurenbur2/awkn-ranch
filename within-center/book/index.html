@@ -778,11 +778,11 @@
       var params = new URLSearchParams(window.location.search);
       var slug = params.get('pkg');
 
-      // Resolve immersive retreat slug from ?pkg=immersive&room=private/shared
-      if (slug === 'immersive') {
+      // Resolve immersive retreat slug from ?pkg=immersive&room=... or ?pkg=immersive-3day&room=...
+      if (slug === 'immersive' || slug === 'immersive-3day') {
         var room = (params.get('room') || '').toLowerCase();
         if (room === 'private' || room === 'shared') {
-          slug = 'immersive-' + room;
+          slug = slug + '-' + room;
         }
       }
 
@@ -900,8 +900,8 @@
 
       // Room badge (for retreats that have a room choice)
       var roomBadgeHtml = '';
-      if (slug === 'immersive-private') roomBadgeHtml = '<span class="room-badge">Private Room</span>';
-      if (slug === 'immersive-shared')  roomBadgeHtml = '<span class="room-badge">Shared Room</span>';
+      if (/-private$/.test(slug)) roomBadgeHtml = '<span class="room-badge">Private Room</span>';
+      if (/-shared$/.test(slug))  roomBadgeHtml = '<span class="room-badge">Shared Room</span>';
 
       // Split the deposit amount into $ symbol + number for refined typography
       var depositFormatted = deposit.toLocaleString('en-US');
