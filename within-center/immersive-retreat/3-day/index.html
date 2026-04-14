@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-Day Retreat at AWKN Ranch | Within Center</title>
+  <meta name="description" content="A three-day ceremonial ketamine retreat held at AWKN Ranch in Austin, Texas. One guided ceremony, integration coaching, IV vitamin therapy, and a condensed residential reset.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/within.css?v=20260413a">
+  <meta property="og:title" content="3-Day Retreat at AWKN Ranch | Within Center">
+  <meta property="og:description" content="A three-day ceremonial ketamine retreat held at AWKN Ranch in Austin, Texas.">
+  <meta property="og:type" content="website">
+  <style>
+    .ranch-banner {
+      background: var(--dark);
+      color: rgba(255,255,255,0.85);
+      padding: 1.1rem 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(201,148,62,0.35);
+    }
+    .ranch-banner strong { color: var(--gold); font-weight: 600; letter-spacing: 0.32em; }
+    .ranch-banner .sep { display: inline-block; margin: 0 0.9rem; color: rgba(201,148,62,0.5); }
+
+    .retreat-hero h1 { font-size: clamp(2.8rem, 6.5vw, 5rem); }
+    .retreat-hero .ranch-mark {
+      display: inline-block;
+      margin-top: 1.6rem;
+      padding: 0.55rem 1.4rem;
+      border: 1px solid rgba(201,148,62,0.55);
+      border-radius: 999px;
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(28,22,24,0.35);
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 760px;
+      margin: 3rem auto 0;
+    }
+    @media (max-width: 640px) { .room-grid { grid-template-columns: 1fr; } }
+    .room-option {
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.08);
+      border-radius: 14px;
+      padding: 2.6rem 2rem 2.2rem;
+      text-align: center;
+      box-shadow: 0 1px 2px rgba(28,22,24,0.04);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .room-option:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,148,62,0.4);
+      box-shadow: 0 18px 40px rgba(28,22,24,0.08);
+    }
+    .room-label {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      color: var(--dark);
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+    }
+    .room-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 3rem;
+      color: var(--gold);
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 0.7rem;
+    }
+
+    .included-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 3rem;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    @media (max-width: 720px) { .included-two-col { grid-template-columns: 1fr; gap: 0; } }
+
+    .ranch-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin: 3rem auto 0;
+      max-width: 1100px;
+    }
+    .ranch-strip img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    @media (max-width: 720px) { .ranch-strip { grid-template-columns: 1fr; } .ranch-strip img { height: 220px; } }
+
+    .ranch-context {
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .ranch-context h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 400;
+      color: var(--dark);
+      margin: 0 0 1.3rem;
+      line-height: 1.2;
+    }
+    .ranch-context h2 em { color: var(--gold); font-style: italic; font-weight: 500; }
+    .ranch-context p {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: rgba(28,22,24,0.75);
+      margin: 0 auto 1.2rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.2rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    @media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+    .detail-card {
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+    }
+    .detail-card .num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.4rem;
+      color: var(--gold);
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+    .detail-card .lbl {
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(28,22,24,0.55);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../../#contact" class="secondary-cta">Contact Us</a>
+      <a href="../../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li><a href="../../facility/" data-menu-link>Our Facility</a></li>
+      <li><a href="../../about/" data-menu-link>About Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">
+      A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
+    </div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="./" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+
+  <div class="ranch-banner">
+    Held at <strong>AWKN Ranch</strong> <span class="sep">&middot;</span> 7600 Stillridge Dr, Austin, TX
+  </div>
+
+  <header class="page-hero retreat-hero" style="background-color:var(--dark);">
+    <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/dome-exterior.jpeg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">3-Day Residential Reset</span>
+      <h1>3-Day Retreat<br>at AWKN Ranch</h1>
+      <p class="lead">A condensed residential reset. The same ceremonial care and twelve-acre sanctuary, in a shorter arc.</p>
+      <span class="ranch-mark">A Within Center Retreat &middot; AWKN Ranch</span>
+    </div>
+  </header>
+
+  <section class="pkg-section bg-white">
+    <div class="container-wide">
+      <div class="ranch-context">
+        <div class="section-eyebrow">The Setting</div>
+        <h2>Held at <em>AWKN Ranch</em> &mdash; Austin, Texas</h2>
+        <p>AWKN Ranch is our private wellness sanctuary on the western edge of Austin. Live oaks, a honeycomb ceremony dome, sauna, cold plunge, hot tub, resort pool, and private yurts and rooms for residential guests. This is your container.</p>
+        <div style="margin-top:1.5rem;">
+          <a href="../../facility/" class="awknhero-cta secondary" style="color:var(--dark); border-color:var(--dark);">View Our Facility</a>
+        </div>
+      </div>
+      <div class="ranch-strip">
+        <img src="/awkn-ranch/pricing/images/dome-interior.jpeg" alt="Honeycomb ceremony dome interior at AWKN Ranch">
+        <img src="/awkn-ranch/pricing/images/yurts.jpg" alt="Private guest yurts under the live oaks at AWKN Ranch">
+        <img src="/awkn-ranch/pricing/images/pool.jpg" alt="Private resort pool at AWKN Ranch">
+      </div>
+    </div>
+  </section>
+
+  <section class="pkg-section bg-cream">
+    <div class="container">
+      <div style="text-align:center; margin-bottom: 2.6rem;">
+        <div class="section-eyebrow">At a Glance</div>
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.8rem); margin:0;">A Condensed Residential Reset.</h2>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="num">Three</div>
+          <div class="lbl">Days of Care</div>
+        </div>
+        <div class="detail-card">
+          <div class="num">One</div>
+          <div class="lbl">Guided Ceremony</div>
+        </div>
+        <div class="detail-card">
+          <div class="num">One</div>
+          <div class="lbl">Integration Session</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pkg-section bg-white">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:2.4rem;">
+        <div class="section-eyebrow">What's Included</div>
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.8rem); margin:0;">Your Residential Reset</h2>
+        <p style="max-width:560px; margin:0.75rem auto 0; color:rgba(28,22,24,0.65); line-height:1.75; font-size:0.95rem;">Everything is included. The same ceremonial rigor, in a shorter arc.</p>
+      </div>
+      <ul class="included-list included-two-col">
+        <li><strong>1 ketamine session (IM)</strong></li>
+        <li><strong>1 integration coaching session</strong></li>
+        <li><strong>1 IV vitamin therapy session</strong></li>
+        <li><strong>Additional classes may vary</strong><span style="display:block;font-size:0.8rem;color:rgba(28,22,24,0.55);font-weight:400;margin-top:0.15rem;">sound bath or yoga depending on the day</span></li>
+        <li><strong>Meals included by onsite chef</strong></li>
+        <li><strong>Pool, cold plunge, sauna &amp; hot tub</strong></li>
+        <li><strong>Wellness Center &amp; 12 private acres</strong></li>
+      </ul>
+      <div style="text-align:center; margin-top:2.5rem;">
+        <a href="../" style="font-size:0.78rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); text-decoration:none; border-bottom:1px solid rgba(201,148,62,0.4); padding-bottom:0.2rem;">Ready for a deeper immersion? View 6-Day Retreat &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <h2>Reserve Your 3-Day Retreat</h2>
+    <p>Ceremonial ketamine therapy at AWKN Ranch. Book now or schedule a call with our team to talk it through first.</p>
+    <div class="pkg-cta-buttons">
+      <a href="../../book/?pkg=immersive-3day" class="awknhero-cta">Reserve Your Place</a>
+      <a href="tel:5129692399" class="awknhero-cta secondary">Book a Call First</a>
+    </div>
+    <div class="contact-row">
+      <div class="contact-item">
+        <span class="label">Phone</span>
+        <a href="tel:5129692399">512-969-2399</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:intake@within.center">intake@within.center</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Web</span>
+        <a href="https://within.center">within.center</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');var allSubs=document.querySelectorAll('.menu-sub');function isOpen(){return panel.classList.contains('open');}function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});backdrop.addEventListener('click',closeMenu);document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});})();
+  </script>
+</body>
+</html>
