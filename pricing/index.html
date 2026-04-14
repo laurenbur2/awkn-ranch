@@ -426,8 +426,9 @@
     .retreat-option-card {
       border: 1px solid var(--border);
       border-radius: 12px;
-      overflow: hidden;
+      overflow: visible;
       background: var(--white);
+      position: relative;
     }
     .retreat-option-card .room-photo {
       width: 100%;
@@ -491,20 +492,34 @@
       background: var(--gold);
       color: #fff;
     }
-    .schedule-inline {
+    .schedule-overlay {
       display: none;
-      margin-top: 1rem;
-      background: var(--cream);
-      border-radius: 10px;
-      padding: 1.5rem;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+      padding: 2rem;
       text-align: left;
     }
-    .schedule-inline.open { display: block; }
-    .schedule-inline-title {
+    .schedule-overlay.open { display: block; }
+    .schedule-overlay-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--grey);
+      line-height: 1;
+    }
+    .schedule-overlay-title {
       font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       color: var(--dark);
       text-align: center;
     }
@@ -917,33 +932,34 @@
                     <div class="room-price">$3,499</div>
                   </div>
                 </div>
-                <button class="schedule-btn" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'Hide Schedule':'Sample Schedule';if(el.classList.contains('open'))setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'})},100)">Sample Schedule</button>
-                <div class="schedule-inline">
-                  <div class="schedule-inline-title">Sample Schedule</div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Sunday</div>
-                    <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Monday</div>
-                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Tuesday</div>
-                    <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Dinner</div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Wednesday</div>
-                    <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Thursday</div>
-                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Friday</div>
-                    <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
-                  </div>
+                <button class="schedule-btn" onclick="var o=this.closest('.retreat-option-card').querySelector('.schedule-overlay');o.classList.toggle('open')">Sample Schedule</button>
+              </div>
+              <div class="schedule-overlay">
+                <button class="schedule-overlay-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="schedule-overlay-title">Sample Schedule: 6 Days / 5 Nights</div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Sunday</div>
+                  <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Monday</div>
+                  <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Tuesday</div>
+                  <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Dinner</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Wednesday</div>
+                  <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Thursday</div>
+                  <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Friday</div>
+                  <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
                 </div>
               </div>
             </div>
@@ -966,21 +982,22 @@
                     <div class="room-price">$1,499</div>
                   </div>
                 </div>
-                <button class="schedule-btn" onclick="var el=this.nextElementSibling;el.classList.toggle('open');this.textContent=el.classList.contains('open')?'Hide Schedule':'Sample Schedule';if(el.classList.contains('open'))setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'})},100)">Sample Schedule</button>
-                <div class="schedule-inline">
-                  <div class="schedule-inline-title">Sample Schedule</div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Sunday</div>
-                    <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Monday</div>
-                    <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
-                  </div>
-                  <div class="schedule-day">
-                    <div class="schedule-day-label">Tuesday</div>
-                    <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Departure (11am)</div>
-                  </div>
+                <button class="schedule-btn" onclick="var o=this.closest('.retreat-option-card').querySelector('.schedule-overlay');o.classList.toggle('open')">Sample Schedule</button>
+              </div>
+              <div class="schedule-overlay">
+                <button class="schedule-overlay-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="schedule-overlay-title">Sample Schedule: 3 Days / 2 Nights</div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Sunday</div>
+                  <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Monday</div>
+                  <div class="schedule-day-details">Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Tuesday</div>
+                  <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Departure (11am)</div>
                 </div>
               </div>
             </div>
