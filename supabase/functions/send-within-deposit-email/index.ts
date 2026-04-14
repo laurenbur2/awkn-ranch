@@ -30,12 +30,35 @@ const REPLY_TO = "intake@within.center";
 const APPLICATION_LINK = "https://laurenbur2.github.io/awkn-ranch/within-center/book/schedule/";
 
 // Package catalog — keep in sync with the booking page.
-const PACKAGES: Record<string, { name: string; deposit: string; balance: string }> = {
+const PACKAGES: Record<string, { name: string; deposit: string; balance: string; isRetreat?: boolean }> = {
   discover: { name: "The Discover Package", deposit: "$150", balance: "$1,350" },
   heal:     { name: "The Heal Package",     deposit: "$350", balance: "$3,150" },
   awkn:     { name: "The AWKN Package",     deposit: "$550", balance: "$4,950" },
   twin:     { name: "The Twin Flame Package", deposit: "$1,100", balance: "$9,900" },
+  'immersive-private':      { name: "Six-Day Retreat — Private Room",   deposit: "$499.90",  balance: "$4,499.10", isRetreat: true },
+  'immersive-shared':       { name: "Six-Day Retreat — Shared Room",    deposit: "$399.90",  balance: "$3,599.10", isRetreat: true },
+  'immersive-3day-private': { name: "Three-Day Retreat — Private Room", deposit: "$169.90",  balance: "$1,529.10", isRetreat: true },
+  'immersive-3day-shared':  { name: "Three-Day Retreat — Shared Room",  deposit: "$149.90",  balance: "$1,349.10", isRetreat: true },
 };
+
+function formatRetreatDates(startISO: string, endISO: string): string {
+  if (!startISO || !endISO) return "";
+  // Parse YYYY-MM-DD as local noon to avoid timezone rollover.
+  const parse = (s: string) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (!m) return null;
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12, 0, 0);
+  };
+  const start = parse(startISO);
+  const end   = parse(endISO);
+  if (!start || !end) return "";
+  const monthShort = (d: Date) => d.toLocaleString("en-US", { month: "short" });
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+  if (sameMonth) {
+    return `${monthShort(start)} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+  }
+  return `${monthShort(start)} ${start.getDate()} – ${monthShort(end)} ${end.getDate()}, ${end.getFullYear()}`;
+}
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -78,7 +101,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
           <td style="padding:40px 40px 24px 40px;text-align:center;">
             <div style="display:inline-block;width:56px;height:56px;border-radius:50%;background:#c9943e;color:#ffffff;font-size:28px;line-height:56px;font-weight:600;margin-bottom:18px;">✓</div>
             <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Deposit Received</div>
-            <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 12px 0;line-height:1.2;">Thank you, {{first_name}} — your spot is held.</h1>
+            <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 12px 0;line-height:1.2;">{{headline}}</h1>
             <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.5;">We are honored to walk this with you.</p>
           </td>
         </tr>
@@ -97,10 +120,12 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
                   </tr>
                 </table>
               </td></tr>
+              {{retreat_dates_row}}
               <tr><td style="padding:10px 24px 20px 24px;font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;border-top:1px solid rgba(201,148,62,0.18);">Balance of <strong style="color:#1c1618;">{{balance_amount}}</strong> due before your first ceremony.</td></tr>
             </table>
           </td>
         </tr>
+        {{retreat_hold_notice}}
         <tr>
           <td style="padding:0 40px 16px 40px;">
             <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Your Next Steps</div>
@@ -147,28 +172,14 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
                   <div style="width:36px;height:36px;border-radius:50%;background:rgba(201,148,62,0.12);color:#c9943e;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;text-align:center;line-height:36px;">3</div>
                 </td>
                 <td valign="top">
-                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">Once approved, choose your ceremony dates</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;">After your consultation and clearance, we'll send you a private link to schedule your ceremonies and integration sessions around your life.</div>
+                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">{{step3_title}}</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;">After your consultation and clearance, we'll send you a private link to schedule your {{step3_noun}}.</div>
                 </td>
               </tr>
             </table>
           </td>
         </tr>
-        <tr>
-          <td style="padding:0 40px 36px 40px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1c1618;border-radius:4px;">
-              <tr>
-                <td style="padding:32px 32px 28px 32px;text-align:center;">
-                  <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Stay With Us</div>
-                  <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;margin:0 0 12px 0;line-height:1.2;">Make this a true container — stay onsite at AWKN Ranch</h3>
-                  <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:rgba(255,255,255,0.75);line-height:1.6;margin:0 0 18px 0;">Many of our clients choose to stay at AWKN Ranch during their work. Wake up on the land, slip into the sauna or cold plunge between sessions, share meals in community, and let the integration happen in your body — not in traffic on the way home.</p>
-                  <p style="font-family:'Inter',sans-serif;font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin:0 0 22px 0;">Private rooms, shared houses, and seasonal retreat experiences available. We will share options on your consultation call.</p>
-                  <a href="https://awknranch.com/membership" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:12px 26px;border-radius:3px;">Explore Stay Options →</a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+        {{stay_with_us_block}}
         <tr>
           <td style="padding:0 40px 32px 40px;">
             <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.7;margin:0;text-align:center;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
@@ -227,6 +238,9 @@ Deno.serve(async (req: Request) => {
       package_name,
       deposit_amount,
       balance_amount,
+      retreat_start_date,
+      retreat_end_date,
+      retreat_nights,
     } = body ?? {};
 
     if (!email || !first_name) {
@@ -250,15 +264,84 @@ Deno.serve(async (req: Request) => {
     const resolvedDeposit = deposit_amount || pkg?.deposit || "";
     const resolvedBalance = balance_amount || pkg?.balance || "";
 
+    const isRetreat = !!pkg?.isRetreat || /^immersive/.test(String(package_slug ?? ""));
+    const retreatDatesFormatted = formatRetreatDates(retreat_start_date || "", retreat_end_date || "");
+
+    // Headline changes for retreats — dates aren't locked until medical clearance.
+    const headline = isRetreat
+      ? `Thank you, ${escapeHtml(first_name)} — your deposit is received.`
+      : `Thank you, ${escapeHtml(first_name)} — your spot is held.`;
+
+    // Extra row inside the package/deposit block showing the selected retreat dates.
+    const retreatDatesRow = (isRetreat && retreatDatesFormatted)
+      ? `<tr><td style="padding:14px 24px 0 24px;border-top:1px solid rgba(201,148,62,0.18);">
+           <table width="100%" cellpadding="0" cellspacing="0" border="0">
+             <tr>
+               <td style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;">Selected Dates</td>
+               <td style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;text-align:right;">${retreat_nights ? escapeHtml(String(retreat_nights)) + ' nights' : ''}</td>
+             </tr>
+             <tr>
+               <td colspan="2" style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#1c1618;font-weight:500;padding-bottom:6px;">${escapeHtml(retreatDatesFormatted)}</td>
+             </tr>
+           </table>
+         </td></tr>`
+      : "";
+
+    // Prominent "not fully reserved until cleared" notice for retreats.
+    const retreatHoldNotice = isRetreat
+      ? `<tr>
+           <td style="padding:0 40px 28px 40px;">
+             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fdf6e7;border:1px solid rgba(201,148,62,0.35);border-radius:4px;">
+               <tr>
+                 <td style="padding:18px 22px;">
+                   <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#a67a2e;font-weight:700;margin-bottom:8px;">Important — Dates Are Tentative</div>
+                   <div style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.6;">Your retreat dates above are tentatively held. <strong>Your spot is not fully reserved until you complete your patient application and finish your medical consultation.</strong> Please complete both steps below as soon as possible so our clinician can confirm your clearance and lock in your dates.</div>
+                 </td>
+               </tr>
+             </table>
+           </td>
+         </tr>`
+      : "";
+
+    // Hide the "Stay With Us" block for retreats — they're already staying onsite.
+    const stayWithUsBlock = isRetreat
+      ? ""
+      : `<tr>
+           <td style="padding:0 40px 36px 40px;">
+             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1c1618;border-radius:4px;">
+               <tr>
+                 <td style="padding:32px 32px 28px 32px;text-align:center;">
+                   <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Stay With Us</div>
+                   <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-weight:500;color:#ffffff;margin:0 0 12px 0;line-height:1.2;">Make this a true container — stay onsite at AWKN Ranch</h3>
+                   <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:rgba(255,255,255,0.75);line-height:1.6;margin:0 0 18px 0;">Many of our clients choose to stay at AWKN Ranch during their work. Wake up on the land, slip into the sauna or cold plunge between sessions, share meals in community, and let the integration happen in your body — not in traffic on the way home.</p>
+                   <p style="font-family:'Inter',sans-serif;font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin:0 0 22px 0;">Private rooms, shared houses, and seasonal retreat experiences available. We will share options on your consultation call.</p>
+                   <a href="https://awknranch.com/membership" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:12px 26px;border-radius:3px;">Explore Stay Options →</a>
+                 </td>
+               </tr>
+             </table>
+           </td>
+         </tr>`;
+
+    const step3Title = isRetreat ? "Once approved, your stay is confirmed" : "Once approved, choose your ceremony dates";
+    const step3Noun  = isRetreat ? "stay" : "ceremonies and integration sessions around your life";
+
     const html = renderTemplate(HTML_TEMPLATE, {
       first_name: escapeHtml(first_name),
+      headline,
       package_name: escapeHtml(resolvedPackageName),
       deposit_amount: escapeHtml(resolvedDeposit),
       balance_amount: escapeHtml(resolvedBalance),
       application_link: APPLICATION_LINK,
+      retreat_dates_row: retreatDatesRow,
+      retreat_hold_notice: retreatHoldNotice,
+      stay_with_us_block: stayWithUsBlock,
+      step3_title: step3Title,
+      step3_noun: step3Noun,
     });
 
-    const subject = `Your spot is held, ${first_name} — deposit received`;
+    const subject = isRetreat
+      ? `Deposit received, ${first_name} — next steps to confirm your retreat`
+      : `Your spot is held, ${first_name} — deposit received`;
 
     const resendRes = await fetch(RESEND_API_URL, {
       method: "POST",

@@ -76,6 +76,9 @@ async function fireDepositEmail(session: Record<string, unknown>): Promise<void>
   const packageSlug = metadata.package_slug || '';
   const packageName = metadata.package_name || '';
   const stayAtRanch = metadata.stay_at_ranch || '';
+  const retreatStartDate = metadata.retreat_start_date || '';
+  const retreatEndDate   = metadata.retreat_end_date   || '';
+  const retreatNights    = metadata.retreat_nights     || '';
 
   if (!email || !firstName || !packageSlug) {
     console.warn('Missing required fields for deposit email', { email, firstName, packageSlug });
@@ -83,7 +86,9 @@ async function fireDepositEmail(session: Record<string, unknown>): Promise<void>
   }
 
   const amountTotal = typeof session.amount_total === 'number' ? session.amount_total : 0;
-  const depositAmount = amountTotal > 0 ? `$${(amountTotal / 100).toLocaleString('en-US')}` : '';
+  const depositAmount = amountTotal > 0
+    ? `$${(amountTotal / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : '';
 
   const payload = {
     first_name: firstName,
@@ -93,6 +98,9 @@ async function fireDepositEmail(session: Record<string, unknown>): Promise<void>
     package_name: packageName,
     deposit_amount: depositAmount,
     stay_at_ranch: stayAtRanch,
+    retreat_start_date: retreatStartDate,
+    retreat_end_date:   retreatEndDate,
+    retreat_nights:     retreatNights,
   };
 
   try {

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Your Room | Within Center Retreat</title>
+  <meta name="description" content="Choose your room for a residential ceremonial ketamine retreat at AWKN Ranch — Within Center.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/within.css?v=20260413a">
+  <style>
+    .ranch-banner {
+      background: var(--dark);
+      color: rgba(255,255,255,0.85);
+      padding: 1.1rem 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(201,148,62,0.35);
+    }
+    .ranch-banner strong { color: var(--gold); font-weight: 600; letter-spacing: 0.32em; }
+    .ranch-banner .sep { display: inline-block; margin: 0 0.9rem; color: rgba(201,148,62,0.5); }
+
+    .reserve-page {
+      background: var(--cream);
+      min-height: 70vh;
+      padding: 5rem 1.5rem 6rem;
+    }
+    .reserve-inner {
+      max-width: 880px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .reserve-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .reserve-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      color: var(--dark);
+      margin: 0 0 0.8rem;
+      line-height: 1.15;
+    }
+    .reserve-sub {
+      max-width: 540px;
+      margin: 0 auto 0.4rem;
+      color: rgba(28,22,24,0.7);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    .reserve-meta {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 760px;
+      margin: 3rem auto 0;
+    }
+    @media (max-width: 640px) { .room-grid { grid-template-columns: 1fr; } }
+
+    .room-option {
+      display: block;
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.08);
+      border-radius: 14px;
+      padding: 2.8rem 2rem 2.4rem;
+      text-align: center;
+      box-shadow: 0 1px 2px rgba(28,22,24,0.04);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    .room-option:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,148,62,0.55);
+      box-shadow: 0 18px 40px rgba(28,22,24,0.08);
+    }
+    .room-label {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.65rem;
+      color: var(--dark);
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .room-tag {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(28,22,24,0.5);
+      margin-bottom: 1.4rem;
+      font-weight: 500;
+    }
+    .room-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 3rem;
+      color: var(--gold);
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .room-deposit-note {
+      font-size: 0.78rem;
+      color: rgba(28,22,24,0.55);
+      font-style: italic;
+      margin-bottom: 1.4rem;
+    }
+    .room-cta {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(201,148,62,0.4);
+      padding-bottom: 0.2rem;
+    }
+    .room-option:hover .room-cta { border-bottom-color: var(--gold); }
+
+    .reserve-back {
+      display: inline-block;
+      margin-top: 3.2rem;
+      font-size: 0.74rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(28,22,24,0.55);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(28,22,24,0.18);
+      padding-bottom: 0.2rem;
+    }
+    .reserve-back:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .reserve-trust {
+      max-width: 620px;
+      margin: 2.6rem auto 0;
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(28,22,24,0.55);
+      line-height: 1.7;
+    }
+    .reserve-trust strong { color: var(--gold); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../../#contact" class="secondary-cta">Contact Us</a>
+      <a href="../../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li><a href="../../facility/" data-menu-link>Our Facility</a></li>
+      <li><a href="../../about/" data-menu-link>About Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">
+      A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
+    </div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+
+  <div class="ranch-banner">
+    Held at <strong>AWKN Ranch</strong> <span class="sep">&middot;</span> 7600 Stillridge Dr, Austin, TX
+  </div>
+
+  <main class="reserve-page">
+    <div class="reserve-inner">
+      <div class="reserve-eyebrow" id="rEyebrow">Step 1 of 3 &middot; Choose Your Room</div>
+      <h1 class="reserve-title" id="rTitle">Choose Your Room</h1>
+      <p class="reserve-meta" id="rMeta"></p>
+      <p class="reserve-sub" id="rSub">Two room options for your residential retreat at AWKN Ranch. Both include all meals, ceremonies, integration coaching, and full use of the wellness facilities.</p>
+
+      <div class="room-grid" id="rGrid">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="reserve-trust">
+        <strong>10% deposit holds your room.</strong> Fully refundable if our clinician determines you are not a medical fit.
+      </div>
+
+      <a href="../" class="reserve-back" id="rBack">&larr; Back to Retreat Details</a>
+    </div>
+  </main>
+
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script>
+    (function(){
+      var params = new URLSearchParams(window.location.search);
+      var type = (params.get('type') || '6day').toLowerCase();
+      var is3day = type === '3day' || type === '3-day';
+
+      var cfg = is3day ? {
+        title: '3-Day Retreat',
+        meta: 'Three days &middot; Two nights &middot; One guided ceremony',
+        privatePrice: '$1,699',
+        sharedPrice:  '$1,499',
+        privateSlug:  'immersive-3day&room=private',
+        sharedSlug:   'immersive-3day&room=shared',
+        backHref:     '../3-day/',
+      } : {
+        title: '6-Day Retreat',
+        meta: 'Six days &middot; Five nights &middot; Two guided ceremonies',
+        privatePrice: '$4,999',
+        sharedPrice:  '$3,999',
+        privateSlug:  'immersive&room=private',
+        sharedSlug:   'immersive&room=shared',
+        backHref:     '../',
+      };
+
+      document.getElementById('rTitle').textContent = 'Choose Your Room';
+      document.getElementById('rMeta').innerHTML = cfg.title + ' &middot; ' + cfg.meta;
+      document.getElementById('rBack').setAttribute('href', cfg.backHref);
+
+      var grid = document.getElementById('rGrid');
+      grid.innerHTML =
+        '<a href="../../book/?pkg=' + cfg.privateSlug + '" class="room-option">' +
+          '<div class="room-label">Private Room</div>' +
+          '<div class="room-tag">Solo Sanctuary</div>' +
+          '<div class="room-price">' + cfg.privatePrice + '</div>' +
+          '<div class="room-deposit-note">All-inclusive &middot; 10% deposit to reserve</div>' +
+          '<span class="room-cta">Reserve &rarr;</span>' +
+        '</a>' +
+        '<a href="../../book/?pkg=' + cfg.sharedSlug + '" class="room-option">' +
+          '<div class="room-label">Shared Room</div>' +
+          '<div class="room-tag">Companion Stay</div>' +
+          '<div class="room-price">' + cfg.sharedPrice + '</div>' +
+          '<div class="room-deposit-note">All-inclusive &middot; 10% deposit to reserve</div>' +
+          '<span class="room-cta">Reserve &rarr;</span>' +
+        '</a>';
+    })();
+  </script>
+
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');var allSubs=document.querySelectorAll('.menu-sub');function isOpen(){return panel.classList.contains('open');}function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});backdrop.addEventListener('click',closeMenu);document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});})();
+  </script>
+</body>
+</html>
