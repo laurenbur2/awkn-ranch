@@ -132,62 +132,95 @@
     .included-grouped {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 2.5rem 3rem;
-      max-width: 1080px;
+      gap: 1.6rem;
+      max-width: 1140px;
       margin: 0 auto;
     }
     @media (max-width: 860px) { .included-grouped { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 560px) { .included-grouped { grid-template-columns: 1fr; } }
+    .inc-group {
+      position: relative;
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.07);
+      border-radius: 14px;
+      padding: 2.2rem 1.8rem 1.8rem;
+      box-shadow: 0 1px 2px rgba(28,22,24,0.04);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      overflow: hidden;
+    }
+    .inc-group::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.55;
+    }
+    .inc-group:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,148,62,0.4);
+      box-shadow: 0 18px 40px rgba(28,22,24,0.07);
+    }
+    .inc-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+      color: var(--gold);
+    }
+    .inc-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
     .inc-group-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       color: var(--dark);
-      margin: 0 0 1rem;
-      padding-bottom: 0.75rem;
+      margin: 0 0 1.1rem;
+      padding-bottom: 0.85rem;
       position: relative;
+      line-height: 1.2;
     }
     .inc-group-title::after {
       content: "";
       position: absolute;
       left: 0;
       bottom: 0;
-      width: 32px;
+      width: 28px;
       height: 1px;
       background: var(--gold);
     }
-    .inc-group ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+    .inc-group ul { list-style: none; padding: 0; margin: 0; }
     .inc-group li {
-      padding: 0.5rem 0 0.5rem 1.4rem;
+      padding: 0.65rem 0 0.65rem 1.7rem;
       position: relative;
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       line-height: 1.55;
       color: rgba(28,22,24,0.82);
-      border-bottom: 1px solid rgba(28,22,24,0.05);
+      border-bottom: 1px dashed rgba(28,22,24,0.06);
     }
-    .inc-group li:last-child { border-bottom: none; }
+    .inc-group li:last-child { border-bottom: none; padding-bottom: 0.2rem; }
     .inc-group li::before {
       content: "";
       position: absolute;
       left: 0;
-      top: 0.95rem;
-      width: 6px;
-      height: 6px;
+      top: 1.05rem;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--gold);
-      opacity: 0.7;
+      border: 1.5px solid var(--gold);
+      background: rgba(201,148,62,0.15);
     }
     .inc-group li .note {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: rgba(28,22,24,0.5);
-      margin-top: 0.2rem;
+      margin-top: 0.25rem;
       font-style: italic;
+      letter-spacing: 0.02em;
     }
 
     /* ── RETREAT OPTION CARDS ────────────────────────── */
@@ -419,6 +452,7 @@
       </div>
       <div class="included-grouped">
         <div class="inc-group">
+          <div class="inc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3c-2 3-2 5 0 7s2 4 0 7"/><path d="M8 6c-1.5 2-1.5 3.5 0 5.5"/><path d="M16 6c1.5 2 1.5 3.5 0 5.5"/><path d="M5 21h14"/></svg></div>
           <h3 class="inc-group-title">Ceremony &amp; Integration</h3>
           <ul>
             <li>Two guided ketamine ceremonies</li>
@@ -428,6 +462,7 @@
           </ul>
         </div>
         <div class="inc-group">
+          <div class="inc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg></div>
           <h3 class="inc-group-title">Wellness &amp; Movement</h3>
           <ul>
             <li>IV vitamin therapy session</li>
@@ -436,6 +471,7 @@
           </ul>
         </div>
         <div class="inc-group">
+          <div class="inc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></div>
           <h3 class="inc-group-title">Lodging &amp; Care</h3>
           <ul>
             <li>Meals by our onsite chef</li>
