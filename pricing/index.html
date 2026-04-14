@@ -427,8 +427,17 @@
     .retreat-option-card {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 2rem;
+      overflow: hidden;
       background: var(--white);
+    }
+    .retreat-option-card .room-photo {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+    }
+    .retreat-option-inner {
+      padding: 2rem;
     }
     .retreat-option-label {
       font-family: 'Playfair Display', serif;
@@ -801,38 +810,44 @@
 
             <!-- 6 Day -->
             <div class="retreat-option-card">
-              <div class="retreat-option-label">6 Days / 5 Nights</div>
-              <ul class="retreat-option-highlights">
-                <li><strong>2</strong> guided ketamine ceremonies</li>
-                <li><strong>2</strong> integration coaching sessions</li>
-              </ul>
-              <div class="room-grid">
-                <div class="room-option">
-                  <div class="room-label">Private Room</div>
-                  <div class="room-price">$3,999</div>
-                </div>
-                <div class="room-option">
-                  <div class="room-label">Shared Room</div>
-                  <div class="room-price">$3,499</div>
+              <img src="images/private-room.png" alt="Private retreat bedroom with queen bed" class="room-photo">
+              <div class="retreat-option-inner">
+                <div class="retreat-option-label">6 Days / 5 Nights</div>
+                <ul class="retreat-option-highlights">
+                  <li><strong>2</strong> guided ketamine ceremonies</li>
+                  <li><strong>2</strong> integration coaching sessions</li>
+                </ul>
+                <div class="room-grid">
+                  <div class="room-option">
+                    <div class="room-label">Private Room</div>
+                    <div class="room-price">$3,999</div>
+                  </div>
+                  <div class="room-option">
+                    <div class="room-label">Shared Room</div>
+                    <div class="room-price">$3,499</div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- 3 Day -->
             <div class="retreat-option-card">
-              <div class="retreat-option-label">3 Days / 2 Nights</div>
-              <ul class="retreat-option-highlights">
-                <li><strong>1</strong> guided ketamine ceremony</li>
-                <li><strong>1</strong> integration coaching session</li>
-              </ul>
-              <div class="room-grid">
-                <div class="room-option">
-                  <div class="room-label">Private Room</div>
-                  <div class="room-price">$1,699</div>
-                </div>
-                <div class="room-option">
-                  <div class="room-label">Shared Room</div>
-                  <div class="room-price">$1,499</div>
+              <img src="images/shared-room.jpg" alt="Shared retreat room with bunk beds" class="room-photo">
+              <div class="retreat-option-inner">
+                <div class="retreat-option-label">3 Days / 2 Nights</div>
+                <ul class="retreat-option-highlights">
+                  <li><strong>1</strong> guided ketamine ceremony</li>
+                  <li><strong>1</strong> integration coaching session</li>
+                </ul>
+                <div class="room-grid">
+                  <div class="room-option">
+                    <div class="room-label">Private Room</div>
+                    <div class="room-price">$1,699</div>
+                  </div>
+                  <div class="room-option">
+                    <div class="room-label">Shared Room</div>
+                    <div class="room-price">$1,499</div>
+                  </div>
                 </div>
               </div>
             </div>
