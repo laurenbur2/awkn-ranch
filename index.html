@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWKN Ranch | Where Consciousness Meets Community</title>
-    <meta name="description" content="AWKN Ranch - A wellness and retreat center in Austin, TX offering healing, events, membership, and venue rental.">
+    <title>AWKN Ranch | Team Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -20,347 +21,302 @@
             --cream: #f5f0e8;
             --offwhite: #faf8f4;
             --white: #ffffff;
+            --error: #e07a5f;
         }
 
         body {
             font-family: var(--font-body);
-            color: #333;
-            background: var(--offwhite);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* NAV */
-        nav {
-            position: fixed; top: 0; width: 100%; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 40px;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
         }
-        .logo {
-            font-family: var(--font-heading);
-            font-size: 28px; font-weight: 400;
-            color: var(--brown-dark);
-            text-decoration: none; letter-spacing: 2px;
+        .bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
         }
-        .nav-links { display: flex; gap: 32px; list-style: none; }
-        .nav-links a {
-            font-size: 12px; font-weight: 500;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: var(--brown-dark); text-decoration: none;
-            transition: color 0.3s;
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(26,20,13,0.75) 0%, rgba(26,20,13,0.55) 50%, rgba(26,20,13,0.70) 100%);
+            z-index: 1;
         }
-        .nav-links a:hover { color: var(--brown-light); }
 
-        /* HERO */
-        .hero {
-            height: 100vh; min-height: 600px;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center; position: relative; overflow: hidden;
+        .portal {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 1.5rem;
         }
-        .hero-bg {
-            position: absolute; inset: 0; z-index: 0;
+
+        .card {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 3rem 2.5rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
         }
-        .hero-bg img {
-            width: 100%; height: 100%; object-fit: cover;
+
+        .card-logo {
+            display: block;
+            width: 140px;
+            height: auto;
+            margin: 0 auto 1.5rem;
         }
-        .hero-overlay {
-            position: absolute; inset: 0;
-            background: rgba(26,26,26,0.4); z-index: 1;
-        }
-        .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 24px; }
-        .hero h1 {
-            font-family: var(--font-heading);
-            font-size: clamp(40px, 6vw, 72px);
-            font-weight: 300; color: var(--white);
-            line-height: 1.15; margin-bottom: 16px; letter-spacing: 1px;
-        }
-        .hero .subtitle {
-            font-size: clamp(13px, 1.5vw, 16px);
-            font-weight: 300; letter-spacing: 4px;
+
+        .card-eyebrow {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 48px;
+            color: var(--brown-light);
+            margin-bottom: 2rem;
         }
-        .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
-        /* BUTTONS */
-        .btn {
-            display: inline-block; padding: 14px 36px;
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--brown);
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
             font-family: var(--font-body);
-            font-size: 11px; font-weight: 600;
-            letter-spacing: 2px; text-transform: uppercase;
-            text-decoration: none; transition: all 0.3s; cursor: pointer;
+            font-size: 14px;
+            color: var(--brown-dark);
+            background: var(--offwhite);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .btn-primary {
-            background: var(--brown-light); color: var(--white);
-            border: 1px solid var(--brown-light);
+        .form-input:focus {
+            border-color: var(--brown-light);
+            box-shadow: 0 0 0 3px rgba(166,124,82,0.12);
         }
-        .btn-primary:hover { background: var(--brown); border-color: var(--brown); }
-        .btn-outline {
-            background: rgba(255,255,255,0.25); color: var(--white);
-            border: 1px solid rgba(255,255,255,0.5);
+        .form-input::placeholder {
+            color: #bbb;
         }
-        .btn-outline:hover { background: rgba(255,255,255,0.4); border-color: var(--white); }
-        .btn-dark {
-            background: var(--brown-dark); color: var(--white);
-            border: 1px solid var(--brown-dark);
-        }
-        .btn-dark:hover { background: #2a1f14; }
 
-        /* SECTIONS */
-        section { padding: 100px 24px; }
-        .section-grid {
-            max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 60px; align-items: center;
+        .btn-google {
+            width: 100%;
+            padding: 14px;
+            margin-top: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--brown-dark);
+            background: var(--white);
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .section-title {
+        .btn-google:hover {
+            background: var(--offwhite);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .btn-google:active {
+            transform: scale(0.99);
+        }
+        .btn-google:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .google-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .btn-google.loading .google-icon,
+        .btn-google.loading .btn-text { display: none; }
+        .btn-google.loading .spinner {
+            display: block;
+            border-color: rgba(58,42,26,0.2);
+            border-top-color: var(--brown-dark);
+        }
+
+        .error-msg {
+            background: rgba(224,122,95,0.1);
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 1rem;
+            font-size: 13px;
+            color: var(--error);
+            display: none;
+        }
+        .error-msg.visible { display: block; }
+
+        .forgot-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 12px;
+            color: var(--brown-light);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .forgot-link:hover { color: var(--brown); }
+
+        .tagline {
+            text-align: center;
+            margin-top: 2rem;
             font-family: var(--font-heading);
-            font-size: clamp(32px, 4vw, 52px);
-            font-weight: 300; line-height: 1.2;
-            color: var(--brown-dark); margin-bottom: 24px;
-        }
-        .section-text {
-            font-size: 15px; line-height: 1.9;
-            color: #666; margin-bottom: 32px;
-        }
-        .lead {
-            font-family: var(--font-heading);
-            font-size: 20px; font-style: italic;
-            color: var(--brown); line-height: 1.6; margin-bottom: 20px;
-        }
-        .img-placeholder {
-            width: 100%; height: 450px;
-            background: linear-gradient(135deg, var(--cream) 0%, #e8ddd0 100%);
-            display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-heading); font-size: 18px;
-            color: var(--brown-light); font-style: italic;
+            font-size: 15px;
+            font-style: italic;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.5px;
         }
 
-        /* OFFERINGS */
-        .offerings { background: var(--white); }
-        .offerings-header { text-align: center; margin-bottom: 60px; }
-        .offerings-grid {
-            max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
-        }
-        .offering-card {
-            text-align: center; padding: 0;
-            background: var(--offwhite); transition: transform 0.3s;
-            overflow: hidden;
-        }
-        .offering-card img {
-            width: 100%; height: 220px; object-fit: cover;
-        }
-        .offering-card-text { padding: 32px; }
-        .offering-card:hover { transform: translateY(-4px); }
-        .offering-icon { font-size: 36px; margin-bottom: 20px; display: block; }
-        .offering-card h3 {
-            font-family: var(--font-heading);
-            font-size: 24px; font-weight: 400;
-            color: var(--brown-dark); margin-bottom: 12px;
-        }
-        .offering-card p {
-            font-size: 14px; line-height: 1.7; color: #888; margin-bottom: 24px;
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            text-align: center;
+            padding: 1.25rem;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.3);
         }
 
-        /* QUOTE */
-        .quote-section {
-            position: relative; text-align: center; padding: 120px 24px; overflow: hidden;
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto;
         }
-        .quote-bg {
-            position: absolute; inset: 0;
-        }
-        .quote-bg img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .quote-overlay {
-            position: absolute; inset: 0;
-            background: rgba(26,26,26,0.6);
-        }
-        .quote-section blockquote {
-            position: relative; z-index: 2;
-            max-width: 700px; margin: 0 auto;
-            font-family: var(--font-heading);
-            font-size: clamp(20px, 2.5vw, 28px);
-            font-weight: 300; font-style: italic;
-            line-height: 1.7; color: rgba(255,255,255,0.9);
+        .loading .spinner { display: block; }
+        .loading .btn-text { display: none; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        /* FOOTER */
-        footer {
-            background: #1a140d; color: rgba(255,255,255,0.6); padding: 60px 24px 30px;
-        }
-        .footer-grid {
-            max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
-        }
-        .footer-brand .logo { color: var(--white); font-size: 24px; display: block; margin-bottom: 16px; }
-        .footer-brand p { font-size: 13px; line-height: 1.7; }
-        footer h4 {
-            font-family: var(--font-heading); font-size: 16px;
-            font-weight: 400; color: var(--white); margin-bottom: 16px;
-        }
-        footer ul { list-style: none; }
-        footer li { margin-bottom: 8px; }
-        footer a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; }
-        footer a:hover { color: var(--white); }
-        .footer-bottom {
-            max-width: 1200px; margin: 40px auto 0;
-            padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);
-            text-align: center; font-size: 12px;
-        }
-
-        @media (max-width: 768px) {
-            nav { padding: 16px 20px; }
-            .nav-links { display: none; }
-            .section-grid { grid-template-columns: 1fr; gap: 30px; }
-            .offerings-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-            .img-placeholder { height: 300px; }
+        @media (max-width: 480px) {
+            .card {
+                padding: 2.5rem 1.75rem 2rem;
+            }
+            .portal {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="./" class="logo"><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch" style="height:40px;"></a>
-        <span id="nav-version" style="font-size:10px;color:var(--brown-light);letter-spacing:1px;font-family:var(--font-body);opacity:0.7;"></span>
-        <ul class="nav-links">
-            <li><a href="./">Home</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">Offerings</a></li>
-            <li><a href="#">Membership</a></li>
-            <li><a href="#">Host An Event</a></li>
-            <li><a href="#">Connect</a></li>
-            <li><a href="login/" style="background:var(--brown-dark);color:var(--white);padding:8px 20px;border-radius:4px;">Sign In</a></li>
-        </ul>
-    </nav>
+    <div class="bg">
+        <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="">
+    </div>
+    <div class="bg-overlay"></div>
 
-    <section class="hero" style="background: #2d5a27;">
-        <div class="hero-overlay" style="background: rgba(0,0,0,0.25);"></div>
-        <div class="hero-content">
-            <h1>Welcome to<br>AWKN Ranch</h1>
-            <p class="subtitle">Where consciousness meets community</p>
-            <div class="hero-ctas">
-                <a href="#" class="btn btn-primary">Explore Membership</a>
-                <a href="#" class="btn btn-outline">Get A Day Pass</a>
-            </div>
-        </div>
-    </section>
+    <div class="portal">
+        <div class="card">
+            <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch" class="card-logo">
+            <div class="card-eyebrow">Team Portal</div>
 
-    <section style="background: var(--offwhite);">
-        <div class="section-grid">
-            <div>
-                <h2 class="section-title">Connect<br>Transform<br>AWKN</h2>
-                <p class="section-text">At AWKN Ranch, ancient knowledge meets modern wellness in the heart of the Texas Hill Country. We are a sanctuary for those seeking authentic connection, personal transformation, and community rooted in the wisdom of the ages.</p>
-                <a href="#" class="btn btn-dark">Get In Now</a>
-            </div>
-            <div><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/cbbf27c9-7557-4ddd-b4ab-ed52ac81c194/PC230227-Enhanced-NR.jpg" alt="AWKN Ranch space" style="width:100%;height:450px;object-fit:cover;"></div>
-        </div>
-    </section>
+            <div class="error-msg" id="errorMsg"></div>
 
-    <section class="offerings">
-        <div class="offerings-header">
-            <h2 class="section-title">What We Offer</h2>
+            <button type="button" class="btn-google" id="googleSignInBtn">
+                <svg class="google-icon" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                    <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                </svg>
+                <span class="btn-text">Sign in with Google</span>
+                <div class="spinner"></div>
+            </button>
         </div>
-        <div class="offerings-grid">
-            <div class="offering-card">
-                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/b9084d60-3178-4880-911d-65218001958f/e2c8b0ea-dbf7-4192-8d27-cec7724b3ee1.jpg" alt="AWKN Ranch events">
-                <div class="offering-card-text">
-                    <h3>Events</h3>
-                    <p>Sound baths, breathwork, community gatherings, and transformative experiences throughout the week.</p>
-                    <a href="#" class="btn btn-dark">View Events</a>
-                </div>
-            </div>
-            <div class="offering-card">
-                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/6f6766f9-eaee-40b5-8708-4b6c1bf3bc39/ea06753c-76b3-4ee9-a407-cb8b503c8e05.jpg" alt="AWKN Ranch membership">
-                <div class="offering-card-text">
-                    <h3>Membership</h3>
-                    <p>Join our community for unlimited access to the ranch, events, wellness amenities, and member-only perks.</p>
-                    <a href="#" class="btn btn-dark">Learn More</a>
-                </div>
-            </div>
-            <div class="offering-card">
-                <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/60bd0b08-73ec-4532-bde5-fd1f7827017b/PC230062-Enhanced-NR.jpg" alt="AWKN Ranch venue">
-                <div class="offering-card-text">
-                    <h3>Host Your Event</h3>
-                    <p>A stunning Hill Country venue for retreats, workshops, weddings, and private gatherings.</p>
-                    <a href="#" class="btn btn-dark">Inquire</a>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section style="background: var(--offwhite);">
-        <div class="section-grid">
-            <div><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="AWKN Ranch wellness space" style="width:100%;height:450px;object-fit:cover;"></div>
-            <div>
-                <h2 class="section-title">Our Vision</h2>
-                <p class="lead">At AWKN Ranch, we believe healing works best when the whole person is supported.</p>
-                <p class="section-text">Our integrated approach brings together functional medicine, mental health support, psychedelic-assisted therapy, life coaching, wellness practices, and authentic community. Each element strengthens the others, creating a foundation for lasting transformation and growth.</p>
-                <a href="#" class="btn btn-dark">Our Offerings</a>
-            </div>
-        </div>
-    </section>
+        <div class="tagline">Where consciousness meets community.</div>
+    </div>
 
-    <section class="quote-section">
-        <div class="quote-bg">
-            <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/a33e1895-9d7b-4d7e-a8f7-47be83a776cb/2.png" alt="">
-        </div>
-        <div class="quote-overlay"></div>
-        <blockquote>
-            &ldquo;Return to the essence of who you are &mdash; rooted in nature, connected to community, and inspired by the wisdom of the ages.&rdquo;
-        </blockquote>
-    </section>
+    <div class="page-footer">AWKN Ranch · Austin, TX</div>
 
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <a href="./" class="logo">AWKN Ranch</a>
-                <p>A wellness and retreat center in Austin, TX. Where consciousness meets community.</p>
-            </div>
-            <div>
-                <h4>Navigate</h4>
-                <ul>
-                    <li><a href="./">Home</a></li>
-                    <li><a href="#">Events</a></li>
-                    <li><a href="#">Offerings</a></li>
-                    <li><a href="#">Membership</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Contact</h4>
-                <ul>
-                    <li><a href="tel:5125159924">512-515-9924</a></li>
-                    <li><a href="mailto:connect@awknranch.com">connect@awknranch.com</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Hours</h4>
-                <ul>
-                    <li>Mon&ndash;Fri: 9am&ndash;9pm</li>
-                    <li>Saturday: 9am&ndash;8pm</li>
-                    <li>Sunday: 10am&ndash;6pm</li>
-                </ul>
-                <h4 style="margin-top: 20px;">Location</h4>
-                <ul>
-                    <li><a href="https://maps.google.com/?q=7600+Stillridge+Dr+Austin+TX+78736" target="_blank">7600 Stillridge Dr<br>Austin, TX 78736</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 AWKN Ranch. All rights reserved.</p>
-        </div>
-    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<script>
-fetch('version.json').then(r=>r.json()).then(d=>{
-    const el=document.getElementById('nav-version');
-    if(el&&d.version) el.textContent=d.version;
-}).catch(()=>{});
-</script>
+        const CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
+        const REDIRECT_URL = '/awkn-ranch/spaces/admin/spaces.html';
+        const OAUTH_RETURN_URL = window.location.origin + '/awkn-ranch/';
+
+        const errorMsg = document.getElementById('errorMsg');
+        const googleBtn = document.getElementById('googleSignInBtn');
+
+        // Check for existing session on load (handles OAuth callback too)
+        (async function checkSession() {
+            try {
+                const { data } = await sb.auth.getSession();
+                if (data.session) {
+                    localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
+                        email: data.session.user.email,
+                        ts: Date.now()
+                    }));
+                    window.location.href = REDIRECT_URL;
+                }
+            } catch(e) {}
+        })();
+
+        googleBtn.addEventListener('click', async () => {
+            errorMsg.classList.remove('visible');
+            googleBtn.classList.add('loading');
+            googleBtn.disabled = true;
+
+            try {
+                const { error } = await sb.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: OAUTH_RETURN_URL
+                    }
+                });
+
+                if (error) {
+                    errorMsg.textContent = error.message || 'Unable to sign in with Google.';
+                    errorMsg.classList.add('visible');
+                    googleBtn.classList.remove('loading');
+                    googleBtn.disabled = false;
+                }
+                // On success, browser redirects to Google; no further handling needed
+            } catch (err) {
+                errorMsg.textContent = 'Something went wrong. Please try again.';
+                errorMsg.classList.add('visible');
+                googleBtn.classList.remove('loading');
+                googleBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
