@@ -445,7 +445,7 @@ function renderAccessDenied(state, activeTab) {
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async () => {
       await signOut();
-      window.location.href = '/login/';
+      window.location.href = '/awkn-ranch/login/';
     });
   }
 
@@ -653,7 +653,7 @@ export async function initResidentPage({ activeTab, requiredRole = 'resident', r
       if (!pageContentShown) {
         const handleSignOut = async () => {
           await signOut();
-          window.location.href = '/login/';
+          window.location.href = '/awkn-ranch/login/';
         };
         document.getElementById('signOutBtn')?.addEventListener('click', handleSignOut);
         const userInfoEl = document.getElementById('userInfo') || document.getElementById('aapHeaderAuth');
@@ -686,7 +686,7 @@ export async function initResidentPage({ activeTab, requiredRole = 'resident', r
           console.warn('[resident-shell] Token refresh failed — redirecting to login');
           try { localStorage.removeItem('your-project-cached-auth'); } catch (e) { /* ignore */ }
           transitionBootState('redirecting');
-          window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+          window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
           return;
         }
         onReady(state);
@@ -702,7 +702,7 @@ export async function initResidentPage({ activeTab, requiredRole = 'resident', r
       renderAccessDenied(state, activeTab);
     } else if (!state.isAuthenticated && !pageContentShown) {
       transitionBootState('redirecting');
-      window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+      window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
     }
   }
 

@@ -596,7 +596,7 @@ function renderUserMenu(state) {
   // Sign out
   authEl.querySelector('#ppSignOutBtn')?.addEventListener('click', async () => {
     await signOut();
-    window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+    window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
   });
 }
 
@@ -637,7 +637,7 @@ function renderAccessDenied(state) {
 
   overlay.querySelector('#ppDeniedSignOut')?.addEventListener('click', async () => {
     await signOut();
-    window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+    window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
   });
 }
 
@@ -696,7 +696,7 @@ export async function initPersonalPage(options = {}) {
 
   // Not authenticated -> redirect to login
   if (!authState.isAuthenticated) {
-    window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
     return authState;
   }
 
@@ -733,7 +733,7 @@ export async function initPersonalPage(options = {}) {
   onAuthStateChange((newState) => {
     authState = newState;
     if (!newState.isAuthenticated) {
-      window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+      window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
     }
   });
 
