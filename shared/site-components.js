@@ -444,7 +444,7 @@ export async function initPublicHeaderAuth({ authContainerId, signInLinkId, prof
         // Bind mobile sign out
         document.getElementById('mobileSignOutBtn')?.addEventListener('click', async () => {
           await signOut();
-          window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+          window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
         });
       }
     }
@@ -465,7 +465,7 @@ export async function initPublicHeaderAuth({ authContainerId, signInLinkId, prof
     }
     authEl.querySelector('#publicHeaderSignOutBtn')?.addEventListener('click', async () => {
       await signOut();
-      window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+      window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
     });
   } else {
     authEl.innerHTML = '';

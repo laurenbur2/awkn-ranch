@@ -232,7 +232,7 @@ function renderAccessDenied(state, activeTab) {
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async () => {
       await signOut();
-      window.location.href = '/login/';
+      window.location.href = '/awkn-ranch/login/';
     });
   }
 
@@ -411,7 +411,7 @@ export async function initAssociatePage({ activeTab, onReady }) {
       if (!pageContentShown) {
         const handleSignOut = async () => {
           await signOut();
-          window.location.href = '/login/';
+          window.location.href = '/awkn-ranch/login/';
         };
         document.getElementById('signOutBtn')?.addEventListener('click', handleSignOut);
         const userInfo = document.getElementById('userInfo');
@@ -441,7 +441,7 @@ export async function initAssociatePage({ activeTab, onReady }) {
           console.warn('[associate-shell] Token refresh failed — redirecting to login');
           try { localStorage.removeItem('your-project-cached-auth'); } catch (e) { /* ignore */ }
           transitionBootState('redirecting');
-          window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+          window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
           return;
         }
         onReady(state);
@@ -457,7 +457,7 @@ export async function initAssociatePage({ activeTab, onReady }) {
       renderAccessDenied(state, activeTab);
     } else if (!state.isAuthenticated && !pageContentShown) {
       transitionBootState('redirecting');
-      window.location.href = '/login/?redirect=' + encodeURIComponent(window.location.pathname);
+      window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
     }
   }
 
