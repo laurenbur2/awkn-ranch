@@ -183,7 +183,7 @@
   font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
 }
 .crm-biz-tag-within { background: #d1fae5; color: #065f46; }
-.crm-biz-tag-ranch { background: #fde6c7; color: #9a3412; }
+.crm-biz-tag-ranch { background: #d4883a; color: #fff; }
 
 /* Modal System */
 #crm-modal { position: fixed; inset: 0; z-index: 1000; }
