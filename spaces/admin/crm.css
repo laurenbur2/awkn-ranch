@@ -276,7 +276,8 @@
   grid-template-columns: 100px 2fr 70px 100px 100px 40px;
 }
 .crm-line-item .crm-li-cat { min-width: 0; }
-.crm-line-item .crm-li-desc { min-width: 0; }
+.crm-line-item .crm-li-desc { min-width: 0; resize: vertical; font-family: inherit; line-height: 1.4; white-space: pre-wrap; }
+textarea.crm-li-desc { field-sizing: content; min-height: 36px; }
 .crm-line-item .crm-li-qty { width: 70px; text-align: center; }
 .crm-line-item .crm-li-price { width: 100px; min-width: 0; }
 .crm-line-item .crm-li-total { font-weight: 600; font-size: 13px; white-space: nowrap; }

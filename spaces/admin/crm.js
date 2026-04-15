@@ -1523,8 +1523,13 @@ async function openInvoiceModal(invoice = null, lead = null) {
     const bl = document.getElementById('inv-biz-line').value;
     const catalog = bl === 'awkn_ranch' ? venueCatalog : servicePackages.filter(p => p.business_line === bl);
     showCatalogPicker(catalog, (item) => {
+      const baseLabel = item._selectedLabel || item.name || item.description || '';
+      const includes = Array.isArray(item.includes) ? item.includes.filter(Boolean) : [];
+      const description = includes.length
+        ? `${baseLabel}\n${includes.map(i => `• ${i}`).join('\n')}`
+        : baseLabel;
       addInvoiceLineItem({
-        description: item._selectedLabel || item.name || item.description,
+        description,
         quantity: 1,
         unit_price: item._selectedPrice || item.price_regular || item.unit_price || 0,
         service_package_id: item.id || null,
@@ -1551,7 +1556,7 @@ async function openInvoiceModal(invoice = null, lead = null) {
 function renderInvoiceLineItem(item, index) {
   return `
     <div class="crm-line-item" data-index="${index}">
-      <input type="text" class="crm-input crm-li-desc" placeholder="Description" value="${escapeHtml(item.description || '')}">
+      <textarea class="crm-input crm-li-desc" placeholder="Description" rows="1">${escapeHtml(item.description || '')}</textarea>
       <input type="number" class="crm-input crm-li-qty" placeholder="Qty" value="${item.quantity || 1}" min="1" step="1">
       <input type="number" class="crm-input crm-li-price" placeholder="Price" value="${item.unit_price || 0}" min="0" step="0.01">
       <span class="crm-li-total">${formatCurrency((item.quantity || 1) * (item.unit_price || 0))}</span>
@@ -2009,7 +2014,7 @@ function renderProposalLineItem(item, index) {
   return `
     <div class="crm-line-item" data-index="${index}">
       <input type="text" class="crm-input crm-li-cat" placeholder="Category" value="${escapeHtml(item.category || '')}" style="width:100px;">
-      <input type="text" class="crm-input crm-li-desc" placeholder="Description" value="${escapeHtml(item.description || '')}">
+      <textarea class="crm-input crm-li-desc" placeholder="Description" rows="1">${escapeHtml(item.description || '')}</textarea>
       <input type="number" class="crm-input crm-li-qty" placeholder="Qty" value="${item.quantity || 1}" min="1" step="1">
       <input type="number" class="crm-input crm-li-price" placeholder="Price" value="${item.unit_price || 0}" min="0" step="0.01">
       <span class="crm-li-total">${formatCurrency((item.quantity || 1) * (item.unit_price || 0))}</span>
