@@ -458,7 +458,7 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
   let hasCachedAuthHint = rootEl.hasAttribute('data-cached-auth');
   if (!hasCachedAuthHint) {
     try {
-      const raw = localStorage.getItem('your-project-cached-auth');
+      const raw = localStorage.getItem('awkn-ranch-cached-auth');
       if (raw) {
         const cached = JSON.parse(raw);
         const ageMs = Date.now() - (cached?.timestamp || 0);
@@ -669,7 +669,7 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
         if (!sessionData?.session) {
           // Refresh also failed — force re-login
           console.warn('[admin-shell] Token refresh failed — redirecting to login');
-          try { localStorage.removeItem('your-project-cached-auth'); } catch (e) { /* ignore */ }
+          try { localStorage.removeItem('awkn-ranch-cached-auth'); } catch (e) { /* ignore */ }
           transitionBootState('redirecting');
           window.location.href = '/awkn-ranch/login/?redirect=' + encodeURIComponent(window.location.pathname);
           return;

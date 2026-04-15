@@ -99,7 +99,7 @@ async function init() {
       if (age < 90 * 24 * 60 * 60 * 1000 && ['oracle', 'admin', 'staff', 'resident', 'associate', 'public'].includes(cached.role)) {
         const targetUrl = getRedirectTarget(cached.role);
         console.log('[LOGIN]', 'Cached auth found, redirecting immediately', { email: cached.email, role: cached.role });
-        localStorage.removeItem('your-project-login-redirect');
+        localStorage.removeItem('awkn-ranch-login-redirect');
         window.location.href = targetUrl;
         return;
       }
@@ -158,7 +158,7 @@ function checkAuthAndRedirect() {
     if (state.isAuthorized) {
       const targetUrl = getRedirectTarget(state.role);
       console.log('[LOGIN]', 'Authorized — redirecting to:', targetUrl);
-      localStorage.removeItem('your-project-login-redirect');
+      localStorage.removeItem('awkn-ranch-login-redirect');
       window.location.href = targetUrl;
     } else if (state.isUnauthorized) {
       console.log('[LOGIN]', 'Authenticated but unauthorized');
@@ -281,7 +281,7 @@ googleSignInBtn.addEventListener('click', async () => {
   try {
     // Redirect URL: use just /login/ so Supabase can append ?code= cleanly (PKCE flow)
     // We store the intended destination in sessionStorage so it survives the OAuth round-trip
-    localStorage.setItem('your-project-login-redirect', redirectUrl);
+    localStorage.setItem('awkn-ranch-login-redirect', redirectUrl);
     // In Capacitor (native app), use the custom URL scheme for OAuth redirect
     const isCapacitor = window.Capacitor?.isNativePlatform?.() ?? false;
     const loginRedirect = isCapacitor

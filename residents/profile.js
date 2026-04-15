@@ -481,12 +481,12 @@ async function saveProfile() {
 
 function updateCachedAuth(fields) {
   try {
-    const cached = localStorage.getItem('your-project-cached-auth');
+    const cached = localStorage.getItem('awkn-ranch-cached-auth');
     if (cached) {
       const parsed = JSON.parse(cached);
       if (parsed.appUser) {
         Object.assign(parsed.appUser, fields);
-        localStorage.setItem('your-project-cached-auth', JSON.stringify(parsed));
+        localStorage.setItem('awkn-ranch-cached-auth', JSON.stringify(parsed));
       }
     }
   } catch (e) {

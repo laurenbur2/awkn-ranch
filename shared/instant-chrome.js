@@ -13,7 +13,7 @@
  */
 (function () {
   try {
-    var cached = localStorage.getItem('your-project-cached-auth');
+    var cached = localStorage.getItem('awkn-ranch-cached-auth');
     if (!cached) return;
     var data = JSON.parse(cached);
     if (!data || !data.appUser) return;
