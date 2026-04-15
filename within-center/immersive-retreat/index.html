@@ -281,6 +281,83 @@
     }
     @media (max-width: 720px) { .ranch-strip { grid-template-columns: 1fr; } .ranch-strip img { height: 220px; } }
 
+    /* ── SAMPLE SCHEDULE MODAL ─────────────────────── */
+    .schedule-btn {
+      display: inline-block;
+      padding: 0.6rem 1.4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold, #b08a3e);
+      background: transparent;
+      border: 1px solid var(--gold, #b08a3e);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .schedule-btn:hover { background: var(--gold, #b08a3e); color: #fff; }
+    .schedule-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      overflow-y: auto;
+    }
+    .schedule-modal.open { display: flex; }
+    .schedule-modal-inner {
+      position: relative;
+      background: #fff;
+      max-width: 520px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 2.5rem 2rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: left;
+    }
+    .schedule-modal-close {
+      position: absolute;
+      top: 0.8rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: #888;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .schedule-modal-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--dark, #1c1618);
+      text-align: center;
+    }
+    .schedule-day {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(28,22,24,0.1);
+    }
+    .schedule-day:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .schedule-day-label {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold, #b08a3e);
+      margin-bottom: 0.35rem;
+    }
+    .schedule-day-details {
+      font-size: 0.88rem;
+      color: rgba(28,22,24,0.75);
+      line-height: 1.7;
+    }
+
     .ranch-context {
       max-width: 720px;
       margin: 0 auto;
@@ -505,8 +582,43 @@
           <span class="room-cta">Reserve &rarr;</span>
         </a>
       </div>
+      <div style="text-align:center; margin-top:2rem;">
+        <button type="button" class="schedule-btn" onclick="document.getElementById('sampleScheduleModal').classList.add('open')">Sample Schedule</button>
+      </div>
     </div>
   </section>
+
+  <!-- ── SAMPLE SCHEDULE MODAL ─────────────────────── -->
+  <div id="sampleScheduleModal" class="schedule-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="schedule-modal-inner">
+      <button type="button" class="schedule-modal-close" onclick="document.getElementById('sampleScheduleModal').classList.remove('open')" aria-label="Close">&times;</button>
+      <div class="schedule-modal-title">Sample Schedule: 6 Days / 5 Nights</div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Sunday</div>
+        <div class="schedule-day-details">Arrival (4pm) &middot; Dinner &middot; Welcome Session</div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Monday</div>
+        <div class="schedule-day-details">Ketamine Session (IM) &middot; Lunch &middot; Sound Bath &middot; Dinner<br><em>No breakfast before ketamine</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Tuesday</div>
+        <div class="schedule-day-details">Breakfast &middot; IV Vitamin Therapy &middot; Lunch &middot; Integration Coaching &middot; Dinner</div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Wednesday</div>
+        <div class="schedule-day-details">Breakfast &middot; Yoga Class &middot; Lunch &middot; Relaxation &amp; Reflection &middot; Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Thursday</div>
+        <div class="schedule-day-details">Ketamine Session (IM) &middot; Lunch &middot; Intro to Meditation &middot; Dinner &middot; Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
+      </div>
+      <div class="schedule-day">
+        <div class="schedule-day-label">Friday</div>
+        <div class="schedule-day-details">Breakfast &middot; Integration Coaching Session &middot; Departure (11am)</div>
+      </div>
+    </div>
+  </div>
 
   <!-- ── HOW IT WORKS ──────────────────────────────── -->
   <section class="pkg-section bg-white">
