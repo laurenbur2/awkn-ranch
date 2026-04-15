@@ -716,97 +716,205 @@ async function openLeadDetail(leadId) {
     console.error('Error loading activities:', err);
   }
 
-  const name = escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed');
+  const fullName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed Lead';
+  const initials = (((lead.first_name || '')[0] || '') + ((lead.last_name || '')[0] || '')).toUpperCase()
+    || (lead.email || '?')[0].toUpperCase();
+  const bizLabel = lead.business_line === 'within' ? 'Within' : 'AWKN Ranch';
+  const bizClass = lead.business_line === 'within' ? 'within' : 'awkn_ranch';
   const stageColor = lead.stage?.color || '#6b7280';
 
-  // Stage dropdown options
+  // Stage options
   const stageOpts = stages
     .filter(s => s.business_line === lead.business_line)
     .map(s => `<option value="${s.id}" ${s.id === lead.stage_id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`)
     .join('');
 
+  // Stats
+  const daysAsLead = lead.created_at ? Math.max(0, Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000)) : 0;
+  const stageEnteredAt = leadActivities.find(a => a.activity_type === 'stage_change')?.created_at || lead.created_at;
+  const daysInStage = stageEnteredAt ? Math.max(0, Math.floor((Date.now() - new Date(stageEnteredAt).getTime()) / 86400000)) : 0;
+  const lastActivity = leadActivities[0]?.created_at || lead.created_at;
+  const lastActivityRel = lastActivity ? formatRelativeTime(lastActivity) : '—';
+
+  // Related records
+  const relatedInvoices = invoices.filter(i => i.lead_id === lead.id);
+  const relatedProposals = proposals.filter(p => p.lead_id === lead.id);
+  const totalInvoiced = relatedInvoices.reduce((s, i) => s + (parseFloat(i.total) || 0), 0);
+  const totalPaid = relatedInvoices.filter(i => i.status === 'paid').reduce((s, i) => s + (parseFloat(i.total) || 0), 0);
+
+  // Group activities by day
+  const groupedActivities = groupActivitiesByDay(leadActivities);
+
   const modal = document.getElementById('crm-modal');
   modal.innerHTML = `
     <div class="crm-modal-overlay" id="crm-modal-overlay">
-      <div class="crm-modal-content crm-modal-large">
-        <div class="crm-modal-header">
-          <div style="display:flex;align-items:center;gap:10px">
-            <h2>${name}</h2>
-            <button class="crm-btn crm-btn-sm" id="btn-edit-lead" style="font-size:11px">Edit</button>
+      <div class="crm-modal-content crm-modal-xlarge crm-lead-detail">
+        <!-- HEADER BAR -->
+        <div class="crm-lead-header">
+          <div class="crm-lead-header-main">
+            <div class="crm-avatar crm-avatar-lg crm-avatar-${bizClass}">${escapeHtml(initials)}</div>
+            <div class="crm-lead-header-info">
+              <div class="crm-lead-header-row">
+                <h2 class="crm-lead-name">${escapeHtml(fullName)}</h2>
+                <span class="crm-biz-tag crm-biz-tag-${bizClass}">${escapeHtml(bizLabel)}</span>
+                <span class="crm-status-badge crm-status-${lead.status}">${escapeHtml(lead.status)}</span>
+              </div>
+              <div class="crm-lead-subline">
+                ${lead.email ? `<a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a>` : '<span class="crm-muted">No email</span>'}
+                <span class="crm-dot">·</span>
+                ${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}">${escapeHtml(lead.phone)}</a>` : '<span class="crm-muted">No phone</span>'}
+                <span class="crm-dot">·</span>
+                <span class="crm-muted">Created ${formatDate(lead.created_at)} · Last activity ${lastActivityRel}</span>
+              </div>
+            </div>
           </div>
-          <button class="crm-modal-close" id="crm-modal-close-btn">&times;</button>
+          <div class="crm-lead-header-actions">
+            <button class="crm-btn crm-btn-sm" id="btn-edit-lead" title="Edit lead">Edit</button>
+            <div class="crm-menu-wrap">
+              <button class="crm-btn crm-btn-sm" id="btn-more-menu" title="More actions">More ▾</button>
+              <div class="crm-menu" id="crm-more-menu" style="display:none">
+                ${lead.business_line === 'within' ? '<button class="crm-menu-item" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
+                ${lead.business_line === 'awkn_ranch' ? '<button class="crm-menu-item" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
+                ${lead.email ? '<button class="crm-menu-item" id="btn-send-feedback">Send Feedback Form</button>' : ''}
+                ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-success" id="btn-mark-won">Mark Won</button>' : ''}
+                ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-danger" id="btn-mark-lost">Mark Lost</button>' : ''}
+              </div>
+            </div>
+            <button class="crm-modal-close" id="crm-modal-close-btn" title="Close">&times;</button>
+          </div>
         </div>
-        <div class="crm-modal-body crm-detail-layout">
-          <div class="crm-detail-left">
-            <h3>Contact Info</h3>
-            <div class="crm-detail-field">
-              <label>Email</label>
-              <div>${escapeHtml(lead.email || 'N/A')}</div>
-            </div>
-            <div class="crm-detail-field">
-              <label>Phone</label>
-              <div>${escapeHtml(lead.phone || 'N/A')}</div>
-            </div>
-            <div class="crm-detail-field">
-              <label>Location</label>
-              <div>${escapeHtml([lead.city, lead.state].filter(Boolean).join(', ') || 'N/A')}</div>
+
+        <!-- BODY: 3 columns -->
+        <div class="crm-lead-body">
+          <!-- LEFT: PROPERTIES -->
+          <aside class="crm-lead-rail crm-lead-rail-left">
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">About</div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Email</span><span class="crm-prop-val">${lead.email ? `<a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a>` : '—'}</span></div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Phone</span><span class="crm-prop-val">${lead.phone ? `<a href="tel:${escapeHtml(lead.phone)}">${escapeHtml(lead.phone)}</a>` : '—'}</span></div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Location</span><span class="crm-prop-val">${escapeHtml([lead.city, lead.state].filter(Boolean).join(', ') || '—')}</span></div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Source</span><span class="crm-prop-val">${escapeHtml(lead.source?.name || '—')}</span></div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Owner</span><span class="crm-prop-val">${escapeHtml(lead.owner?.display_name || lead.owner?.email || 'Unassigned')}</span></div>
             </div>
 
-            <h3>Pipeline</h3>
-            <div class="crm-detail-field">
-              <label>Stage</label>
-              <select class="crm-select" id="detail-stage-select">${stageOpts}</select>
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">Pipeline</div>
+              <div class="crm-prop-row crm-prop-row-stack">
+                <span class="crm-prop-key">Stage</span>
+                <select class="crm-select crm-select-sm" id="detail-stage-select" style="border-left:3px solid ${stageColor}">${stageOpts}</select>
+              </div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Value</span><span class="crm-prop-val crm-prop-val-strong">${formatCurrency(lead.estimated_value)}</span></div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Days in stage</span><span class="crm-prop-val">${daysInStage}</span></div>
             </div>
-            <div class="crm-detail-field">
-              <label>Status</label>
-              <span class="crm-status-badge crm-status-${lead.status}">${escapeHtml(lead.status)}</span>
+
+            ${lead.business_line === 'awkn_ranch' && (lead.space?.name || lead.event_type || lead.event_date || lead.guest_count) ? `
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">Event</div>
+              ${lead.space?.name ? `<div class="crm-prop-row"><span class="crm-prop-key">Space</span><span class="crm-prop-val"><span class="crm-space-tag">${escapeHtml(lead.space.name)}</span></span></div>` : ''}
+              ${lead.event_type ? `<div class="crm-prop-row"><span class="crm-prop-key">Type</span><span class="crm-prop-val">${escapeHtml(lead.event_type)}</span></div>` : ''}
+              ${lead.event_date ? `<div class="crm-prop-row"><span class="crm-prop-key">Date</span><span class="crm-prop-val">${formatDate(lead.event_date)}</span></div>` : ''}
+              ${lead.guest_count ? `<div class="crm-prop-row"><span class="crm-prop-key">Guests</span><span class="crm-prop-val">${lead.guest_count}</span></div>` : ''}
+              ${(lead.event_start_time || lead.event_end_time) ? `<div class="crm-prop-row"><span class="crm-prop-key">Time</span><span class="crm-prop-val">${escapeHtml(lead.event_start_time || '')}${lead.event_end_time ? ' – ' + escapeHtml(lead.event_end_time) : ''}</span></div>` : ''}
             </div>
-            <div class="crm-detail-field">
-              <label>Estimated Value</label>
-              <div>${formatCurrency(lead.estimated_value)}</div>
-            </div>
-            <div class="crm-detail-field">
-              <label>Source</label>
-              <div>${escapeHtml(lead.source?.name || 'N/A')}</div>
-            </div>
-            <div class="crm-detail-field">
-              <label>Owner</label>
-              <div>${escapeHtml(lead.owner?.display_name || lead.owner?.email || 'Unassigned')}</div>
-            </div>
-            ${lead.business_line === 'awkn_ranch' ? `
-            <h3>Event Details</h3>
-            <div class="crm-detail-field">
-              <label>Requested Space</label>
-              <div>${lead.space?.name ? `<span class="crm-space-tag">${escapeHtml(lead.space.name)}</span>` : 'Not selected'}</div>
-            </div>
-            ${lead.event_type ? `<div class="crm-detail-field"><label>Event Type</label><div>${escapeHtml(lead.event_type)}</div></div>` : ''}
-            ${lead.event_date ? `<div class="crm-detail-field"><label>Event Date</label><div>${formatDate(lead.event_date)}</div></div>` : ''}
-            ${lead.guest_count ? `<div class="crm-detail-field"><label>Guest Count</label><div>${lead.guest_count}</div></div>` : ''}
-            ${lead.event_start_time || lead.event_end_time ? `<div class="crm-detail-field"><label>Time</label><div>${escapeHtml(lead.event_start_time || '')}${lead.event_end_time ? ' – ' + escapeHtml(lead.event_end_time) : ''}</div></div>` : ''}
             ` : ''}
-            ${lead.utm_source ? `<div class="crm-detail-field"><label>UTM</label><div>${escapeHtml(lead.utm_source)}${lead.utm_medium ? ' / ' + escapeHtml(lead.utm_medium) : ''}${lead.utm_campaign ? ' / ' + escapeHtml(lead.utm_campaign) : ''}</div></div>` : ''}
 
-            <h3>Quick Actions</h3>
-            <div class="crm-quick-actions">
-              <button class="crm-btn crm-btn-sm" id="btn-add-note">Add Note</button>
-              <button class="crm-btn crm-btn-sm" id="btn-log-call">Log Call</button>
-              ${lead.business_line === 'within' ? '<button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
-              ${lead.business_line === 'awkn_ranch' ? '<button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
-              ${lead.email ? '<button class="crm-btn crm-btn-sm" id="btn-send-feedback" style="background:#6366F1;color:#fff;border-color:#6366F1">Send Feedback Form</button>' : ''}
-              ${lead.status === 'open' ? '<button class="crm-btn crm-btn-sm crm-btn-success" id="btn-mark-won">Mark Won</button>' : ''}
-              ${lead.status === 'open' ? '<button class="crm-btn crm-btn-sm crm-btn-danger" id="btn-mark-lost">Mark Lost</button>' : ''}
+            ${lead.utm_source ? `
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">Marketing</div>
+              <div class="crm-prop-row"><span class="crm-prop-key">Source</span><span class="crm-prop-val">${escapeHtml(lead.utm_source)}</span></div>
+              ${lead.utm_medium ? `<div class="crm-prop-row"><span class="crm-prop-key">Medium</span><span class="crm-prop-val">${escapeHtml(lead.utm_medium)}</span></div>` : ''}
+              ${lead.utm_campaign ? `<div class="crm-prop-row"><span class="crm-prop-key">Campaign</span><span class="crm-prop-val">${escapeHtml(lead.utm_campaign)}</span></div>` : ''}
+            </div>
+            ` : ''}
+          </aside>
+
+          <!-- CENTER: COMPOSER + ACTIVITY -->
+          <main class="crm-lead-main">
+            <div class="crm-composer">
+              <div class="crm-composer-tabs">
+                <button class="crm-composer-tab active" data-composer-type="note">📝 Note</button>
+                <button class="crm-composer-tab" data-composer-type="call">📞 Call</button>
+                ${lead.email ? '<button class="crm-composer-tab" data-composer-type="email">✉️ Email</button>' : ''}
+              </div>
+              <div class="crm-composer-body">
+                <textarea id="composer-text" class="crm-textarea" rows="3" placeholder="Add a note about this lead..."></textarea>
+                <div class="crm-composer-actions">
+                  <span class="crm-composer-hint" id="composer-hint">Saved to activity timeline</span>
+                  <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-composer-save">Save Note</button>
+                </div>
+              </div>
             </div>
 
-            <div id="crm-quick-action-form" class="crm-quick-action-form" style="display:none;"></div>
-          </div>
+            <div class="crm-activity-feed">
+              <div class="crm-activity-filters">
+                <button class="crm-chip active" data-filter="all">All <span class="crm-chip-count">${leadActivities.length}</span></button>
+                <button class="crm-chip" data-filter="note">Notes</button>
+                <button class="crm-chip" data-filter="call">Calls</button>
+                <button class="crm-chip" data-filter="email">Emails</button>
+                <button class="crm-chip" data-filter="stage_change">Stage</button>
+                <button class="crm-chip" data-filter="system">System</button>
+              </div>
 
-          <div class="crm-detail-right">
-            <h3>Activity Timeline</h3>
-            <div class="crm-timeline">
-              ${leadActivities.length === 0 ? '<div class="crm-empty">No activity yet</div>' : ''}
-              ${leadActivities.map(a => renderActivityItem(a)).join('')}
+              <div class="crm-activity-list" id="crm-activity-list">
+                ${leadActivities.length === 0
+                  ? '<div class="crm-empty">No activity yet — add a note above to get started.</div>'
+                  : groupedActivities.map(group => `
+                      <div class="crm-activity-day-group">
+                        <div class="crm-activity-day-label">${escapeHtml(group.label)}</div>
+                        ${group.items.map(a => renderActivityItem(a)).join('')}
+                      </div>
+                    `).join('')}
+              </div>
             </div>
-          </div>
+          </main>
+
+          <!-- RIGHT: RELATED / STATS -->
+          <aside class="crm-lead-rail crm-lead-rail-right">
+            <div class="crm-prop-card crm-stats-card">
+              <div class="crm-stats-grid">
+                <div class="crm-stat"><div class="crm-stat-num">${daysAsLead}</div><div class="crm-stat-label">Days as lead</div></div>
+                <div class="crm-stat"><div class="crm-stat-num">${daysInStage}</div><div class="crm-stat-label">Days in stage</div></div>
+                <div class="crm-stat"><div class="crm-stat-num">${formatCurrency(totalInvoiced).replace('.00', '')}</div><div class="crm-stat-label">Invoiced</div></div>
+                <div class="crm-stat"><div class="crm-stat-num">${formatCurrency(totalPaid).replace('.00', '')}</div><div class="crm-stat-label">Paid</div></div>
+              </div>
+            </div>
+
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">
+                Invoices <span class="crm-prop-count">${relatedInvoices.length}</span>
+              </div>
+              ${relatedInvoices.length === 0
+                ? '<div class="crm-rail-empty">No invoices yet</div>'
+                : relatedInvoices.map(inv => `
+                    <button class="crm-related-row" data-view-invoice="${inv.id}">
+                      <div class="crm-related-row-main">
+                        <div class="crm-related-row-title">${escapeHtml(inv.invoice_number || 'Draft')}</div>
+                        <div class="crm-related-row-sub">${escapeHtml(inv.status || '')}</div>
+                      </div>
+                      <div class="crm-related-row-amt">${formatCurrency(inv.total || 0)}</div>
+                    </button>
+                  `).join('')}
+            </div>
+
+            ${lead.business_line === 'awkn_ranch' ? `
+            <div class="crm-prop-card">
+              <div class="crm-prop-card-head">
+                Proposals <span class="crm-prop-count">${relatedProposals.length}</span>
+              </div>
+              ${relatedProposals.length === 0
+                ? '<div class="crm-rail-empty">No proposals yet</div>'
+                : relatedProposals.map(p => `
+                    <button class="crm-related-row" data-view-proposal="${p.id}">
+                      <div class="crm-related-row-main">
+                        <div class="crm-related-row-title">${escapeHtml(p.proposal_number || p.title || 'Draft')}</div>
+                        <div class="crm-related-row-sub">${escapeHtml(p.status || '')}</div>
+                      </div>
+                      <div class="crm-related-row-amt">${formatCurrency(p.total || 0)}</div>
+                    </button>
+                  `).join('')}
+            </div>
+            ` : ''}
+          </aside>
         </div>
       </div>
     </div>
@@ -816,26 +924,80 @@ async function openLeadDetail(leadId) {
   setupLeadDetailListeners(lead);
 }
 
+function groupActivitiesByDay(activities) {
+  const groups = new Map();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+
+  activities.forEach(a => {
+    if (!a.created_at) return;
+    const d = new Date(a.created_at); d.setHours(0,0,0,0);
+    const key = d.getTime();
+    let label;
+    if (key === today.getTime()) label = 'Today';
+    else if (key === yesterday.getTime()) label = 'Yesterday';
+    else label = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: d.getFullYear() === today.getFullYear() ? undefined : 'numeric' });
+    if (!groups.has(key)) groups.set(key, { label, items: [] });
+    groups.get(key).items.push(a);
+  });
+
+  return Array.from(groups.values()).sort((a, b) => {
+    const ad = new Date(a.items[0].created_at).getTime();
+    const bd = new Date(b.items[0].created_at).getTime();
+    return bd - ad;
+  });
+}
+
+function formatRelativeTime(iso) {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo ago`;
+  return `${Math.floor(months / 12)}y ago`;
+}
+
 function renderActivityItem(activity) {
   const iconMap = {
-    note: 'N',
-    call: 'C',
-    email: 'E',
-    stage_change: 'S',
-    sms: 'T',
-    meeting: 'M',
-    system: 'SYS',
+    note: '📝',
+    call: '📞',
+    email: '✉️',
+    sms: '💬',
+    meeting: '📅',
+    stage_change: '↗',
+    system: '⚙',
   };
-  const icon = iconMap[activity.activity_type] || '?';
-  const typeLabel = (activity.activity_type || '').replace('_', ' ');
+  const labelMap = {
+    note: 'Note',
+    call: 'Call logged',
+    email: 'Email',
+    sms: 'SMS',
+    meeting: 'Meeting',
+    stage_change: 'Stage changed',
+    system: 'System',
+  };
+  const type = activity.activity_type || 'system';
+  const icon = iconMap[type] || '•';
+  const label = labelMap[type] || type;
+  const time = activity.created_at
+    ? new Date(activity.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    : '';
 
   return `
-    <div class="crm-timeline-item">
-      <div class="crm-timeline-icon crm-timeline-${activity.activity_type}">${icon}</div>
-      <div class="crm-timeline-content">
-        <div class="crm-timeline-type">${escapeHtml(typeLabel)}</div>
-        <div class="crm-timeline-desc">${escapeHtml(activity.description || '')}</div>
-        <div class="crm-timeline-date">${formatDateTime(activity.created_at)}</div>
+    <div class="crm-activity-item" data-activity-type="${escapeHtml(type)}">
+      <div class="crm-activity-icon crm-activity-icon-${escapeHtml(type)}">${icon}</div>
+      <div class="crm-activity-content">
+        <div class="crm-activity-head">
+          <span class="crm-activity-label">${escapeHtml(label)}</span>
+          <span class="crm-activity-time">${escapeHtml(time)}</span>
+        </div>
+        ${activity.description ? `<div class="crm-activity-desc">${escapeHtml(activity.description)}</div>` : ''}
       </div>
     </div>
   `;
@@ -863,47 +1025,93 @@ function setupLeadDetailListeners(lead) {
     }
   });
 
-  // Add Note
-  document.getElementById('btn-add-note')?.addEventListener('click', () => {
-    const form = document.getElementById('crm-quick-action-form');
-    form.style.display = 'block';
-    form.innerHTML = `
-      <textarea id="note-text" class="crm-textarea" placeholder="Enter note..." rows="3"></textarea>
-      <div class="crm-form-actions">
-        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-save-note">Save Note</button>
-        <button class="crm-btn crm-btn-sm" id="btn-cancel-note">Cancel</button>
-      </div>
-    `;
-    document.getElementById('btn-save-note').addEventListener('click', async () => {
-      const text = document.getElementById('note-text').value.trim();
-      if (!text) { showToast('Note cannot be empty', 'error'); return; }
-      await addActivity(lead.id, 'note', text);
-      await openLeadDetail(lead.id);
-    });
-    document.getElementById('btn-cancel-note').addEventListener('click', () => {
-      form.style.display = 'none';
+  // Composer (Note / Call / Email tabs)
+  let composerType = 'note';
+  const composerText = document.getElementById('composer-text');
+  const composerSaveBtn = document.getElementById('btn-composer-save');
+  const composerHint = document.getElementById('composer-hint');
+  const composerPlaceholders = {
+    note: 'Add a note about this lead...',
+    call: 'Summarize the call (purpose, outcome, next steps)...',
+    email: 'Email body — sent and logged to timeline...',
+  };
+  const composerHints = {
+    note: 'Saved to activity timeline',
+    call: 'Logged to activity timeline',
+    email: 'Sent via Resend and logged',
+  };
+  const composerLabels = { note: 'Save Note', call: 'Log Call', email: 'Send Email' };
+
+  document.querySelectorAll('.crm-composer-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.crm-composer-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      composerType = tab.dataset.composerType;
+      if (composerText) composerText.placeholder = composerPlaceholders[composerType];
+      if (composerHint) composerHint.textContent = composerHints[composerType];
+      if (composerSaveBtn) composerSaveBtn.textContent = composerLabels[composerType];
     });
   });
 
-  // Log Call
-  document.getElementById('btn-log-call')?.addEventListener('click', () => {
-    const form = document.getElementById('crm-quick-action-form');
-    form.style.display = 'block';
-    form.innerHTML = `
-      <textarea id="call-text" class="crm-textarea" placeholder="Call summary..." rows="3"></textarea>
-      <div class="crm-form-actions">
-        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-save-call">Save Call</button>
-        <button class="crm-btn crm-btn-sm" id="btn-cancel-call">Cancel</button>
-      </div>
-    `;
-    document.getElementById('btn-save-call').addEventListener('click', async () => {
-      const text = document.getElementById('call-text').value.trim();
-      if (!text) { showToast('Call summary cannot be empty', 'error'); return; }
-      await addActivity(lead.id, 'call', text);
+  composerSaveBtn?.addEventListener('click', async () => {
+    const text = composerText?.value.trim();
+    if (!text) { showToast(`${composerType === 'note' ? 'Note' : composerType === 'call' ? 'Call summary' : 'Email body'} cannot be empty`, 'error'); return; }
+    composerSaveBtn.disabled = true;
+    composerSaveBtn.textContent = 'Saving...';
+    try {
+      if (composerType === 'email') {
+        await sendLeadEmail(lead, text);
+      } else {
+        await addActivity(lead.id, composerType, text);
+      }
       await openLeadDetail(lead.id);
+    } catch (err) {
+      console.error('Composer save error:', err);
+      showToast('Error saving — please try again', 'error');
+      composerSaveBtn.disabled = false;
+      composerSaveBtn.textContent = composerLabels[composerType];
+    }
+  });
+
+  // More menu toggle
+  const moreBtn = document.getElementById('btn-more-menu');
+  const moreMenu = document.getElementById('crm-more-menu');
+  moreBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    moreMenu.style.display = moreMenu.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', (e) => {
+    if (moreMenu && !e.target.closest('.crm-menu-wrap')) moreMenu.style.display = 'none';
+  }, { once: true });
+
+  // Related invoice/proposal click — open the relevant modal
+  document.querySelectorAll('[data-view-invoice]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inv = invoices.find(i => i.id === btn.dataset.viewInvoice);
+      if (inv) { closeModal(); openInvoiceModal(inv); }
     });
-    document.getElementById('btn-cancel-call').addEventListener('click', () => {
-      form.style.display = 'none';
+  });
+  document.querySelectorAll('[data-view-proposal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = proposals.find(x => x.id === btn.dataset.viewProposal);
+      if (p) { closeModal(); openProposalModal(p); }
+    });
+  });
+
+  // Activity filter chips
+  document.querySelectorAll('.crm-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.crm-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const filter = chip.dataset.filter;
+      document.querySelectorAll('.crm-activity-item').forEach(el => {
+        el.style.display = (filter === 'all' || el.dataset.activityType === filter) ? '' : 'none';
+      });
+      // Hide empty day groups
+      document.querySelectorAll('.crm-activity-day-group').forEach(group => {
+        const visible = Array.from(group.querySelectorAll('.crm-activity-item')).some(el => el.style.display !== 'none');
+        group.style.display = visible ? '' : 'none';
+      });
     });
   });
 
@@ -929,10 +1137,10 @@ function setupLeadDetailListeners(lead) {
 
   // Mark Lost
   document.getElementById('btn-mark-lost')?.addEventListener('click', () => {
-    const form = document.getElementById('crm-quick-action-form');
-    form.style.display = 'block';
+    const form = openInlineActionForm();
     form.innerHTML = `
-      <input type="text" id="lost-reason" class="crm-input" placeholder="Lost reason...">
+      <h4 class="crm-inline-form-title">Mark lead as lost</h4>
+      <input type="text" id="lost-reason" class="crm-input" placeholder="Lost reason (optional)...">
       <div class="crm-form-actions">
         <button class="crm-btn crm-btn-sm crm-btn-danger" id="btn-save-lost">Confirm Lost</button>
         <button class="crm-btn crm-btn-sm" id="btn-cancel-lost">Cancel</button>
@@ -976,12 +1184,12 @@ function setupLeadDetailListeners(lead) {
 
   // Send Feedback Form
   document.getElementById('btn-send-feedback')?.addEventListener('click', () => {
-    const form = document.getElementById('crm-quick-action-form');
+    const form = openInlineActionForm();
     const leadName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim();
     const bizLabel = lead.business_line === 'within' ? 'Within' : 'AWKN Ranch';
 
-    form.style.display = 'block';
     form.innerHTML = `
+      <h4 class="crm-inline-form-title">Send Feedback Form</h4>
       <div class="crm-form-field">
         <label>To</label>
         <input type="email" class="crm-input" id="feedback-to" value="${escapeHtml(lead.email || '')}" readonly style="background:#f3f4f6">
@@ -1078,6 +1286,46 @@ The ${bizLabel} Team</textarea>
       form.style.display = 'none';
     });
   });
+}
+
+function openInlineActionForm() {
+  let form = document.getElementById('crm-quick-action-form');
+  if (!form) {
+    form = document.createElement('div');
+    form.id = 'crm-quick-action-form';
+    form.className = 'crm-inline-action-form';
+    const main = document.querySelector('.crm-lead-main');
+    main?.insertBefore(form, main.firstChild);
+  }
+  form.style.display = 'block';
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return form;
+}
+
+async function sendLeadEmail(lead, body) {
+  if (!lead?.email) throw new Error('Lead has no email address');
+  const leadName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'there';
+  const bizLabel = lead.business_line === 'within' ? 'Within' : 'AWKN Ranch';
+  const subject = `A note from ${bizLabel}`;
+  const htmlBody = '<p>' + escapeHtml(body).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+
+  const { data: session } = await supabase.auth.getSession();
+  const token = session?.session?.access_token;
+  const resp = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+    },
+    body: JSON.stringify({ type: 'custom', to: lead.email, data: { subject, html: htmlBody, text: body } }),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to send email');
+  }
+  await addActivity(lead.id, 'email', `Email to ${lead.email}: ${body.substring(0, 200)}${body.length > 200 ? '…' : ''}`);
+  showToast('Email sent', 'success');
 }
 
 async function addActivity(leadId, type, description) {
