@@ -99,6 +99,7 @@ Deno.serve(async (req) => {
   params.append('mode', 'payment');
   params.append('payment_method_types[0]', 'card');
   params.append('customer_email', email);
+  params.append('phone_number_collection[enabled]', 'true');
 
   params.append('line_items[0][quantity]', '1');
   params.append('line_items[0][price_data][currency]', 'usd');

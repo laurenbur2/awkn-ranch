@@ -75,7 +75,7 @@ async function fireDepositEmail(session: Record<string, unknown>): Promise<void>
   const lastName = metadata.last_name || '';
   const packageSlug = metadata.package_slug || '';
   const packageName = metadata.package_name || '';
-  const phone        = metadata.phone        || '';
+  const phone        = (typeof customerDetails.phone === 'string' ? customerDetails.phone : '') || metadata.phone || '';
   const stayAtRanch = metadata.stay_at_ranch || '';
   const retreatStartDate = metadata.retreat_start_date || '';
   const retreatEndDate   = metadata.retreat_end_date   || '';
