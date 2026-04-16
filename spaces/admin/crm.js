@@ -1746,7 +1746,8 @@ async function openInvoiceModal(invoice = null, lead = null) {
         </div>
         <div class="crm-modal-footer">
           <button class="crm-btn" id="btn-cancel-invoice">Cancel</button>
-          <div>
+          <div style="display:flex;gap:8px;">
+            <button class="crm-btn" id="btn-preview-invoice" style="border-color:#6366f1;color:#6366f1;">Preview</button>
             <button class="crm-btn crm-btn-primary" id="btn-save-invoice-draft">Save Draft</button>
             <button class="crm-btn crm-btn-success" id="btn-send-invoice">Send Invoice</button>
           </div>
@@ -1795,6 +1796,9 @@ async function openInvoiceModal(invoice = null, lead = null) {
 
   // Send invoice
   document.getElementById('btn-send-invoice').addEventListener('click', () => saveInvoice(invoice, 'sent'));
+
+  // Preview invoice
+  document.getElementById('btn-preview-invoice').addEventListener('click', () => openInvoicePreview());
 
   // Recalculate totals on discount/tax change
   document.getElementById('inv-discount')?.addEventListener('input', recalcInvoiceTotals);
@@ -1861,6 +1865,148 @@ function recalcInvoiceTotals() {
   const totalEl = document.getElementById('inv-total');
   if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
   if (totalEl) totalEl.textContent = formatCurrency(total);
+}
+
+function openInvoicePreview() {
+  const lineItems = [];
+  document.querySelectorAll('.crm-line-item').forEach(el => {
+    const desc = el.querySelector('.crm-li-desc')?.value?.trim() || '';
+    const qty = parseFloat(el.querySelector('.crm-li-qty')?.value) || 1;
+    const price = parseFloat(el.querySelector('.crm-li-price')?.value) || 0;
+    if (desc) lineItems.push({ description: desc, quantity: qty, unit_price: price, total: qty * price });
+  });
+
+  const bizLine = document.getElementById('inv-biz-line')?.value || 'within';
+  const bizLabel = bizLine === 'within' ? 'Within' : 'AWKN Ranch';
+  const invoiceNumber = document.getElementById('inv-number')?.value || '';
+  const clientName = document.getElementById('inv-client-name')?.value || '';
+  const clientEmail = document.getElementById('inv-client-email')?.value || '';
+  const clientPhone = document.getElementById('inv-client-phone')?.value || '';
+  const invoiceDate = document.getElementById('inv-date')?.value || '';
+  const dueDate = document.getElementById('inv-due-date')?.value || '';
+  const discountLabel = document.getElementById('inv-discount-label')?.value || '';
+  const discount = parseFloat(document.getElementById('inv-discount')?.value) || 0;
+  const tax = parseFloat(document.getElementById('inv-tax')?.value) || 0;
+  const notes = document.getElementById('inv-notes')?.value || '';
+  const subtotal = lineItems.reduce((s, li) => s + li.total, 0);
+  const total = subtotal - discount + tax;
+
+  const logoUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/logos/logo-black-transparent.png';
+  const accentColor = bizLine === 'within' ? '#2a1f23' : '#d4883a';
+
+  const lineItemRows = lineItems.map(li => `
+    <tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;white-space:pre-line;">${escapeHtml(li.description)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:center;">${li.quantity}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;">${formatCurrency(li.unit_price)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;font-weight:600;">${formatCurrency(li.total)}</td>
+    </tr>
+  `).join('');
+
+  const previewHtml = `
+    <div id="invoice-preview-overlay" style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #eee;">
+          <span style="font-weight:700;font-size:15px;">Invoice Preview</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button id="btn-print-invoice" style="padding:6px 14px;font-size:12px;font-weight:600;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">Print / PDF</button>
+            <button id="btn-close-preview" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">&times;</button>
+          </div>
+        </div>
+        <div id="invoice-preview-content" style="padding:32px;font-family:'DM Sans',system-ui,sans-serif;">
+          <!-- Header -->
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+            <div>
+              <img src="${logoUrl}" alt="${escapeHtml(bizLabel)}" style="height:48px;margin-bottom:8px;" onerror="this.style.display='none'">
+              <div style="font-size:12px;color:#888;margin-top:4px;">${escapeHtml(bizLabel)}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:28px;font-weight:800;color:${accentColor};letter-spacing:-0.5px;">INVOICE</div>
+              ${invoiceNumber ? `<div style="font-size:13px;color:#666;margin-top:4px;">${escapeHtml(invoiceNumber)}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Client & Date Info -->
+          <div style="display:flex;justify-content:space-between;margin-bottom:28px;gap:24px;">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;margin-bottom:6px;">Bill To</div>
+              <div style="font-size:14px;font-weight:600;color:#222;">${escapeHtml(clientName)}</div>
+              ${clientEmail ? `<div style="font-size:12px;color:#666;margin-top:2px;">${escapeHtml(clientEmail)}</div>` : ''}
+              ${clientPhone ? `<div style="font-size:12px;color:#666;margin-top:2px;">${escapeHtml(clientPhone)}</div>` : ''}
+            </div>
+            <div style="text-align:right;">
+              ${invoiceDate ? `<div style="margin-bottom:6px;"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Date</span><br><span style="font-size:13px;color:#333;">${formatDate(invoiceDate)}</span></div>` : ''}
+              ${dueDate ? `<div><span style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Due Date</span><br><span style="font-size:13px;color:#333;">${formatDate(dueDate)}</span></div>` : ''}
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+            <thead>
+              <tr style="border-bottom:2px solid ${accentColor};">
+                <th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Description</th>
+                <th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Qty</th>
+                <th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Rate</th>
+                <th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${lineItemRows || '<tr><td colspan="4" style="padding:20px;text-align:center;color:#999;font-size:13px;">No line items added</td></tr>'}
+            </tbody>
+          </table>
+
+          <!-- Totals -->
+          <div style="display:flex;justify-content:flex-end;">
+            <div style="width:240px;">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
+                <span>Subtotal</span><span>${formatCurrency(subtotal)}</span>
+              </div>
+              ${discount > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
+                <span>${escapeHtml(discountLabel || 'Discount')}</span><span>-${formatCurrency(discount)}</span>
+              </div>` : ''}
+              ${tax > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
+                <span>Tax</span><span>${formatCurrency(tax)}</span>
+              </div>` : ''}
+              <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:18px;font-weight:800;color:${accentColor};border-top:2px solid ${accentColor};margin-top:6px;">
+                <span>Total</span><span>${formatCurrency(total)}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          ${notes ? `
+          <div style="margin-top:28px;padding-top:20px;border-top:1px solid #eee;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;margin-bottom:6px;">Notes</div>
+            <div style="font-size:12px;color:#666;white-space:pre-line;">${escapeHtml(notes)}</div>
+          </div>` : ''}
+
+          <!-- Footer -->
+          <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;text-align:center;">
+            <div style="font-size:11px;color:#bbb;">Thank you for your business</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', previewHtml);
+
+  document.getElementById('btn-close-preview').addEventListener('click', () => {
+    document.getElementById('invoice-preview-overlay')?.remove();
+  });
+  document.getElementById('invoice-preview-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'invoice-preview-overlay') e.target.remove();
+  });
+  document.getElementById('btn-print-invoice').addEventListener('click', () => {
+    const content = document.getElementById('invoice-preview-content').innerHTML;
+    const win = window.open('', '_blank', 'width=700,height=900');
+    win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${escapeHtml(invoiceNumber)}</title>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+      <style>body{margin:0;padding:32px;font-family:'DM Sans',system-ui,sans-serif;}@media print{body{padding:20px;}}</style>
+    </head><body>${content}</body></html>`);
+    win.document.close();
+    win.onload = () => { win.print(); };
+  });
 }
 
 function getInvoiceLineItemsFromForm() {
