@@ -228,6 +228,20 @@
   vertical-align: middle;
 }
 
+.mb-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.mb-sortable:hover {
+  color: var(--accent, #d4883a);
+}
+
+.mb-sorted {
+  color: var(--accent, #d4883a);
+}
+
 .mb-empty {
   text-align: center;
   padding: 3rem;

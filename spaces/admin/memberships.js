@@ -7,6 +7,8 @@ let allPlans = [];
 let allMembers = [];
 let editingMember = null;
 let editingPlan = null;
+let sortColumn = null;
+let sortDirection = 'asc';
 
 // =============================================
 // INIT
@@ -97,9 +99,57 @@ const STATUS_COLORS = {
   cancelled: '#9CA3AF',
 };
 
+function getSortValue(member, column) {
+  const plan = member.plan || allPlans.find(p => p.id === member.plan_id);
+  switch (column) {
+    case 'member': return (member.member_name || '').toLowerCase();
+    case 'plan': return (plan?.name || '').toLowerCase();
+    case 'status': return member.status || '';
+    case 'start_date': return member.start_date || '';
+    case 'next_billing': return member.next_billing_date || '';
+    case 'amount': return plan?.price ? parseFloat(plan.price) : 0;
+    case 'visits': return member.total_visits || 0;
+    default: return '';
+  }
+}
+
+function sortMembers(members) {
+  if (!sortColumn) return members;
+  const sorted = [...members].sort((a, b) => {
+    const aVal = getSortValue(a, sortColumn);
+    const bVal = getSortValue(b, sortColumn);
+    if (typeof aVal === 'number' && typeof bVal === 'number') return aVal - bVal;
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+    return 0;
+  });
+  return sortDirection === 'desc' ? sorted.reverse() : sorted;
+}
+
+function renderSortHeaders() {
+  const headerRow = document.querySelector('#membersTable thead tr');
+  const columns = [
+    { key: 'member', label: 'Member' },
+    { key: 'plan', label: 'Plan' },
+    { key: 'status', label: 'Status' },
+    { key: 'start_date', label: 'Start Date' },
+    { key: 'next_billing', label: 'Next Billing' },
+    { key: 'amount', label: 'Amount' },
+    { key: 'visits', label: 'Visits' },
+    { key: null, label: '' },
+  ];
+  headerRow.innerHTML = columns.map(col => {
+    if (!col.key) return `<th></th>`;
+    const isActive = sortColumn === col.key;
+    const arrow = isActive ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : '';
+    return `<th class="mb-sortable${isActive ? ' mb-sorted' : ''}" data-sort="${col.key}">${col.label}${arrow}</th>`;
+  }).join('');
+}
+
 function renderMembersTable() {
+  renderSortHeaders();
   const tbody = document.getElementById('membersTableBody');
-  const members = getFilteredMembers();
+  const members = sortMembers(getFilteredMembers());
 
   if (members.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" class="mb-empty">No members found. Click "+ Add Member" to get started.</td></tr>`;
@@ -422,6 +472,22 @@ function setupEventListeners() {
   // Add buttons
   document.getElementById('btnAddMember')?.addEventListener('click', () => openMemberModal());
   document.getElementById('btnAddPlan')?.addEventListener('click', () => openPlanModal());
+
+  // Sort headers
+  document.getElementById('membersTable')?.addEventListener('click', (e) => {
+    const th = e.target.closest('.mb-sortable');
+    if (th) {
+      const col = th.dataset.sort;
+      if (sortColumn === col) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = col;
+        sortDirection = 'asc';
+      }
+      renderMembersTable();
+      return;
+    }
+  });
 
   // Table row clicks
   document.getElementById('membersTable')?.addEventListener('click', (e) => {
