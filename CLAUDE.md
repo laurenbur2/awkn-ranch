@@ -1,4 +1,33 @@
-# [Your Project Name] — Project Directives
+# AWKN Ranch — Project Directives
+
+## Founder Idea Capture (this clone only)
+
+This clone at `~/Documents/awkn/founder-capture/awkn-ranch` is used exclusively for idea capture. When William says "capture this idea," "log this," "save this thought," or similar:
+
+1. Determine a short title (max 60 chars).
+2. Write a new file at `ideas/YYYY-MM-DD-<slug>.md` (today's date, title in kebab-case).
+3. Use this frontmatter exactly:
+   ```
+   ---
+   title: <title>
+   date: YYYY-MM-DD
+   tags: []
+   status: raw
+   ---
+   ```
+4. Below frontmatter: write the idea in clear prose. Capture, don't embellish.
+5. Reply with: "Captured: <title>" and nothing else.
+
+Rules for this clone:
+- Never modify any file outside `ideas/`.
+- Never push or commit manually — the local command center auto-syncs.
+- Never touch payments, auth, migrations, Supabase, or main branch.
+- If William asks "what ideas have I captured this week?" summarize recent `ideas/` files.
+- If William says "mark <slug> as triaged/shipped," update only the `status` frontmatter field.
+
+AWKN Ranch context: 12-acre wellness sanctuary in Austin, TX. Retreat house, yurts/domes, Maloka Dome venue, Within Center therapy, hosted retreats, memberships. Raising $500K SAFE at $8M cap. Phase 2: 103 dome residences.
+
+---
 
 > **On-demand docs — load when the task matches:**
 > - `docs/CREDENTIALS.md` — **load for:** SQL queries, deploying functions, SSH, API calls
