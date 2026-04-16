@@ -367,6 +367,53 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // Send staff notification to Shannon so she can create the client portal
+    // and send intake documents before the medical consultation.
+    const staffSubject = `New deposit — ${escapeHtml(first_name)} ${escapeHtml(last_name || "")} (${resolvedPackageName})`;
+    const retreatDatesLine = retreatDatesFormatted
+      ? `<tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Retreat dates:</strong> ${escapeHtml(retreatDatesFormatted)}${retreat_nights ? ` (${escapeHtml(String(retreat_nights))} nights)` : ""}</td></tr>`
+      : "";
+    const staffHtml = `<!DOCTYPE html>
+<html><body style="font-family:sans-serif;color:#1c1618;padding:24px;">
+  <h2 style="margin-bottom:4px;">New deposit received</h2>
+  <p style="color:#6b4c3b;margin-top:0;">Please create their client portal and send intake documents before their medical consultation.</p>
+  <table style="border-collapse:collapse;margin-top:16px;">
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Name:</strong> ${escapeHtml(first_name)} ${escapeHtml(last_name || "")}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Package:</strong> ${escapeHtml(resolvedPackageName)}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Deposit:</strong> ${escapeHtml(resolvedDeposit)}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Balance due:</strong> ${escapeHtml(resolvedBalance)}</td></tr>
+    ${retreatDatesLine}
+  </table>
+  <p style="margin-top:24px;font-size:13px;color:#999;">Sent automatically when a deposit is received via the Within Center booking flow.</p>
+</body></html>`;
+
+    try {
+      const staffRes = await fetch(RESEND_API_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: FROM,
+          reply_to: email,
+          to: ["shannon@within.center"],
+          subject: staffSubject,
+          html: staffHtml,
+        }),
+      });
+      if (!staffRes.ok) {
+        const staffBody = await staffRes.json();
+        console.error("Staff notification email error", staffBody);
+      } else {
+        console.log("Staff notification sent to shannon@within.center");
+      }
+    } catch (staffErr) {
+      // Non-fatal — customer email already sent.
+      console.error("Failed to send staff notification:", staffErr);
+    }
+
     return new Response(
       JSON.stringify({ ok: true, id: resendBody.id }),
       { status: 200, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
