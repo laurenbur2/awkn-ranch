@@ -368,28 +368,94 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Send staff notification to Shannon so she can create the client portal
+    // Send staff notification so Shannon can create the CarePlatron profile
     // and send intake documents before the medical consultation.
-    const staffSubject = `New deposit — ${escapeHtml(first_name)} ${escapeHtml(last_name || "")} (${resolvedPackageName})`;
-    const retreatDatesLine = retreatDatesFormatted
-      ? `<tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Retreat dates:</strong> ${escapeHtml(retreatDatesFormatted)}${retreat_nights ? ` (${escapeHtml(String(retreat_nights))} nights)` : ""}</td></tr>`
-      : "";
+    const staffSubject = `⚠️ ACTION NEEDED — New Client Deposit: ${escapeHtml(first_name)} ${escapeHtml(last_name || "")}`;
     const staffHtml = `<!DOCTYPE html>
-<html><body style="font-family:sans-serif;color:#1c1618;padding:24px;">
-  <h2 style="margin-bottom:4px;">New deposit received</h2>
-  <p style="color:#6b4c3b;margin-top:0;">Please create their client portal and send intake documents before their medical consultation.</p>
-  <table style="border-collapse:collapse;margin-top:16px;">
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>First name:</strong> ${escapeHtml(first_name)}</td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Last name:</strong> ${escapeHtml(last_name || "")}</td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Phone:</strong> ${phone ? `<a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>` : "<em>not provided</em>"}</td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Package:</strong> ${escapeHtml(resolvedPackageName)}</td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Deposit:</strong> ${escapeHtml(resolvedDeposit)}</td></tr>
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Balance due:</strong> ${escapeHtml(resolvedBalance)}</td></tr>
-    ${retreatDatesLine}
-  </table>
-  <p style="margin-top:24px;font-size:13px;color:#999;">Sent automatically when a deposit is received via the Within Center booking flow.</p>
-</body></html>`;
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Client Deposit</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f5;padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+
+        <!-- Urgent banner -->
+        <tr>
+          <td style="background:#b91c1c;padding:14px 32px;text-align:center;">
+            <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#ffffff;">&#9888;&#65039; Action Required — New Client</span>
+          </td>
+        </tr>
+
+        <!-- Header -->
+        <tr>
+          <td style="padding:32px 32px 20px 32px;border-bottom:1px solid #e5e7eb;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#6b7280;margin-bottom:6px;">Within Center</div>
+            <h1 style="font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:#111827;margin:0 0 6px 0;line-height:1.3;">New deposit received</h1>
+            <p style="font-family:'Inter',sans-serif;font-size:15px;color:#374151;margin:0;line-height:1.5;">A client just placed a deposit for <strong>${escapeHtml(resolvedPackageName)}</strong>. Please create their CarePlatron profile as soon as possible so they can complete their intake forms before their medical consultation.</p>
+          </td>
+        </tr>
+
+        <!-- Client details -->
+        <tr>
+          <td style="padding:24px 32px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#6b7280;margin-bottom:14px;">Client Information</div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;">
+              <tr>
+                <td style="padding:13px 18px;border-bottom:1px solid #e5e7eb;">
+                  <span style="font-family:'Inter',sans-serif;font-size:12px;color:#6b7280;display:block;margin-bottom:2px;">First Name</span>
+                  <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#111827;">${escapeHtml(first_name)}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:13px 18px;border-bottom:1px solid #e5e7eb;">
+                  <span style="font-family:'Inter',sans-serif;font-size:12px;color:#6b7280;display:block;margin-bottom:2px;">Last Name</span>
+                  <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#111827;">${escapeHtml(last_name || "—")}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:13px 18px;border-bottom:1px solid #e5e7eb;">
+                  <span style="font-family:'Inter',sans-serif;font-size:12px;color:#6b7280;display:block;margin-bottom:2px;">Email</span>
+                  <a href="mailto:${escapeHtml(email)}" style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#1d4ed8;text-decoration:none;">${escapeHtml(email)}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:13px 18px;">
+                  <span style="font-family:'Inter',sans-serif;font-size:12px;color:#6b7280;display:block;margin-bottom:2px;">Phone</span>
+                  ${phone
+                    ? `<a href="tel:${escapeHtml(phone)}" style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#1d4ed8;text-decoration:none;">${escapeHtml(phone)}</a>`
+                    : `<span style="font-family:'Inter',sans-serif;font-size:15px;color:#9ca3af;font-style:italic;">not provided</span>`}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:0 32px 32px 32px;text-align:center;">
+            <a href="https://app.carepatron.com/" style="display:inline-block;background:#b91c1c;color:#ffffff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:4px;">Open CarePlatron → Create Profile</a>
+            <p style="font-family:'Inter',sans-serif;font-size:13px;color:#6b7280;margin:14px 0 0 0;line-height:1.5;">Once the profile is created, send them their intake forms so they can complete everything before their consultation.</p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;text-align:center;">
+            <span style="font-family:'Inter',sans-serif;font-size:11px;color:#9ca3af;">Sent automatically when a deposit is received · Within Center at AWKN Ranch</span>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
 
     try {
       const staffRes = await fetch(RESEND_API_URL, {
@@ -401,7 +467,7 @@ Deno.serve(async (req: Request) => {
         body: JSON.stringify({
           from: FROM,
           reply_to: email,
-          to: ["shannon@within.center"],
+          to: ["lauren@awknranch.com"], // TODO: change to shannon@within.center after testing
           subject: staffSubject,
           html: staffHtml,
         }),
@@ -410,7 +476,7 @@ Deno.serve(async (req: Request) => {
         const staffBody = await staffRes.json();
         console.error("Staff notification email error", staffBody);
       } else {
-        console.log("Staff notification sent to shannon@within.center");
+        console.log("Staff notification sent");
       }
     } catch (staffErr) {
       // Non-fatal — customer email already sent.
