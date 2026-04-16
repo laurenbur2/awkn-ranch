@@ -140,9 +140,8 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
                   <div style="width:36px;height:36px;border-radius:50%;background:rgba(201,148,62,0.12);color:#c9943e;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;text-align:center;line-height:36px;">1</div>
                 </td>
                 <td valign="top">
-                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">Complete your patient application</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;margin-bottom:10px;">A confidential intake covering personal info, medical history, current medications, and your goals for this work. Please complete it first so our clinician can review before your consultation.</div>
-                  <a href="{{application_link}}" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:11px 22px;border-radius:3px;">Open Application →</a>
+                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">Watch for your intake forms email</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;">You will receive a separate email from <strong style="color:#1c1618;">CarePlatron</strong> shortly with a link to your patient intake forms. These cover your personal info, medical history, current medications, and your goals for this work.</div>
                 </td>
               </tr>
             </table>
@@ -157,7 +156,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
                 </td>
                 <td valign="top">
                   <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">Book your medical consultation</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;margin-bottom:10px;">Once your application is submitted, schedule a 30-minute video call with our MAPS-trained nurse practitioner. This is required clearance before any ceremony work.</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;margin-bottom:10px;">Schedule a 30-minute video call with our MAPS-trained nurse practitioner. This is required medical clearance before any ceremony work.</div>
                   <a href="https://calendly.com/lauren-awknranch/30min" style="display:inline-block;background:transparent;color:#c9943e;border:1px solid #c9943e;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:10px 22px;border-radius:3px;">Schedule Consultation →</a>
                 </td>
               </tr>
@@ -172,8 +171,8 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
                   <div style="width:36px;height:36px;border-radius:50%;background:rgba(201,148,62,0.12);color:#c9943e;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;text-align:center;line-height:36px;">3</div>
                 </td>
                 <td valign="top">
-                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">{{step3_title}}</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;">After your consultation and clearance, we'll send you a private link to schedule your {{step3_noun}}.</div>
+                  <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1c1618;margin-bottom:4px;">Complete your forms before your consultation</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.6;"><strong style="color:#1c1618;">Important:</strong> Please fill out all intake forms in CarePlatron before your medical consultation so our clinician has time to review your history. After clearance, we'll confirm your {{step3_noun}}.</div>
                 </td>
               </tr>
             </table>
