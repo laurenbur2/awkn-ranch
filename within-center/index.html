@@ -1109,13 +1109,16 @@
         isOpen() ? closeMenu() : openMenu();
       });
       backdrop.addEventListener('click', closeMenu);
-      document.querySelectorAll('.menu-panel li.has-sub').forEach(function (li) {
-        li.addEventListener('mouseenter', function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});
-      });
-      allSubs.forEach(function(s){s.addEventListener('mouseleave', closeAllSubs);});
-      document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function (li) {
-        li.addEventListener('mouseenter', closeAllSubs);
-      });
+      // Hover-based submenu only on true pointer devices (not iOS/Android touch)
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.querySelectorAll('.menu-panel li.has-sub').forEach(function (li) {
+          li.addEventListener('mouseenter', function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});
+        });
+        allSubs.forEach(function(s){s.addEventListener('mouseleave', closeAllSubs);});
+        document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function (li) {
+          li.addEventListener('mouseenter', closeAllSubs);
+        });
+      }
       document.querySelectorAll('[data-submenu-toggle]').forEach(function (a) {
         a.addEventListener('click', function (e) {
           e.preventDefault();
