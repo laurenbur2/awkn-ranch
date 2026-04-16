@@ -209,6 +209,7 @@
     </div>
   </aside>
   <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
     <span class="sub-header">All-Inclusive Retreats</span>
     <ul>
       <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
@@ -216,6 +217,7 @@
     </ul>
   </aside>
   <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
     <span class="sub-header">Our Packages</span>
     <ul>
       <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
@@ -347,7 +349,7 @@
       allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});
       document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});
       document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
-      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
     })();
 

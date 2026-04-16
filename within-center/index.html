@@ -370,11 +370,42 @@
       .menu-panel a { padding: 1.3rem 1.5rem; font-size: 0.72rem; }
       .menu-panel a:hover { padding-left: 2rem; }
       .menu-panel-foot { padding: 2.5rem 1.5rem 1rem; }
-      .menu-sub { left: 0; width: 100%; padding-top: 7rem; }
+      .menu-sub { left: -100%; width: 100%; padding-top: 7rem; z-index: 165; }
+      .menu-sub.open { left: 0; }
       .menu-sub a { padding: 1.2rem 1.5rem; font-size: 0.68rem; }
       .menu-sub a:hover { padding-left: 2rem; }
+      .menu-sub-back {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        width: 100%;
+        padding: 1.15rem 1.5rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.62rem;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--grey);
+        cursor: pointer;
+        background: none;
+        border: none;
+        border-bottom: 1px solid rgba(28,22,24,0.08);
+        transition: color 0.25s;
+      }
+      .menu-sub-back:hover { color: var(--gold); }
+      .menu-sub-back::before {
+        content: '‹';
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: var(--gold);
+        line-height: 1;
+      }
+      .nav-right a:not(.secondary-cta) { display: none; }
     }
 
+    /* Back button hidden on desktop, shown by mobile media query above */
+    .menu-sub-back { display: none; }
     body.menu-open { overflow: hidden; }
 
     /* ── HERO ─────────────────────────────────────────── */
@@ -885,6 +916,7 @@
     </div>
   </aside>
   <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
     <span class="sub-header">All-Inclusive Retreats</span>
     <ul>
       <li><a href="immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
@@ -892,6 +924,7 @@
     </ul>
   </aside>
   <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
     <span class="sub-header">Our Packages</span>
     <ul>
       <li><a href="ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
@@ -1092,6 +1125,9 @@
       });
       document.querySelectorAll('[data-menu-link]').forEach(function (a) {
         a.addEventListener('click', closeMenu);
+      });
+      document.querySelectorAll('[data-sub-back]').forEach(function (btn) {
+        btn.addEventListener('click', closeAllSubs);
       });
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && isOpen()) closeMenu();

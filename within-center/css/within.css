@@ -285,14 +285,51 @@ img { display: block; max-width: 100%; }
 .menu-label { visibility: hidden; position: relative; }
 .menu-label::before { visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap; }
 
+/* Back button: hidden on desktop, shown on mobile */
+.menu-sub-back {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .menu-panel { width: 100%; padding-top: 7rem; }
   .menu-panel a { padding: 1.3rem 1.5rem; font-size: 0.72rem; }
   .menu-panel a:hover { padding-left: 2rem; }
   .menu-panel-foot { padding: 2.5rem 1.5rem 1rem; }
-  .menu-sub { left: 0; width: 100%; padding-top: 7rem; }
+  /* Hidden state: slide off-screen left; open state: cover full panel */
+  .menu-sub { left: -100%; width: 100%; padding-top: 7rem; z-index: 165; }
+  .menu-sub.open { left: 0; }
   .menu-sub a { padding: 1.2rem 1.5rem; font-size: 0.68rem; }
   .menu-sub a:hover { padding-left: 2rem; }
+  /* Back button visible on mobile */
+  .menu-sub-back {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 1.15rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--grey);
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(28,22,24,0.08);
+    transition: color 0.25s;
+  }
+  .menu-sub-back:hover { color: var(--gold); }
+  .menu-sub-back::before {
+    content: '‹';
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  /* Hide long nav link that's already in the menu panel */
+  .nav-right a:not(.secondary-cta) { display: none; }
 }
 body.menu-open { overflow: hidden; }
 
