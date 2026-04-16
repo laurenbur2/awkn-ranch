@@ -238,6 +238,7 @@ Deno.serve(async (req: Request) => {
       package_name,
       deposit_amount,
       balance_amount,
+      phone,
       retreat_start_date,
       retreat_end_date,
       retreat_nights,
@@ -378,8 +379,10 @@ Deno.serve(async (req: Request) => {
   <h2 style="margin-bottom:4px;">New deposit received</h2>
   <p style="color:#6b4c3b;margin-top:0;">Please create their client portal and send intake documents before their medical consultation.</p>
   <table style="border-collapse:collapse;margin-top:16px;">
-    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Name:</strong> ${escapeHtml(first_name)} ${escapeHtml(last_name || "")}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>First name:</strong> ${escapeHtml(first_name)}</td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Last name:</strong> ${escapeHtml(last_name || "")}</td></tr>
     <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+    <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Phone:</strong> ${phone ? `<a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>` : "<em>not provided</em>"}</td></tr>
     <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Package:</strong> ${escapeHtml(resolvedPackageName)}</td></tr>
     <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Deposit:</strong> ${escapeHtml(resolvedDeposit)}</td></tr>
     <tr><td style="padding:6px 0;color:#555;font-size:14px;"><strong>Balance due:</strong> ${escapeHtml(resolvedBalance)}</td></tr>
