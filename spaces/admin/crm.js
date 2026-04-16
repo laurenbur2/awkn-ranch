@@ -1671,15 +1671,12 @@ async function openInvoiceModal(invoice = null, lead = null) {
     <div class="crm-modal-overlay" id="crm-modal-overlay">
       <div class="crm-modal-content crm-modal-large">
         <div class="crm-modal-header">
-          <h2>${isEdit ? 'Edit Invoice' : 'New Invoice'}</h2>
+          <h2>${isEdit ? `Edit Invoice${invoiceNumber ? ` · ${escapeHtml(invoiceNumber)}` : ''}` : 'New Invoice'}</h2>
           <button class="crm-modal-close" id="crm-modal-close-btn">&times;</button>
         </div>
         <div class="crm-modal-body">
+          <input type="hidden" id="inv-number" value="${escapeHtml(invoiceNumber)}">
           <div class="crm-form-grid">
-            <div class="crm-form-field">
-              <label>Invoice Number</label>
-              <input type="text" class="crm-input" id="inv-number" value="${escapeHtml(invoiceNumber)}" readonly>
-            </div>
             <div class="crm-form-field">
               <label>Business Line</label>
               <select class="crm-select" id="inv-biz-line">
