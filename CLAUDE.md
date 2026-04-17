@@ -21,9 +21,10 @@
 ## Mandatory Behaviors
 
 1. After code changes: end response with `vYYMMDD.NN H:MMa [model]` + affected URLs (read `version.json`)
-2. Push immediately — GitHub Pages deploys on push to main. See `docs/DEPLOY.md`
-3. CI bumps version — never bump locally
+2. Push via `./scripts/push-main.sh` — it bumps version locally then pushes. GitHub Pages deploys on push to main. See `docs/DEPLOY.md`
+3. Version bumping happens **locally**. CI must never modify `version.json` or call external services. See `docs/HANDOFF-github-ban-root-cause.md`
 4. Run SQL migrations directly — never ask the user to run SQL manually
+5. Deploy Supabase Edge Functions locally: `supabase functions deploy <name>`. Never from CI.
 
 ## Code Guards
 

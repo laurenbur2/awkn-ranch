@@ -1,12 +1,11 @@
 #!/bin/bash
-# push-main.sh — pull latest, then push to main. Version is bumped by GitHub Actions.
+# push-main.sh — bump version locally, then push to main.
 #
-# Usage:
-#   ./scripts/push-main.sh
+# Usage: ./scripts/push-main.sh
 #
-# Flow: pull --rebase from origin/main, then push. The "Bump version on push to main"
-# workflow runs on every push to main and commits a version bump (so you don't run
-# bump-version.sh locally). Version only ever goes up on main.
+# Flow: pull --rebase → bump version (offline mode) → commit bump → push.
+# Version is bumped LOCALLY, never in CI. See docs/HANDOFF-github-ban-root-cause.md
+# for why: GitHub Actions must not call external services.
 
 set -euo pipefail
 
@@ -17,5 +16,14 @@ if [ "$BRANCH" != "main" ]; then
 fi
 
 git pull --rebase origin main
+
+npm run bump
+
+if ! git diff --quiet -- version.json '*.html' 2>/dev/null; then
+  git add version.json
+  git add -- '*.html' 2>/dev/null || true
+  git commit -m "chore: bump version"
+fi
+
 git push origin main
-echo "Pushed. Version will be bumped by GitHub Actions."
+echo "Pushed."
