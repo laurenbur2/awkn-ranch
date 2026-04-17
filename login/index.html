@@ -7,87 +7,106 @@
   <link rel="apple-touch-icon" href="../apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <title>Sign In - AWKN Ranch</title>
   <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root {
-      --bg: #faf8f5;
-      --bg-card: #ffffff;
-      --text: #1a1a2e;
-      --text-muted: #6b7280;
-      --border: #e5e2dc;
-      --accent: #3d8b7a;
-      --accent-light: #e5f4f1;
-      --success: #2d8659;
-      --success-light: #e5f4ed;
+      --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Montserrat', sans-serif;
+      --brown-dark: #3a2a1a;
+      --brown: #6b4c2a;
+      --brown-light: #a67c52;
+      --cream: #f5f0e8;
+      --offwhite: #faf8f4;
+      --white: #ffffff;
       --error: #e07a5f;
       --error-light: #fdf0ec;
+      --success: #2d8659;
+      --success-light: #e5f4ed;
+      --border: rgba(0,0,0,0.08);
       --radius: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
     }
 
     body {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      position: relative;
+      padding: 2rem 1rem;
+      -webkit-font-smoothing: antialiased;
+      color: var(--brown-dark);
     }
 
-    /* Login container is visible by default; JS toggles individual states */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+    .bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(26,20,13,0.75) 0%, rgba(26,20,13,0.55) 50%, rgba(26,20,13,0.70) 100%);
+      z-index: 1;
+    }
 
     .login-container {
+      position: relative;
+      z-index: 10;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
     }
 
     .login-card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      padding: 2rem 2.25rem;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 2.5rem 2.25rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
       text-align: center;
-      border: 1px solid rgba(0, 0, 0, 0.04);
     }
 
     .logo {
-      margin-bottom: 0.25rem;
+      margin-bottom: 1rem;
     }
     .logo img {
-      width: 72px;
+      display: block;
+      width: 140px;
       height: auto;
+      margin: 0 auto;
     }
 
     h1 {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.125rem;
-      letter-spacing: -0.01em;
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--brown-dark);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.02em;
     }
 
     .subtitle {
-      color: var(--text-muted);
-      margin-bottom: 0.125rem;
-      font-size: 0.875rem;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 1.5rem;
     }
 
     /* Auth tabs */
     .auth-tabs {
       display: flex;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
     }
 
     .auth-tab {
@@ -96,74 +115,88 @@
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      font-family: inherit;
-      font-size: 0.9375rem;
-      font-weight: 500;
-      color: var(--text-muted);
+      margin-bottom: -1px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--brown-light);
       cursor: pointer;
       transition: color 0.2s ease, border-color 0.2s ease;
     }
 
     .auth-tab:hover {
-      color: var(--text);
+      color: var(--brown);
     }
 
     .auth-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
+      color: var(--brown-dark);
+      border-bottom-color: var(--brown);
     }
 
     .input-group {
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.875rem;
       text-align: left;
     }
 
     .input-group label {
       display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--brown);
+      margin-bottom: 6px;
     }
 
     .input-group input {
       width: 100%;
-      padding: 0.65rem 0.875rem;
+      padding: 12px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--brown-dark);
+      background: var(--offwhite);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 1rem;
-      background: var(--bg);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .input-group input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
-      background: var(--bg-card);
+      border-color: var(--brown-light);
+      box-shadow: 0 0 0 3px rgba(166,124,82,0.12);
+      background: var(--white);
+    }
+
+    .input-group input::placeholder {
+      color: #bbb;
     }
 
     .btn-primary {
       width: 100%;
-      padding: 0.7rem 1.5rem;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 1rem;
+      padding: 14px;
+      margin-top: 0.25rem;
+      font-family: var(--font-body);
+      font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--brown);
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      transition: background 0.2s ease, transform 0.1s, box-shadow 0.2s;
     }
 
     .btn-primary:hover {
-      background: #2f6d5f;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(61, 139, 122, 0.3);
+      background: var(--brown-dark);
+      box-shadow: 0 4px 12px rgba(58,42,26,0.25);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.99);
     }
 
     .btn-primary:disabled {
@@ -173,22 +206,27 @@
 
     .forgot-link {
       display: block;
-      margin-top: 0.5rem;
-      font-size: 0.8125rem;
-      color: var(--text-muted);
+      text-align: center;
+      margin-top: 0.875rem;
+      font-size: 12px;
+      color: var(--brown-light);
       text-decoration: none;
+      transition: color 0.2s;
     }
 
     .forgot-link:hover {
-      color: var(--accent);
+      color: var(--brown);
     }
 
     .divider {
       display: flex;
       align-items: center;
-      margin: 0.875rem 0;
-      color: var(--text-muted);
-      font-size: 0.8125rem;
+      margin: 1rem 0;
+      color: var(--brown-light);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .divider::before,
@@ -206,35 +244,40 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.75rem;
+      gap: 10px;
       width: 100%;
-      padding: 0.7rem 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text);
+      padding: 14px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--brown-dark);
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
       cursor: pointer;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
     }
 
     .btn-google:hover {
-      border-color: var(--text-muted);
-      box-shadow: var(--shadow);
-      transform: translateY(-1px);
+      background: var(--offwhite);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .btn-google:active {
+      transform: scale(0.99);
     }
 
     .btn-google svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
     .help-text {
       margin-top: 1.5rem;
-      font-size: 0.875rem;
-      color: var(--text-muted);
+      font-size: 13px;
+      color: var(--brown-light);
     }
 
     .loading {
@@ -242,15 +285,16 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
+      padding: 1.5rem 0;
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(166,124,82,0.2);
+      border-top-color: var(--brown);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 0.8s linear infinite;
     }
 
     @keyframes spin {
@@ -261,9 +305,11 @@
       background: var(--error-light);
       border: 1px solid var(--error);
       border-radius: var(--radius);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
+      padding: 0.875rem 1rem;
+      margin-bottom: 1rem;
       color: var(--error);
+      font-size: 13px;
+      text-align: left;
     }
 
     .error-box p {
@@ -274,9 +320,11 @@
       background: var(--success-light);
       border: 1px solid var(--success);
       border-radius: var(--radius);
-      padding: 1rem;
+      padding: 0.875rem 1rem;
       margin-bottom: 1rem;
       color: var(--success);
+      font-size: 13px;
+      text-align: left;
     }
 
     .success-box p {
@@ -286,13 +334,15 @@
     .btn-secondary {
       display: inline-block;
       padding: 0.625rem 1.25rem;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--offwhite);
+      color: var(--brown-dark);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-family: inherit;
-      font-size: 0.875rem;
-      font-weight: 500;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.15s ease;
@@ -300,7 +350,8 @@
     }
 
     .btn-secondary:hover {
-      border-color: var(--text-muted);
+      border-color: var(--brown-light);
+      background: var(--cream);
     }
 
     .hidden {
@@ -309,23 +360,62 @@
 
     .back-link {
       display: block;
-      margin-top: 1rem;
-      color: var(--text-muted);
+      margin-top: 1.25rem;
+      color: var(--brown-light);
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
     }
 
     .back-link:hover {
-      color: var(--text);
+      color: var(--brown);
+    }
+
+    .tagline {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-style: italic;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.5px;
+    }
+
+    .page-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      text-align: center;
+      padding: 1.25rem;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 2rem 1.5rem 1.75rem;
+      }
+      body {
+        padding: 1.5rem 0.75rem 4rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="bg">
+    <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="">
+  </div>
+  <div class="bg-overlay"></div>
+
   <div class="login-container">
     <div class="login-card">
-      <div class="logo"><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch logo" style="width:120px;"></div>
-      <h1>AWKN Ranch</h1>
-      <p class="subtitle">Where consciousness meets community</p>
+      <div class="logo"><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch logo"></div>
+      <div class="subtitle">Team Portal</div>
       <span title="Site version" style="font-size:0.65rem;color:#bbb;font-weight:400;cursor:pointer;display:block;margin-bottom:0.5rem"></span>
 
       <!-- Sign In / Sign Up forms -->
@@ -396,7 +486,7 @@
         <div class="success-box">
           <p>Check your email to verify your account.</p>
         </div>
-        <p style="color: var(--text-muted); font-size: 0.875rem;">
+        <p style="color: var(--brown-light); font-size: 0.875rem;">
           Once verified, come back here to sign in.
         </p>
         <button id="backToSignInBtn" class="btn-secondary">Back to Sign In</button>
@@ -442,7 +532,11 @@
 
       <a href="../" class="back-link">&larr; Back to AWKN Ranch</a>
     </div>
+
+    <div class="tagline">Where consciousness meets community.</div>
   </div>
+
+  <div class="page-footer">AWKN Ranch · Austin, TX</div>
 
   <script>
     // Self-healing: clear stale cached auth that redirects to wrong paths
