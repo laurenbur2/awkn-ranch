@@ -303,16 +303,13 @@ async function renderContextSwitcher(userRole, activeSection = 'staff') {
   const staffHref = firstStaffTab ? (firstStaffTab.href.startsWith('/') ? firstStaffTab.href : `/spaces/admin/${firstStaffTab.href}`) : '/spaces/admin/';
   const adminHref = firstAdminTab ? (firstAdminTab.href.startsWith('/') ? firstAdminTab.href : `/spaces/admin/${firstAdminTab.href}`) : '/spaces/admin/users.html';
 
-  const DEVICE_PERMISSION_KEYS = ['view_lighting', 'view_music', 'view_cameras', 'view_climate', 'view_laundry', 'view_cars', 'view_oven', 'view_glowforge', 'view_printer'];
-  const hasDevicePerms = hasAnyPermission(...DEVICE_PERMISSION_KEYS);
-  const hasAssociatePerms = hasAnyPermission('clock_in_out', 'view_own_hours');
+  // Template-era tabs (Devices / Residents / Associates) removed for AWKN Ranch.
+  // New business-specific top-level sections can be pushed into `tabs` below as
+  // they come online. Keeping the hasDevicePerms / hasAssociatePerms checks
+  // around in case old records still carry those permissions — they just don't
+  // surface a tab right now.
 
   const tabs = [];
-  if (hasDevicePerms) tabs.push({ id: 'devices', label: 'Devices', href: '/residents/devices.html' });
-  tabs.push({ id: 'resident', label: 'Residents', href: '/residents/' });
-  if (hasAssociatePerms || ['staff', 'admin', 'oracle'].includes(userRole)) {
-    tabs.push({ id: 'associate', label: 'Associates', href: '/associates/worktracking.html' });
-  }
   if (hasStaffPerms) tabs.push({ id: 'staff', label: 'Staff', href: staffHref });
   if (hasAdminPerms) tabs.push({ id: 'admin', label: 'Admin', href: adminHref });
   if (hasAdminPerms) tabs.push({ id: 'devcontrol', label: 'DevControl', href: '/spaces/admin/devcontrol.html' });
@@ -349,6 +346,7 @@ function injectSiteNav() {
     light: false,
     version,
     showRoleBadge: true,
+    logoHref: '/awkn-ranch/spaces/admin/dashboard.html',
   });
 
   initSiteComponents();
