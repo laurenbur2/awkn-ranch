@@ -496,62 +496,107 @@
   <script>
     const API_BASE = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1';
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+    const BOOKER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago';
 
-    let slug = '';
-    let profileData = null;
+    const params = new URLSearchParams(window.location.search);
+    // New URL shape: ?p=<profile_slug>&e=<event_slug>. Fall back to legacy ?staff=<slug> (event=default).
+    const profileSlug = params.get('p') || params.get('staff') || '';
+    const eventSlug = params.get('e') || 'default';
+
     let currentMonth = new Date();
     let selectedDate = null;
-    let selectedSlot = null;
-    let availableSlots = [];
-    let availableDays = new Set();
+    let selectedSlot = null; // ISO UTC start datetime
+    let slotsByDate = {};    // { 'YYYY-MM-DD': [{start, end}] } in booker TZ
+    let eventType = null;
+    let profileInfo = null;
+    let staffTimezone = 'America/Chicago';
 
-    // Get slug from URL
-    const params = new URLSearchParams(window.location.search);
-    slug = params.get('staff') || '';
-
-    if (!slug) {
-      showError('No staff member specified. Please use a valid booking link.');
+    if (!profileSlug) {
+      showError('No booking link specified.');
     } else {
       init();
     }
 
+    async function apiPost(fn, body) {
+      return fetch(`${API_BASE}/${fn}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + ANON_KEY,
+          'apikey': ANON_KEY,
+        },
+        body: JSON.stringify(body),
+      });
+    }
+
     async function init() {
       try {
-        // Fetch profile info by loading a dummy availability call to see if profile exists
-        // We'll use today's date to test
-        const today = new Date();
-        const todayStr = formatDateISO(today);
-        const res = await fetch(`${API_BASE}/google-calendar-availability`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },
-          body: JSON.stringify({ slug, date: todayStr }),
-        });
-
-        if (res.status === 404) {
-          showError('This booking link is not active right now.');
-          return;
-        }
-
-        const data = await res.json();
-        profileData = data;
-
-        // Update left panel
-        document.getElementById('scStaffName').textContent = data.staff_name || 'Staff Member';
-        document.getElementById('scMeetingTitle').textContent = data.meeting_title || 'Free Consultation';
-        document.getElementById('scDuration').textContent = (data.duration || 30) + ' min';
-        document.title = `Schedule with ${data.staff_name || 'AWKN'} — AWKN`;
-
-        // Build calendar
-        currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        renderCalendar();
+        await loadMonth(currentMonth);
       } catch (err) {
         console.error('Init error:', err);
         showError('Unable to load scheduling. Please try again later.');
       }
     }
 
+    async function loadMonth(monthDate) {
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth();
+      const first = new Date(year, month, 1);
+      const last = new Date(year, month + 1, 0);
+      // Don't request past dates
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const from = first < today ? today : first;
+
+      const res = await apiPost('scheduling-availability', {
+        profile_slug: profileSlug,
+        event_type_slug: eventSlug,
+        from_date: formatDateISO(from),
+        to_date: formatDateISO(last),
+        booker_timezone: BOOKER_TZ,
+      });
+
+      if (res.status === 404) return showError('This booking link is not active right now.');
+      if (!res.ok) return showError('Unable to load availability.');
+
+      const data = await res.json();
+      eventType = data.event_type || null;
+      profileInfo = data.profile || null;
+      staffTimezone = data.staff_timezone || 'America/Chicago';
+
+      // Group slots by local (booker) date
+      slotsByDate = {};
+      (data.slots || []).forEach(slot => {
+        const d = new Date(slot.start);
+        const key = formatDateISO(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        (slotsByDate[key] ||= []).push(slot);
+      });
+
+      updateHeader();
+      renderCalendar();
+    }
+
+    function updateHeader() {
+      if (!eventType) return;
+      document.getElementById('scStaffName').textContent = profileInfo?.name || '';
+      document.getElementById('scMeetingTitle').textContent = eventType.name || 'Meeting';
+      document.getElementById('scDuration').textContent = (eventType.duration_minutes || 30) + ' min';
+
+      const locLabels = { video: 'Video call', phone: 'Phone call', in_person: 'In person', custom: 'Custom' };
+      const locLabel = locLabels[eventType.location_type] || 'Meeting';
+      const locRow = document.querySelectorAll('.sc-meta-row')[1];
+      if (locRow) locRow.querySelector('span').textContent = locLabel + (eventType.location_detail ? ' — ' + eventType.location_detail : '');
+
+      document.title = `${eventType.name || 'Schedule'} — AWKN`;
+
+      // Timezone line
+      const tzSpan = document.querySelector('.sc-timezone span');
+      if (tzSpan) tzSpan.textContent = BOOKER_TZ;
+    }
+
     function showError(msg) {
       document.getElementById('scCalendarStep').style.display = 'none';
+      document.getElementById('scForm').classList.remove('active');
       document.getElementById('scError').style.display = 'block';
       document.getElementById('scErrorMsg').textContent = msg;
     }
@@ -565,11 +610,8 @@
       return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
 
-    function formatTime12(t) {
-      const [h, m] = t.split(':').map(Number);
-      const suffix = h >= 12 ? 'pm' : 'am';
-      const hour12 = h % 12 || 12;
-      return `${hour12}:${String(m).padStart(2, '0')}${suffix}`;
+    function formatSlotTime(isoUtc) {
+      return new Date(isoUtc).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
     }
 
     function renderCalendar() {
@@ -581,142 +623,95 @@
       document.getElementById('scCalMonth').textContent =
         currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-      // Disable prev if current month is this month
       const thisMonth = new Date();
       document.getElementById('scPrevMonth').disabled =
-        year <= thisMonth.getFullYear() && month <= thisMonth.getMonth();
+        year < thisMonth.getFullYear() || (year === thisMonth.getFullYear() && month <= thisMonth.getMonth());
 
-      // Max advance
-      const maxDate = new Date();
-      maxDate.setDate(maxDate.getDate() + (profileData?.advance_days || 30));
-
-      const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+      const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
       const grid = document.getElementById('scCalGrid');
-      // DOW headers
       let html = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
         .map(d => `<div class="sc-cal-dow">${d}</div>`).join('');
+      for (let i = 0; i < firstDay; i++) html += '<div class="sc-cal-day"></div>';
 
-      // Empty cells before first day
-      for (let i = 0; i < firstDay; i++) {
-        html += '<div class="sc-cal-day"></div>';
-      }
-
-      // Day cells
       for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(year, month, d);
         const dateStr = formatDateISO(date);
-        const isPast = date < today;
-        const isBeyond = date > maxDate;
         const isToday = date.getTime() === today.getTime();
         const isSelected = selectedDate === dateStr;
-
-        // Check if this day of week is available
-        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-        const dayKey = dayNames[date.getDay()];
-        // Also check short keys (mon, tue, etc.) from available_hours
-        const shortKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-        const shortKey = shortKeys[date.getDay()];
-        const hours = profileData?.available_hours;
-        const dayHours = hours?.[dayKey] || hours?.[shortKey];
-        const isAvailable = !isPast && !isBeyond && dayHours && (dayHours.enabled !== false);
+        const hasSlots = (slotsByDate[dateStr]?.length || 0) > 0;
 
         let classes = 'sc-cal-day';
-        if (isAvailable) classes += ' sc-cal-day--available';
+        if (hasSlots) classes += ' sc-cal-day--available';
         if (isSelected) classes += ' sc-cal-day--selected';
         if (isToday) classes += ' sc-cal-day--today';
 
-        html += `<div class="${classes}" ${isAvailable ? `data-date="${dateStr}" role="button" tabindex="0"` : ''}>${d}</div>`;
+        html += `<div class="${classes}" ${hasSlots ? `data-date="${dateStr}" role="button" tabindex="0"` : ''}>${d}</div>`;
       }
 
       grid.innerHTML = html;
 
-      // Click handlers
       grid.querySelectorAll('.sc-cal-day--available').forEach(el => {
         el.addEventListener('click', () => {
           selectedDate = el.dataset.date;
           selectedSlot = null;
           renderCalendar();
-          loadSlots(selectedDate);
+          renderSlots();
         });
       });
     }
 
-    async function loadSlots(dateStr) {
+    function renderSlots() {
       const container = document.getElementById('scSlots');
+      const slots = slotsByDate[selectedDate] || [];
       container.classList.add('active');
-      container.innerHTML = `<div class="sc-loading"><div class="sc-spinner"></div> Loading times...</div>`;
 
-      try {
-        const res = await fetch(`${API_BASE}/google-calendar-availability`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },
-          body: JSON.stringify({ slug, date: dateStr }),
-        });
-
-        const data = await res.json();
-        availableSlots = data.slots || [];
-
-        if (availableSlots.length === 0) {
-          container.innerHTML = `<div class="sc-no-slots">No available times for this day.<br>Please try another date.</div>`;
-          return;
-        }
-
-        container.innerHTML = `
-          <div class="sc-slots-date">${formatDateDisplay(dateStr)}</div>
-          ${availableSlots.map(slot => `
-            <div class="sc-slot" data-slot="${slot}">${formatTime12(slot)}</div>
-          `).join('')}
-        `;
-
-        // Slot click → show confirm button pair
-        container.querySelectorAll('.sc-slot').forEach(el => {
-          el.addEventListener('click', () => {
-            // If already selected, deselect
-            if (el.classList.contains('sc-slot--selected')) {
-              selectedSlot = null;
-              loadSlots(dateStr);
-              return;
-            }
-
-            selectedSlot = el.dataset.slot;
-
-            // Replace all slots with the selected one + confirm button
-            container.querySelectorAll('.sc-slot').forEach(s => {
-              if (s.dataset.slot === selectedSlot) {
-                s.outerHTML = `
-                  <div class="sc-slot-pair">
-                    <div class="sc-slot sc-slot--selected">${formatTime12(selectedSlot)}</div>
-                    <button class="sc-slot-confirm" id="scConfirmSlot">Confirm</button>
-                  </div>
-                `;
-              } else {
-                s.style.display = 'none';
-              }
-            });
-
-            document.getElementById('scConfirmSlot')?.addEventListener('click', () => {
-              showForm();
-            });
-          });
-        });
-      } catch (err) {
-        console.error('Load slots error:', err);
-        container.innerHTML = `<div class="sc-no-slots">Error loading times. Please try again.</div>`;
+      if (!slots.length) {
+        container.innerHTML = `<div class="sc-no-slots">No available times for this day.</div>`;
+        return;
       }
+
+      container.innerHTML = `
+        <div class="sc-slots-date">${formatDateDisplay(selectedDate)}</div>
+        ${slots.map(s => `<div class="sc-slot" data-start="${s.start}">${formatSlotTime(s.start)}</div>`).join('')}
+      `;
+
+      container.querySelectorAll('.sc-slot').forEach(el => {
+        el.addEventListener('click', () => {
+          if (el.classList.contains('sc-slot--selected')) {
+            selectedSlot = null;
+            renderSlots();
+            return;
+          }
+          selectedSlot = el.dataset.start;
+
+          container.querySelectorAll('.sc-slot').forEach(s => {
+            if (s.dataset.start === selectedSlot) {
+              s.outerHTML = `
+                <div class="sc-slot-pair">
+                  <div class="sc-slot sc-slot--selected">${formatSlotTime(selectedSlot)}</div>
+                  <button class="sc-slot-confirm" id="scConfirmSlot">Confirm</button>
+                </div>
+              `;
+            } else {
+              s.style.display = 'none';
+            }
+          });
+
+          document.getElementById('scConfirmSlot')?.addEventListener('click', showForm);
+        });
+      });
     }
 
     function showForm() {
       document.getElementById('scCalendarStep').style.display = 'none';
       document.getElementById('scForm').classList.add('active');
       document.getElementById('scBackLink').style.display = 'block';
-
       document.getElementById('scFormSelected').innerHTML =
-        `<strong>${formatDateDisplay(selectedDate)}</strong> at <strong>${formatTime12(selectedSlot)}</strong>`;
+        `<strong>${formatDateDisplay(selectedDate)}</strong> at <strong>${formatSlotTime(selectedSlot)}</strong>`;
     }
 
-    // Back from form
     document.getElementById('scFormBack').addEventListener('click', goBackToCalendar);
     document.getElementById('scBackLink').addEventListener('click', goBackToCalendar);
 
@@ -726,7 +721,6 @@
       document.getElementById('scBackLink').style.display = 'none';
     }
 
-    // Submit booking
     document.getElementById('scFormSubmit').addEventListener('click', async () => {
       const name = document.getElementById('scName').value.trim();
       const email = document.getElementById('scEmail').value.trim();
@@ -741,42 +735,39 @@
       btn.textContent = 'Scheduling...';
 
       try {
-        // Build datetime ISO string in Central Time
-        const datetime = `${selectedDate}T${selectedSlot}:00`;
-
-        const res = await fetch(`${API_BASE}/google-calendar-book`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },
-          body: JSON.stringify({ slug, datetime, name, email, phone, message }),
+        const res = await apiPost('scheduling-book', {
+          profile_slug: profileSlug,
+          event_type_slug: eventSlug,
+          start_datetime: selectedSlot,
+          booker_name: name,
+          booker_email: email,
+          booker_phone: phone || null,
+          booker_timezone: BOOKER_TZ,
+          notes: message || null,
         });
 
         if (res.status === 409) {
-          alert('This time slot was just taken. Please choose another time.');
+          alert('This time slot was just taken. Please choose another.');
           btn.disabled = false;
           btn.textContent = 'Schedule Event';
           goBackToCalendar();
-          loadSlots(selectedDate);
+          await loadMonth(currentMonth);
           return;
         }
-
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || 'Booking failed');
         }
 
-        const result = await res.json();
-
-        // Show confirmation
         document.getElementById('scForm').classList.remove('active');
         document.getElementById('scBackLink').style.display = 'none';
         document.getElementById('scConfirm').classList.add('active');
 
-        const duration = profileData?.duration || 30;
         document.getElementById('scConfirmDetails').innerHTML = `
           <div><strong>Date:</strong> ${formatDateDisplay(selectedDate)}</div>
-          <div><strong>Time:</strong> ${formatTime12(selectedSlot)}</div>
-          <div><strong>Duration:</strong> ${duration} minutes</div>
-          <div><strong>With:</strong> ${profileData?.staff_name || 'Staff'}</div>
+          <div><strong>Time:</strong> ${formatSlotTime(selectedSlot)} (${BOOKER_TZ})</div>
+          <div><strong>Duration:</strong> ${eventType?.duration_minutes || 30} minutes</div>
+          ${profileInfo?.name ? `<div><strong>With:</strong> ${profileInfo.name}</div>` : ''}
         `;
       } catch (err) {
         console.error('Booking error:', err);
@@ -786,35 +777,30 @@
       }
     });
 
-    // Book another
-    document.getElementById('scBookAnother').addEventListener('click', (e) => {
+    document.getElementById('scBookAnother').addEventListener('click', async (e) => {
       e.preventDefault();
       selectedDate = null;
       selectedSlot = null;
       document.getElementById('scConfirm').classList.remove('active');
       document.getElementById('scCalendarStep').style.display = 'block';
       document.getElementById('scSlots').classList.remove('active');
-      document.getElementById('scName').value = '';
-      document.getElementById('scEmail').value = '';
-      document.getElementById('scPhone').value = '';
-      document.getElementById('scMessage').value = '';
+      ['scName','scEmail','scPhone','scMessage'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('scFormSubmit').disabled = false;
       document.getElementById('scFormSubmit').textContent = 'Schedule Event';
-      renderCalendar();
+      await loadMonth(currentMonth);
     });
 
-    // Calendar month navigation
-    document.getElementById('scPrevMonth').addEventListener('click', () => {
+    document.getElementById('scPrevMonth').addEventListener('click', async () => {
       currentMonth.setMonth(currentMonth.getMonth() - 1);
       selectedDate = null;
       document.getElementById('scSlots').classList.remove('active');
-      renderCalendar();
+      await loadMonth(currentMonth);
     });
-    document.getElementById('scNextMonth').addEventListener('click', () => {
+    document.getElementById('scNextMonth').addEventListener('click', async () => {
       currentMonth.setMonth(currentMonth.getMonth() + 1);
       selectedDate = null;
       document.getElementById('scSlots').classList.remove('active');
-      renderCalendar();
+      await loadMonth(currentMonth);
     });
   </script>
 </body>

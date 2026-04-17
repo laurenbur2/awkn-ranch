@@ -74,7 +74,6 @@ export const ALL_ADMIN_TABS = [
   { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff' },
-  { id: 'scheduling', label: 'Scheduling', href: 'scheduling.html', permission: 'view_crm', section: 'staff' },
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events' },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
