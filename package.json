@@ -8,7 +8,8 @@
   },
   "scripts": {
     "css:build": "tailwindcss -i styles/tailwind.css -o styles/tailwind.out.css --minify",
-    "css:watch": "tailwindcss -i styles/tailwind.css -o styles/tailwind.out.css --watch"
+    "css:watch": "tailwindcss -i styles/tailwind.css -o styles/tailwind.out.css --watch",
+    "bump": "./scripts/bump-version.sh --model local"
   },
   "keywords": ["property-management", "supabase", "tailwind", "github-pages"],
   "author": "",

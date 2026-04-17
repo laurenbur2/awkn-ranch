@@ -12,7 +12,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,8 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,18 +27,6 @@ jobs:
 
       - name: Build Tailwind CSS
         run: npm ci && npm run css:build
-
-      - name: Bump version (build-time only — no commit)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          RELEASE_COMPARE_FROM_SHA: ${{ github.event.before }}
-          RELEASE_COMPARE_TO_SHA: ${{ github.sha }}
-          RELEASE_PUSH_SHA: ${{ github.sha }}
-          RELEASE_ACTOR_LOGIN: ${{ github.actor }}
-          RELEASE_BRANCH: main
-          RELEASE_PUSHED_AT: ${{ github.event.head_commit.timestamp }}
-          RELEASE_SOURCE: github-main-push
-        run: ./scripts/bump-version.sh --model ci
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
