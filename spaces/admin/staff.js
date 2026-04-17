@@ -20,10 +20,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       authState = state;
       await loadData();
       wireToolbar();
+      wireAdminBar();
       render();
     },
   });
 });
+
+function wireAdminBar() {
+  const role = authState?.appUser?.role;
+  const isAdmin = role === 'admin' || role === 'oracle';
+  const bar = document.getElementById('sdAdminBar');
+  if (!bar) return;
+  if (!isAdmin) return; // stays hidden
+  bar.classList.remove('hidden');
+
+  const btn = document.getElementById('sdStaffAdminBtn');
+  const menu = document.getElementById('sdStaffAdminMenu');
+  if (!btn || !menu) return;
+
+  const close = () => {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && e.target !== btn) close();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+}
 
 async function loadData() {
   const { data: titles } = await supabase

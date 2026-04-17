@@ -48,10 +48,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       pendingCount = document.getElementById('pendingCount');
       usersCount = document.getElementById('usersCount');
 
+      // Deep-link: ?archived=1 enables the "show archived" toggle on load
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('archived') === '1') showArchivedUsers = true;
+
       // Load data
       await Promise.all([loadUsers(), loadInvitations(), loadPeople(), loadJobTitles()]);
       render();
       setupEventListeners();
+
+      if (showArchivedUsers) {
+        const toggle = document.getElementById('showArchivedToggle');
+        if (toggle) toggle.checked = true;
+        document.getElementById('usersSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   });
 });

@@ -36,6 +36,31 @@
 }
 
 /* Sub-tabs */
+.sch-admin-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 1rem;
+  background: #fff7ed;
+  border: 1px solid #fbd7a3;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+.sch-admin-switcher-label {
+  font-weight: 600;
+  color: var(--text, #2a1f23);
+}
+.sch-admin-switcher-select {
+  min-width: 220px;
+  max-width: 360px;
+  flex: 0 1 auto;
+}
+.sch-admin-switcher-hint {
+  color: var(--text-muted, #6b7280);
+  font-size: 0.78rem;
+}
+
 .sch-subtabs {
   display: flex;
   gap: 0;

@@ -79,6 +79,39 @@
       padding: 2rem; text-align: center; color: var(--text-muted, #6b7280);
       border: 1px dashed var(--border, #e5e7eb); border-radius: 12px; background: #fff;
     }
+
+    .sd-admin-bar {
+      display: flex; gap: 0.5rem; align-items: center;
+      margin: 0.25rem 0 0.75rem; flex-wrap: wrap;
+    }
+    .sd-admin-btn {
+      padding: 0.5rem 0.875rem; border-radius: 8px; border: 1px solid var(--border, #e5e7eb);
+      background: #fff; color: #111827; font-family: inherit; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 0.375rem;
+    }
+    .sd-admin-btn:hover { background: #f9fafb; }
+    .sd-admin-btn--primary {
+      background: var(--accent, #d4883a); color: #fff; border-color: var(--accent, #d4883a);
+    }
+    .sd-admin-btn--primary:hover { background: #b77128; }
+
+    .sd-menu-wrap { position: relative; }
+    .sd-menu {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: 200px; background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      z-index: 50; padding: 0.25rem; display: none;
+    }
+    .sd-menu.open { display: block; }
+    .sd-menu a {
+      display: block; padding: 0.55rem 0.75rem; border-radius: 6px;
+      color: #111827; text-decoration: none; font-size: 0.85rem;
+    }
+    .sd-menu a:hover { background: #f3f4f6; }
+    .sd-menu-caret {
+      display: inline-block; margin-left: 0.125rem; font-size: 0.6rem; opacity: 0.7;
+    }
   </style>
 </head>
 <body>
@@ -107,6 +140,19 @@
     <div class="manage-tabs"></div>
 
     <div class="sd-wrap">
+      <div class="sd-admin-bar hidden" id="sdAdminBar">
+        <a class="sd-admin-btn sd-admin-btn--primary" href="users.html" id="sdAddStaff">+ Add Staff</a>
+        <div class="sd-menu-wrap">
+          <button class="sd-admin-btn" id="sdStaffAdminBtn" aria-haspopup="true" aria-expanded="false">
+            Staff Admin <span class="sd-menu-caret">▾</span>
+          </button>
+          <div class="sd-menu" id="sdStaffAdminMenu" role="menu">
+            <a href="users.html" role="menuitem">Manage Users</a>
+            <a href="job-titles.html" role="menuitem">Job Titles &amp; Permissions</a>
+            <a href="users.html?archived=1" role="menuitem">Archived Users</a>
+          </div>
+        </div>
+      </div>
       <div class="sd-toolbar">
         <input type="search" id="sdSearch" placeholder="Search by name or email…">
         <select id="sdTitleFilter"><option value="">All titles</option></select>

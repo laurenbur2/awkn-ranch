@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="../styles.css?v=5">
   <link rel="stylesheet" href="styles.css?v=5">
   <link rel="stylesheet" href="manage-shared.css?v=1">
-  <link rel="stylesheet" href="scheduling.css?v=1">
+  <link rel="stylesheet" href="scheduling.css?v=2">
   <link rel="stylesheet" href="../../styles/site.css">
   <link rel="stylesheet" href="../../styles/tailwind.out.css">
 </head>
@@ -60,10 +60,18 @@
         </div>
       </div>
 
+      <!-- Admin-only mode switcher (staff/team calendars) -->
+      <div class="sch-admin-switcher hidden" id="adminSwitcher">
+        <label class="sch-admin-switcher-label" for="adminStaffSelect">Viewing</label>
+        <select id="adminStaffSelect" class="sch-input sch-admin-switcher-select"></select>
+        <span class="sch-admin-switcher-hint" id="adminSwitcherHint"></span>
+      </div>
+
       <!-- Sub-tabs -->
       <div class="sch-subtabs">
         <button class="sch-subtab active" data-panel="profile">My Profile</button>
         <button class="sch-subtab" data-panel="bookings">Upcoming Bookings</button>
+        <button class="sch-subtab hidden" data-panel="allstaff" id="subtabAllStaff">All Staff Calendars</button>
       </div>
 
       <!-- My Profile Panel -->
@@ -196,6 +204,31 @@
               <button class="sch-btn" data-close>Cancel</button>
               <button class="sch-btn sch-btn--primary" id="btnEventTypeSave">Save</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Staff Calendars Panel (admin-only) -->
+      <div class="sch-panel" id="panelAllstaff">
+        <div class="sch-section">
+          <h3 class="sch-section-title">All Staff Calendars</h3>
+          <p class="sch-hint">Any staff member with scheduling access appears here. Click "Manage" to view or edit their setup.</p>
+          <div class="sch-table-wrap">
+            <table class="sch-table" id="allStaffTable">
+              <thead>
+                <tr>
+                  <th>Staff</th>
+                  <th>Google Calendar</th>
+                  <th>Event Types</th>
+                  <th>Accepting</th>
+                  <th>Booking Slug</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="allStaffTableBody">
+                <tr><td colspan="6" class="sch-empty">Loading staff calendars…</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

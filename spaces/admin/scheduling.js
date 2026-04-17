@@ -7,6 +7,10 @@ let profile = null;
 let eventTypes = [];
 let bookings = [];
 let editingEventTypeId = null; // null = creating new; uuid = editing existing
+let isSchedulingAdmin = false; // has manage_scheduling permission → can view any staff's setup
+let viewAsUserId = null;       // which app_user we're currently viewing (defaults to self)
+let viewAsUserName = '';       // display name of viewed user, for hints
+let allStaff = [];             // admin-only: [{ app_user_id, name, email, profile, event_type_count }]
 
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -46,8 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     section: 'staff',
     onReady: async (state) => {
       authState = state;
+      isSchedulingAdmin = !!(state.hasPermission && state.hasPermission('manage_scheduling'));
+      viewAsUserId = state.appUser.id;
       checkUrlParams();
+      if (isSchedulingAdmin) await loadAllStaff();
       await loadData();
+      renderAdminSwitcher();
       render();
       setupEventListeners();
     },
@@ -67,10 +75,11 @@ function checkUrlParams() {
 // =============================================
 
 async function loadData() {
+  const targetUserId = viewAsUserId || authState.appUser.id;
   const { data: p } = await supabase
     .from('scheduling_profiles')
     .select('*')
-    .eq('app_user_id', authState.appUser.id)
+    .eq('app_user_id', targetUserId)
     .maybeSingle();
   profile = p || null;
 
@@ -98,6 +107,47 @@ async function loadData() {
   }
 }
 
+async function loadAllStaff() {
+  const { data: users } = await supabase
+    .from('app_users')
+    .select('id, display_name, first_name, last_name, email, role')
+    .in('role', ['staff', 'admin', 'oracle'])
+    .eq('is_archived', false);
+
+  const { data: profs } = await supabase
+    .from('scheduling_profiles')
+    .select('id, app_user_id, booking_slug, is_bookable, google_refresh_token');
+
+  const { data: counts } = await supabase
+    .from('scheduling_event_types')
+    .select('profile_id, is_active');
+
+  const profByUser = new Map((profs || []).map(p => [p.app_user_id, p]));
+  const countsByProfile = new Map();
+  (counts || []).forEach(c => {
+    const cur = countsByProfile.get(c.profile_id) || { total: 0, active: 0 };
+    cur.total += 1;
+    if (c.is_active) cur.active += 1;
+    countsByProfile.set(c.profile_id, cur);
+  });
+
+  allStaff = (users || [])
+    .map(u => {
+      const name = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || '—';
+      const p = profByUser.get(u.id) || null;
+      const cnt = p ? (countsByProfile.get(p.id) || { total: 0, active: 0 }) : { total: 0, active: 0 };
+      return {
+        app_user_id: u.id,
+        name,
+        email: u.email,
+        role: u.role,
+        profile: p,
+        eventCount: cnt,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 // =============================================
 // RENDER
 // =============================================
@@ -107,18 +157,100 @@ function render() {
   renderProfileForm();
   renderEventTypesList();
   renderBookingsTable();
+  renderAllStaffTable();
   updateStats();
+}
+
+function renderAdminSwitcher() {
+  const box = document.getElementById('adminSwitcher');
+  const select = document.getElementById('adminStaffSelect');
+  const hint = document.getElementById('adminSwitcherHint');
+  const allStaffTab = document.getElementById('subtabAllStaff');
+  if (!box || !select) return;
+
+  if (!isSchedulingAdmin) {
+    box.classList.add('hidden');
+    if (allStaffTab) allStaffTab.classList.add('hidden');
+    return;
+  }
+
+  box.classList.remove('hidden');
+  if (allStaffTab) allStaffTab.classList.remove('hidden');
+
+  const selfId = authState.appUser.id;
+  const selfName = authState.appUser.display_name
+    || `${authState.appUser.first_name || ''} ${authState.appUser.last_name || ''}`.trim()
+    || authState.appUser.email
+    || 'Me';
+
+  const others = allStaff.filter(s => s.app_user_id !== selfId);
+  select.innerHTML = [
+    `<option value="${escapeHtml(selfId)}">My Calendar (${escapeHtml(selfName)})</option>`,
+    others.length ? `<optgroup label="Staff">${others.map(s => {
+      const badges = [];
+      if (s.profile?.google_refresh_token) badges.push('connected');
+      if (s.eventCount.active) badges.push(`${s.eventCount.active} active`);
+      const suffix = badges.length ? ` — ${badges.join(', ')}` : ' — not set up';
+      return `<option value="${escapeHtml(s.app_user_id)}">${escapeHtml(s.name)}${escapeHtml(suffix)}</option>`;
+    }).join('')}</optgroup>` : '',
+  ].join('');
+
+  select.value = viewAsUserId || selfId;
+
+  const isSelf = (viewAsUserId || selfId) === selfId;
+  viewAsUserName = isSelf ? selfName : (allStaff.find(s => s.app_user_id === viewAsUserId)?.name || '');
+  hint.textContent = isSelf ? '' : `Admin view — changes affect ${viewAsUserName}.`;
+}
+
+function renderAllStaffTable() {
+  const tbody = document.getElementById('allStaffTableBody');
+  if (!tbody) return;
+  if (!isSchedulingAdmin) {
+    tbody.innerHTML = '<tr><td colspan="6" class="sch-empty">Admin permission required.</td></tr>';
+    return;
+  }
+  if (!allStaff.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="sch-empty">No staff found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allStaff.map(s => {
+    const connected = !!s.profile?.google_refresh_token;
+    const slug = s.profile?.booking_slug || '';
+    const publicLink = slug ? `${SITE_BASE}/schedule/?p=${encodeURIComponent(slug)}` : '';
+    const accepting = s.profile?.is_bookable ? 'Yes' : 'No';
+    const evLabel = `${s.eventCount.active}/${s.eventCount.total}`;
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:600">${escapeHtml(s.name)}</div>
+          <div style="font-size:.75rem;color:#6b7280">${escapeHtml(s.email || '')}</div>
+        </td>
+        <td>${connected
+          ? '<span class="sch-badge sch-badge--connected">Connected</span>'
+          : '<span class="sch-badge sch-badge--disconnected">Not connected</span>'}</td>
+        <td>${escapeHtml(evLabel)}</td>
+        <td>${escapeHtml(accepting)}</td>
+        <td>${publicLink
+          ? `<a href="${escapeHtml(publicLink)}" target="_blank" rel="noopener" style="color:var(--accent,#d4883a)">${escapeHtml(slug)}</a>`
+          : '—'}</td>
+        <td><button class="sch-btn sch-btn--sm" data-manage-user="${escapeHtml(s.app_user_id)}">Manage</button></td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function renderCalendarStatus() {
   const container = document.getElementById('calendarStatus');
   const isConnected = profile && profile.google_refresh_token;
+  const viewingSelf = !viewAsUserId || viewAsUserId === authState.appUser.id;
 
   if (isConnected) {
     container.innerHTML = `
       <div class="sch-connect-box">
         <span class="sch-badge sch-badge--connected">Connected</span>
-        <button class="sch-btn sch-btn--sm" id="btnReconnect">Reconnect</button>
+        ${viewingSelf
+          ? '<button class="sch-btn sch-btn--sm" id="btnReconnect">Reconnect</button>'
+          : `<span class="sch-hint">Only ${escapeHtml(viewAsUserName)} can reconnect their own Google account.</span>`}
       </div>
     `;
     document.getElementById('profileSection').classList.remove('hidden');
@@ -127,7 +259,9 @@ function renderCalendarStatus() {
     container.innerHTML = `
       <div class="sch-connect-box">
         <span class="sch-badge sch-badge--disconnected">Not Connected</span>
-        <button class="sch-btn sch-btn--primary" id="btnConnect">Connect Google Calendar</button>
+        ${viewingSelf
+          ? '<button class="sch-btn sch-btn--primary" id="btnConnect">Connect Google Calendar</button>'
+          : `<span class="sch-hint">${escapeHtml(viewAsUserName)} must sign in and connect their own Google account.</span>`}
       </div>
     `;
     document.getElementById('profileSection').classList.add('hidden');
@@ -253,7 +387,38 @@ function setupEventListeners() {
     });
   });
 
-  // Connect / Reconnect Google Calendar
+  // Admin: staff switcher (view/edit another user's scheduling setup)
+  const adminSelect = document.getElementById('adminStaffSelect');
+  if (adminSelect) {
+    adminSelect.addEventListener('change', async (e) => {
+      viewAsUserId = e.target.value || authState.appUser.id;
+      await loadData();
+      renderAdminSwitcher();
+      render();
+      // Jump to the "My Profile" panel so the admin can see the selected user's setup
+      document.querySelectorAll('.sch-subtab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sch-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.sch-subtab[data-panel="profile"]')?.classList.add('active');
+      document.getElementById('panelProfile')?.classList.add('active');
+    });
+  }
+
+  // Admin: "Manage" buttons in All Staff table
+  document.getElementById('allStaffTableBody')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-manage-user]');
+    if (!btn) return;
+    viewAsUserId = btn.dataset.manageUser;
+    await loadData();
+    renderAdminSwitcher();
+    render();
+    document.querySelectorAll('.sch-subtab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sch-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.sch-subtab[data-panel="profile"]')?.classList.add('active');
+    document.getElementById('panelProfile')?.classList.add('active');
+  });
+
+  // Connect / Reconnect Google Calendar — always uses the current signed-in user
+  // (never admin-view target, since Google OAuth runs against the browser's session).
   document.getElementById('calendarStatus').addEventListener('click', (e) => {
     if (e.target.id === 'btnConnect' || e.target.id === 'btnReconnect') {
       window.location.href = `${GOOGLE_AUTH_URL}?action=start&user_id=${encodeURIComponent(authState.appUser.id)}`;
