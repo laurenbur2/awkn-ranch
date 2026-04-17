@@ -17,7 +17,7 @@ let _cache = null;
 async function fetchVersionInfo() {
   if (_cache) return _cache;
   try {
-    const r = await fetch('/version.json?_=' + Date.now());
+    const r = await fetch('/awkn-ranch/version.json?_=' + Date.now());
     if (!r.ok) return null;
     _cache = await r.json();
     return _cache;
