@@ -26,6 +26,8 @@ let users = [];
 let invitations = [];
 let prospectTokens = {}; // invitation_id → access_token record
 let peopleSuggestions = []; // For typeahead
+let jobTitles = [];         // active + archived job titles
+let showArchivedUsers = false; // toggle in Active Users section
 
 // DOM elements (set after DOM ready)
 let pendingSection, usersSection, pendingCount, usersCount;
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       usersCount = document.getElementById('usersCount');
 
       // Load data
-      await Promise.all([loadUsers(), loadInvitations(), loadPeople()]);
+      await Promise.all([loadUsers(), loadInvitations(), loadPeople(), loadJobTitles()]);
       render();
       setupEventListeners();
     }
@@ -91,6 +93,25 @@ async function loadUsers() {
   } catch (timeoutError) {
     console.error('Users load timeout:', timeoutError.message);
     showToast('Loading users timed out. Please refresh the page.', 'error');
+  }
+}
+
+async function loadJobTitles() {
+  try {
+    const { data, error } = await supabase
+      .from('job_titles')
+      .select('id, name, color, is_archived')
+      .order('name');
+    if (error) {
+      // Table may not exist yet on older DBs — fail silently.
+      console.warn('Job titles unavailable:', error.message);
+      jobTitles = [];
+      return;
+    }
+    jobTitles = data || [];
+  } catch (e) {
+    console.warn('Job title load failed:', e);
+    jobTitles = [];
   }
 }
 
@@ -758,7 +779,7 @@ async function updateUserRole(userId, newRole) {
 }
 
 async function removeUser(userId) {
-  if (!confirm('Remove this user? They will no longer be able to access admin features.')) return;
+  if (!confirm('Permanently DELETE this user? This removes the record. Use Archive instead if you might restore them later.')) return;
 
   try {
     const { error } = await supabase
@@ -770,12 +791,71 @@ async function removeUser(userId) {
 
     await loadUsers();
     render();
-    showToast('User removed', 'success');
+    showToast('User deleted', 'success');
 
   } catch (error) {
     console.error('Error removing user:', error);
-    showToast('Failed to remove user: ' + error.message, 'error');
+    showToast('Failed to delete user: ' + error.message, 'error');
   }
+}
+
+async function archiveUser(userId) {
+  if (!confirm('Archive this user? They will be hidden from the active list and their permissions revoked until restored.')) return;
+  try {
+    const { error } = await supabase
+      .from('app_users')
+      .update({
+        is_archived: true,
+        archived_at: new Date().toISOString(),
+        archived_by: authState?.appUser?.id || null,
+      })
+      .eq('id', userId);
+    if (error) throw error;
+    await loadUsers();
+    render();
+    showToast('User archived', 'success');
+  } catch (error) {
+    console.error('Error archiving user:', error);
+    showToast('Failed to archive user: ' + error.message, 'error');
+  }
+}
+
+async function unarchiveUser(userId) {
+  try {
+    const { error } = await supabase
+      .from('app_users')
+      .update({ is_archived: false, archived_at: null, archived_by: null })
+      .eq('id', userId);
+    if (error) throw error;
+    await loadUsers();
+    render();
+    showToast('User restored', 'success');
+  } catch (error) {
+    console.error('Error restoring user:', error);
+    showToast('Failed to restore user: ' + error.message, 'error');
+  }
+}
+
+async function updateUserJobTitle(userId, titleId) {
+  const normalized = titleId ? titleId : null;
+  try {
+    const { error } = await supabase
+      .from('app_users')
+      .update({ job_title_id: normalized })
+      .eq('id', userId);
+    if (error) throw error;
+    const u = users.find(x => x.id === userId);
+    if (u) u.job_title_id = normalized;
+    showToast('Job title updated', 'success');
+  } catch (error) {
+    console.error('Error updating job title:', error);
+    showToast('Failed to update job title: ' + error.message, 'error');
+  }
+}
+
+function toggleShowArchived(checked) {
+  showArchivedUsers = !!checked;
+  render();
 }
 
 // --- Current Resident Management ---
@@ -1054,13 +1134,30 @@ function renderUsers() {
 
   const currentUserId = authState.appUser?.id;
 
+  const visibleUsers = users.filter(u => showArchivedUsers ? true : !u.is_archived);
+
+  const titleOptions = jobTitles
+    .filter(t => !t.is_archived)
+    .map(t => `<option value="${t.id}">${t.name}</option>`)
+    .join('');
+
   usersSection.innerHTML = `
+    <div style="display:flex; gap:0.5rem; align-items:center; padding:0.5rem 1rem; border-bottom:1px solid var(--border);">
+      <label style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:0.375rem; cursor:pointer;">
+        <input type="checkbox" id="showArchivedToggle" onchange="toggleShowArchived(this.checked)" ${showArchivedUsers ? 'checked' : ''}>
+        Show archived
+      </label>
+      <span style="margin-left:auto; font-size:0.75rem; color:var(--text-muted);">
+        ${visibleUsers.length} of ${users.length}
+      </span>
+    </div>
     <table class="users-table">
       <thead>
         <tr>
           <th>Name</th>
           <th>Email</th>
           <th>Role</th>
+          <th>Job Title</th>
           <th>Here</th>
           <th>Person</th>
           <th>Last Login</th>
@@ -1068,7 +1165,7 @@ function renderUsers() {
         </tr>
       </thead>
       <tbody>
-        ${users.map(u => {
+        ${visibleUsers.map(u => {
           const isCurrentUser = u.id === currentUserId;
           const isHere = u.is_current_resident;
           const isOverride = u.is_current_resident_override !== null && u.is_current_resident_override !== undefined;
@@ -1077,18 +1174,22 @@ function renderUsers() {
             : `Auto-derived from assignments. Click to override.`;
           const displayName = isDemoUser() ? redactString(u.display_name || '-', 'name') : (u.display_name || '-');
           const personName = isDemoUser() ? redactString(getPersonName(u.person_id), 'name') : getPersonName(u.person_id);
+          const archivedBadge = u.is_archived
+            ? '<span class="expired-badge" style="background:#9ca3af;">Archived</span>'
+            : '';
           return `
-            <tr>
+            <tr class="${u.is_archived ? 'expired-row' : ''}">
               <td>
-                <span class="${isDemoUser() ? 'demo-redacted' : ''}">${displayName}</span>
+                <span class="${isDemoUser() ? 'demo-redacted' : ''}${u.is_archived ? ' expired-text' : ''}">${displayName}</span>
                 ${isCurrentUser ? '<span class="you-tag">You</span>' : ''}
+                ${archivedBadge}
               </td>
               <td>${isDemoUser() ? `<span class="demo-redacted">${redactString(u.email, 'email')}</span>` : u.email}${u.contact_email && u.contact_email !== u.email ? `<br><span style="font-size:0.75rem;color:var(--text-muted)">contact: ${isDemoUser() ? `<span class="demo-redacted">${redactString(u.contact_email, 'email')}</span>` : u.contact_email}</span>` : ''}</td>
               <td>
                 <select
                   class="role-select"
                   data-user-id="${u.id}"
-                  ${isCurrentUser || isDemoUser() ? 'disabled' : ''}
+                  ${isCurrentUser || isDemoUser() || u.is_archived ? 'disabled' : ''}
                   onchange="updateUserRole('${u.id}', this.value)"
                 >
                   <option value="prospect" ${u.role === 'prospect' ? 'selected' : ''}>Prospect</option>
@@ -1099,6 +1200,20 @@ function renderUsers() {
                   <option value="staff" ${u.role === 'staff' ? 'selected' : ''}>Staff</option>
                   <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                   <option value="oracle" ${u.role === 'oracle' ? 'selected' : ''}>Oracle</option>
+                </select>
+              </td>
+              <td>
+                <select
+                  class="role-select"
+                  data-user-id="${u.id}"
+                  ${u.is_archived ? 'disabled' : ''}
+                  onchange="updateUserJobTitle('${u.id}', this.value)"
+                  title="Job title — permissions from the title apply automatically"
+                >
+                  <option value="">— none —</option>
+                  ${jobTitles.filter(t => !t.is_archived || t.id === u.job_title_id).map(t => `
+                    <option value="${t.id}" ${u.job_title_id === t.id ? 'selected' : ''}>${t.name}${t.is_archived ? ' (archived)' : ''}</option>
+                  `).join('')}
                 </select>
               </td>
               <td>
@@ -1116,15 +1231,16 @@ function renderUsers() {
                 }
               </td>
               <td>${u.last_login_at ? formatDateAustin(u.last_login_at, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Never'}</td>
-              <td>
+              <td class="actions-cell">
                 ${hasPermission('manage_permissions') && !isCurrentUser
-                  ? `<button class="btn-secondary btn-small" onclick="showPermissionsModal('${u.id}')" style="margin-right:0.25rem;">Permissions</button>`
+                  ? `<button class="btn-secondary btn-small" onclick="showPermissionsModal('${u.id}')">Permissions</button>`
                   : ''
                 }
-                ${isCurrentUser
-                  ? ''
-                  : `<button class="btn-danger btn-small" onclick="removeUser('${u.id}')" title="Remove user">&times;</button>`
-                }
+                ${isCurrentUser ? '' : (u.is_archived
+                  ? `<button class="btn-secondary btn-small" onclick="unarchiveUser('${u.id}')" title="Restore user">Restore</button>
+                     <button class="btn-danger btn-small" onclick="removeUser('${u.id}')" title="Delete permanently">Delete</button>`
+                  : `<button class="btn-secondary btn-small" onclick="archiveUser('${u.id}')" title="Archive (hide but keep record)">Archive</button>`
+                )}
               </td>
             </tr>
           `;
@@ -1431,6 +1547,10 @@ window.revokeInvitation = revokeInvitation;
 window.resendInvitation = resendInvitation;
 window.updateUserRole = updateUserRole;
 window.removeUser = removeUser;
+window.archiveUser = archiveUser;
+window.unarchiveUser = unarchiveUser;
+window.updateUserJobTitle = updateUserJobTitle;
+window.toggleShowArchived = toggleShowArchived;
 window.copyInviteText = copyInviteText;
 window.closeInviteModal = closeInviteModal;
 window.showInvitationModal = showInvitationModal;

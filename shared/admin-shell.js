@@ -17,12 +17,14 @@ import { getEnabledFeatures } from './feature-registry.js';
 // =============================================
 // Permission keys for staff/admin section detection
 const STAFF_PERMISSION_KEYS = [
+  'view_dashboard', 'view_staff_directory',
   'view_spaces', 'view_rentals', 'view_events', 'view_media', 'view_sms',
   'view_purchases', 'view_hours', 'view_faq', 'view_voice', 'view_todo', 'view_appdev', 'view_inventory',
-  'view_crm',
+  'view_crm', 'view_memberships', 'view_scheduler', 'view_calendar',
 ];
 const ADMIN_PERMISSION_KEYS = [
   'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev', 'view_openclaw', 'view_devcontrol',
+  'manage_users', 'manage_job_titles',
 ];
 
 // Compact SVG icons for tabs (16x16, stroke-based)
@@ -56,6 +58,9 @@ const TAB_ICONS = {
   devcontrol: _i('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'),
   crm:        _i('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'),
   scheduling: _i('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/>'),
+  dashboard:  _i('<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'),
+  staff:      _i('<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>'),
+  jobtitles:  _i('<path d="M20 7h-3V4a1 1 0 00-1-1H8a1 1 0 00-1 1v3H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/><line x1="9" y1="7" x2="15" y2="7"/>'),
 };
 
 // Tab definitions with optional `feature` key for config-driven visibility.
@@ -64,6 +69,8 @@ const TAB_ICONS = {
 // When property_config.features is NOT set, all tabs show (backward compatible).
 export const ALL_ADMIN_TABS = [
   // Staff section — primary admin tabs (Mindbody-style)
+  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff' },
+  { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff' },
   { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff' },
@@ -83,6 +90,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'appdev', label: 'App Dev', href: 'appdev.html', permission: 'view_appdev', section: 'staff', feature: '_hidden' },
   // Admin section
   { id: 'users', label: 'Users', href: 'users.html', permission: 'view_users', section: 'admin' },
+  { id: 'jobtitles', label: 'Job Titles', href: 'job-titles.html', permission: 'manage_job_titles', section: 'admin' },
   { id: 'passwords', label: 'Passwords', href: 'passwords.html', permission: 'view_passwords', section: 'admin' },
   { id: 'settings', label: 'Settings', href: 'settings.html', permission: 'view_settings', section: 'admin' },
   { id: 'releases', label: 'Releases', href: 'releases.html', permission: 'view_settings', section: 'admin' },
