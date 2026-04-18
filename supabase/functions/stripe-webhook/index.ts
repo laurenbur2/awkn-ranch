@@ -5,10 +5,10 @@
  * Updates payouts table (and optionally stripe_payments) and ledger accordingly.
  * On payment success, sends a rich confirmation email to the payer with a statement
  * summary showing what was paid, prior payments, and remaining balance.
- * Also forwards to payments@YOUR_DOMAIN.
+ * Also forwards to payments@awknranch.com.
  *
  * Deploy with: supabase functions deploy stripe-webhook --no-verify-jwt
- * Webhook URL: YOUR_SUPABASE_URL/functions/v1/stripe-webhook
+ * Webhook URL: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/stripe-webhook
  *
  * Events handled:
  * - transfer.paid → payout completed
@@ -25,7 +25,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature'
 };
 
-const PAYMENTS_EMAIL = 'payments@YOUR_DOMAIN';
+const PAYMENTS_EMAIL = 'payments@awknranch.com';
 
 interface StripeEvent {
   id: string;
@@ -279,7 +279,7 @@ async function sendPaymentConfirmation(
           </div>
         `).join('')}
         <div style="text-align:center;margin-top:12px;">
-          <a href="https://YOUR_DOMAIN/pay/?amount=${balanceDue}&person_id=${row.person_id}&person_name=${encodeURIComponent(person.first_name + ' ' + person.last_name)}&email=${encodeURIComponent(person.email)}&description=${encodeURIComponent('Remaining balance')}&payment_type=rent&reference_type=assignment${assignments?.length ? '&reference_id=' + assignments[0].id : ''}" style="display:inline-block;background:linear-gradient(135deg,#e65100 0%,#bf360c 100%);color:white;padding:12px 32px;text-decoration:none;border-radius:8px;font-size:15px;font-weight:700;">Pay ${formatCurrency(balanceDue)} Now</a>
+          <a href="https://laurenbur2.github.io/awkn-ranch/pay/?amount=${balanceDue}&person_id=${row.person_id}&person_name=${encodeURIComponent(person.first_name + ' ' + person.last_name)}&email=${encodeURIComponent(person.email)}&description=${encodeURIComponent('Remaining balance')}&payment_type=rent&reference_type=assignment${assignments?.length ? '&reference_id=' + assignments[0].id : ''}" style="display:inline-block;background:linear-gradient(135deg,#e65100 0%,#bf360c 100%);color:white;padding:12px 32px;text-decoration:none;border-radius:8px;font-size:15px;font-weight:700;">Pay ${formatCurrency(balanceDue)} Now</a>
         </div>
       </div>`
     : `<div style="background:#e8f5e9;border-left:4px solid #2e7d32;padding:16px 20px;margin:20px 0;border-radius:0 8px 8px 0;">
@@ -330,7 +330,7 @@ async function sendPaymentConfirmation(
         <p style="color:#555;font-size:14px;">Best regards,<br><strong>AWKN Ranch</strong></p>
       </div>
       <div style="background:#f5f5f5;padding:16px 32px;text-align:center;border-top:1px solid #e0e0e0;">
-        <p style="margin:0;color:#999;font-size:12px;">123 Main Stive, Your City, TX 00000</p>
+        <p style="margin:0;color:#999;font-size:12px;">7600 Stillridge Dr, Austin, TX 78736</p>
       </div>
     </div>
   `;
@@ -341,7 +341,7 @@ Hi ${person.first_name},
 
 We've received your payment of ${formatCurrency(row.amount)} for ${paymentTypeLabel} (${spaceName}).
 
-${balanceDue > 0 ? `Outstanding balance: ${formatCurrency(balanceDue)}\nPay now: https://YOUR_DOMAIN/pay/?amount=${balanceDue}&person_id=${row.person_id}` : 'You\'re all caught up! No outstanding balance.'}
+${balanceDue > 0 ? `Outstanding balance: ${formatCurrency(balanceDue)}\nPay now: https://laurenbur2.github.io/awkn-ranch/pay/?amount=${balanceDue}&person_id=${row.person_id}` : 'You\'re all caught up! No outstanding balance.'}
 
 Thank you!
 AWKN Ranch`;
@@ -355,9 +355,9 @@ AWKN Ranch`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property Team <team@YOUR_DOMAIN>',
+        from: 'Property Team <team@awknranch.com>',
         to: [person.email],
-        reply_to: 'team@YOUR_DOMAIN',
+        reply_to: 'team@awknranch.com',
         subject: `Payment Received - ${formatCurrency(row.amount)} - AWKN Ranch`,
         html: emailHtml,
         text: emailText,
@@ -382,7 +382,7 @@ AWKN Ranch`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property System <auto@YOUR_DOMAIN>',
+        from: 'Property System <auto@awknranch.com>',
         to: [PAYMENTS_EMAIL],
         subject: `[Stripe] ${formatCurrency(row.amount)} received from ${person.first_name} ${person.last_name} - ${paymentTypeLabel}`,
         html: emailHtml,

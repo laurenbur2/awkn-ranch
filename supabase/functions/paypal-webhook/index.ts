@@ -7,7 +7,7 @@
  * 3. Payment refunds
  *
  * Deploy with: supabase functions deploy paypal-webhook --no-verify-jwt
- * Webhook URL: YOUR_SUPABASE_URL/functions/v1/paypal-webhook
+ * Webhook URL: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/paypal-webhook
  *
  * PayPal Events handled:
  * --- Payouts (outbound) ---
@@ -606,8 +606,8 @@ async function notifyUnknownEvent(event: PayPalWebhookEvent) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property Payments <noreply@YOUR_DOMAIN>',
-        to: ['admin@YOUR_DOMAIN'],
+        from: 'Property Payments <noreply@awknranch.com>',
+        to: ['admin@awknranch.com'],
         subject: `Unknown PayPal Event: ${event.event_type}`,
         html: `
           <div style="font-family:-apple-system,sans-serif;max-width:600px;">

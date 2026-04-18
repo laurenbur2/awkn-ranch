@@ -7,10 +7,10 @@
 const FALLBACK_CONFIG: Record<string, any> = {
   property: {
     name: "AWKN Ranch",
-    short_name: "YOUR_APP_NAME",
+    short_name: "AWKN Team Portal",
     tagline: "We put the AI into Propertys",
-    address: "123 Main St, Your City, ST 00000",
-    city: "Your City",
+    address: "7600 Stillridge Dr, Austin, TX 78736",
+    city: "Austin",
     state: "TX",
     zip: "00000",
     country: "US",
@@ -19,33 +19,33 @@ const FALLBACK_CONFIG: Record<string, any> = {
     timezone: "America/Chicago",
   },
   domain: {
-    primary: "YOUR_DOMAIN",
+    primary: "awknranch.com",
     github_pages: "USERNAME.github.io/REPO",
     camera_proxy: "YOUR_CAMERA_PROXY",
   },
   email: {
-    team: "team@YOUR_DOMAIN",
-    admin_gmail: "admin@YOUR_DOMAIN",
-    notifications_from: "notifications@YOUR_DOMAIN",
-    noreply_from: "noreply@YOUR_DOMAIN",
-    automation: "automation@YOUR_DOMAIN",
+    team: "team@awknranch.com",
+    admin_gmail: "admin@awknranch.com",
+    notifications_from: "notifications@awknranch.com",
+    noreply_from: "noreply@awknranch.com",
+    automation: "automation@awknranch.com",
   },
   payment: {
-    zelle_email: "admin@YOUR_DOMAIN",
+    zelle_email: "admin@awknranch.com",
     venmo_handle: "@PropertyPlayhouse",
   },
   ai_assistant: {
     name: "PAI",
     full_name: "Prompt Property Intelligence",
     personality: "the AI assistant for the property",
-    email_from: "pai@YOUR_DOMAIN",
+    email_from: "pai@awknranch.com",
   },
   wifi: {
     network_name: "Black Rock City",
   },
   mobile_app: {
     name: "AWKN Ranch",
-    id: "com.yourorg.app",
+    id: "com.awknranch.app",
   },
 };
 

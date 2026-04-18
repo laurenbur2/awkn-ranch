@@ -20,7 +20,7 @@ cp package.json "$INSTALL_DIR/"
 # Create .env template if it doesn't exist
 if [ ! -f "$INSTALL_DIR/.env" ]; then
   cat > "$INSTALL_DIR/.env" <<'EOF'
-SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_URL=https://lnqxarwqckpmirpmixcw.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<paste-service-role-key>
 POLL_INTERVAL_MS=30000
 API_DELAY_MS=1000

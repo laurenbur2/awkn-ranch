@@ -666,7 +666,7 @@ async function sendClockInEmail() {
     },
     body: JSON.stringify({
       type: 'work_clockin_summary',
-      to: [authState.appUser.email, 'automation@YOUR_DOMAIN'].filter(Boolean),
+      to: [authState.appUser.email, 'automation@awknranch.com'].filter(Boolean),
       data: emailData,
     }),
   });
@@ -1125,7 +1125,7 @@ async function handleRequestPayment() {
 
     // Send email to admin
     const { sendEmail } = await import('../shared/email-service.js');
-    const adminEmail = 'team@YOUR_DOMAIN';
+    const adminEmail = 'team@awknranch.com';
 
     const hasRateMismatch = mismatchedEntries.length > 0;
     const subject = `Payment Request from ${name}` + (hasRateMismatch ? ' (Rate Update Needed)' : '');
@@ -1142,9 +1142,9 @@ async function handleRequestPayment() {
     }
     body += `</table>`;
     if (hasRateMismatch) {
-      body += `<p style="color:#92400e;"><strong>Action needed:</strong> Some entries were recorded at the wrong rate. Go to <a href="https://YOUR_DOMAIN/spaces/admin/worktracking.html">Admin Hours</a>, filter by ${escapeHtml(name)}, select all unpaid entries, and click "Recalc" to update them to the current rate. Then "Mark Selected as Paid" to process payment.</p>`;
+      body += `<p style="color:#92400e;"><strong>Action needed:</strong> Some entries were recorded at the wrong rate. Go to <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/worktracking.html">Admin Hours</a>, filter by ${escapeHtml(name)}, select all unpaid entries, and click "Recalc" to update them to the current rate. Then "Mark Selected as Paid" to process payment.</p>`;
     } else {
-      body += `<p>Go to <a href="https://YOUR_DOMAIN/spaces/admin/worktracking.html">Admin Hours</a> to review and process payment.</p>`;
+      body += `<p>Go to <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/worktracking.html">Admin Hours</a> to review and process payment.</p>`;
     }
 
     const result = await sendEmail('custom', adminEmail, {

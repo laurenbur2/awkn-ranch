@@ -257,7 +257,7 @@ This Rental Agreement (hereinafter, "Agreement") is made by and between the Revo
 
 ## RENTAL VENUE
 
-Company agrees to rent to Client the following spaces at 123 Main Stive (aka the Austin AWKN Ranch):
+Company agrees to rent to Client the following spaces at 7600 Stillridge Dr (aka the Austin AWKN Ranch):
 
 {{included_spaces}}
 
@@ -361,8 +361,8 @@ This Agreement may be executed in one or more counterparts, each of which shall 
 | **{{client_name}}**      | Rahul Sonnad                                   |
 | Date:                    | Date:                                          |
 |                          | Administrator Austin AWKN Ranch          |
-| Address                  | 123 Main St DR                            |
-| City, State, Zip Code    | Your City TX 00000                           |
+| Address                  | 7600 Stillridge Dr DR                            |
+| City, State, Zip Code    | Austin TX 78736                           |
 | Phone                    | +1-424-234-1750                                |
 
 ---
@@ -408,9 +408,9 @@ This Agreement may be executed in one or more counterparts, each of which shall 
 
 2. **Guest Limit:** No more than **{{max_guests}} people** including volunteers and paid attendees. $15 fee per additional person applies.
 
-3. **Address Privacy:** Client agrees to NOT post the address of the venue in any distributed materials including texts, emails, social media postings or printed materials. Instead a link to YOUR_DOMAIN/visiting web page will be provided. $100 fee if address is posted.
+3. **Address Privacy:** Client agrees to NOT post the address of the venue in any distributed materials including texts, emails, social media postings or printed materials. Instead a link to awknranch.com/visiting web page will be provided. $100 fee if address is posted.
 
-4. **Marketing Materials:** Client will send links to all marketing materials to +14242341750 on WhatsApp or to specified WhatsApp group or team@YOUR_DOMAIN
+4. **Marketing Materials:** Client will send links to all marketing materials to +14242341750 on WhatsApp or to specified WhatsApp group or team@awknranch.com
 
 5. **Parking Management:** Client agrees to manage parking to ensure no vehicles are parked in front of neighbors houses. $150 penalty for each complaint from neighbors regarding parking on their property.
 

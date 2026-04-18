@@ -14,7 +14,7 @@ import { supabaseHealth } from '../shared/supabase-health.js';
 // =============================================
 // CONFIGURATION
 // =============================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const GOVEE_CONTROL_URL = `${SUPABASE_URL}/functions/v1/govee-control`;
 const HOME_ASSISTANT_CONTROL_URL = `${SUPABASE_URL}/functions/v1/home-assistant-control`;
 const POLL_INTERVAL_MS = 30000; // 30 seconds

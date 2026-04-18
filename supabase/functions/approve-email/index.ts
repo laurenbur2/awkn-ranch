@@ -13,8 +13,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
-const CONFIRM_PAGE = "https://YOUR_DOMAIN/admin/email-confirm.html";
-const RESULT_PAGE = "https://YOUR_DOMAIN/admin/email-approved.html";
+const CONFIRM_PAGE = "https://laurenbur2.github.io/awkn-ranch/admin/email-confirm.html";
+const RESULT_PAGE = "https://laurenbur2.github.io/awkn-ranch/admin/email-approved.html";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -234,13 +234,13 @@ async function processPayrollApproval(html: string, supabaseUrl: string, supabas
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${supabaseKey}` },
         body: JSON.stringify({
           type: "custom",
-          to: "admin@YOUR_DOMAIN",
+          to: "admin@awknranch.com",
           subject: `Payroll Payout FAILED — ${meta.associate_name}`,
           data: {
             _raw_html: `<h2 style="color:#c62828;">Payout Failed</h2>
               <p>The payroll approval for <strong>${meta.associate_name}</strong> ($${amount.toFixed(2)}) was approved, but the Stripe payout failed:</p>
               <p style="background:#ffebee;padding:12px;border-radius:8px;font-family:monospace;">${payoutResult.error}</p>
-              <p>You can retry the payout manually from the <a href="https://YOUR_DOMAIN/spaces/admin/worktracking.html">Work Tracking</a> page.</p>`,
+              <p>You can retry the payout manually from the <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/worktracking.html">Work Tracking</a> page.</p>`,
           },
         }),
       });
@@ -258,7 +258,7 @@ async function processPayrollApproval(html: string, supabaseUrl: string, supabas
       });
       const onboardResult = await onboardRes.json();
 
-      let setupUrl = "https://YOUR_DOMAIN/associates/worktracking.html";
+      let setupUrl = "https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html";
       if (onboardResult.success && onboardResult.account_id) {
         // Get the account link
         const linkRes = await fetch(`${supabaseUrl}/functions/v1/stripe-connect-onboard`, {

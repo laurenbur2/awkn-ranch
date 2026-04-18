@@ -5,7 +5,7 @@
  * automatically matched. Saves the mapping for future payments.
  *
  * Deploy with: supabase functions deploy resolve-payment
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/resolve-payment
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/resolve-payment
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';

@@ -5,7 +5,7 @@
  * cached mappings or Gemini AI, and records the payment.
  *
  * Deploy with: supabase functions deploy record-payment
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/record-payment
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/record-payment
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';

@@ -27,12 +27,12 @@ CI bumps automatically via GitHub Action on every push. **Never bump locally.**
 
 | Environment | URL |
 |---|---|
-| Custom domain | https://YOUR_DOMAIN/ |
+| Custom domain | https://laurenbur2.github.io/awkn-ranch/ |
 | GitHub Pages | https://USERNAME.github.io/REPO/ |
-| Resident portal | https://YOUR_DOMAIN/residents/ |
-| Admin | https://YOUR_DOMAIN/spaces/admin/manage.html |
-| Public spaces | https://YOUR_DOMAIN/spaces/ |
-| Payments | https://YOUR_DOMAIN/pay/ |
+| Resident portal | https://laurenbur2.github.io/awkn-ranch/residents/ |
+| Admin | https://laurenbur2.github.io/awkn-ranch/spaces/admin/manage.html |
+| Public spaces | https://laurenbur2.github.io/awkn-ranch/spaces/ |
+| Payments | https://laurenbur2.github.io/awkn-ranch/pay/ |
 | Repository | https://github.com/USERNAME/REPO |
 
 ## Tailwind CSS

@@ -23,9 +23,9 @@ const corsHeaders = {
 };
 
 // Email configuration
-const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@YOUR_DOMAIN';
+const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@awknranch.com';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-const FROM_EMAIL = 'Property Automaton Errors <auto@YOUR_DOMAIN>';
+const FROM_EMAIL = 'Property Automaton Errors <auto@awknranch.com>';
 
 // =============================================
 // RISK EVALUATION CONFIG
@@ -117,7 +117,7 @@ function evaluateRisk(error: ErrorEntry): RiskAssessment {
   let level: 'low' | 'medium' | 'high' = 'low';
 
   const pageUrl = error.environment?.url || '';
-  const pagePath = new URL(pageUrl, 'https://YOUR_DOMAIN').pathname;
+  const pagePath = new URL(pageUrl, 'https://laurenbur2.github.io/awkn-ranch').pathname;
 
   // Check high-risk paths
   if (HIGH_RISK_PATHS.some(p => pagePath.startsWith(p))) {
@@ -194,7 +194,7 @@ function getErrorSignature(error: ErrorEntry): string {
   const pageUrl = error.environment?.url || '';
   let pagePath = '';
   try {
-    pagePath = new URL(pageUrl, 'https://YOUR_DOMAIN').pathname;
+    pagePath = new URL(pageUrl, 'https://laurenbur2.github.io/awkn-ranch').pathname;
   } catch {
     pagePath = pageUrl;
   }
@@ -358,7 +358,7 @@ async function handleErrorReport(report: ErrorReport) {
         .from('bug_reports')
         .insert({
           reporter_name: 'Property Error Monitor',
-          reporter_email: 'automation@YOUR_DOMAIN',
+          reporter_email: 'automation@awknranch.com',
           description,
           page_url: pageUrl,
           error_message: `${error.code}: ${error.message}`.substring(0, 500),
@@ -524,7 +524,7 @@ To reject: Update bug_reports.status to 'skipped'.
   }
 
   const emailBody = `
-YOUR_APP_NAME Daily Error Digest
+AWKN Team Portal Daily Error Digest
 ============================
 Period: ${sinceDate.toLocaleString()} to ${now.toLocaleString()}
 Total Errors: ${errorCount}
@@ -548,8 +548,8 @@ View the error_logs table in Supabase for full details.
   if (RESEND_API_KEY) {
     try {
       const subject = pendingApproval && pendingApproval.length > 0
-        ? `[YOUR_APP_NAME] Error Digest: ${errorCount} error(s), ${pendingApproval.length} awaiting approval`
-        : `[YOUR_APP_NAME] Daily Error Digest: ${errorCount} error(s)`;
+        ? `[AWKN Team Portal] Error Digest: ${errorCount} error(s), ${pendingApproval.length} awaiting approval`
+        : `[AWKN Team Portal] Daily Error Digest: ${errorCount} error(s)`;
 
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',

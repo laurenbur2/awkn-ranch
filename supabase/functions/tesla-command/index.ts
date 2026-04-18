@@ -84,7 +84,7 @@ serve(async (req) => {
         client_id: acct.fleet_client_id,
         client_secret: acct.fleet_client_secret,
         code: body.code,
-        redirect_uri: "https://YOUR_DOMAIN/auth/tesla/callback",
+        redirect_uri: "https://laurenbur2.github.io/awkn-ranch/auth/tesla/callback",
         audience: acct.fleet_api_base || DEFAULT_FLEET_API_BASE,
       });
 

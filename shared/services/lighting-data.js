@@ -6,7 +6,7 @@
 
 import { supabase, SUPABASE_ANON_KEY } from '../supabase.js';
 
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const GOVEE_CONTROL_URL = `${SUPABASE_URL}/functions/v1/govee-control`;
 
 // Color presets for quick selection

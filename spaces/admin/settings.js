@@ -1275,7 +1275,7 @@ async function loadForwardingRules() {
     container.innerHTML = Object.entries(grouped).map(([prefix, rules]) => `
       <div style="margin-bottom: 1rem;">
         <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-primary);">
-          ${prefix}@YOUR_DOMAIN
+          ${prefix}@awknranch.com
         </div>
         ${rules.map(r => `
           <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: ${r.is_active ? '#f8faf8' : '#fafafa'}; border-radius: 6px; margin-bottom: 0.25rem; border: 1px solid ${r.is_active ? '#e0e8e0' : '#eee'};">

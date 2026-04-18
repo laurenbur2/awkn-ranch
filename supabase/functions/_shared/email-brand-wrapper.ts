@@ -23,10 +23,10 @@ const FALLBACK = {
   brand: {
     primary_name: 'AWKN Ranch',
     full_name: 'AWKN Ranch Austin',
-    platform_name: 'YOUR_APP_NAME',
+    platform_name: 'AWKN Team Portal',
     tagline: 'We put the AI into Propertys',
-    address: '123 Main St, Your City, ST 00000',
-    website: 'https://YOUR_DOMAIN',
+    address: '7600 Stillridge Dr, Austin, TX 78736',
+    website: 'https://laurenbur2.github.io/awkn-ranch',
   },
   colors: {
     primary: {
@@ -45,7 +45,7 @@ const FALLBACK = {
     font_stack: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   },
   logos: {
-    base_url: 'YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/logos',
+    base_url: 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/logos',
     icon_light: 'logo-white-transparent.png',
     wordmark_light: 'wordmark-white-transparent.png',
   },
@@ -201,7 +201,7 @@ export async function wrapEmailHtml(
 
   const accent = accentColor || c.accent;
 
-  const siteUrl = brand.website || 'https://YOUR_DOMAIN';
+  const siteUrl = brand.website || 'https://laurenbur2.github.io/awkn-ranch';
   const headerHtml = showHeader ? `
     <!-- Header -->
     <tr>
@@ -249,7 +249,7 @@ export async function wrapEmailHtml(
       <td style="padding:20px ${e.body.padding} 8px;font-family:${fontFamily};">
         <div style="background:${c.background_muted};border:1px solid ${c.border};border-radius:8px;padding:16px 20px;text-align:center;">
           <p style="margin:0 0 10px;color:${c.text};font-size:14px;font-weight:600;">Any questions or feedback?</p>
-          <a href="mailto:pai@YOUR_DOMAIN?subject=${feedbackSubject}" style="display:inline-block;background:${accent};color:#ffffff;padding:10px 24px;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;font-family:${fontFamily};">Send PAI a Message</a>
+          <a href="mailto:pai@awknranch.com?subject=${feedbackSubject}" style="display:inline-block;background:${accent};color:#ffffff;padding:10px 24px;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;font-family:${fontFamily};">Send PAI a Message</a>
           <p style="margin:10px 0 0;color:${c.text_muted};font-size:12px;">Or just reply to this email</p>
         </div>
       </td>

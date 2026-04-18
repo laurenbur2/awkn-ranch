@@ -28,7 +28,7 @@ const IMAGES = {
   heroPropertys: 'https://images.squarespace-cdn.com/content/v1/6213d804273001551ffe5b8c/4e23696e-623b-4621-8f3a-c223a521131b/P1020387.jpeg',
 };
 
-// Base path for links (root on YOUR_DOMAIN)
+// Base path for links (root on awknranch.com)
 // Change this if deploying to a different subdirectory
 const BASE_PATH = '';
 
@@ -156,12 +156,12 @@ function renderFooter() {
         </div>
 
         <div class="aap-footer__social">
-          <a href="https://www.facebook.com/yourorg" target="_blank" rel="noopener" aria-label="Facebook">
+          <a href="https://www.facebook.com/awknranch" target="_blank" rel="noopener" aria-label="Facebook">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
             </svg>
           </a>
-          <a href="https://instagram.com/yourorgatx" target="_blank" rel="noopener" aria-label="Instagram">
+          <a href="https://instagram.com/awknranch" target="_blank" rel="noopener" aria-label="Instagram">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
               <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -172,7 +172,7 @@ function renderFooter() {
 
         <p class="aap-footer__copyright">
           © ${currentYear} Austin AWKN Ranch. All rights reserved.<br>
-          123 Main Stive, Your City, TX 00000
+          7600 Stillridge Dr, Austin, TX 78736
         </p>
       </div>
     </footer>

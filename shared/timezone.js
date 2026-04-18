@@ -1,5 +1,5 @@
 /**
- * Timezone utilities for YOUR_APP_NAME
+ * Timezone utilities for AWKN Ranch
  * All dates should be displayed in Austin, Texas timezone (America/Chicago)
  * regardless of the user's browser timezone.
  */

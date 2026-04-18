@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">YOUR_APP_NAME</string>
-    <string name="title_activity_main">YOUR_APP_NAME</string>
-    <string name="package_name">com.yourorg.app</string>
-    <string name="custom_url_scheme">com.yourorg.app</string>
+    <string name="app_name">AWKN Ranch</string>
+    <string name="title_activity_main">AWKN Ranch</string>
+    <string name="package_name">com.awknranch.app</string>
+    <string name="custom_url_scheme">com.awknranch.app</string>
 </resources>

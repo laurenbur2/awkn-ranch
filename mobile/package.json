@@ -1,7 +1,7 @@
 {
   "name": "your-project-mobile",
   "version": "1.0.0",
-  "description": "YOUR_APP_NAME mobile app - iOS & Android",
+  "description": "AWKN Ranch mobile app - iOS & Android",
   "private": true,
   "scripts": {
     "sync": "node scripts/copy-web.js && npx cap sync",

@@ -5,7 +5,7 @@
  *
  * Trigger: Called daily via pg_cron or external cron
  * Deploy: supabase functions deploy event-payment-reminder
- * Manual trigger: curl -X POST YOUR_SUPABASE_URL/functions/v1/event-payment-reminder -H "Authorization: Bearer <anon_key>"
+ * Manual trigger: curl -X POST https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/event-payment-reminder -H "Authorization: Bearer <anon_key>"
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -197,9 +197,9 @@ Deno.serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Property Team <team@YOUR_DOMAIN>',
+            from: 'Property Team <team@awknranch.com>',
             to: [person.email],
-            reply_to: 'team@YOUR_DOMAIN',
+            reply_to: 'team@awknranch.com',
             subject: `Payment Reminder: ${event.event_name} - Fees Due in 3 Days`,
             html: `
               <h2>Payment Reminder - Your Event is Coming Up!</h2>
@@ -234,11 +234,11 @@ Deno.serve(async (req) => {
               <p><strong>Quick Reminders:</strong></p>
               <ul>
                 <li>Setup crew must arrive 90 minutes before your event</li>
-                <li>Direct attendees to <a href="https://YOUR_DOMAIN/visiting">YOUR_DOMAIN/visiting</a> for directions (do NOT post the address publicly)</li>
+                <li>Direct attendees to <a href="https://laurenbur2.github.io/awkn-ranch/visiting">awknranch.com/visiting</a> for directions (do NOT post the address publicly)</li>
                 <li>Cleanup must be completed by 1:01pm the day after your event</li>
               </ul>
 
-              <p>Questions? Reply to this email or contact us at team@YOUR_DOMAIN</p>
+              <p>Questions? Reply to this email or contact us at team@awknranch.com</p>
               <p>Best regards,<br>AWKN Ranch</p>
             `,
             text: `Payment Reminder - Your Event is Coming Up!
@@ -269,10 +269,10 @@ ${eventTimeFormatted ? `Time: ${eventTimeFormatted}` : ''}
 QUICK REMINDERS
 ---------------
 - Setup crew must arrive 90 minutes before your event
-- Direct attendees to YOUR_DOMAIN/visiting for directions (do NOT post the address publicly)
+- Direct attendees to awknranch.com/visiting for directions (do NOT post the address publicly)
 - Cleanup must be completed by 1:01pm the day after your event
 
-Questions? Reply to this email or contact us at team@YOUR_DOMAIN
+Questions? Reply to this email or contact us at team@awknranch.com
 
 Best regards,
 AWKN Ranch`,

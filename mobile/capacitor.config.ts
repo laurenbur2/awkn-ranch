@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.yourorg.app',
-  appName: 'YOUR_APP_NAME',
+  appId: 'com.awknranch.app',
+  appName: 'AWKN Ranch',
   webDir: 'www',
   plugins: {
     StatusBar: {
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    scheme: 'YOUR_APP_NAME',
+    scheme: 'AWKN Ranch',
   },
   android: {
     allowMixedContent: true,

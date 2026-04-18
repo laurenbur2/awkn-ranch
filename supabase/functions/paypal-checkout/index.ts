@@ -7,7 +7,7 @@
  *   - capture_order: Captures payment after user approves in PayPal
  *
  * Deploy with: supabase functions deploy paypal-checkout --no-verify-jwt
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/paypal-checkout
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/paypal-checkout
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -104,8 +104,8 @@ async function createPayPalOrder(
           brand_name: 'AWKN Ranch',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
-          return_url: 'https://YOUR_DOMAIN/pay/?paypal_success=true',
-          cancel_url: 'https://YOUR_DOMAIN/pay/?paypal_cancelled=true',
+          return_url: 'https://laurenbur2.github.io/awkn-ranch/pay/?paypal_success=true',
+          cancel_url: 'https://laurenbur2.github.io/awkn-ranch/pay/?paypal_cancelled=true',
         },
       },
     },

@@ -13,11 +13,11 @@ const FALLBACK_CONFIG = {
   brand: {
     primary_name: 'AWKN Ranch',
     full_name: 'AWKN Ranch Austin',
-    platform_name: 'YOUR_APP_NAME',
-    legal_name: 'YOUR_APP_NAME Residency',
+    platform_name: 'AWKN Ranch',
+    legal_name: 'AWKN Ranch Residency',
     tagline: 'Where the herd gathers',
-    address: '123 Main St, Your City, ST 00000',
-    website: 'https://YOUR_DOMAIN',
+    address: '7600 Stillridge Dr, Austin, TX 78736',
+    website: 'https://laurenbur2.github.io/awkn-ranch',
   },
   colors: {
     primary: {
@@ -60,7 +60,7 @@ const FALLBACK_CONFIG = {
     weights: { light: 300, regular: 400, medium: 500, semibold: 600, bold: 700 },
   },
   logos: {
-    base_url: 'YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/logos',
+    base_url: 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/logos',
     icon_dark: 'logo-black-transparent.png',
     icon_light: 'logo-white-transparent.png',
     wordmark_dark: 'wordmark-black-transparent.png',

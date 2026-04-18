@@ -12,7 +12,7 @@ This repo is a **generic template** with placeholder values (`YOUR_*`) throughou
 
 | File | What to replace |
 |------|----------------|
-| `shared/supabase.js` | `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY` |
+| `shared/supabase.js` | `https://lnqxarwqckpmirpmixcw.supabase.co` and `YOUR_SUPABASE_ANON_KEY` |
 | `CLAUDE.md` | All `YOUR_*` placeholders |
 | `shared/config-loader.js` | Fallback property config values |
 

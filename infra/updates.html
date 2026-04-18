@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YOUR_APP_NAME Updates — Sync New Features</title>
-  <meta name="description" content="Catch up on new YOUR_APP_NAME features and sync them into your project with Claude Code.">
+  <title>AWKN Ranch Updates — Sync New Features</title>
+  <meta name="description" content="Catch up on new AWKN Ranch features and sync them into your project with Claude Code.">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="stylesheet" href="/styles/site.css">
   <link rel="stylesheet" href="/styles/tailwind.out.css">
@@ -259,8 +259,8 @@
 
 <div class="guide-header">
   <div class="guide-header-inner">
-    <a href="/infra/">&larr; Back to YOUR_APP_NAME Infra</a>
-    <h1><span>YOUR_APP_NAME</span> Updates</h1>
+    <a href="/infra/">&larr; Back to AWKN Ranch Infra</a>
+    <h1><span>AWKN Ranch</span> Updates</h1>
     <p>New features added to the template since you first cloned it. Select the ones you want, copy the prompt, and paste it into Claude Code to adopt them.</p>
   </div>
 </div>
@@ -727,7 +727,7 @@ spaces/admin/devcontrol.css    (complete styling)</code></pre>
       name: 'Session Logging to Cloudflare D1',
       prompt: `Set up Cloudflare D1 session logging for my Claude Code sessions.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Session Logging to Cloudflare D1" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Session Logging to Cloudflare D1" feature:
 - Pull the cloudflare/claude-sessions/ directory from the template repo (https://github.com/USERNAME/REPO-infra)
 - Install wrangler, create the D1 database, deploy the worker
 - Set up the save-session.sh hook with the Stop event
@@ -738,7 +738,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'On-Demand Context System',
       prompt: `Set up the on-demand context system to reduce token usage.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "On-Demand Context System" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "On-Demand Context System" feature:
 - Pull the docs/ directory structure from the template repo (https://github.com/USERNAME/REPO-infra)
 - Slim down CLAUDE.md to ~30 lines with on-demand doc index
 - Migrate any existing credentials/schema/patterns from CLAUDE.md to the appropriate docs/*.md file
@@ -749,7 +749,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'Open Brain — Session Transparency Dashboard',
       prompt: `Set up the Open Brain session transparency dashboard.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Open Brain" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Open Brain" feature:
 - Verify D1 session logging is working first
 - Create open-brain/index.html with stats, search, filters, and transcript viewer
 - Ask me whether it should be public or auth-gated
@@ -760,7 +760,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'Smart Polling with Circuit Breaker',
       prompt: `Set up the PollManager with circuit breaker pattern.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Smart Polling" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Smart Polling" feature:
 - Pull shared/services/poll-manager.js and shared/supabase-health.js from the template repo (https://github.com/USERNAME/REPO-infra)
 - Replace any existing setInterval polling with PollManager
 - Update docs/KEY-FILES.md and docs/PATTERNS.md`
@@ -769,7 +769,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'Intranet Tab Visibility Config',
       prompt: `Set up database-driven tab visibility configuration.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Tab Visibility Config" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Tab Visibility Config" feature:
 - Run supabase/migrations/001_page_display_config.sql against my Supabase project
 - Pull updated intranet tab components from the template repo (https://github.com/USERNAME/REPO-infra)
 - Customize the seed data for my specific sections/tabs
@@ -779,7 +779,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'Centralized Error Logger',
       prompt: `Set up the centralized error logger.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Error Logger" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Error Logger" feature:
 - Pull shared/error-logger.js from the template repo (https://github.com/USERNAME/REPO-infra)
 - Wire it into existing error handling patterns
 - Update docs/KEY-FILES.md and docs/PATTERNS.md`
@@ -788,7 +788,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'Stop Hook Upgrade',
       prompt: `Upgrade my session logging hook from SessionEnd to Stop.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "Stop Hook Upgrade" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "Stop Hook Upgrade" feature:
 - Check ~/.claude/settings.json for a SessionEnd hook and replace with Stop
 - Update ~/.claude/hooks/save-session.sh with the latest version (includes rate-limiting)
 - Verify the lock directory is created at ~/.claude/hooks/.session-locks/`
@@ -797,7 +797,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       name: 'DevControl — AI Development Dashboard',
       prompt: `Set up the DevControl admin dashboard for monitoring AI development activity.
 
-Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) for the "DevControl" feature:
+Follow the instructions on the AWKN Ranch updates page (infra/updates.html) for the "DevControl" feature:
 - Pull spaces/admin/devcontrol.html, devcontrol.js, and devcontrol.css from the template repo (https://github.com/USERNAME/REPO-infra)
 - Configure GH_OWNER, GH_REPO, SESSIONS_API, SESSIONS_TOKEN, and PROJECT_FILTER in devcontrol.js for my project
 - Add the DevControl tab and icon to shared/admin-shell.js
@@ -843,7 +843,7 @@ Follow the instructions on the YOUR_APP_NAME updates page (infra/updates.html) f
       warnings.push('Note: "Stop Hook Upgrade" requires D1 Session Logging to already be configured.');
     }
 
-    let prompt = `I cloned the YOUR_APP_NAME template a while ago and want to adopt ${features.length === 1 ? 'this new feature' : 'these new features'}:
+    let prompt = `I cloned the AWKN Ranch template a while ago and want to adopt ${features.length === 1 ? 'this new feature' : 'these new features'}:
 
 ${featureNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 

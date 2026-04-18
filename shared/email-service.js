@@ -429,7 +429,7 @@ export const emailService = {
    * @param {Array} data.photos - Array of {url, type, caption}
    */
   async sendWorkCheckoutSummary(data) {
-    const recipients = [data.associate_email, 'admin@YOUR_DOMAIN', 'automation@YOUR_DOMAIN'].filter(Boolean);
+    const recipients = [data.associate_email, 'admin@awknranch.com', 'automation@awknranch.com'].filter(Boolean);
     return sendEmail(EMAIL_TYPES.WORK_CHECKOUT_SUMMARY, recipients, data);
   },
 
@@ -466,7 +466,7 @@ export const emailService = {
    * @param {Array} data.todo_list - [{title, priority, location, is_new}]
    */
   async sendTaskAssigned(email, data) {
-    const recipients = [email, 'admin@YOUR_DOMAIN'].filter(Boolean);
+    const recipients = [email, 'admin@awknranch.com'].filter(Boolean);
     return sendEmail(EMAIL_TYPES.TASK_ASSIGNED, recipients, data);
   },
 
@@ -488,7 +488,7 @@ export const emailService = {
    * @param {string} [data.space_name] - Space/location name
    */
   async sendTimeEntryEdited(data) {
-    const recipients = [data.associate_email, 'admin@YOUR_DOMAIN'].filter(Boolean);
+    const recipients = [data.associate_email, 'admin@awknranch.com'].filter(Boolean);
     return sendEmail(EMAIL_TYPES.TIME_ENTRY_EDITED, recipients, data);
   },
 

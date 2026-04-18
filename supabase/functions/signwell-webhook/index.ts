@@ -4,7 +4,7 @@
  * Handles both rental lease agreements and event hosting agreements
  *
  * Deploy with: supabase functions deploy signwell-webhook
- * Webhook URL: YOUR_SUPABASE_URL/functions/v1/signwell-webhook
+ * Webhook URL: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/signwell-webhook
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -268,7 +268,7 @@ async function processRentalAgreement(
         .eq('id', application.waiver_template_id)
         .single();
 
-      const tenantRecipient = payload?.recipients?.find((r: any) => r.email !== 'admin@YOUR_DOMAIN');
+      const tenantRecipient = payload?.recipients?.find((r: any) => r.email !== 'admin@awknranch.com');
       const signerName = person ? `${person.first_name || ''} ${person.last_name || ''}`.trim() : 'Unknown';
 
       await supabase.from('waiver_signatures').insert({
@@ -496,9 +496,9 @@ async function sendRentalSignedEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property Team <team@YOUR_DOMAIN>',
+        from: 'Property Team <team@awknranch.com>',
         to: [person.email],
-        reply_to: 'team@YOUR_DOMAIN',
+        reply_to: 'team@awknranch.com',
         subject: 'Lease Signed - Reservation Deposit Due - AWKN Ranch',
         html: `
           <h2>Lease Signing Complete!</h2>
@@ -531,11 +531,11 @@ async function sendRentalSignedEmail(
           <div style="background: #f0f7ff; border-radius: 8px; padding: 20px; margin: 20px 0;">
             <h3 style="margin-top: 0; color: #3d8b7a;">Set Up Your Resident Profile</h3>
             <p>While you're here, take a minute to fill out your resident profile. This helps your housemates get to know you before you arrive!</p>
-            <p style="margin-bottom: 0;"><a href="https://YOUR_DOMAIN/residents/profile.html" style="display: inline-block; background: #3d8b7a; color: #fff; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Complete Your Profile</a></p>
+            <p style="margin-bottom: 0;"><a href="https://laurenbur2.github.io/awkn-ranch/residents/profile.html" style="display: inline-block; background: #3d8b7a; color: #fff; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Complete Your Profile</a></p>
           </div>
 
           <p>Once we receive your reservation deposit, we'll send confirmation and prepare for your arrival.</p>
-          <p>Questions? Reply to this email or contact us at team@YOUR_DOMAIN</p>
+          <p>Questions? Reply to this email or contact us at team@awknranch.com</p>
           <p>Best regards,<br>AWKN Ranch</p>
         `,
         text: `Lease Signing Complete!
@@ -562,11 +562,11 @@ Monthly Rent: $${monthlyRate || 'TBD'}/${rateTermDisplay}
 SET UP YOUR RESIDENT PROFILE
 -----------------------------
 Take a minute to fill out your resident profile — it helps your housemates get to know you before you arrive!
-https://YOUR_DOMAIN/residents/profile.html
+https://laurenbur2.github.io/awkn-ranch/residents/profile.html
 
 Once we receive your reservation deposit, we'll send confirmation and prepare for your arrival.
 
-Questions? Reply to this email or contact us at team@YOUR_DOMAIN
+Questions? Reply to this email or contact us at team@awknranch.com
 
 Best regards,
 AWKN Ranch`,
@@ -610,9 +610,9 @@ async function sendEventSignedEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property Team <team@YOUR_DOMAIN>',
+        from: 'Property Team <team@awknranch.com>',
         to: [person.email],
-        reply_to: 'team@YOUR_DOMAIN',
+        reply_to: 'team@awknranch.com',
         subject: 'Event Agreement Signed - Outstanding Fees Due Before Event - AWKN Ranch',
         html: `
           <h2>Event Agreement Signed!</h2>
@@ -658,12 +658,12 @@ async function sendEventSignedEmail(
           <p><strong>Remember:</strong></p>
           <ul>
             <li>Setup crew must arrive 90 minutes before your event</li>
-            <li>Direct attendees to <a href="https://YOUR_DOMAIN/visiting">YOUR_DOMAIN/visiting</a> for directions (do NOT post the address publicly)</li>
+            <li>Direct attendees to <a href="https://laurenbur2.github.io/awkn-ranch/visiting">awknranch.com/visiting</a> for directions (do NOT post the address publicly)</li>
             <li>Cleanup must be completed by 1:01pm the day after your event</li>
           </ul>
 
           <p>Once we receive the cleaning deposit and rental fee, your event is confirmed!</p>
-          <p>Questions? Reply to this email or contact us at team@YOUR_DOMAIN</p>
+          <p>Questions? Reply to this email or contact us at team@awknranch.com</p>
           <p>Best regards,<br>AWKN Ranch</p>
         `,
         text: `Event Agreement Signed!
@@ -696,12 +696,12 @@ ${eventTime ? `Time: ${eventTime}` : ''}
 REMINDERS
 ---------
 - Setup crew must arrive 90 minutes before your event
-- Direct attendees to YOUR_DOMAIN/visiting for directions (do NOT post the address publicly)
+- Direct attendees to awknranch.com/visiting for directions (do NOT post the address publicly)
 - Cleanup must be completed by 1:01pm the day after your event
 
 Once we receive the cleaning deposit and rental fee, your event is confirmed!
 
-Questions? Reply to this email or contact us at team@YOUR_DOMAIN
+Questions? Reply to this email or contact us at team@awknranch.com
 
 Best regards,
 AWKN Ranch`,
@@ -730,7 +730,7 @@ async function sendVehicleRegistrationEmail(
     return;
   }
 
-  const profileUrl = 'https://YOUR_DOMAIN/residents/profile.html#vehicles';
+  const profileUrl = 'https://laurenbur2.github.io/awkn-ranch/residents/profile.html#vehicles';
 
   // Build vehicle info section if available
   const hasVehicle = vehicleInfo && (vehicleInfo.make || vehicleInfo.model);
@@ -767,9 +767,9 @@ ${vehicleInfo.color ? `Color: ${vehicleInfo.color}\n` : ''}${vehicleInfo.vin ? `
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property Team <team@YOUR_DOMAIN>',
+        from: 'Property Team <team@awknranch.com>',
         to: [person.email],
-        reply_to: 'team@YOUR_DOMAIN',
+        reply_to: 'team@awknranch.com',
         subject,
         html: `
           <h2>${hasVehicle ? 'Your Vehicle Information' : 'Register Your Vehicle'}</h2>
@@ -797,7 +797,7 @@ ${vehicleInfo.color ? `Color: ${vehicleInfo.color}\n` : ''}${vehicleInfo.vin ? `
             <p style="margin-bottom: 0;">If your vehicle is a Tesla, you can connect it to our smart charging system. This enables lock/unlock for charger rotation and lets you monitor your car's battery and charging status right from the resident dashboard. Just select "Tesla" as the make when registering, and you'll be guided through the quick connection process.</p>
           </div>
 
-          <p>Questions? Reply to this email or contact us at team@YOUR_DOMAIN</p>
+          <p>Questions? Reply to this email or contact us at team@awknranch.com</p>
           <p>Best regards,<br>AWKN Ranch</p>
         `,
         text: `${hasVehicle ? 'Your Vehicle Information' : 'Register Your Vehicle'}
@@ -822,7 +822,7 @@ DRIVE A TESLA?
 --------------
 If your vehicle is a Tesla, you can connect it to our smart charging system. This enables lock/unlock for charger rotation and lets you monitor your car's battery and charging status right from the resident dashboard. Just select "Tesla" as the make when registering, and you'll be guided through the quick connection process.
 
-Questions? Reply to this email or contact us at team@YOUR_DOMAIN
+Questions? Reply to this email or contact us at team@awknranch.com
 
 Best regards,
 AWKN Ranch`,

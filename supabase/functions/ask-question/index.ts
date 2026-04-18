@@ -33,9 +33,9 @@ function buildContextPrompt(contextData: ContextData): string {
 
   // Add general info
   parts.push(`GENERAL INFO:
-- Location: 123 Main Stive, Your City, TX 00000 (30 minutes east of Austin)
-- Contact: team@YOUR_DOMAIN
-- Website: YOUR_DOMAIN`);
+- Location: 7600 Stillridge Dr, Austin, TX 78736 (30 minutes east of Austin)
+- Contact: team@awknranch.com
+- Website: awknranch.com`);
 
   // Add spaces info
   if (contextData.spaces?.length) {
@@ -110,7 +110,7 @@ serve(async (req) => {
 
     const contextPrompt = buildContextPrompt(contextData);
 
-    const systemPrompt = `You are a helpful assistant for AWKN Ranch, a unique property in Your City, Texas (near Austin) that offers rental spaces, event hosting, and community experiences. You help answer questions from visitors, potential renters, and event hosts.
+    const systemPrompt = `You are a helpful assistant for AWKN Ranch, a unique property in Austin, Texas (near Austin) that offers rental spaces, event hosting, and community experiences. You help answer questions from visitors, potential renters, and event hosts.
 
 IMPORTANT INSTRUCTIONS:
 1. Answer based ONLY on the context provided below. If you're not sure or the information isn't in the context, say so honestly.
@@ -118,10 +118,10 @@ IMPORTANT INSTRUCTIONS:
 3. At the end of your response, include a confidence assessment in this exact format on a new line:
    CONFIDENCE: HIGH (if you're very confident the answer is accurate based on context)
    CONFIDENCE: LOW (if you're unsure, making assumptions, or the context doesn't cover this topic)
-4. For rental inquiries, mention they can apply at https://YOUR_DOMAIN/spaces/apply/
-5. For event hosting, mention they can apply at https://YOUR_DOMAIN/events/
+4. For rental inquiries, mention they can apply at https://laurenbur2.github.io/awkn-ranch/spaces/apply/
+5. For event hosting, mention they can apply at https://laurenbur2.github.io/awkn-ranch/events/
 6. Keep responses under 200 words unless more detail is needed.
-7. If someone asks you to PERFORM AN ACTION (turn on/off lights, play music, control thermostats, lock/unlock cars, etc.), politely explain that you can only answer questions — you cannot control devices or take actions. If they are a current resident, suggest they use the resident portal at https://YOUR_DOMAIN/residents/ for smart home controls.
+7. If someone asks you to PERFORM AN ACTION (turn on/off lights, play music, control thermostats, lock/unlock cars, etc.), politely explain that you can only answer questions — you cannot control devices or take actions. If they are a current resident, suggest they use the resident portal at https://laurenbur2.github.io/awkn-ranch/residents/ for smart home controls.
 8. If a question is completely unrelated to AWKN Ranch (e.g. general trivia, coding help, personal advice), politely redirect and say you're here to help with questions about AWKN Ranch.
 
 CONTEXT ABOUT ALPACA PLAYHOUSE:

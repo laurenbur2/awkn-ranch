@@ -114,9 +114,9 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'Property Team <team@YOUR_DOMAIN>',
-              to: [appUser.email, 'automation@YOUR_DOMAIN'],
-              reply_to: 'team@YOUR_DOMAIN',
+              from: 'Property Team <team@awknranch.com>',
+              to: [appUser.email, 'automation@awknranch.com'],
+              reply_to: 'team@awknranch.com',
               subject: 'Reminder: Upload Before Photos for Your Work Session',
               html: buildHtml(firstName, 'clock_in', spaceName),
               text: buildText(firstName, 'clock_in', spaceName),
@@ -214,9 +214,9 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'Property Team <team@YOUR_DOMAIN>',
-              to: [appUser.email, 'automation@YOUR_DOMAIN'],
-              reply_to: 'team@YOUR_DOMAIN',
+              from: 'Property Team <team@awknranch.com>',
+              to: [appUser.email, 'automation@awknranch.com'],
+              reply_to: 'team@awknranch.com',
               subject: 'Reminder: Upload After Photos for Your Work Session',
               html: buildHtml(firstName, 'clock_out', spaceName),
               text: buildText(firstName, 'clock_out', spaceName),
@@ -271,7 +271,7 @@ Deno.serve(async (req) => {
   }
 });
 
-const WORK_PAGE_URL = 'https://YOUR_DOMAIN/associates/worktracking.html';
+const WORK_PAGE_URL = 'https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html';
 
 function buildHtml(firstName: string, phase: 'clock_in' | 'clock_out', spaceName: string): string {
   const isClockIn = phase === 'clock_in';

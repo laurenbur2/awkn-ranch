@@ -18,7 +18,7 @@ let cameraSettings = {};
 // Blink snapshot refresh intervals
 const blinkRefreshIntervals = {};
 const BLINK_REFRESH_MS = 60000; // refresh snapshot every 60s
-const BLINK_STORAGE_BASE = 'YOUR_SUPABASE_URL/storage/v1/object/public/housephotos';
+const BLINK_STORAGE_BASE = 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos';
 const BLINK_SNAPSHOT_PATH = 'cameras/blink-latest.jpg';
 
 const PTZ_PROXY_BASE = 'https://YOUR_CAMERA_PROXY/ptz';

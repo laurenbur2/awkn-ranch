@@ -6,7 +6,7 @@
  * Updates square_payments and ledger tables, sends admin notifications.
  *
  * Deploy with: supabase functions deploy square-webhook --no-verify-jwt
- * Webhook URL: YOUR_SUPABASE_URL/functions/v1/square-webhook
+ * Webhook URL: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/square-webhook
  *
  * Events handled:
  * - payment.created → log receipt, update source type
@@ -26,7 +26,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-square-hmacsha256-signature'
 };
 
-const PAYMENTS_EMAIL = 'payments@YOUR_DOMAIN';
+const PAYMENTS_EMAIL = 'payments@awknranch.com';
 
 interface SquareWebhookEvent {
   merchant_id: string;
@@ -185,7 +185,7 @@ async function sendPaymentStatusEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Property System <auto@YOUR_DOMAIN>',
+        from: 'Property System <auto@awknranch.com>',
         to: [PAYMENTS_EMAIL],
         subject,
         html,

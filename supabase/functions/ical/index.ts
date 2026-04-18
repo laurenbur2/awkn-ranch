@@ -182,7 +182,7 @@ function generateIcal(spaceName: string, spaceSlug: string, assignments: Assignm
   const lines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    `PRODID:-//YOUR_APP_NAME//${spaceName}//EN`,
+    `PRODID:-//AWKN Team Portal//${spaceName}//EN`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     `X-WR-CALNAME:${spaceName}`,

@@ -247,7 +247,7 @@ Deno.serve(async (req) => {
       .eq("id", conf.id);
 
     // Send notification to admin
-    const adminUrl = `https://YOUR_DOMAIN/spaces/admin/rentals.html#applicant=${application.id}`;
+    const adminUrl = `https://laurenbur2.github.io/awkn-ranch/spaces/admin/rentals.html#applicant=${application.id}`;
     const overpayStr = remaining > 0 ? `<p style="color:#e74c3c;"><strong>Overpayment:</strong> $${remaining.toFixed(2)} exceeds deposits owed.</p>` : "";
 
     try {
@@ -258,8 +258,8 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Property Payments <noreply@YOUR_DOMAIN>",
-          to: ["team@YOUR_DOMAIN"],
+          from: "Property Payments <noreply@awknranch.com>",
+          to: ["team@awknranch.com"],
           subject: `Payment Confirmed: $${conf.amount} from ${conf.sender_name} → ${personName}`,
           html: `
             <div style="font-family:-apple-system,sans-serif;">

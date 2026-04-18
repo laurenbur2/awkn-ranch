@@ -57,16 +57,16 @@ async function loadForwardingRules(supabase: any): Promise<Record<string, string
   } catch (err) {
     console.error("Failed to load forwarding rules from DB, using defaults:", err);
     return {
-      team: ["admin@YOUR_DOMAIN"],
+      team: ["admin@awknranch.com"],
     };
   }
 }
 
-const DEFAULT_FORWARD_TO = "admin@YOUR_DOMAIN";
+const DEFAULT_FORWARD_TO = "admin@awknranch.com";
 
 /**
  * Extract the local part (prefix) from an email address.
- * e.g. "haydn@mail.YOUR_DOMAIN" → "haydn"
+ * e.g. "haydn@mail.awknranch.com" → "haydn"
  */
 function extractPrefix(email: string): string {
   return email.split("@")[0].toLowerCase().trim();
@@ -183,7 +183,7 @@ async function forwardEmail(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `${originalFrom.replace(/<.*>/, '').trim() || originalFrom} <notifications@YOUR_DOMAIN>`,
+        from: `${originalFrom.replace(/<.*>/, '').trim() || originalFrom} <notifications@awknranch.com>`,
         to: [to],
         reply_to: originalFrom,
         subject: subject,
@@ -244,7 +244,7 @@ async function handleSpecialLogic(
 // =============================================
 
 /**
- * Handle inbound emails to herd@YOUR_DOMAIN.
+ * Handle inbound emails to herd@awknranch.com.
  * Uses the dual-model classifier to determine what to do with the email,
  * then routes accordingly.
  */
@@ -371,7 +371,7 @@ async function routeByClassification(
       // Try to find the person by the to-address prefix
       const prefix = extractPrefix(emailRecord.to_address || "");
       const forwardingRules = await loadForwardingRules(supabase);
-      const targets = forwardingRules[prefix] || ["admin@YOUR_DOMAIN"];
+      const targets = forwardingRules[prefix] || ["admin@awknranch.com"];
 
       for (const target of targets) {
         await forwardEmail(resendApiKey, target, from, subject, bodyHtml, bodyText);
@@ -404,12 +404,12 @@ async function routeByClassification(
         <div>${bodyHtml || `<pre>${bodyText}</pre>`}</div>
       `;
 
-      await forwardEmail(resendApiKey, "admin@YOUR_DOMAIN", from, flagSubject, flagHtml, bodyText);
+      await forwardEmail(resendApiKey, "admin@awknranch.com", from, flagSubject, flagHtml, bodyText);
       await supabase
         .from("inbound_emails")
         .update({
           route_action: "flagged_review",
-          forwarded_to: "admin@YOUR_DOMAIN",
+          forwarded_to: "admin@awknranch.com",
           forwarded_at: new Date().toISOString(),
         })
         .eq("id", emailRecord.id);
@@ -418,12 +418,12 @@ async function routeByClassification(
     case "forward_admin":
     default:
       // Forward to admin
-      await forwardEmail(resendApiKey, "admin@YOUR_DOMAIN", from, subject, bodyHtml, bodyText);
+      await forwardEmail(resendApiKey, "admin@awknranch.com", from, subject, bodyHtml, bodyText);
       await supabase
         .from("inbound_emails")
         .update({
           route_action: "forward",
-          forwarded_to: "admin@YOUR_DOMAIN",
+          forwarded_to: "admin@awknranch.com",
           forwarded_at: new Date().toISOString(),
         })
         .eq("id", emailRecord.id);
@@ -436,7 +436,7 @@ async function routeByClassification(
 // =============================================
 
 /**
- * Handle inbound emails to guestbook@YOUR_DOMAIN.
+ * Handle inbound emails to guestbook@awknranch.com.
  * Extracts sender name and message body, inserts into guestbook_entries.
  */
 async function handleGuestbookEmail(
@@ -473,7 +473,7 @@ async function handleGuestbookEmail(
 // =============================================
 
 /**
- * Handle inbound emails to claudero@YOUR_DOMAIN.
+ * Handle inbound emails to claudero@awknranch.com.
  * These are replies to feature build result emails.
  *
  * 1. Scan subject + body for version pattern (vYYMMDD.NN) or feature request context
@@ -624,14 +624,14 @@ async function handleClauderoEmail(
 
   // Send acknowledgment reply
   const ackText = parentRequest
-    ? `Got it — I'll look at the context from ${versionMatch ? `version ${`v${versionMatch[1]}`}` : `your previous build`} and process your feedback. You can track progress at https://YOUR_DOMAIN/spaces/admin/appdev.html`
-    : `Got it — I'll process your request. You can track progress at https://YOUR_DOMAIN/spaces/admin/appdev.html`;
+    ? `Got it — I'll look at the context from ${versionMatch ? `version ${`v${versionMatch[1]}`}` : `your previous build`} and process your feedback. You can track progress at https://laurenbur2.github.io/awkn-ranch/spaces/admin/appdev.html`
+    : `Got it — I'll process your request. You can track progress at https://laurenbur2.github.io/awkn-ranch/spaces/admin/appdev.html`;
 
   await sendClauderoReply(resendApiKey, senderEmail, ackText, subject, messageBody);
 }
 
 /**
- * Send a reply from claudero@YOUR_DOMAIN via Resend API directly.
+ * Send a reply from claudero@awknranch.com via Resend API directly.
  */
 async function sendClauderoReply(
   resendApiKey: string,
@@ -675,9 +675,9 @@ This is an automated reply from Claudero at AWKN Ranch.`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Claudero <claudero@YOUR_DOMAIN>",
+      from: "Claudero <claudero@awknranch.com>",
       to: [to],
-      reply_to: "claudero@YOUR_DOMAIN",
+      reply_to: "claudero@awknranch.com",
       subject: reSubject,
       html,
       text,
@@ -825,7 +825,7 @@ async function checkSpamThresholdAndAlert(
         .from("app_users")
         .select("email")
         .eq("role", "admin");
-      const adminEmails = admins?.map((a: any) => a.email) || ["admin@YOUR_DOMAIN"];
+      const adminEmails = admins?.map((a: any) => a.email) || ["admin@awknranch.com"];
 
       await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: "POST",
@@ -837,7 +837,7 @@ async function checkSpamThresholdAndAlert(
           type: "pai_email_reply",
           to: adminEmails,
           data: {
-            reply_body: `<strong>Spam Alert:</strong> pai@YOUR_DOMAIN has received <strong>${spamCount} spam emails</strong> in the last ${PAI_SPAM_WINDOW_HOURS} hours.\n\nMost recent: from ${senderEmail} — "${summary}"\n\nAll spam is being silently dropped (no replies sent). If this continues, consider removing the address from public-facing pages or adding domain-level filtering.`,
+            reply_body: `<strong>Spam Alert:</strong> pai@awknranch.com has received <strong>${spamCount} spam emails</strong> in the last ${PAI_SPAM_WINDOW_HOURS} hours.\n\nMost recent: from ${senderEmail} — "${summary}"\n\nAll spam is being silently dropped (no replies sent). If this continues, consider removing the address from public-facing pages or adding domain-level filtering.`,
             original_subject: "PAI Spam Alert",
             original_body: "",
           },
@@ -886,8 +886,8 @@ async function sendPaiReply(
           body: JSON.stringify({
             type: "pai_email_reply",
             to: to,
-            from: "PAI <pai@YOUR_DOMAIN>",
-            reply_to: "pai@YOUR_DOMAIN",
+            from: "PAI <pai@awknranch.com>",
+            reply_to: "pai@awknranch.com",
             data: {
               reply_body: replyBody,
               original_subject: originalSubject,
@@ -943,9 +943,9 @@ This is an automated reply from PAI at AWKN Ranch.`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "PAI <pai@YOUR_DOMAIN>",
+      from: "PAI <pai@awknranch.com>",
       to: [to],
-      reply_to: "pai@YOUR_DOMAIN",
+      reply_to: "pai@awknranch.com",
       subject,
       html,
       text,
@@ -1006,9 +1006,9 @@ This is an automated reply from AlpaClaw at AWKN Ranch.`;
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "AlpaClaw <ai-admin@YOUR_DOMAIN>",
+      from: "AlpaClaw <ai-admin@awknranch.com>",
       to: [to],
-      reply_to: "ai-admin@YOUR_DOMAIN",
+      reply_to: "ai-admin@awknranch.com",
       subject,
       html,
       text,
@@ -1029,7 +1029,7 @@ This is an automated reply from AlpaClaw at AWKN Ranch.`;
 // =============================================
 
 /**
- * Handle inbound email to ai-admin@YOUR_DOMAIN.
+ * Handle inbound email to ai-admin@awknranch.com.
  *
  * Routes to PAI edge function with context.source = "ai-admin-email"
  * so that the ai-admin_addendum (AlpaClaw personality) is injected.
@@ -1076,7 +1076,7 @@ async function handleAI AdminEmail(
     }
 
     if (!replyText) {
-      replyText = `Thank you for your email! I've received your message and I'll do my best to help.\n\nFor faster responses, you can also chat with me on Discord at the Alpacord server, or visit https://YOUR_DOMAIN/residents/ (requires resident login).`;
+      replyText = `Thank you for your email! I've received your message and I'll do my best to help.\n\nFor faster responses, you can also chat with me on Discord at the Alpacord server, or visit https://laurenbur2.github.io/awkn-ranch/residents/ (requires resident login).`;
     }
 
     const sendResult = await sendAI AdminReply(resendApiKey, senderEmail, replyText, subject, bodyText || bodyHtml || "");
@@ -1108,7 +1108,7 @@ async function handleAI AdminEmail(
     const sendResult = await sendAI AdminReply(
       resendApiKey,
       senderEmail,
-      "Thank you for your email! I've received your message and the team will review it shortly.\n\nFor immediate assistance, you can reach us on Discord or at https://YOUR_DOMAIN/residents/.",
+      "Thank you for your email! I've received your message and the team will review it shortly.\n\nFor immediate assistance, you can reach us on Discord or at https://laurenbur2.github.io/awkn-ranch/residents/.",
       subject,
       bodyText || bodyHtml || ""
     );
@@ -1140,7 +1140,7 @@ async function sendPaiDocumentNotification(
     .select("email")
     .eq("role", "admin");
 
-  const adminEmails = admins?.map((a: any) => a.email) || ["admin@YOUR_DOMAIN"];
+  const adminEmails = admins?.map((a: any) => a.email) || ["admin@awknranch.com"];
 
   const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
     method: "POST",
@@ -1158,7 +1158,7 @@ async function sendPaiDocumentNotification(
         message_body: messageBody,
         files,
         file_count: files.length,
-        admin_url: "https://YOUR_DOMAIN/spaces/admin/manage.html",
+        admin_url: "https://laurenbur2.github.io/awkn-ranch/spaces/admin/manage.html",
       },
       sender_type: "auto",
     }),
@@ -1237,7 +1237,7 @@ function looksLikeQuestion(subject: string, body: string): boolean {
 }
 
 /**
- * Handle inbound email to pai@YOUR_DOMAIN.
+ * Handle inbound email to pai@awknranch.com.
  *
  * 1. Classify via Gemini (question/document/command/other)
  * 2. Questions & commands → forward to PAI chat, send reply email
@@ -1434,7 +1434,7 @@ async function handlePaiEmail(
       await sendPaiReply(
         resendApiKey,
         senderEmail,
-        `Thank you for sending ${processedReceipts.length === 1 ? "the receipt" : `${processedReceipts.length} receipts`}! I've processed and logged:\n\n${receiptsList}\n\nYou can view all purchases at https://YOUR_DOMAIN/spaces/admin/purchases.html`,
+        `Thank you for sending ${processedReceipts.length === 1 ? "the receipt" : `${processedReceipts.length} receipts`}! I've processed and logged:\n\n${receiptsList}\n\nYou can view all purchases at https://laurenbur2.github.io/awkn-ranch/spaces/admin/purchases.html`,
         subject,
         bodyText || bodyHtml || ""
       );
@@ -1572,7 +1572,7 @@ async function handlePaiEmail(
       }
 
       if (!replyText) {
-        replyText = `Thank you for your email. I've received your ${classification.type === "command" ? "request" : "question"} and I'll have someone from the team follow up with you.\n\nFor faster responses, you can chat with me directly at https://YOUR_DOMAIN/residents/ (requires resident login).`;
+        replyText = `Thank you for your email. I've received your ${classification.type === "command" ? "request" : "question"} and I'll have someone from the team follow up with you.\n\nFor faster responses, you can chat with me directly at https://laurenbur2.github.io/awkn-ranch/residents/ (requires resident login).`;
       }
 
       const sendResult = await sendPaiReply(resendApiKey, senderEmail, replyText, subject, bodyText || bodyHtml || "");
@@ -1605,7 +1605,7 @@ async function handlePaiEmail(
       const sendResult = await sendPaiReply(
         resendApiKey,
         senderEmail,
-        "Thank you for your email. I've received your message and the team will review it shortly.\n\nFor immediate assistance, you can call us or chat with me at https://YOUR_DOMAIN/residents/.",
+        "Thank you for your email. I've received your message and the team will review it shortly.\n\nFor immediate assistance, you can call us or chat with me at https://laurenbur2.github.io/awkn-ranch/residents/.",
         subject,
         bodyText || bodyHtml || ""
       );
@@ -1620,7 +1620,7 @@ async function handlePaiEmail(
     console.log(`PAI email classified as 'other', forwarding to admin`);
     // Just forward — the normal forwarding logic handles this since we don't set forwardTargets for special logic
     // But since special logic handlers don't forward by default, let's manually forward
-    const adminEmail = "admin@YOUR_DOMAIN";
+    const adminEmail = "admin@awknranch.com";
     const forwardRes = await fetch(`${RESEND_API_URL}/emails`, {
       method: "POST",
       headers: {
@@ -1628,7 +1628,7 @@ async function handlePaiEmail(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `PAI Forward <notifications@YOUR_DOMAIN>`,
+        from: `PAI Forward <notifications@awknranch.com>`,
         to: [adminEmail],
         reply_to: senderEmail,
         subject: `[PAI Forward] ${subject}`,
@@ -1917,7 +1917,7 @@ async function handleOutboundZellePayment(
   }
 
   // Notify admin
-  const adminEmail = "team@YOUR_DOMAIN";
+  const adminEmail = "team@awknranch.com";
   const categoryLabel = category === "associate_payment" ? "Contractor Payment" : category === "refund" ? "Refund" : category === "merchandise" ? "Merchandise/Supplies" : "Other (verify)";
   const subject = `Outbound Zelle Recorded: $${outbound.amount.toFixed(2)} to ${personName}${outbound.memo ? ` — ${outbound.memo}` : ""}`;
   const html = `
@@ -1932,7 +1932,7 @@ async function handleOutboundZellePayment(
         <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Method</td><td style="padding:8px;border-bottom:1px solid #eee;">Zelle outbound (${outbound.bank})</td></tr>
         <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:bold;">Category</td><td style="padding:8px;border-bottom:1px solid #eee;">${categoryLabel}</td></tr>
       </table>
-      <p style="color:#666;font-size:0.85rem;margin-top:12px;">This outbound payment was auto-recorded in the ledger. Verify the category in the <a href="https://YOUR_DOMAIN/spaces/admin/accounting.html">accounting dashboard</a>.</p>
+      <p style="color:#666;font-size:0.85rem;margin-top:12px;">This outbound payment was auto-recorded in the ledger. Verify the category in the <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/accounting.html">accounting dashboard</a>.</p>
     </div>
   `;
 
@@ -1944,7 +1944,7 @@ async function handleOutboundZellePayment(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Property Payments <noreply@YOUR_DOMAIN>",
+        from: "Property Payments <noreply@awknranch.com>",
         to: [adminEmail],
         subject,
         html,
@@ -2608,7 +2608,7 @@ async function sendTenantReceipt(
         </div>
 
         <p style="color:#999;font-size:0.8rem;margin-top:20px;text-align:center;">
-          YOUR_APP_NAME Residency &bull; This is an automated receipt.
+          AWKN Team Portal Residency &bull; This is an automated receipt.
         </p>
       </div>
     </div>
@@ -2622,9 +2622,9 @@ async function sendTenantReceipt(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "YOUR_APP_NAME <noreply@YOUR_DOMAIN>",
+        from: "AWKN Team Portal <noreply@awknranch.com>",
         to: [details.tenantEmail],
-        bcc: ["automation@YOUR_DOMAIN"],
+        bcc: ["automation@awknranch.com"],
         subject,
         html,
       }),
@@ -2718,9 +2718,9 @@ async function sendPaymentNotification(
   type: string,
   details: any
 ): Promise<void> {
-  const adminEmail = "team@YOUR_DOMAIN";
+  const adminEmail = "team@awknranch.com";
   const { parsed, personName, applicationId } = details;
-  const adminUrl = `https://YOUR_DOMAIN/spaces/admin/rentals.html#applicant=${applicationId}`;
+  const adminUrl = `https://laurenbur2.github.io/awkn-ranch/spaces/admin/rentals.html#applicant=${applicationId}`;
 
   let subject = "";
   let html = "";
@@ -2824,7 +2824,7 @@ async function sendPaymentNotification(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Property Payments <noreply@YOUR_DOMAIN>",
+        from: "Property Payments <noreply@awknranch.com>",
         to: [adminEmail],
         subject,
         html,
@@ -2879,19 +2879,19 @@ async function handlePaymentEmail(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Property Payments <noreply@YOUR_DOMAIN>",
-          to: ["admin@YOUR_DOMAIN"],
+          from: "Property Payments <noreply@awknranch.com>",
+          to: ["admin@awknranch.com"],
           subject: `Unrecognized payment email: ${subject}`,
           html: `
             <div style="font-family:-apple-system,sans-serif;max-width:600px;">
               <h2 style="color:#e67e22;">&#x26A0;&#xFE0F; Unrecognized Payment Email</h2>
-              <p>A forwarded email to <strong>payments@YOUR_DOMAIN</strong> could not be automatically classified as Zelle, PayPal, or any known payment format.</p>
+              <p>A forwarded email to <strong>payments@awknranch.com</strong> could not be automatically classified as Zelle, PayPal, or any known payment format.</p>
               <p><strong>Original subject:</strong> ${subject}</p>
               <p><strong>From:</strong> ${emailRecord.from_address || "unknown"}</p>
               <hr style="border:none;border-top:1px solid #eee;margin:16px 0;">
               <p style="font-size:0.85rem;color:#666;"><strong>Body preview:</strong></p>
               <pre style="background:#f8f8f8;padding:12px;border-radius:4px;font-size:0.8rem;white-space:pre-wrap;max-height:300px;overflow:auto;">${snippet}</pre>
-              <p style="color:#666;font-size:0.85rem;margin-top:12px;">Please review and manually record in the <a href="https://YOUR_DOMAIN/spaces/admin/accounting.html">accounting dashboard</a> if needed.</p>
+              <p style="color:#666;font-size:0.85rem;margin-top:12px;">Please review and manually record in the <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/accounting.html">accounting dashboard</a> if needed.</p>
             </div>
           `,
         }),
@@ -3234,8 +3234,8 @@ async function handleAutoReply(
   const fromEmail = (from.match(/<(.+)>/)?.[1] || from).toLowerCase().trim();
   const toEmail = (toAddr.match(/<(.+)>/)?.[1] || toAddr).toLowerCase().trim();
 
-  if (fromEmail.includes("auto@YOUR_DOMAIN") || fromEmail.includes("noreply@YOUR_DOMAIN") ||
-      toEmail.includes("auto@YOUR_DOMAIN") || toEmail.includes("noreply@YOUR_DOMAIN")) {
+  if (fromEmail.includes("auto@awknranch.com") || fromEmail.includes("noreply@awknranch.com") ||
+      toEmail.includes("auto@awknranch.com") || toEmail.includes("noreply@awknranch.com")) {
     console.log("Ignoring automated email reply loop", { from: fromEmail, to: toEmail });
     return;
   }
@@ -3417,7 +3417,7 @@ serve(async (req) => {
     // ==============================================
     const fromLower = from.toLowerCase();
     const fromAddr = (fromLower.match(/<(.+)>/)?.[1] || fromLower).trim();
-    if (fromAddr.endsWith("@YOUR_DOMAIN")) {
+    if (fromAddr.endsWith("@awknranch.com")) {
       const toAutoOrNoreply = toList.some(t => {
         const p = extractPrefix(t);
         return p === "auto" || p === "noreply" || p === "pai" || p === "ai-admin";

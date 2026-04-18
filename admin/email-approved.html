@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Approval — YOUR_APP_NAME</title>
+  <title>Email Approval — AWKN Ranch</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -78,7 +78,7 @@
       <a id="type-approval-btn" href="#" style="display: inline-block; padding: 12px 28px; background: #d4883a; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">Auto-Approve <span id="type-label-btn"></span></a>
       <p style="font-size: 12px; color: #7d6f74; margin-top: 8px;">This permanently disables approval for this email type.</p>
     </div>
-    <p class="footer">YOUR_APP_NAME Email Approval System</p>
+    <p class="footer">AWKN Ranch Email Approval System</p>
   </div>
 
   <script>
@@ -123,7 +123,7 @@
       const labelSpan = document.getElementById('type-label-btn');
       offer.style.display = 'block';
       labelSpan.textContent = typeLabel;
-      const base = 'YOUR_SUPABASE_URL/functions/v1/approve-email';
+      const base = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/approve-email';
       btn.href = base + '?token=' + encodeURIComponent(approvalToken) + '&action=approve_all&confirm=1';
     }
   </script>

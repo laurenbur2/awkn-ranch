@@ -335,7 +335,7 @@ Either party may terminate the agreement with {{notice_period}} notice.
 
 ## Work Reporting
 
-- The renter will send an email summary at the end of each day where work is performed outlining the work completed and the hours to team@YOUR_DOMAIN. This email must be sent on each and every day when work is performed (before the end of the day).
+- The renter will send an email summary at the end of each day where work is performed outlining the work completed and the hours to team@awknranch.com. This email must be sent on each and every day when work is performed (before the end of the day).
 
 - Hours for work not reported on the same day by email will be discounted 25%.
 
@@ -378,7 +378,7 @@ Renter will be paid at the end of each month for any excess hours (beyond the va
 Signature: _________________________
 
 Rahul Sonnad - Revocable Trust of Subhash Sonnad - dba AWKN Ranch
-123 Main Stive Your City TX 00000
+7600 Stillridge Dr Austin TX 78736
 
 Date: _________________________
 
@@ -399,7 +399,7 @@ Emergency Contact & Phone #: {{emergency_contact}}
 
 ---
 
-**Payments:** YOUR_DOMAIN/pay
+**Payments:** awknranch.com/pay
 `;
 }
 

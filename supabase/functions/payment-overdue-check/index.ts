@@ -1,13 +1,13 @@
 /**
  * Payment & Contract Overdue Check
  * Detects overdue rent, event payments, AND unsigned rental contracts.
- * Sends escalating reminders to the payer + CC team@YOUR_DOMAIN.
+ * Sends escalating reminders to the payer + CC team@awknranch.com.
  *
  * Escalation: day 1 (friendly), day 3 (firm), day 5 (persistent), day 7+ (urgent)
  *
  * Trigger: Daily via pg_cron at 10 AM CT (3 PM UTC)
  * Deploy: supabase functions deploy payment-overdue-check
- * Manual: curl -X POST YOUR_SUPABASE_URL/functions/v1/payment-overdue-check -H "Authorization: Bearer <anon_key>"
+ * Manual: curl -X POST https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/payment-overdue-check -H "Authorization: Bearer <anon_key>"
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -17,9 +17,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const TEAM_EMAIL = 'team@YOUR_DOMAIN';
+const TEAM_EMAIL = 'team@awknranch.com';
 const ESCALATION_DAYS = [1, 3, 5, 7]; // days after due date
-const PAY_BASE_URL = 'https://YOUR_DOMAIN/pay/';
+const PAY_BASE_URL = 'https://laurenbur2.github.io/awkn-ranch/pay/';
 
 interface OverdueItem {
   sourceType: string;
@@ -317,7 +317,7 @@ function buildContractReminderEmail(
         <p style="color:#2a1f23;font-size:14px;margin-top:8px;">Best regards,<br><strong>AWKN Ranch</strong></p>
       </div>
       <div style="background:#f2f0e8;padding:16px 32px;text-align:center;border-top:1px solid #e6e2d9;">
-        <p style="margin:0;color:#7d6f74;font-size:12px;">123 Main Stive, Your City, TX 00000</p>
+        <p style="margin:0;color:#7d6f74;font-size:12px;">7600 Stillridge Dr, Austin, TX 78736</p>
       </div>
     </div>
   `;
@@ -718,7 +718,7 @@ Deno.serve(async (req) => {
             .select('token')
             .single();
           if (tokenData?.token) {
-            uploadUrl = `https://YOUR_DOMAIN/spaces/verify.html?token=${tokenData.token}`;
+            uploadUrl = `https://laurenbur2.github.io/awkn-ranch/spaces/verify.html?token=${tokenData.token}`;
           }
         }
         personIdVerification.set(personId, { needsId, uploadUrl });
@@ -842,7 +842,7 @@ Deno.serve(async (req) => {
             <p style="color:#2a1f23;font-size:14px;margin-top:8px;">Best regards,<br><strong>AWKN Ranch</strong></p>
           </div>
           <div style="background:#f2f0e8;padding:16px 32px;text-align:center;border-top:1px solid #e6e2d9;">
-            <p style="margin:0;color:#7d6f74;font-size:12px;">123 Main Stive, Your City, TX 00000</p>
+            <p style="margin:0;color:#7d6f74;font-size:12px;">7600 Stillridge Dr, Austin, TX 78736</p>
           </div>
         </div>
       `;
@@ -888,10 +888,10 @@ AWKN Ranch`;
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Property Team <team@YOUR_DOMAIN>',
+            from: 'Property Team <team@awknranch.com>',
             to: [first.personEmail],
             cc: [TEAM_EMAIL],
-            reply_to: 'team@YOUR_DOMAIN',
+            reply_to: 'team@awknranch.com',
             subject,
             html: emailHtml,
             text: emailText,
@@ -962,10 +962,10 @@ AWKN Ranch`;
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'Property Team <team@YOUR_DOMAIN>',
+              from: 'Property Team <team@awknranch.com>',
               to: [item.personEmail],
               cc: [TEAM_EMAIL],
-              reply_to: 'team@YOUR_DOMAIN',
+              reply_to: 'team@awknranch.com',
               subject,
               html,
               text,
@@ -1141,7 +1141,7 @@ AWKN Ranch`;
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Property System <auto@YOUR_DOMAIN>',
+            from: 'Property System <auto@awknranch.com>',
             to: [TEAM_EMAIL],
             subject: digestSubject,
             html: digestHtml,

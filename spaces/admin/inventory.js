@@ -161,8 +161,8 @@ const SOFTWARE = [
   { name: 'Colima + Docker', desc: 'Lightweight Docker runtime on macOS via Lima VMs. Used for containerized services.', tags: ['containers', 'infra'], where: 'Alpuca Mac (Homebrew)' },
   { name: 'QEMU', desc: 'Virtual machine hypervisor running the Home Assistant OS VM.', tags: ['vm', 'infra'], where: 'Alpuca Mac (Homebrew)' },
   { name: 'cloudflared', desc: 'Cloudflare Tunnel client — exposes local services (Sonos API, WiZ Proxy, HAOS) to the internet securely without port forwarding.', tags: ['tunnel', 'infra'], where: 'Alpuca Mac (Homebrew)' },
-  { name: 'Tailwind CSS v4', desc: 'Utility-first CSS framework used across all YOUR_APP_NAME pages. Custom <code>aap-*</code> design tokens defined in config. Run <code>npm run css:build</code> after adding new classes.', tags: ['frontend', 'css'], where: 'your-app repo (npm)' },
-  { name: 'Capacitor 8', desc: 'Cross-platform mobile app framework. Wraps YOUR_APP_NAME web UI into native iOS and Android apps with camera feeds, Sonos control, and device management.', tags: ['mobile', 'ios', 'android'], where: 'your-app/mobile/' },
+  { name: 'Tailwind CSS v4', desc: 'Utility-first CSS framework used across all AWKN Team Portal pages. Custom <code>aap-*</code> design tokens defined in config. Run <code>npm run css:build</code> after adding new classes.', tags: ['frontend', 'css'], where: 'your-app repo (npm)' },
+  { name: 'Capacitor 8', desc: 'Cross-platform mobile app framework. Wraps AWKN Team Portal web UI into native iOS and Android apps with camera feeds, Sonos control, and device management.', tags: ['mobile', 'ios', 'android'], where: 'your-app/mobile/' },
   { name: 'Supabase CLI', desc: 'Local development, migrations, and edge function deployment for the Supabase backend.', tags: ['database', 'deploy'], where: 'Alpuca Mac (npm)' },
   { name: 'gh (GitHub CLI)', desc: 'GitHub command-line tool for PR management, releases, and CI/CD interaction.', tags: ['git', 'deploy'], where: 'Alpuca Mac (Homebrew)' },
   { name: 'jq', desc: 'JSON query tool used in shell scripts for parsing API responses and config files.', tags: ['utility'], where: 'Alpuca Mac (Homebrew)' },
@@ -268,7 +268,7 @@ const REPOS = [
     tech: 'Vanilla HTML/JS + Tailwind v4 + Supabase + GitHub Pages + Capacitor 8',
     stats: '103 dirs · 66 edge functions · 49 shared modules · 36 migrations',
     url: 'https://github.com/USERNAME/REPO',
-    live: 'https://YOUR_DOMAIN/',
+    live: 'https://laurenbur2.github.io/awkn-ranch/',
   },
   {
     name: 'finleg',
@@ -285,7 +285,7 @@ const REPOS = [
     url: 'https://github.com/USERNAME/sponic-garden',
   },
   {
-    name: 'YOUR_APP_NAME Mobile',
+    name: 'AWKN Team Portal Mobile',
     desc: 'Native iOS + Android app wrapping the web platform with camera feeds, music control, lights, climate, and vehicle tabs',
     tech: 'Capacitor 8 + Vanilla JS',
     stats: 'Located at your-app/mobile/',

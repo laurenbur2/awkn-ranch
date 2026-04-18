@@ -111,7 +111,7 @@ serve(async (req) => {
 
     // After payment, redirect to a thank-you or property page
     params.append("after_completion[type]", "redirect");
-    params.append("after_completion[redirect][url]", "https://YOUR_DOMAIN/residents/profile.html?payment=success");
+    params.append("after_completion[redirect][url]", "https://laurenbur2.github.io/awkn-ranch/residents/profile.html?payment=success");
 
     // Create Payment Link via Stripe API
     const stripeResponse = await fetch(`${STRIPE_API_BASE}/payment_links`, {

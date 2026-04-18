@@ -1413,7 +1413,7 @@ async function aiEditTemplate() {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     const resp = await fetch(
-      `YOUR_SUPABASE_URL/functions/v1/edit-email-template`,
+      `https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/edit-email-template`,
       {
         method: 'POST',
         headers: {

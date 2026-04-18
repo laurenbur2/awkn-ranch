@@ -18,7 +18,7 @@ import https from 'https';
 // ============================================
 // Configuration
 // ============================================
-const SUPABASE_URL = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const UDM_HOST = process.env.UDM_HOST || '192.168.1.1';
 const UDM_USER = process.env.UDM_USER || 'propertyauto';

@@ -126,7 +126,7 @@ async function loadUsers() {
 
   users.forEach(u => {
     // Skip bot user
-    if (u.email === 'bot@YOUR_DOMAIN') return;
+    if (u.email === 'bot@awknranch.com') return;
     const name = (u.first_name && u.last_name)
       ? `${u.first_name} ${u.last_name}`
       : u.display_name || u.email;

@@ -184,7 +184,7 @@ function buildAssistantConfig(
     } else if (callerType === 'airbnb_guest') {
       systemPrompt += `\nAs a guest, ${callerName} does NOT have access to smart home controls. If they ask about lights, thermostats, or music, politely let them know those features are available through the resident portal and suggest they contact the property manager for help.`;
     } else {
-      systemPrompt += `\nThis caller does not have smart home access. Focus on answering property questions and directing them to team@YOUR_DOMAIN for further help.`;
+      systemPrompt += `\nThis caller does not have smart home access. Focus on answering property questions and directing them to team@awknranch.com for further help.`;
     }
   } else {
     // Unknown caller

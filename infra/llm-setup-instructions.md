@@ -1,11 +1,11 @@
-# YOUR_APP_NAME Setup Instructions (Machine-Readable)
+# AWKN Ranch Setup Instructions (Machine-Readable)
 
-> **For Claude, ChatGPT, or any LLM helping a user set up YOUR_APP_NAME.**
+> **For Claude, ChatGPT, or any LLM helping a user set up AWKN Ranch.**
 > This file is the canonical setup reference. The HTML page at `/infra/` is the human-friendly overview.
 
 ## Overview
 
-YOUR_APP_NAME is a full-stack platform using:
+AWKN Ranch is a full-stack platform using:
 - **GitHub Pages** — static site hosting (free)
 - **Supabase** — PostgreSQL database, auth, storage, edge functions (free tier)
 - **Claude Code** — AI developer agent that writes and deploys code
@@ -47,7 +47,7 @@ Once Conductor is installed, the user switches from Claude Code in the terminal 
 ## Detailed Step-by-Step Guide
 
 For the full detailed setup procedure with checkpoints and validation steps, read:
-**https://YOUR_DOMAIN/infra/setup-guide.html**
+**https://laurenbur2.github.io/awkn-ranch/infra/setup-guide.html**
 
 ## Service Options
 
@@ -88,9 +88,9 @@ Both use the same template. The setup wizard tailors the project to the user's c
 ## Updates
 
 After initial setup, users can adopt new features by reading:
-**https://YOUR_DOMAIN/infra/updates.html**
+**https://laurenbur2.github.io/awkn-ranch/infra/updates.html**
 
-Feature index (machine-readable): **https://YOUR_DOMAIN/infra/updates.json**
+Feature index (machine-readable): **https://laurenbur2.github.io/awkn-ranch/infra/updates.json**
 
 ## Platform Notes
 

@@ -468,7 +468,7 @@ function renderEmailPreview() {
         <tr>
           <td style="background:${e.footer?.background || '#f2f0e8'};padding:${e.footer?.padding || '20px 32px'};text-align:center;border-top:${e.footer?.border_top || '1px solid #e6e2d9'};">
             <p style="margin:0;color:${e.footer?.text_color || '#7d6f74'};font-size:12px;">${brand.address || ''}</p>
-            <p style="margin:6px 0 0;color:${e.footer?.text_color || '#7d6f74'};font-size:11px;opacity:0.7;">${brand.platform_name || 'YOUR_APP_NAME'} &bull; ${brand.tagline || ''}</p>
+            <p style="margin:6px 0 0;color:${e.footer?.text_color || '#7d6f74'};font-size:11px;opacity:0.7;">${brand.platform_name || 'AWKN Team Portal'} &bull; ${brand.tagline || ''}</p>
           </td>
         </tr>
       </table>

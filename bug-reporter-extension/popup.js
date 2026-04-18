@@ -1,7 +1,7 @@
 // ============================================
 // Supabase config (same anon key as main app)
 // ============================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 // ============================================

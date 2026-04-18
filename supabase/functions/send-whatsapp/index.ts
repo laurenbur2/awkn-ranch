@@ -226,13 +226,13 @@ function getTemplateMapping(
 function getPlainTextBody(type: MessageType, data: Record<string, any>): string {
   switch (type) {
     case "payment_reminder":
-      return `Hi ${data.first_name}, friendly reminder: your ${data.period || "rent"} of $${data.amount} is due ${data.due_date}. Pay via Venmo @PropertyPlayhouse or Zelle admin@YOUR_DOMAIN - AWKN Ranch`;
+      return `Hi ${data.first_name}, friendly reminder: your ${data.period || "rent"} of $${data.amount} is due ${data.due_date}. Pay via Venmo @PropertyPlayhouse or Zelle admin@awknranch.com - AWKN Ranch`;
     case "payment_overdue":
       return `Hi ${data.first_name}, your rent of $${data.amount} was due ${data.due_date} and is ${data.days_overdue} day(s) overdue.${data.late_fee ? ` Late fee: $${data.late_fee}. Total: $${data.total_due}.` : ""} Please pay ASAP. - AWKN Ranch`;
     case "payment_received":
       return `Hi ${data.first_name}, we received your $${data.amount} payment${data.period ? ` for ${data.period}` : ""}. Thank you! - AWKN Ranch`;
     case "deposit_requested":
-      return `Hi ${data.first_name}, your deposit of $${data.total_due} is due${data.due_date ? ` by ${data.due_date}` : ""}. Pay via Venmo @PropertyPlayhouse or Zelle admin@YOUR_DOMAIN - AWKN Ranch`;
+      return `Hi ${data.first_name}, your deposit of $${data.total_due} is due${data.due_date ? ` by ${data.due_date}` : ""}. Pay via Venmo @PropertyPlayhouse or Zelle admin@awknranch.com - AWKN Ranch`;
     case "deposit_received":
       return `Hi ${data.first_name}, we received your $${data.amount} deposit.${data.remaining_balance > 0 ? ` Remaining: $${data.remaining_balance}.` : " All deposits received!"} Thank you! - AWKN Ranch`;
     case "lease_sent":

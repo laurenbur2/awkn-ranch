@@ -1,5 +1,5 @@
 /**
- * API Helpers — shared utilities for the YOUR_APP_NAME Internal REST API.
+ * API Helpers — shared utilities for the AWKN Team Portal Internal REST API.
  *
  * Auth resolution, response builders, query helpers, and smart lookups.
  */

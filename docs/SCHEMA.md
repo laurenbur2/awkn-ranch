@@ -17,7 +17,7 @@ people.residence_location - Segregates tenants by property location
 spaces.location           - Matches residence_location for filtering
 
 NOTE: Secondary Location is a SEPARATE tax entity from AWKN Ranch.
-      YOUR_APP_NAME only manages late rent email tracking for Secondary Location.
+      AWKN Ranch only manages late rent email tracking for Secondary Location.
       Accounting is handled elsewhere (Finleg). Forward payment notifications
       to agent@finleg.net.
 ```

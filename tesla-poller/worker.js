@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 // ============================================
 // Configuration
 // ============================================
-const SUPABASE_URL = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const POLL_INTERVAL_MS = parseInt(process.env.POLL_INTERVAL_MS || '300000'); // 5 min
 const API_DELAY_MS = parseInt(process.env.API_DELAY_MS || '2000'); // 2s between API calls
@@ -50,7 +50,7 @@ async function teslaApi(accessToken, path, apiBase = DEFAULT_FLEET_API_BASE) {
   const response = await fetch(`${apiBase}${path}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'User-Agent': 'YOUR_APP_NAMEPoller/1.0',
+      'User-Agent': 'AWKN RanchPoller/1.0',
     },
   });
 

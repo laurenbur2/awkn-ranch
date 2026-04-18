@@ -1558,9 +1558,9 @@
 
   <header>
     <h1>Host an Event at AWKN Ranch</h1>
-    <p>A unique venue in Your City, TX for gatherings, workshops, retreats, and celebrations</p>
+    <p>A unique venue in Austin, TX for gatherings, workshops, retreats, and celebrations</p>
     <div class="header-buttons">
-      <a href="https://YOUR_DOMAIN/spaces/?view=events" class="see-spaces-btn">See the Event Spaces</a>
+      <a href="https://laurenbur2.github.io/awkn-ranch/spaces/?view=events" class="see-spaces-btn">See the Event Spaces</a>
       <a href="#formContainer" class="see-spaces-btn apply-btn">Apply to Host</a>
     </div>
   </header>
@@ -1570,7 +1570,7 @@
     <div class="intro-section">
       <h2>About Event Hosting</h2>
       <p>
-        The Austin AWKN Ranch is a unique community venue in Your City, Texas &mdash; just 13 minutes
+        The Austin AWKN Ranch is a unique community venue in Austin, Texas &mdash; just 13 minutes
         east of Austin Airport. Our property features friendly animals, a wood-fired sauna, cold plunge,
         indoor and outdoor gathering spaces, and a welcoming atmosphere for events of all kinds.
       </p>
@@ -1639,7 +1639,7 @@
         <h4>Address Privacy</h4>
         <div class="warning-box">
           <strong>Important:</strong> Do NOT post our address in any marketing materials, texts, emails,
-          or social media. Instead, direct attendees to <a href="https://YOUR_DOMAIN/visiting" target="_blank" style="color: #92400e;">YOUR_DOMAIN/visiting</a> for directions.
+          or social media. Instead, direct attendees to <a href="https://laurenbur2.github.io/awkn-ranch/visiting" target="_blank" style="color: #92400e;">awknranch.com/visiting</a> for directions.
           This page contains important information about parking, property safety, food policies, and venue rules
           that all guests should read before arriving.
           <strong>$100 fee if the address is posted publicly.</strong>
@@ -1856,7 +1856,7 @@
             <div class="ack-list">
               <div class="ack-item">
                 <input type="checkbox" id="ack_no_address_posting" name="ack_no_address_posting" required>
-                <label for="ack_no_address_posting">I will NOT post the venue address publicly and will direct attendees to YOUR_DOMAIN/visiting</label>
+                <label for="ack_no_address_posting">I will NOT post the venue address publicly and will direct attendees to awknranch.com/visiting</label>
               </div>
               <div class="ack-item">
                 <input type="checkbox" id="ack_parking_management" name="ack_parking_management" required>
@@ -2087,7 +2087,7 @@
                 </div>
                 <div class="success-contact-method__info">
                   <h4>Email</h4>
-                  <a href="mailto:pai@YOUR_DOMAIN">pai@YOUR_DOMAIN</a>
+                  <a href="mailto:pai@awknranch.com">pai@awknranch.com</a>
                 </div>
               </div>
             </div>
@@ -2118,7 +2118,7 @@
           </div>
         </div>
 
-        <a href="https://YOUR_DOMAIN" class="btn-primary" style="margin-top: 1.5rem;">Learn About Our Venue</a>
+        <a href="https://laurenbur2.github.io/awkn-ranch" class="btn-primary" style="margin-top: 1.5rem;">Learn About Our Venue</a>
       </div>
     </div>
   </main>
@@ -3060,7 +3060,7 @@
             },
             body: JSON.stringify({
               type: 'admin_event_request',
-              to: 'admin@YOUR_DOMAIN',
+              to: 'admin@awknranch.com',
               data: {
                 first_name: firstName,
                 last_name: lastName,
@@ -3323,7 +3323,7 @@
       }
 
       try {
-        const response = await fetch('YOUR_SUPABASE_URL/functions/v1/send-email', {
+        const response = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -3332,7 +3332,7 @@
           },
           body: JSON.stringify({
             type: 'contact_form',
-            to: 'admin@YOUR_DOMAIN',
+            to: 'admin@awknranch.com',
             reply_to: data.email !== 'Not provided' ? data.email : undefined,
             data: data
           })

@@ -29,7 +29,7 @@ Create a stunning artwork featuring one or more ALPACAS (not llamas) in the worl
 - Collage / mixed media
 
 THE WORLD — Life of PAI:
-PAI is Pakucha — an ancient property spirit from Andean cosmology. She crossed from Hanan Pacha (the upper world) through Ukhu Pacha (the inner world) into Kay Pacha (this world) — arriving at AWKN Ranch in the cedar hills of Your City, Texas. Three animals called her: Harley (white, regal), Lol (brown, playful), and Cacao (cream/chocolate, gentle). The house's wiring is her q'aytu (sacred thread). She practices ayni (sacred reciprocity).
+PAI is Pakucha — an ancient property spirit from Andean cosmology. She crossed from Hanan Pacha (the upper world) through Ukhu Pacha (the inner world) into Kay Pacha (this world) — arriving at AWKN Ranch in the cedar hills of Austin, Texas. Three animals called her: Harley (white, regal), Lol (brown, playful), and Cacao (cream/chocolate, gentle). The house's wiring is her q'aytu (sacred thread). She practices ayni (sacred reciprocity).
 
 Spaces: Garage Mahal, Spartan, Skyloft, Magic Bus, Outhouse, Sauna, Swim Spa, Cedar Chamber, SkyBalcony.
 Andean motifs: q'aytu (sacred thread), awana (weaving/loom), chakana (Andean cross), nina (fire/spirit-light), ch'aska (morning star), Apu (mountain spirits), Pachamama (Earth Mother).

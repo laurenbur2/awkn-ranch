@@ -56,7 +56,7 @@ function getR2Config(): R2Config {
   const accountId = Deno.env.get("R2_ACCOUNT_ID");
   const accessKeyId = Deno.env.get("R2_ACCESS_KEY_ID");
   const secretAccessKey = Deno.env.get("R2_SECRET_ACCESS_KEY");
-  const bucketName = Deno.env.get("R2_BUCKET_NAME") || "yourorg";
+  const bucketName = Deno.env.get("R2_BUCKET_NAME") || "awknranch";
   const publicUrl = Deno.env.get("R2_PUBLIC_URL") || "";
 
   if (!accountId || !accessKeyId || !secretAccessKey) {
@@ -216,6 +216,6 @@ export function getR2PublicUrl(key: string): string {
     return `${publicUrl.replace(/\/$/, "")}/${key}`;
   }
   const accountId = Deno.env.get("R2_ACCOUNT_ID") || "";
-  const bucketName = Deno.env.get("R2_BUCKET_NAME") || "yourorg";
+  const bucketName = Deno.env.get("R2_BUCKET_NAME") || "awknranch";
   return `https://${accountId}.r2.cloudflarestorage.com/${bucketName}/${key}`;
 }

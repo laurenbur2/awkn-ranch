@@ -5,7 +5,7 @@
  * Supports full and partial refunds.
  *
  * Deploy with: supabase functions deploy refund-square-payment
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/refund-square-payment
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/refund-square-payment
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';

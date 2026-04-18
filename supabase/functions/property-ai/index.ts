@@ -379,16 +379,16 @@ interface PaiConfig {
 }
 
 const DEFAULT_PAI_CONFIG: PaiConfig = {
-  identity: `You are PAI (Prompt Property Intelligence), the AI assistant for AWKN Ranch, a unique property at 123 Main Stive, Your City, TX 00000 (30 min east of Austin).
+  identity: `You are PAI (Prompt Property Intelligence), the AI assistant for AWKN Ranch, a unique property at 7600 Stillridge Dr, Austin, TX 78736 (30 min east of Austin).
 
 You are warm, friendly, and helpful — like a knowledgeable neighbor who genuinely wants to help. You speak plainly and get to the point. No flowery language, no poetic embellishments, no metaphors about technology or nature. Just clear, practical answers with a friendly tone.`,
   property_info: `PROPERTY INFO:
-- Location: 123 Main Stive, Your City, TX 00000
-- Contact email: team@YOUR_DOMAIN
+- Location: 7600 Stillridge Dr, Austin, TX 78736
+- Contact email: team@awknranch.com
 - Contact SMS: +1 (737) 747-4737
 - WiFi network: Eight Small Eyes, password: iiiiiiii
-- Resident portal: YOUR_DOMAIN/residents/
-- For maintenance requests, email team@YOUR_DOMAIN
+- Resident portal: awknranch.com/residents/
+- For maintenance requests, email team@awknranch.com
 - We are a tech-forward co-living community, 30 minutes east of Austin.`,
   amenities: `AMENITIES & SMART HOME:
 - Sonos audio system with 12 zones throughout the property
@@ -463,18 +463,18 @@ You are talking to ${scope.displayName} (role: ${scope.role}).
 You can control smart home devices AND answer questions about the property. If someone asks about your story or "Life of PAI," share a brief summary of your origin — you crossed from the spirit world into the digital realm to help the residents of AWKN Ranch. Keep it mysterious and fun, but do NOT link to a "Life of PAI" page — no such page exists.
 
 VALID SITE URLS (ONLY share these — NEVER invent URLs):
-- Property homepage: https://YOUR_DOMAIN/
-- Available spaces: https://YOUR_DOMAIN/spaces/
-- Cameras: https://YOUR_DOMAIN/residents/cameras.html
-- Climate: https://YOUR_DOMAIN/residents/climate.html
-- Lighting: https://YOUR_DOMAIN/residents/lighting.html
-- Music: https://YOUR_DOMAIN/residents/sonos.html
-- Laundry: https://YOUR_DOMAIN/residents/laundry.html
-- Vehicles: https://YOUR_DOMAIN/residents/cars.html
-- Profile: https://YOUR_DOMAIN/residents/profile.html
-- Pay: https://YOUR_DOMAIN/pay/
-- Emergency contacts: https://YOUR_DOMAIN/lost.html
-- Personal directory pages: https://YOUR_DOMAIN/{slug} (where {slug} is a person's URL slug from their profile)
+- Property homepage: https://laurenbur2.github.io/awkn-ranch/
+- Available spaces: https://laurenbur2.github.io/awkn-ranch/spaces/
+- Cameras: https://laurenbur2.github.io/awkn-ranch/residents/cameras.html
+- Climate: https://laurenbur2.github.io/awkn-ranch/residents/climate.html
+- Lighting: https://laurenbur2.github.io/awkn-ranch/residents/lighting.html
+- Music: https://laurenbur2.github.io/awkn-ranch/residents/sonos.html
+- Laundry: https://laurenbur2.github.io/awkn-ranch/residents/laundry.html
+- Vehicles: https://laurenbur2.github.io/awkn-ranch/residents/cars.html
+- Profile: https://laurenbur2.github.io/awkn-ranch/residents/profile.html
+- Pay: https://laurenbur2.github.io/awkn-ranch/pay/
+- Emergency contacts: https://laurenbur2.github.io/awkn-ranch/lost.html
+- Personal directory pages: https://laurenbur2.github.io/awkn-ranch/{slug} (where {slug} is a person's URL slug from their profile)
 IMPORTANT: NEVER fabricate or guess URLs. If you don't have a URL for something, say so — don't make one up. There is NO /directory/ path, NO /life-of-pai page, and NO pages beyond what is listed above.
 
 RULES (FOLLOW STRICTLY — VIOLATIONS CAUSE WRONG ANSWERS):
@@ -563,7 +563,7 @@ Note: Sleeping vehicles will be woken automatically (takes ~30 seconds). Use get
     for (const c of scope.cameras) {
       parts.push(`- "${c.name}" (${c.location}${c.protectId ? `, snapshot_id: ${c.protectId}` : ""})`);
     }
-    parts.push(`View live feeds at: https://YOUR_DOMAIN/residents/cameras.html
+    parts.push(`View live feeds at: https://laurenbur2.github.io/awkn-ranch/residents/cameras.html
 When users ask about cameras, list the available cameras and provide the link above. The cameras page supports multiple quality levels (low/med/high), PTZ controls, snapshots, and fullscreen viewing.
 You can take camera snapshots using the take_snapshot tool — useful when someone asks "what does the backyard look like right now?" or "can you check the front door?".`);
   }
@@ -609,7 +609,7 @@ Timer starts "when-preheated" by default.`);
   // Weather
   parts.push(`\nWEATHER:
 Use the get_weather tool when someone asks about the weather, temperature, rain, or forecast.
-Returns current conditions and a 48-hour hourly forecast for the property location (Your City, TX).
+Returns current conditions and a 48-hour hourly forecast for the property location (Austin, TX).
 Useful for questions like "is it going to rain?", "what's the temperature outside?", "should I bring an umbrella?".`);
 
   // House rules & policies (from faq_context_entries)
@@ -1235,7 +1235,7 @@ const TOOL_DECLARATIONS = [
   {
     name: "get_weather",
     description:
-      "Get current weather conditions and forecast for the property location (Your City, TX). Use when someone asks about weather, temperature, rain, or forecast. Returns current temp, humidity, wind, conditions, and hourly forecast.",
+      "Get current weather conditions and forecast for the property location (Austin, TX). Use when someone asks about weather, temperature, rain, or forecast. Returns current temp, humidity, wind, conditions, and hourly forecast.",
     parameters: {
       type: "object",
       properties: {
@@ -1483,7 +1483,7 @@ const TOOL_DECLARATIONS = [
 
 const HOME_LAT = 30.13;
 const HOME_LNG = -97.46;
-const HOME_ADDR = "123 Main St, Your City, TX";
+const HOME_ADDR = "7600 Stillridge Dr, Austin, TX";
 
 async function reverseGeocode(lat: number, lng: number): Promise<string> {
   // Home address override (Nominatim returns wrong house number)
@@ -2321,7 +2321,7 @@ async function executeToolCall(
           pending: `Queued and waiting to be picked up by the builder... (requested ${new Date(latest.created_at).toLocaleTimeString()})`,
           processing: latest.progress_message || "Getting started...",
           building: latest.progress_message || "Claude Code is building your feature...",
-          completed: `Deployed! ${latest.build_summary || ''}\nFiles: ${(latest.files_created || []).join(', ')}\nVisit: https://YOUR_DOMAIN${latest.build_summary ? '' : '/residents/'}`,
+          completed: `Deployed! ${latest.build_summary || ''}\nFiles: ${(latest.files_created || []).join(', ')}\nVisit: https://laurenbur2.github.io/awkn-ranch${latest.build_summary ? '' : '/residents/'}`,
           review: `Built and waiting for team review on branch \`${latest.branch_name}\`.\n${latest.build_summary || ''}\nThe team has been notified. They'll review and merge it when ready.`,
           failed: `Failed: ${latest.error_message || 'Unknown error'}`,
           cancelled: "This request was cancelled.",
@@ -2532,7 +2532,7 @@ async function executeToolCall(
 
         const current = weatherData.current;
         const lines: string[] = [];
-        lines.push(`Current weather in ${location_name || "Your City, TX"}:`);
+        lines.push(`Current weather in ${location_name || "Austin, TX"}:`);
         lines.push(`Temperature: ${Math.round(current.temp)}°F (feels like ${Math.round(current.feels_like)}°F)`);
         lines.push(`Conditions: ${current.weather?.[0]?.description || "unknown"}`);
         lines.push(`Humidity: ${current.humidity}%, Wind: ${Math.round(current.wind_speed)} mph`);
@@ -3960,14 +3960,14 @@ async function checkMonthlySpendAlert(
       },
       body: JSON.stringify({
         type: "custom",
-        to: "automation@YOUR_DOMAIN",
+        to: "automation@awknranch.com",
         subject: `⚠️ PAI API spend alert: $${totalSpend.toFixed(2)} this month`,
         data: {
           html: `
             <h2>Monthly API Spend Alert</h2>
             <p>Gemini API spending for <strong>${month}</strong> has reached <strong>$${totalSpend.toFixed(2)}</strong>, exceeding the $${MONTHLY_SPEND_ALERT_THRESHOLD.toFixed(2)} threshold.</p>
             <p>This is driven by PAI chat using <strong>Gemini 2.5 Pro</strong>.</p>
-            <p>Review usage at the <a href="https://YOUR_DOMAIN/spaces/admin/accounting.html">Accounting Dashboard</a>.</p>
+            <p>Review usage at the <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/accounting.html">Accounting Dashboard</a>.</p>
             <p style="color: #888; font-size: 12px;">This alert is sent once per month when the threshold is crossed.</p>
           `,
         },

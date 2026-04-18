@@ -175,36 +175,36 @@ The accounting admin page (`spaces/admin/accounting.html`) should show:
 5. `agreement_status` updated to "signed"
 
 ### Resend (Email)
-- **Domain**: `YOUR_DOMAIN` (verified, sending + receiving)
+- **Domain**: `awknranch.com` (verified, sending + receiving)
 - **Account**: wingsiebird@gmail.com
 - **API Key**: Stored as Supabase secret `RESEND_API_KEY`
 - **Webhook Secret**: Stored as Supabase secret `RESEND_WEBHOOK_SECRET` (SVIX-based)
 - **Outbound**: `send-email` Edge Function sends via Resend API (43 templates)
-  - From: `notifications@YOUR_DOMAIN` (forwarded emails) or `noreply@YOUR_DOMAIN` (system emails)
+  - From: `notifications@awknranch.com` (forwarded emails) or `noreply@awknranch.com` (system emails)
   - Client service: `shared/email-service.js`
 - **Inbound**: `resend-inbound-webhook` Edge Function (deployed with `--no-verify-jwt`)
-  - Webhook URL: `YOUR_SUPABASE_URL/functions/v1/resend-inbound-webhook`
+  - Webhook URL: `https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/resend-inbound-webhook`
   - Event: `email.received`
   - All inbound emails logged to `inbound_emails` table
   - Webhook payload doesn't include body — fetched separately via Resend API
 
-**DNS Records** (GoDaddy, domain: `YOUR_DOMAIN`):
+**DNS Records** (GoDaddy, domain: `awknranch.com`):
 - MX `@` → `inbound-smtp.us-east-1.amazonaws.com` (priority 10) — inbound receiving
 - MX `send` → `feedback-smtp.us-east-1.amazonses.com` (priority 10) — SPF for outbound
 - TXT `send` → SPF record for outbound
 - TXT `resend._domainkey` → DKIM record
 
-**Inbound Email Routing** (`*@YOUR_DOMAIN`):
+**Inbound Email Routing** (`*@awknranch.com`):
 | Prefix | Action | Destination |
 |--------|--------|-------------|
 | `haydn@` | Forward | `hUSERNAME@gmail.com` |
 | `rahulio@` | Forward | `rahulioson@gmail.com` |
 | `sonia@` | Forward | `sonia245g@gmail.com` |
-| `team@` | Forward | `admin@YOUR_DOMAIN` |
+| `team@` | Forward | `admin@awknranch.com` |
 | `herd@` | Special logic | (stub — future AI processing) |
 | `auto@` | Special logic | Bug report replies → new bug report; others → admin |
 | `pai@` | Special logic | Gemini classifies → questions/commands get PAI reply; documents uploaded to R2; other forwarded to admin |
-| Everything else | Forward | `admin@YOUR_DOMAIN` |
+| Everything else | Forward | `admin@awknranch.com` |
 
 ### Telnyx (SMS)
 - Config stored in `telnyx_config` table (api_key, messaging_profile_id, phone_number, test_mode)
@@ -244,10 +244,10 @@ The accounting admin page (`spaces/admin/accounting.html`) should show:
 
 ### Spotify (Music Integration)
 - **API**: Spotify Web API + Authorization Code Flow with PKCE
-- **App**: YOUR_APP_NAME (Development mode)
+- **App**: AWKN Ranch (Development mode)
 - **Dashboard**: https://developer.spotify.com/dashboard
 - **Config**: `spotify_config` table (client_id, client_secret, tokens)
-- **Redirect URIs**: `http://127.0.0.1:8080` (local dev), `https://YOUR_DOMAIN/auth/spotify/callback` (production)
+- **Redirect URIs**: `http://127.0.0.1:8080` (local dev), `https://laurenbur2.github.io/awkn-ranch/auth/spotify/callback` (production)
 - **Scopes**: TBD (will need `user-read-playback-state`, `user-modify-playback-state`, etc.)
 - **DB**: `spotify_config` (single row, id=1)
 
@@ -271,12 +271,12 @@ The accounting admin page (`spaces/admin/accounting.html`) should show:
 - **Traits used**: Temperature, Humidity, ThermostatMode, ThermostatHvac, ThermostatEco, ThermostatTemperatureSetpoint, Connectivity
 - **Temperature**: SDM API uses Celsius, UI shows Fahrenheit, edge function converts
 - **Rate limit**: 5 QPS per SDM project (polling at 0.1 QPS is well within limit)
-- **OAuth setup**: One-time admin flow via Climate tab Settings → "Authorize Google Account". If you get Error 400 redirect_uri_mismatch, add `https://YOUR_DOMAIN/residents/climate.html` to the OAuth client's Authorized redirect URIs in Google Cloud Console (APIs & Services → Credentials).
+- **OAuth setup**: One-time admin flow via Climate tab Settings → "Authorize Google Account". If you get Error 400 redirect_uri_mismatch, add `https://laurenbur2.github.io/awkn-ranch/residents/climate.html` to the OAuth client's Authorized redirect URIs in Google Cloud Console (APIs & Services → Credentials).
 
 ### OpenWeatherMap (Weather)
 - **API**: One Call API 3.0 (with 2.5 free tier fallback)
 - **Config**: `weather_config` table (owm_api_key, latitude, longitude, location_name)
-- **Location**: 123 Main St, Your City, TX (30.13, -97.46)
+- **Location**: 7600 Stillridge Dr, Austin, TX (30.13, -97.46)
 - **Display**: Rain windows summary + expandable hourly 48-hour forecast
 - **Client-side only**: No edge function needed, API key safe for read-only weather
 
@@ -348,7 +348,7 @@ The accounting admin page (`spaces/admin/accounting.html`) should show:
 - **DB:** `camera_streams` table stores stream config (stream_name, proxy_base_url, quality, location)
 - **Client:** `residents/cameras.js` loads streams from DB, plays via HLS.js with fMP4 mode (`&mp4` parameter)
 - **PTZ:** UniFi Protect API — continuous move at `POST /proxy/protect/api/cameras/{id}/move`, presets at `POST .../ptz/goto/{slot}`
-- **CORS:** Caddy strips go2rtc's CORS headers, adds origin-specific ones for `USERNAME.github.io` and `YOUR_DOMAIN`
+- **CORS:** Caddy strips go2rtc's CORS headers, adds origin-specific ones for `USERNAME.github.io` and `awknranch.com`
 - **Launchd:** `com.go2rtc` service (KeepAlive + RunAtLoad)
 - **Full docs:** `HOMEAUTOMATION.md`
 
@@ -477,7 +477,7 @@ The accounting admin page (`spaces/admin/accounting.html`) should show:
 - **DB columns on spaces**: `airbnb_ical_url`, `airbnb_link`, `airbnb_rate`, `airbnb_blocked_dates`
 
 ### Cloudflare R2 (Object Storage)
-- **Account**: Cloudflare YOUR_APP_NAME (wingsiebird@gmail.com)
+- **Account**: Cloudflare AWKN Ranch (wingsiebird@gmail.com)
 - **Bucket**: `your-app` (APAC region)
 - **S3 API**: `https://<account_id>.r2.cloudflarestorage.com`
 - **Public URL**: `https://pub-5a7344c4dab2467eb917ff4b897e066d.r2.dev`

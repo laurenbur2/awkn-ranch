@@ -6,7 +6,7 @@
 
 set -e
 
-echo "=== YOUR_APP_NAME Tesla Poller - Installation ==="
+echo "=== AWKN Ranch Tesla Poller - Installation ==="
 
 WORKER_DIR="/opt/tesla-poller"
 
@@ -46,7 +46,7 @@ if [ ! -f "$ENV_FILE" ]; then
     echo ""
     echo "Creating environment file..."
     cat > "$ENV_FILE" << 'ENVEOF'
-SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_URL=https://lnqxarwqckpmirpmixcw.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 POLL_INTERVAL_MS=300000
 API_DELAY_MS=2000

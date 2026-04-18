@@ -259,7 +259,7 @@ If this is not an ID document, return: {"error": "not_a_valid_id"}`,
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'We were unable to analyze your ID photo. This can happen with certain image types or lighting conditions. Please try again with a clearer, well-lit photo of your ID. If this persists, contact team@YOUR_DOMAIN.',
+          error: 'We were unable to analyze your ID photo. This can happen with certain image types or lighting conditions. Please try again with a clearer, well-lit photo of your ID. If this persists, contact team@awknranch.com.',
           technical_detail: lastError,
         }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -409,7 +409,7 @@ If this is not an ID document, return: {"error": "not_a_valid_id"}`,
             }),
           });
         } else {
-          const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@YOUR_DOMAIN';
+          const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@awknranch.com';
           const adminUrl = isAssociateContext
             ? `https://USERNAME.github.io/REPO/spaces/admin/worktracking.html`
             : `https://USERNAME.github.io/REPO/spaces/admin/rentals.html`;

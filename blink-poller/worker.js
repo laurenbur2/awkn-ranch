@@ -27,7 +27,7 @@ import { createInterface } from 'readline';
 // ============================================
 // Configuration
 // ============================================
-const SUPABASE_URL = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const BLINK_EMAIL = process.env.BLINK_EMAIL;
 const BLINK_PASSWORD = process.env.BLINK_PASSWORD;

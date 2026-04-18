@@ -179,7 +179,7 @@ export const identityService = {
 
     if (error) throw error;
 
-    const uploadUrl = `https://YOUR_DOMAIN/spaces/verify.html?token=${token.token}`;
+    const uploadUrl = `https://laurenbur2.github.io/awkn-ranch/spaces/verify.html?token=${token.token}`;
 
     // Update associate profile status
     await supabase

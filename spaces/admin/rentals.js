@@ -3264,7 +3264,7 @@ function copyPaymentInstructions() {
   const sec = app.security_deposit_amount || 0;
   const total = moveIn + sec;
 
-  const text = `Deposit Payment Instructions - AWKN Ranch\n\nMove-in Reservation Deposit: $${moveIn}\nSecurity Deposit: $${sec}\nTotal Due: $${total}\n\nPayment Methods:\n• Venmo: @PropertyPlayhouse\n• Zelle: admin@YOUR_DOMAIN\n\nPlease include your name in the payment memo.`;
+  const text = `Deposit Payment Instructions - AWKN Ranch\n\nMove-in Reservation Deposit: $${moveIn}\nSecurity Deposit: $${sec}\nTotal Due: $${total}\n\nPayment Methods:\n• Venmo: @PropertyPlayhouse\n• Zelle: admin@awknranch.com\n\nPlease include your name in the payment memo.`;
 
   navigator.clipboard.writeText(text).then(() => {
     showToast('Payment instructions copied to clipboard', 'success');

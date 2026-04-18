@@ -5,9 +5,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
-const SITE_URL = "https://YOUR_DOMAIN";
+const SITE_URL = "https://laurenbur2.github.io/awkn-ranch";
 const SITE_NAME = "AWKN Ranch";
-const DEFAULT_IMAGE = "YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/branding/logo-dark.png";
+const DEFAULT_IMAGE = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/branding/logo-dark.png";
 const DEFAULT_DESCRIPTION = "Unique rental and event spaces at Austin's AWKN Ranch — creative living for adventurous souls.";
 
 serve(async (req: Request) => {

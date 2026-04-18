@@ -104,7 +104,7 @@ function buildClassificationPrompt(
   hasAttachments: boolean,
   fromAddress: string
 ): string {
-  return `You are an email classifier for AWKN Ranch, a residential co-living property in Your City, Texas.
+  return `You are an email classifier for AWKN Ranch, a residential co-living property in Austin, Texas.
 
 Classify this email into exactly ONE category:
 
@@ -222,8 +222,8 @@ async function classifyWithOpenRouter(
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://YOUR_DOMAIN",
-        "X-Title": "YOUR_APP_NAME Email Classifier",
+        "HTTP-Referer": "https://laurenbur2.github.io/awkn-ranch",
+        "X-Title": "AWKN Team Portal Email Classifier",
       },
       body: JSON.stringify({
         model: "meta-llama/llama-4-maverick",
@@ -459,7 +459,7 @@ export interface OutboundEmailMeta {
 }
 
 /**
- * Extract YOUR_APP_NAME metadata from an email body (HTML).
+ * Extract AWKN Team Portal metadata from an email body (HTML).
  * Returns null if no metadata found (not a reply to our email).
  */
 export function extractReplyMetadata(htmlBody: string): OutboundEmailMeta | null {

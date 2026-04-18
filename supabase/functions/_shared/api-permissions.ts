@@ -1,7 +1,7 @@
 /**
  * API Permission Matrix & Role Levels
  *
- * Centralized permission definitions for the YOUR_APP_NAME Internal REST API.
+ * Centralized permission definitions for the AWKN Team Portal Internal REST API.
  * Every resource/action combination maps to a minimum role level.
  *
  * Levels:

@@ -15,7 +15,7 @@ import { supabaseHealth } from '../shared/supabase-health.js';
 // =============================================
 const NEST_CONTROL_URL = `${SUPABASE_URL}/functions/v1/nest-control`;
 const POLL_INTERVAL_MS = 30000;
-const NEST_OAUTH_REDIRECT_URI = 'https://YOUR_DOMAIN/residents/climate.html';
+const NEST_OAUTH_REDIRECT_URI = 'https://laurenbur2.github.io/awkn-ranch/residents/climate.html';
 
 // =============================================
 // STATE

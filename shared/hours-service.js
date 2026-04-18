@@ -144,7 +144,7 @@ class HoursService {
     const existingSet = new Set((existing || []).map(e => e.app_user_id));
 
     return (allUsers || []).filter(u =>
-      !existingSet.has(u.id) && u.email !== 'bot@YOUR_DOMAIN' && u.role !== 'demo'
+      !existingSet.has(u.id) && u.email !== 'bot@awknranch.com' && u.role !== 'demo'
     );
   }
 

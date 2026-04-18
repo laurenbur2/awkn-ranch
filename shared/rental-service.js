@@ -1326,7 +1326,7 @@ async function generateDepositRequestMessage(applicationId) {
   const totalDeposit = (app.move_in_deposit_amount || 0) + (app.security_deposit_amount || 0);
 
   let message = `Hi ${app.person?.first_name || 'there'},\n\n`;
-  message += `To secure your space at ${app.approved_space?.name || 'YOUR_APP_NAME'}, please send the following:\n\n`;
+  message += `To secure your space at ${app.approved_space?.name || 'AWKN Ranch'}, please send the following:\n\n`;
   message += `Move-in Deposit: $${app.move_in_deposit_amount || 0}\n`;
 
   if (app.security_deposit_amount > 0) {
@@ -1346,7 +1346,7 @@ async function generateDepositRequestMessage(applicationId) {
     }
   }
 
-  message += `\nPayment link: YOUR_DOMAIN/pay\n\n`;
+  message += `\nPayment link: awknranch.com/pay\n\n`;
   message += `Please include your name and "Deposit" in the payment note.\n\n`;
   message += `Let me know once you've sent the payment!\n`;
 

@@ -6,7 +6,7 @@
 
 set -e
 
-echo "=== YOUR_APP_NAME Camera Event Poller - Installation ==="
+echo "=== AWKN Ranch Camera Event Poller - Installation ==="
 
 WORKER_DIR="/opt/camera-event-poller"
 
@@ -46,7 +46,7 @@ if [ ! -f "$ENV_FILE" ]; then
     echo ""
     echo "Creating environment file..."
     cat > "$ENV_FILE" << 'ENVEOF'
-SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_URL=https://lnqxarwqckpmirpmixcw.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 UDM_HOST=192.168.1.1
 UDM_USER=alpacaauto

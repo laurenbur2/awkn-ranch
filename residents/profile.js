@@ -736,7 +736,7 @@ function bindEvents() {
   document.getElementById('copyUrlBtn')?.addEventListener('click', () => {
     const slug = profileData.slug;
     if (slug) {
-      navigator.clipboard.writeText(`https://YOUR_DOMAIN/${slug}`);
+      navigator.clipboard.writeText(`https://laurenbur2.github.io/awkn-ranch/${slug}`);
       showToast('URL copied!', 'success');
     }
   });
@@ -1330,7 +1330,7 @@ async function startTeslaOAuth() {
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: '3f53a292-07b8-443f-b86d-e4aedc37ac10',
-      redirect_uri: 'https://YOUR_DOMAIN/auth/tesla/callback',
+      redirect_uri: 'https://laurenbur2.github.io/awkn-ranch/auth/tesla/callback',
       scope: 'openid offline_access vehicle_device_data vehicle_location vehicle_cmds vehicle_charging_cmds',
       state,
       audience: 'https://fleet-api.prd.na.vn.cloud.tesla.com',

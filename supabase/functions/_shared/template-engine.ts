@@ -50,27 +50,27 @@ export const SENDER_MAP: Record<
   { from: string; reply_to: string }
 > = {
   team: {
-    from: "PAI at the AWKN Ranch <pai@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "AWKN Ranch <noreply@within.center>",
+    reply_to: "admin@awknranch.com",
   },
   auto: {
-    from: "PAI at the AWKN Ranch <pai@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "AWKN Ranch <noreply@within.center>",
+    reply_to: "admin@awknranch.com",
   },
   noreply: {
-    from: "PAI at the AWKN Ranch <pai@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "AWKN Ranch <noreply@within.center>",
+    reply_to: "admin@awknranch.com",
   },
   payments: {
-    from: "PAI at the AWKN Ranch <pai@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "AWKN Ranch <noreply@within.center>",
+    reply_to: "admin@awknranch.com",
   },
   pai: {
-    from: "PAI at the AWKN Ranch <pai@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "PAI at the AWKN Ranch <pai@within.center>",
+    reply_to: "admin@awknranch.com",
   },
   claudero: {
-    from: "Claudero <claudero@YOUR_DOMAIN>",
-    reply_to: "pai@YOUR_DOMAIN",
+    from: "Claudero <claudero@within.center>",
+    reply_to: "admin@awknranch.com",
   },
 };

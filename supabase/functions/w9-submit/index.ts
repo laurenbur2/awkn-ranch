@@ -232,7 +232,7 @@ Deno.serve(async (req) => {
           || tokenRecord.app_user.email
         : 'Unknown';
 
-      const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@YOUR_DOMAIN';
+      const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'automation@awknranch.com';
       await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: 'POST',
         headers: {

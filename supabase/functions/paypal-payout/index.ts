@@ -6,7 +6,7 @@
  * call external API, dual-write to payouts + ledger tables.
  *
  * Deploy with: supabase functions deploy paypal-payout
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/paypal-payout
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/paypal-payout
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';

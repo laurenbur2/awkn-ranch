@@ -293,7 +293,7 @@ This Rental Agreement (hereinafter, "Agreement") is made by and between the Revo
 
 ## RENTAL VENUE
 
-Company agrees to rent to Client the following spaces at 123 Main Stive (aka the Austin AWKN Ranch):
+Company agrees to rent to Client the following spaces at 7600 Stillridge Dr (aka the Austin AWKN Ranch):
 
 {{included_spaces}}
 

@@ -224,9 +224,9 @@ Use `mcp-remote` bridge or native remote MCP support with the URL above.
 
 ---
 
-## YOUR_APP_NAME-Specific Notes
+## AWKN Ranch-Specific Notes
 
-- **Supabase project:** `YOUR_SUPABASE_REF` (existing YOUR_APP_NAME project)
+- **Supabase project:** `YOUR_SUPABASE_REF` (existing AWKN Ranch project)
 - **Current DB usage:** 43 MB / 500 MB free tier — plenty of headroom
 - **OpenRouter key:** Already stored in `docs/CREDENTIALS.md`
 - **Embedding model:** `text-embedding-3-small` via OpenRouter (~$0.02/M tokens)

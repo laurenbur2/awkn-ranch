@@ -439,7 +439,7 @@ async function loadZoning() {
 // RENDERINGS TAB
 // =============================================
 
-const STORAGE_BASE = 'YOUR_SUPABASE_URL/storage/v1/object/public/housephotos';
+const STORAGE_BASE = 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos';
 
 const SURVEY_PLATS = [
   {
@@ -461,7 +461,7 @@ const SURVEY_PLATS = [
 const RENDERINGS = [
   {
     title: 'Bird\'s-Eye View — Full Property (DB Geometry)',
-    description: '123 Main St — 14 structures rendered from PostGIS footprint_geom. Main House (stone, brown roof), Back House (wood), 4 containers (red/blue/beige), 2 trailers, deck, sauna, bathroom bldg, pool, driveway. Yellow lines = property boundary. Orange lines = setback lines. Red pins = corner markers.',
+    description: '7600 Stillridge Dr — 14 structures rendered from PostGIS footprint_geom. Main House (stone, brown roof), Back House (wood), 4 containers (red/blue/beige), 2 trailers, deck, sauna, bathroom bldg, pool, driveway. Yellow lines = property boundary. Orange lines = setback lines. Red pins = corner markers.',
     file: 'renderings/property-birdseye-2026-03-21.png',
     date: '2026-03-21',
     engine: 'Cycles',

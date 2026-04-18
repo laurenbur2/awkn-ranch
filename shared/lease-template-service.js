@@ -375,14 +375,14 @@ function getTemplatePreview(templateContent) {
 // Default template for initial setup
 const DEFAULT_TEMPLATE = `# RESIDENTIAL LEASE AGREEMENT
 
-**YOUR_APP_NAME Residency**
-123 Main Stive, Your City, TX 00000
+**AWKN Ranch Residency**
+7600 Stillridge Dr, Austin, TX 78736
 
 ---
 
 This Residential Lease Agreement ("Agreement") is entered into on **{{signing_date}}** between:
 
-**LANDLORD:** YOUR_APP_NAME Residency ("Landlord")
+**LANDLORD:** AWKN Ranch Residency ("Landlord")
 
 **TENANT:** {{tenant_name}} ("Tenant")
 - Email: {{tenant_email}}
@@ -397,7 +397,7 @@ The Landlord agrees to rent to the Tenant the dwelling unit described as:
 - **Space:** {{dwelling_description}}
 - **Location:** {{dwelling_location}}
 
-Located at 123 Main Stive, Your City, TX 00000 (the "Premises").
+Located at 7600 Stillridge Dr, Austin, TX 78736 (the "Premises").
 
 ## 2. TERM
 
@@ -458,7 +458,7 @@ By signing below, both parties agree to the terms of this Lease Agreement.
 
 Signature: _________________________
 
-Name: YOUR_APP_NAME Residency
+Name: AWKN Ranch Residency
 
 Date: _________________________
 
@@ -483,7 +483,7 @@ const DEFAULT_RENTER_WAIVER = `# WAIVER OF LIABILITY, ASSUMPTION OF RISK, AND IN
 ---
 
 **Property Owner:** Revocable Trust of Subhash Sonnad ("Owner")
-**Property Address:** 123 Main Stive, Your City, Texas 00000
+**Property Address:** 7600 Stillridge Dr, Austin, Texas 78736
 
 **Resident/Renter:** {{tenant_name}} ("Participant")
 
@@ -493,7 +493,7 @@ const DEFAULT_RENTER_WAIVER = `# WAIVER OF LIABILITY, ASSUMPTION OF RISK, AND IN
 
 ## 1. ACTIVITIES AND FACILITIES
 
-The Owner makes available certain recreational amenities and facilities on the property at 123 Main Stive, Your City, Texas 00000, including but not limited to:
+The Owner makes available certain recreational amenities and facilities on the property at 7600 Stillridge Dr, Austin, Texas 78736, including but not limited to:
 
 - **Hot sauna(s)** (dry sauna and/or infrared sauna)
 - **Cold plunge pool / ice bath**
@@ -525,7 +525,7 @@ I represent and warrant that I am physically fit and sufficiently healthy to par
 
 ## 5. WAIVER AND RELEASE OF LIABILITY
 
-**TO THE FULLEST EXTENT PERMITTED BY TEXAS LAW, I HEREBY RELEASE, WAIVE, DISCHARGE, AND COVENANT NOT TO SUE** the Revocable Trust of Subhash Sonnad, its trustees, agents, employees, representatives, successors, and assigns (collectively, the "Released Parties") from **any and all liability, claims, demands, causes of action, costs, and expenses** (including attorneys' fees) arising out of or related to any loss, damage, or injury, including death, that may be sustained by me, or to any property belonging to me, **WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASED PARTIES OR OTHERWISE,** while participating in or using the facilities and amenities at 123 Main Stive, Your City, Texas 00000.
+**TO THE FULLEST EXTENT PERMITTED BY TEXAS LAW, I HEREBY RELEASE, WAIVE, DISCHARGE, AND COVENANT NOT TO SUE** the Revocable Trust of Subhash Sonnad, its trustees, agents, employees, representatives, successors, and assigns (collectively, the "Released Parties") from **any and all liability, claims, demands, causes of action, costs, and expenses** (including attorneys' fees) arising out of or related to any loss, damage, or injury, including death, that may be sustained by me, or to any property belonging to me, **WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASED PARTIES OR OTHERWISE,** while participating in or using the facilities and amenities at 7600 Stillridge Dr, Austin, Texas 78736.
 
 ## 6. INDEMNIFICATION
 
@@ -575,7 +575,7 @@ const DEFAULT_EVENT_WAIVER = `# WAIVER OF LIABILITY, ASSUMPTION OF RISK, AND IND
 ---
 
 **Property Owner:** Revocable Trust of Subhash Sonnad ("Owner")
-**Property Address:** 123 Main Stive, Your City, Texas 00000
+**Property Address:** 7600 Stillridge Dr, Austin, Texas 78736
 
 **Guest/Attendee:** {{client_name}} ("Participant")
 - **Email:** {{client_email}}
@@ -588,7 +588,7 @@ const DEFAULT_EVENT_WAIVER = `# WAIVER OF LIABILITY, ASSUMPTION OF RISK, AND IND
 
 ## 1. ACTIVITIES AND FACILITIES
 
-The Owner makes available certain recreational amenities and facilities on the property at 123 Main Stive, Your City, Texas 00000 (the "AWKN Ranch"), including but not limited to:
+The Owner makes available certain recreational amenities and facilities on the property at 7600 Stillridge Dr, Austin, Texas 78736 (the "AWKN Ranch"), including but not limited to:
 
 - **Hot sauna(s)** (dry sauna and/or infrared sauna)
 - **Cold plunge pool / ice bath**
@@ -620,7 +620,7 @@ I represent and warrant that I am physically fit and sufficiently healthy to par
 
 ## 5. WAIVER AND RELEASE OF LIABILITY
 
-**TO THE FULLEST EXTENT PERMITTED BY TEXAS LAW, I HEREBY RELEASE, WAIVE, DISCHARGE, AND COVENANT NOT TO SUE** the Revocable Trust of Subhash Sonnad, its trustees, agents, employees, representatives, event hosts, event organizers, successors, and assigns (collectively, the "Released Parties") from **any and all liability, claims, demands, causes of action, costs, and expenses** (including attorneys' fees) arising out of or related to any loss, damage, or injury, including death, that may be sustained by me, or to any property belonging to me, **WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASED PARTIES OR OTHERWISE,** while present at or using the facilities and amenities at 123 Main Stive, Your City, Texas 00000.
+**TO THE FULLEST EXTENT PERMITTED BY TEXAS LAW, I HEREBY RELEASE, WAIVE, DISCHARGE, AND COVENANT NOT TO SUE** the Revocable Trust of Subhash Sonnad, its trustees, agents, employees, representatives, event hosts, event organizers, successors, and assigns (collectively, the "Released Parties") from **any and all liability, claims, demands, causes of action, costs, and expenses** (including attorneys' fees) arising out of or related to any loss, damage, or injury, including death, that may be sustained by me, or to any property belonging to me, **WHETHER CAUSED BY THE NEGLIGENCE OF THE RELEASED PARTIES OR OTHERWISE,** while present at or using the facilities and amenities at 7600 Stillridge Dr, Austin, Texas 78736.
 
 ## 6. INDEMNIFICATION
 
@@ -663,8 +663,8 @@ Date: _________________________
 
 const DEFAULT_VEHICLE_RENTAL = `# VEHICLE RENTAL AGREEMENT
 
-**YOUR_APP_NAME Residency**
-123 Main Stive, Your City, TX 00000
+**AWKN Ranch Residency**
+7600 Stillridge Dr, Austin, TX 78736
 
 ---
 

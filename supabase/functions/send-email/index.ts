@@ -230,7 +230,7 @@ the AWKN Ranch property AI agent`
             </div>` : ''}
 
             <div style="background:#f5f0eb;border-radius:8px;padding:16px 20px;margin:24px 0;">
-              <p style="margin:0;color:#555;font-size:14px;line-height:1.6;">Please re-familiarize yourself with our key operational guidelines at this link: <a href="https://YOUR_DOMAIN/visiting" style="color:#d4883a;font-weight:600;">YOUR_DOMAIN/visiting</a> &mdash; which also has a map link to the property.</p>
+              <p style="margin:0;color:#555;font-size:14px;line-height:1.6;">Please re-familiarize yourself with our key operational guidelines at this link: <a href="https://laurenbur2.github.io/awkn-ranch/visiting" style="color:#d4883a;font-weight:600;">awknranch.com/visiting</a> &mdash; which also has a map link to the property.</p>
             </div>
 
             <div style="background:#fff8e1;border-left:4px solid #f9a825;padding:14px 20px;margin:24px 0;border-radius:0 8px 8px 0;">
@@ -253,7 +253,7 @@ ${data.lease_end_date ? `- Until: ${data.lease_end_date}` : ''}
 Next Steps:
 ${nextStepsText.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
-Please re-familiarize yourself with our key operational guidelines: https://YOUR_DOMAIN/visiting — which also has a map link to the property.
+Please re-familiarize yourself with our key operational guidelines: https://laurenbur2.github.io/awkn-ranch/visiting — which also has a map link to the property.
 
 Reminder: Please don't give the address out to potential guests. Instead, send them the visiting link so they can read the guidelines first.
 
@@ -469,7 +469,7 @@ the AWKN Ranch property AI agent`
 
       // Space link
       const spaceLink = data.space_id
-        ? `<a href="https://YOUR_DOMAIN/spaces/?id=${data.space_id}" style="color:${B.accent};font-weight:600;text-decoration:none;">${data.space_name}</a>`
+        ? `<a href="https://laurenbur2.github.io/awkn-ranch/spaces/?id=${data.space_id}" style="color:${B.accent};font-weight:600;text-decoration:none;">${data.space_name}</a>`
         : `<strong>${data.space_name}</strong>`;
 
       // Build detail rows using shared dataTable component
@@ -505,7 +505,7 @@ the AWKN Ranch property AI agent`
 
           ${miPaymentSection}
 
-          ${calloutBox(`<span style="font-size:13px;color:${B.text};line-height:1.5;">&#128218; Please re-familiarize yourself with our <a href="https://YOUR_DOMAIN/visiting" style="color:${B.accent};font-weight:600;">visiting &amp; operational guidelines</a> &mdash; which also has a map link to the property.</span>`)}
+          ${calloutBox(`<span style="font-size:13px;color:${B.text};line-height:1.5;">&#128218; Please re-familiarize yourself with our <a href="https://laurenbur2.github.io/awkn-ranch/visiting" style="color:${B.accent};font-weight:600;">visiting &amp; operational guidelines</a> &mdash; which also has a map link to the property.</span>`)}
 
           ${calloutBox(`<p style="margin:0;color:${B.textMuted};font-size:12px;line-height:1.5;"><strong style="color:${B.text};">Reminder:</strong> Please don't give the address out to potential guests. Instead, send them the visiting link above so they can read the guidelines first.</p>`, 'warning')}
 
@@ -521,7 +521,7 @@ ${dataTableText(detailRowData)}
 
 ${showPaymentMethods ? paymentMethodsText(data._payment_methods_raw, { memoText: 'rent' }) : ''}
 
-Please re-familiarize yourself with our operational guidelines: https://YOUR_DOMAIN/visiting
+Please re-familiarize yourself with our operational guidelines: https://laurenbur2.github.io/awkn-ranch/visiting
 
 Reminder: Please don't give the address out to potential guests. Instead, send them the visiting link so they can read the guidelines first.
 
@@ -685,7 +685,7 @@ the AWKN Ranch property AI agent`
               <p style="color:#7d6f74;font-size:15px;margin:16px 0 0;"><em>Yours generatively,</em><br><strong style="color:#2a1f23;">PAI</strong><br><span style="font-size:13px;">the AWKN Ranch property AI agent</span></p>
             </div>
             <div style="background:#f5f5f5;padding:20px 32px;text-align:center;border-top:1px solid #e0e0e0;">
-              <p style="margin:0;color:#bbb;font-size:11px;">YOUR_APP_NAME &bull; AWKN Ranch</p>
+              <p style="margin:0;color:#bbb;font-size:11px;">AWKN Team Portal &bull; AWKN Ranch</p>
             </div>
           </div>
         `,
@@ -788,27 +788,27 @@ the AWKN Ranch property AI agent`
       };
       const roleLabel = roleLabels[data.role as string] ?? "a user";
       const roleDescription = roleDescriptions[data.role as string] ?? "access to the platform";
-      const bannerUrl = "YOUR_SUPABASE_URL/storage/v1/object/public/housephotos/ai-gen/invite-banner-ghibli.png";
+      const bannerUrl = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/ai-gen/invite-banner-ghibli.png";
       return {
-        subject: "You're Invited to AWKN Ranch",
+        subject: "You're Invited to the AWKN Team Portal",
         html: `
           <div style="max-width:600px;margin:0 auto;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
             <!-- Header with gradient -->
             <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:40px 32px 24px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Welcome to YOUR_APP_NAME</h1>
-              <p style="margin:8px 0 0;color:#94a3b8;font-size:15px;font-weight:400;">AWKN Ranch &bull; Your City, Texas</p>
+              <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Welcome to the AWKN Team Portal</h1>
+              <p style="margin:8px 0 0;color:#94a3b8;font-size:15px;font-weight:400;">AWKN Ranch</p>
             </div>
 
             <!-- Body -->
             <div style="padding:32px;">
               <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">Hi there,</p>
-              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">You've been invited to join <strong style="color:#0f3460;">AWKN Ranch</strong> as ${roleLabel}. You'll have ${roleDescription}.</p>
+              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">You've been invited to join the <strong style="color:#0f3460;">AWKN Team Portal</strong> as ${roleLabel}. You'll have ${roleDescription}.</p>
 
               <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 24px;">Your access is <strong>pre-approved</strong> — just create your account and you're in.</p>
 
               <!-- CTA Button -->
               <div style="text-align:center;margin:32px 0;">
-                <a href="${data.login_url}" style="background:linear-gradient(135deg,#c2410c 0%,#ea580c 100%);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:16px;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(194,65,12,0.3);">Sign in to YOUR_APP_NAME</a>
+                <a href="${data.login_url}" style="background:linear-gradient(135deg,#c2410c 0%,#ea580c 100%);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:16px;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(194,65,12,0.3);">Sign in to the AWKN Team Portal</a>
               </div>
 
               <!-- Getting started card -->
@@ -830,7 +830,7 @@ the AWKN Ranch property AI agent`
                 </table>
               </div>
 
-              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:24px 0 0;">Questions? Just reply to this email.</p>
+              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:24px 0 0;">Questions or trouble signing in? Email <a href="mailto:admin@awknranch.com" style="color:#c2410c;">admin@awknranch.com</a>.</p>
             </div>
 
             <!-- Property art banner -->
@@ -840,28 +840,27 @@ the AWKN Ranch property AI agent`
 
             <!-- Footer -->
             <div style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;color:#94a3b8;font-size:12px;">AWKN Ranch &bull; 123 Main St, Your City, ST 00000</p>
-              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">YOUR_APP_NAME &bull; Where the herd gathers</p>
+              <p style="margin:0;color:#94a3b8;font-size:12px;">AWKN Ranch</p>
+              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">Where the herd gathers</p>
             </div>
           </div>
         `,
-        text: `Welcome to AWKN Ranch!
+        text: `Welcome to the AWKN Team Portal!
 
 Hi there,
 
-You've been invited to join AWKN Ranch as ${roleLabel}. You'll have ${roleDescription}.
+You've been invited to join the AWKN Team Portal as ${roleLabel}. You'll have ${roleDescription}.
 
-Your access is pre-approved — just create your account and you're in.
+Your access is pre-approved — just sign in and you're in.
 
 Getting Started:
 1. Go to: ${data.login_url}
 2. Sign in with ${data.email} — use "Continue with Google" (one tap) or create a password
 3. That's it — you'll have immediate access
 
-Questions? Just reply to this email.
+Questions or trouble signing in? Email admin@awknranch.com.
 
-— The YOUR_APP_NAME Team
-AWKN Ranch • 123 Main St, Your City, ST 00000`
+— The AWKN Ranch Team`
       };
     }
 
@@ -870,7 +869,7 @@ AWKN Ranch • 123 Main St, Your City, ST 00000`
         subject: "You're Invited to Browse Spaces - AWKN Ranch",
         html: `
           <h2>Welcome${data.first_name ? ', ' + data.first_name : ''}!</h2>
-          <p>You've been invited to browse available spaces at <strong>AWKN Ranch</strong>, a unique co-living community in Your City, Texas.</p>
+          <p>You've been invited to browse available spaces at <strong>AWKN Ranch</strong>, a unique co-living community in Austin, Texas.</p>
           <p>No account or login is needed — just click the button below to start browsing. You'll be able to see photos, amenities, pricing, and availability for all of our spaces.</p>
           <p style="margin: 30px 0; text-align: center;">
             <a href="${data.access_url}" style="background:${B.accent}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 16px;">Browse Available Spaces</a>
@@ -879,14 +878,14 @@ AWKN Ranch • 123 Main St, Your City, ST 00000`
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
           <p>When you're ready, you can also:</p>
           <ul style="line-height: 1.8;">
-            <li><a href="https://YOUR_DOMAIN/spaces/apply/">Apply for a rental space</a></li>
-            <li><a href="https://YOUR_DOMAIN/spaces/hostevent/">Host an event</a></li>
+            <li><a href="https://laurenbur2.github.io/awkn-ranch/spaces/apply/">Apply for a rental space</a></li>
+            <li><a href="https://laurenbur2.github.io/awkn-ranch/spaces/hostevent/">Host an event</a></li>
           </ul>
           <p>If you have any questions or would like to schedule a tour, just reply to this email.</p>
         `,
         text: `Welcome${data.first_name ? ', ' + data.first_name : ''}!
 
-You've been invited to browse available spaces at AWKN Ranch, a unique co-living community in Your City, Texas.
+You've been invited to browse available spaces at AWKN Ranch, a unique co-living community in Austin, Texas.
 
 No account or login is needed — just click the link below to start browsing:
 
@@ -897,8 +896,8 @@ You'll be able to see photos, amenities, pricing, and availability for all of ou
 This link is personal to you and will expire in 14 days.
 
 When you're ready, you can also:
-- Apply for a rental space: https://YOUR_DOMAIN/spaces/apply/
-- Host an event: https://YOUR_DOMAIN/spaces/hostevent/
+- Apply for a rental space: https://laurenbur2.github.io/awkn-ranch/spaces/apply/
+- Host an event: https://laurenbur2.github.io/awkn-ranch/spaces/hostevent/
 
 If you have any questions or would like to schedule a tour, just reply to this email.
 
@@ -1122,7 +1121,7 @@ After answering, remember to recompile the context so future visitors get better
         subject: `[Website Contact] ${data.subject || 'General Inquiry'}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333; margin-bottom: 4px;">${data.name || 'Someone'} submitted a message from YOUR_DOMAIN</h2>
+            <h2 style="color: #333; margin-bottom: 4px;">${data.name || 'Someone'} submitted a message from awknranch.com</h2>
             <p style="color: #888; font-size: 13px; margin-top: 0;">${data.subject || 'General Inquiry'}</p>
             ${dataTable([
               { label: 'Name', value: data.name || 'Not provided' },
@@ -1135,7 +1134,7 @@ After answering, remember to recompile the context so future visitors get better
             ${data.email ? `<p style="margin-top: 20px;"><a href="mailto:${data.email}" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500; font-size: 14px;">Reply to ${data.name || data.email}</a></p>` : ''}
           </div>
         `,
-        text: `${data.name || 'Someone'} submitted a message from YOUR_DOMAIN
+        text: `${data.name || 'Someone'} submitted a message from awknranch.com
 
 Name: ${data.name || 'Not provided'}
 Email: ${data.email || 'Not provided'}
@@ -1160,7 +1159,7 @@ ${data.message || 'No message'}`
             { label: 'Page', value: `<a href="${data.page_url}">${data.page_name}</a>` },
           ])}
           ${data.message ? `<div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #d4883a; margin: 16px 0; white-space: pre-wrap;">${data.message}</div>` : ''}
-          <p style="margin-top: 20px;"><a href="https://YOUR_DOMAIN/spaces/admin/users.html" style="background: #d4883a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500;">Manage Users</a></p>
+          <p style="margin-top: 20px;"><a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/users.html" style="background: #d4883a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500;">Manage Users</a></p>
         `,
         text: `Access Request
 
@@ -1173,7 +1172,7 @@ Page: ${data.page_name}
 URL: ${data.page_url}
 ${data.message ? `\nMessage: ${data.message}` : ''}
 
-Manage users: https://YOUR_DOMAIN/spaces/admin/users.html`
+Manage users: https://laurenbur2.github.io/awkn-ranch/spaces/admin/users.html`
       };
 
     // ===== COMMUNITY FIT INQUIRY =====
@@ -1182,7 +1181,7 @@ Manage users: https://YOUR_DOMAIN/spaces/admin/users.html`
         subject: `[Community Fit] ${data.name || 'New Inquiry'}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333; margin-bottom: 4px;">${data.name || 'Someone'} submitted an inquiry from YOUR_DOMAIN</h2>
+            <h2 style="color: #333; margin-bottom: 4px;">${data.name || 'Someone'} submitted an inquiry from awknranch.com</h2>
             <p style="color: #888; font-size: 13px; margin-top: 0;">Community Fit Inquiry</p>
 
             ${dataTable([
@@ -1216,10 +1215,10 @@ Manage users: https://YOUR_DOMAIN/spaces/admin/users.html`
             <img src="${data.photo_url}" style="max-width: 200px; border-radius: 8px; border: 1px solid #eee;" />
             ` : ''}
 
-            <p style="margin-top: 24px;"><a href="https://YOUR_DOMAIN/spaces/admin/rentals.html" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500; font-size: 14px;">View in Rentals Pipeline</a></p>
+            <p style="margin-top: 24px;"><a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/rentals.html" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 500; font-size: 14px;">View in Rentals Pipeline</a></p>
           </div>
         `,
-        text: `${data.name || 'Someone'} submitted an inquiry from YOUR_DOMAIN
+        text: `${data.name || 'Someone'} submitted an inquiry from awknranch.com
 
 Name: ${data.name || 'Not provided'}
 Email: ${data.email || 'Not provided'}
@@ -1460,7 +1459,7 @@ If the fix doesn't look right, submit another bug report and we'll take another 
           ${data.notes ? `<p><strong>Notes:</strong> ${data.notes}</p>` : ''}
 
           <div style="margin: 20px 0;">
-            <a href="https://YOUR_DOMAIN/spaces/admin/appdev.html" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; margin-right: 10px;">Review in App Dev Console</a>
+            <a href="https://laurenbur2.github.io/awkn-ranch/spaces/admin/appdev.html" style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; margin-right: 10px;">Review in App Dev Console</a>
             ${compareUrl ? `<a href="${compareUrl}" style="background: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">View Diff on GitHub</a>` : ''}
           </div>
 
@@ -1489,7 +1488,7 @@ RISK ASSESSMENT:
 
 ${data.notes ? `Notes: ${data.notes}` : ''}
 
-Review in App Dev Console: https://YOUR_DOMAIN/spaces/admin/appdev.html
+Review in App Dev Console: https://laurenbur2.github.io/awkn-ranch/spaces/admin/appdev.html
 ${compareUrl ? `View diff: ${compareUrl}` : ''}
 
 To deploy: click "Approve & Merge" in the App Dev console, or merge the branch manually on GitHub.
@@ -1505,7 +1504,7 @@ To reject: delete the branch on GitHub.`
       const isReview = data.deploy_decision === 'branched_for_review';
       const isAdminApproved = data.deploy_decision === 'admin_approved';
       const compareUrl = data.branch_name ? `https://github.com/USERNAME/REPO/compare/${data.branch_name}` : '';
-      const pageUrl = data.page_url ? `https://YOUR_DOMAIN${data.page_url}` : '';
+      const pageUrl = data.page_url ? `https://laurenbur2.github.io/awkn-ranch${data.page_url}` : '';
 
       return {
         senderType: 'claudero',
@@ -1788,7 +1787,7 @@ This is an automated reply from PAI at AWKN Ranch.`
         subject: `PAI Document Upload: ${data.file_count || 1} file(s) from ${data.sender_name || data.sender_email}`,
         html: `
           <h2 style="color: #3d8b7a;">Document Received via PAI Email</h2>
-          <p><strong>${data.sender_name || 'Unknown'}</strong> (${data.sender_email}) sent ${data.file_count || 1} document(s) to <code>pai@YOUR_DOMAIN</code>.</p>
+          <p><strong>${data.sender_name || 'Unknown'}</strong> (${data.sender_email}) sent ${data.file_count || 1} document(s) to <code>pai@awknranch.com</code>.</p>
 
           <div style="background: #f0faf7; padding: 15px; border-radius: 8px; border-left: 4px solid #3d8b7a; margin: 15px 0;">
             <strong>Subject:</strong> ${data.original_subject || '(none)'}<br>
@@ -1799,11 +1798,11 @@ This is an automated reply from PAI at AWKN Ranch.`
           <ul>${fileListHtml}</ul>
 
           <p>Files have been uploaded to R2 and added to the <strong>document index</strong> as <strong>inactive</strong> (pending admin review).</p>
-          <p><a href="${data.admin_url || 'https://YOUR_DOMAIN/spaces/admin/manage.html'}" style="background: #3d8b7a; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">Review in Admin</a></p>
+          <p><a href="${data.admin_url || 'https://laurenbur2.github.io/awkn-ranch/spaces/admin/manage.html'}" style="background: #3d8b7a; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">Review in Admin</a></p>
         `,
         text: `PAI Document Upload
 
-${data.sender_name || 'Unknown'} (${data.sender_email}) sent ${data.file_count || 1} document(s) to pai@YOUR_DOMAIN.
+${data.sender_name || 'Unknown'} (${data.sender_email}) sent ${data.file_count || 1} document(s) to pai@awknranch.com.
 
 Subject: ${data.original_subject || '(none)'}
 ${data.message_body ? `Message: ${data.message_body.substring(0, 500)}` : ''}
@@ -1853,7 +1852,7 @@ Thank you for signing. If you have any questions, contact us at (737) 747-4737.`
       const suggestion = isClockIn
         ? 'a quick "before" photo of the space before you start working'
         : 'an "after" photo showing your completed work';
-      const workPageUrl = 'https://YOUR_DOMAIN/associates/worktracking.html';
+      const workPageUrl = 'https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html';
       return {
         subject: `Reminder: Upload ${isClockIn ? 'Before' : 'After'} Photos for Your Work Session`,
         html: `
@@ -1916,7 +1915,7 @@ the AWKN Ranch property AI agent`
           <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:0 0 20px;text-align:center;">
             <p style="margin:0;font-weight:700;color:#92400e;font-size:15px;">📸 Before Photos Required</p>
             <p style="margin:8px 0 12px;color:#92400e;font-size:13px;">Take a photo of the work area before you start.</p>
-            <a href="https://YOUR_DOMAIN/associates/worktracking.html" style="display:inline-block;background:#3d8b7a;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Upload Photos</a>
+            <a href="https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html" style="display:inline-block;background:#3d8b7a;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Upload Photos</a>
           </div>
 
           <p style="margin:16px 0 0;color:#7d6f74;font-size:13px;">This is an automated clock-in summary from AWKN Ranch work tracking.</p>
@@ -1930,7 +1929,7 @@ ${tasks.length > 0 ? tasks.map((t: any) => `• ${t.title}${t.location ? ` (${t.
 
 BEFORE PHOTOS REQUIRED
 Take a photo of the work area before you start.
-Upload: https://YOUR_DOMAIN/associates/worktracking.html
+Upload: https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html
 
 This is an automated clock-in summary from AWKN Ranch work tracking.`,
       };
@@ -2143,7 +2142,7 @@ This is an automated summary from AWKN Ranch work tracking.`
 
           ${todoSection}
 
-          <p style="margin:24px 0 0;font-size:13px;color:#7d6f74;">Clock in at <a href="https://YOUR_DOMAIN/associates/worktracking.html" style="color:#d4883a;">YOUR_DOMAIN</a> to get started. Your task list will be waiting for you.</p>
+          <p style="margin:24px 0 0;font-size:13px;color:#7d6f74;">Clock in at <a href="https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html" style="color:#d4883a;">awknranch.com</a> to get started. Your task list will be waiting for you.</p>
         `,
         text: `New Task Assigned to You
 
@@ -2156,7 +2155,7 @@ ${taskLocation ? `Location: ${taskLocation}` : ''}
 
 ${todoTasks.length > 0 ? `Your Prioritized To-Do List:\n${todoText}` : ''}
 
-Clock in at https://YOUR_DOMAIN/associates/worktracking.html to get started.
+Clock in at https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html to get started.
 
 — AWKN Ranch`
       };
@@ -2517,7 +2516,7 @@ async function holdForApproval(
       <div style="border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">${finalHtml}</div>
     </div>
     <div style="padding:16px 24px;background:#f4f4f4;text-align:center;">
-      <p style="color:#999;font-size:11px;margin:0;">YOUR_APP_NAME Email Approval System</p>
+      <p style="color:#999;font-size:11px;margin:0;">AWKN Team Portal Email Approval System</p>
     </div>
   </div>
 </body></html>`;
@@ -2526,9 +2525,9 @@ async function holdForApproval(
     method: "POST",
     headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "YOUR_APP_NAME <noreply@YOUR_DOMAIN>",
-      to: ["admin@YOUR_DOMAIN"],
-      reply_to: "team@YOUR_DOMAIN",
+      from: "AWKN Team Portal <noreply@awknranch.com>",
+      to: ["admin@awknranch.com"],
+      reply_to: "team@awknranch.com",
       subject: `[Approval Required] ${typeLabel}: ${subject}`,
       html: reviewHtml,
       text: `Email Approval Required\nType: ${typeLabel}\nTo: ${recipientList}\nSubject: ${subject}\n\nApprove: ${approveOneUrl}\nApprove All: ${approveAllUrl}`,
@@ -2590,8 +2589,8 @@ serve(async (req) => {
       }
     }
 
-    // === ALWAYS BCC admin@YOUR_DOMAIN ===
-    const ARCHIVE_BCC = "admin@YOUR_DOMAIN";
+    // === ALWAYS BCC archive inbox ===
+    const ARCHIVE_BCC = "justin@within.center";
     const toArray = Array.isArray(to) ? to : [to];
     const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : undefined;
     const userBcc = bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : [];

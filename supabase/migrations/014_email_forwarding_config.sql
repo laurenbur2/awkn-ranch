@@ -80,8 +80,8 @@ INSERT INTO email_forwarding_config (address_prefix, forward_to, label, is_activ
   ('haydn', 'hUSERNAME@gmail.com', 'Haydn personal', true),
   ('rahulio', 'rahulioson@gmail.com', 'Rahulio personal', true),
   ('sonia', 'sonia245g@gmail.com', 'Sonia personal', true),
-  ('team', 'admin@YOUR_DOMAIN', 'Main inbox', true)
+  ('team', 'admin@awknranch.com', 'Main inbox', true)
 ON CONFLICT (address_prefix, forward_to) DO NOTHING;
 
 -- Add comment to table
-COMMENT ON TABLE email_forwarding_config IS 'Configuration for routing inbound emails received at @YOUR_DOMAIN to specific destinations';
+COMMENT ON TABLE email_forwarding_config IS 'Configuration for routing inbound emails received at @awknranch.com to specific destinations';

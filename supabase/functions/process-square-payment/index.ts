@@ -5,7 +5,7 @@
  * Supports per-session test mode override for staff/admin users.
  *
  * Deploy with: supabase functions deploy process-square-payment
- * Endpoint: YOUR_SUPABASE_URL/functions/v1/process-square-payment
+ * Endpoint: https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/process-square-payment
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';

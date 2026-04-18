@@ -1,4 +1,4 @@
-package com.yourorg.app;
+package com.awknranch.app;
 
 import com.getcapacitor.BridgeActivity;
 

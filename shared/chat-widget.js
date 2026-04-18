@@ -1,7 +1,7 @@
 // Chat Widget for AWKN Ranch
 // Uses Edge Function proxy to call Gemini API (keeps API key secure)
 
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const ASK_QUESTION_URL = `${SUPABASE_URL}/functions/v1/ask-question`;
 
@@ -107,11 +107,11 @@ async function sendAdminNotification(question, userEmail) {
       },
       body: JSON.stringify({
         type: 'faq_unanswered',
-        to: 'admin@YOUR_DOMAIN',
+        to: 'admin@awknranch.com',
         data: {
           question,
           user_email: userEmail || 'Not provided',
-          faq_admin_url: 'https://YOUR_DOMAIN/spaces/admin/faq.html'
+          faq_admin_url: 'https://laurenbur2.github.io/awkn-ranch/spaces/admin/faq.html'
         }
       })
     });

@@ -252,7 +252,7 @@ ${!hasStripe ? `<div style="background:#fff8e1;border-left:4px solid #f9a825;pad
         },
         body: JSON.stringify({
           type: "weekly_payroll_summary",
-          to: "admin@YOUR_DOMAIN", // admin receives it
+          to: "admin@awknranch.com", // admin receives it
           subject: `Weekly Payroll — ${name} — $${amount.toFixed(2)} (${period})`,
           data: {
             _raw_html: fullHtml,

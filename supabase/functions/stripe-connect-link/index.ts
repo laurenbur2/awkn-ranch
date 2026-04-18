@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
     }
 
     // Generate fresh account link
-    const baseUrl = 'https://YOUR_DOMAIN/associates/worktracking.html';
+    const baseUrl = 'https://laurenbur2.github.io/awkn-ranch/associates/worktracking.html';
     const response = await fetch('https://api.stripe.com/v1/account_links', {
       method: 'POST',
       headers: {

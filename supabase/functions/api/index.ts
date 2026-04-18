@@ -1,5 +1,5 @@
 /**
- * YOUR_APP_NAME Internal REST API
+ * AWKN Team Portal Internal REST API
  *
  * Single edge function that acts as a centralized, permissioned gateway
  * for all entity CRUD operations. Replaces ad-hoc Supabase queries scattered

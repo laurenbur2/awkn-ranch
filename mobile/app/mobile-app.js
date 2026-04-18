@@ -1,6 +1,6 @@
 /**
  * Mobile App - Auth, tab switching, lazy initialization
- * Single-page app orchestrator for the YOUR_APP_NAME mobile app.
+ * Single-page app orchestrator for the AWKN Ranch mobile app.
  */
 
 import { initAuth, getAuthState, signOut, signInWithPassword, signInWithGoogle, onAuthStateChange, hasPermission } from '../../shared/auth.js';

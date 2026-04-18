@@ -178,7 +178,7 @@ function generateIcal(spaceName: string, assignments: any[]): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    `PRODID:-//YOUR_APP_NAME//${spaceName}//EN`,
+    `PRODID:-//AWKN Team Portal//${spaceName}//EN`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     `X-WR-CALNAME:${spaceName}`,
