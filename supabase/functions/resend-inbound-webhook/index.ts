@@ -231,7 +231,7 @@ async function handleSpecialLogic(
   } else if (type === "claudero") {
     await handleClauderoEmail(emailRecord, supabase, resendApiKey);
   } else if (type === "ai-admin") {
-    await handleAI AdminEmail(emailRecord, supabase, resendApiKey);
+    await handleAIAdminEmail(emailRecord, supabase, resendApiKey);
   } else if (type === "guestbook") {
     await handleGuestbookEmail(emailRecord, supabase);
   } else if (type === "herd") {
@@ -964,7 +964,7 @@ This is an automated reply from PAI at AWKN Ranch.`;
 /**
  * Send a reply email from AlpaClaw.
  */
-async function sendAI AdminReply(
+async function sendAIAdminReply(
   resendApiKey: string,
   to: string,
   replyBody: string,
@@ -1035,7 +1035,7 @@ This is an automated reply from AlpaClaw at AWKN Ranch.`;
  * so that the ai-admin_addendum (AlpaClaw personality) is injected.
  * Sends reply back via email from ai-admin@.
  */
-async function handleAI AdminEmail(
+async function handleAIAdminEmail(
   emailRecord: any,
   supabase: any,
   resendApiKey: string
@@ -1079,7 +1079,7 @@ async function handleAI AdminEmail(
       replyText = `Thank you for your email! I've received your message and I'll do my best to help.\n\nFor faster responses, you can also chat with me on Discord at the Alpacord server, or visit https://laurenbur2.github.io/awkn-ranch/residents/ (requires resident login).`;
     }
 
-    const sendResult = await sendAI AdminReply(resendApiKey, senderEmail, replyText, subject, bodyText || bodyHtml || "");
+    const sendResult = await sendAIAdminReply(resendApiKey, senderEmail, replyText, subject, bodyText || bodyHtml || "");
     await supabase.from("api_usage_log").insert({
       vendor: "supabase",
       category: "ai-admin_email_reply_attempt",
@@ -1105,7 +1105,7 @@ async function handleAI AdminEmail(
     }
   } catch (err) {
     console.error(`AlpaClaw response error: ${err.message}`);
-    const sendResult = await sendAI AdminReply(
+    const sendResult = await sendAIAdminReply(
       resendApiKey,
       senderEmail,
       "Thank you for your email! I've received your message and the team will review it shortly.\n\nFor immediate assistance, you can reach us on Discord or at https://laurenbur2.github.io/awkn-ranch/residents/.",
