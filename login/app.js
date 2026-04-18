@@ -22,10 +22,17 @@ const tabSignUp = document.getElementById('tabSignUp');
 const signInPane = document.getElementById('signInPane');
 const signUpPane = document.getElementById('signUpPane');
 
-// Get redirect URL from query params or localStorage (survives OAuth round-trip)
+// One-shot purge of the legacy localStorage key. Earlier builds stashed the
+// post-login redirect in localStorage, which outlives the OAuth round-trip AND
+// the browser session — so a stale destination (e.g. the old spaces.html
+// landing) would keep winning over the Dashboard default on every future login.
+// We now stash in sessionStorage, and nuke the legacy key once per browser.
+try { localStorage.removeItem('awkn-ranch-login-redirect'); } catch (e) { /* ignore */ }
+
+// Get redirect URL from query params or sessionStorage (survives OAuth round-trip).
 const urlParams = new URLSearchParams(window.location.search);
 const redirectUrl = urlParams.get('redirect')
-  || localStorage.getItem('awkn-ranch-login-redirect')
+  || sessionStorage.getItem('awkn-ranch-login-redirect')
   || '/awkn-ranch/spaces/admin/dashboard.html';
 
 console.log('[LOGIN]', 'Page loaded', { redirectUrl, href: window.location.href });
@@ -99,7 +106,7 @@ async function init() {
       if (age < 90 * 24 * 60 * 60 * 1000 && ['oracle', 'admin', 'staff', 'resident', 'associate', 'public'].includes(cached.role)) {
         const targetUrl = getRedirectTarget(cached.role);
         console.log('[LOGIN]', 'Cached auth found, redirecting immediately', { email: cached.email, role: cached.role });
-        localStorage.removeItem('awkn-ranch-login-redirect');
+        sessionStorage.removeItem('awkn-ranch-login-redirect');
         window.location.href = targetUrl;
         return;
       }
@@ -158,7 +165,7 @@ function checkAuthAndRedirect() {
     if (state.isAuthorized) {
       const targetUrl = getRedirectTarget(state.role);
       console.log('[LOGIN]', 'Authorized — redirecting to:', targetUrl);
-      localStorage.removeItem('awkn-ranch-login-redirect');
+      sessionStorage.removeItem('awkn-ranch-login-redirect');
       window.location.href = targetUrl;
     } else if (state.isUnauthorized) {
       console.log('[LOGIN]', 'Authenticated but unauthorized');
@@ -281,7 +288,8 @@ googleSignInBtn.addEventListener('click', async () => {
   try {
     // Redirect URL: use just /login/ so Supabase can append ?code= cleanly (PKCE flow)
     // We store the intended destination in sessionStorage so it survives the OAuth round-trip
-    localStorage.setItem('awkn-ranch-login-redirect', redirectUrl);
+    // (but not beyond the browser session — prevents stale destinations winning future logins).
+    sessionStorage.setItem('awkn-ranch-login-redirect', redirectUrl);
     // In Capacitor (native app), use the custom URL scheme for OAuth redirect
     const isCapacitor = window.Capacitor?.isNativePlatform?.() ?? false;
     const loginRedirect = isCapacitor
