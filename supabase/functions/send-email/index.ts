@@ -2609,7 +2609,7 @@ This is an automated weekly schedule report from AWKN Ranch.`
       <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;line-height:1.4;">7600 Grove Crest Circle<br>Austin, TX</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);margin-top:10px;">Gate code: <strong style="color:#c9943e;letter-spacing:0.05em;">2321#</strong> (enter)</div>
     </div>
-    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Maps sometimes routes through the commercial gate off 71 — we prefer the neighborhood entrance. Through the gate, <strong style="color:#1c1618;">go straight (don't turn left)</strong>, come up to the retreat house next to the yurts, and park there. We're a secluded ranch, 15 minutes from downtown. Trouble finding it? Call Shannon.</p>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Maps sometimes routes through the commercial gate off 71 — we prefer the neighborhood entrance. Through the gate, <strong style="color:#1c1618;">go straight (don't turn left)</strong>, come up to the retreat house next to the yurts, and park there. We're a secluded ranch, 15 minutes from downtown. Trouble finding it or any questions day-of? Call or text Justin at <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a>.</p>
   </div>
 
   <!-- Your team -->
@@ -2624,12 +2624,12 @@ This is an automated weekly schedule report from AWKN Ranch.`
     <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Shannon Grossman</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Admissions</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding services to your experience, or help finding the ranch on your first visit.</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding services to your experience.</div>
     </div>
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — an email away. <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a></div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all, including directions or questions day-of — call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
     </div>
     <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, retreat care, and operations — the whole team looks forward to meeting you.</p>
   </div>
@@ -2701,11 +2701,12 @@ FINDING US
 7600 Grove Crest Circle, Austin, TX
 Gate code: 2321# (enter)
 Through the gate, go straight (don't turn left), come up to the retreat house next to the yurts, and park there.
+Trouble finding it or any questions day-of? Call or text Justin at 512-796-1886.
 
 YOUR CORE TEAM
 - Leslie Glace — Clinic Scheduler & Client Care · leslie@within.center
 - Shannon Grossman — Admissions
-- Justin De La Cruz — Managing Director · justin@within.center
+- Justin De La Cruz — Managing Director · 512-796-1886 · justin@within.center
 
 JOIN THE WHATSAPP COMMUNITY
 https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt
