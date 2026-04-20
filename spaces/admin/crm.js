@@ -775,6 +775,7 @@ async function openLeadDetail(leadId) {
               <div class="crm-menu" id="crm-more-menu" style="display:none">
                 ${lead.business_line === 'within' ? '<button class="crm-menu-item" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
                 ${lead.business_line === 'awkn_ranch' ? '<button class="crm-menu-item" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
+                ${lead.business_line === 'within' && lead.email ? '<button class="crm-menu-item" id="btn-send-welcome-letter">Send Welcome Letter</button>' : ''}
                 ${lead.email ? '<button class="crm-menu-item" id="btn-send-feedback">Send Feedback Form</button>' : ''}
                 ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-success" id="btn-mark-won">Mark Won</button>' : ''}
                 ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-danger" id="btn-mark-lost">Mark Lost</button>' : ''}
@@ -1283,6 +1284,143 @@ The ${bizLabel} Team</textarea>
     });
 
     document.getElementById('btn-cancel-feedback').addEventListener('click', () => {
+      form.style.display = 'none';
+    });
+  });
+
+  // Send Welcome Letter — Within Center HEAL package welcome with prep instructions.
+  // "What's included" pulls from the most recently sent proposal's line items.
+  document.getElementById('btn-send-welcome-letter')?.addEventListener('click', () => {
+    const form = openInlineActionForm();
+    const leadProposals = proposals
+      .filter(p => p.lead_id === lead.id)
+      .sort((a, b) => new Date(b.sent_at || b.created_at || 0) - new Date(a.sent_at || a.created_at || 0));
+
+    const proposalOptions = leadProposals.length > 0
+      ? leadProposals.map((p, i) => {
+          const label = `${p.proposal_number || 'Draft'} — ${p.title || 'Untitled'} · ${p.status || 'draft'}`;
+          return `<option value="${p.id}" ${i === 0 ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+        }).join('')
+      : '';
+
+    form.innerHTML = `
+      <h4 class="crm-inline-form-title">Send Welcome Letter</h4>
+      <div class="crm-form-field">
+        <label>To</label>
+        <input type="email" class="crm-input" id="welcome-to" value="${escapeHtml(lead.email || '')}" readonly style="background:#f3f4f6">
+      </div>
+      <div class="crm-form-field">
+        <label>Pull package from proposal</label>
+        ${leadProposals.length > 0
+          ? `<select class="crm-select" id="welcome-proposal">${proposalOptions}</select>`
+          : `<div class="crm-muted" style="font-size:13px;padding:6px 0;">No proposals on this lead yet — will send with the default HEAL package list. Create a proposal first to customize.</div>`}
+      </div>
+      <div class="crm-form-row" style="display:flex;gap:12px;">
+        <div class="crm-form-field" style="flex:1;">
+          <label>First session date (optional)</label>
+          <input type="date" class="crm-input" id="welcome-session-date">
+        </div>
+        <div class="crm-form-field" style="flex:1;">
+          <label>Arrive by (optional)</label>
+          <input type="text" class="crm-input" id="welcome-arrival-time" placeholder="e.g. 9:30 AM">
+        </div>
+      </div>
+      <div class="crm-form-actions">
+        <button class="crm-btn crm-btn-sm" id="btn-preview-welcome">Preview Email</button>
+        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-welcome">Send Welcome Letter</button>
+        <button class="crm-btn crm-btn-sm" id="btn-cancel-welcome">Cancel</button>
+      </div>
+    `;
+
+    const buildPayload = (preview) => {
+      const proposalId = document.getElementById('welcome-proposal')?.value;
+      const proposal = leadProposals.find(p => p.id === proposalId);
+      const items = (proposal?.items || [])
+        .slice()
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      return {
+        type: 'welcome_letter',
+        to: lead.email,
+        preview: preview || undefined,
+        data: {
+          recipient_first_name: lead.first_name || 'there',
+          business_line: lead.business_line || 'within',
+          proposal_title: proposal?.title || 'Your Program',
+          session_date: document.getElementById('welcome-session-date')?.value || null,
+          arrival_time: document.getElementById('welcome-arrival-time')?.value.trim() || null,
+          line_items: items.map(li => ({
+            description: li.description,
+            quantity: li.quantity,
+          })),
+        },
+      };
+    };
+
+    document.getElementById('btn-preview-welcome').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-preview-welcome');
+      const prevLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Loading preview…';
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const token = session?.session?.access_token;
+        if (!token) throw new Error('Not authenticated');
+        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          body: JSON.stringify(buildPayload(true)),
+        });
+        const result = await resp.json().catch(() => ({}));
+        if (!resp.ok || !result.html) throw new Error(result.error || 'Preview failed (HTTP ' + resp.status + ')');
+        showProposalPreviewModal({
+          subject: result.subject || 'Welcome Letter preview',
+          html: result.html,
+          from: result.from || '',
+          to: (result.to && result.to[0]) || lead.email || 'preview@example.com',
+        });
+      } catch (err) {
+        console.error('Welcome preview error:', err);
+        showToast('Preview failed: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+      }
+    });
+
+    document.getElementById('btn-confirm-send-welcome').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-confirm-send-welcome');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const token = session?.session?.access_token;
+        if (!token) throw new Error('Not authenticated');
+        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          body: JSON.stringify(buildPayload(false)),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || 'Send failed (HTTP ' + resp.status + ')');
+        }
+        await addActivity(lead.id, 'email', `Welcome letter sent to ${lead.email}`);
+        showToast('Welcome letter sent', 'success');
+        form.style.display = 'none';
+        await openLeadDetail(lead.id);
+      } catch (err) {
+        console.error('Welcome send error:', err);
+        showToast('Send failed: ' + (err.message || err), 'error');
+        btn.disabled = false;
+        btn.textContent = 'Send Welcome Letter';
+      }
+    });
+
+    document.getElementById('btn-cancel-welcome').addEventListener('click', () => {
       form.style.display = 'none';
     });
   });

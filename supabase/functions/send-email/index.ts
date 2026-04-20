@@ -45,6 +45,8 @@ type EmailType =
   | "prospect_invitation"
   // CRM proposal sent (with Stripe payment link)
   | "proposal_sent"
+  // Within Center welcome letter (HEAL package, prep instructions)
+  | "welcome_letter"
   // Admin notifications
   | "admin_event_request"
   | "admin_rental_application"
@@ -2455,6 +2457,266 @@ This is an automated weekly schedule report from AWKN Ranch.`
       };
     }
 
+    case "welcome_letter": {
+      // Within Center welcome letter for clients entering a ketamine program.
+      // "What's included" is rendered from the proposal line items sent to the lead.
+      const firstName = String(data.recipient_first_name || "there");
+      const isWithin = data.business_line !== "awkn_ranch";
+      const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
+      const sessionDate = data.session_date
+        ? new Date(data.session_date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+        : "TBD";
+      const arrivalTime = String(data.arrival_time || "30 min early");
+      const proposalTitle = String(data.proposal_title || "Your Program");
+
+      const includedItems = lineItems.length > 0
+        ? lineItems.map((li: any) => {
+            const qty = Number(li.quantity || 1);
+            const desc = String(li.description || "");
+            const label = qty > 1 ? `<strong>${qty} ×</strong> ${desc}` : desc;
+            return `<li>${label}</li>`;
+          }).join("")
+        : `
+            <li><strong>3 ×</strong> Personalized guided ketamine sessions</li>
+            <li><strong>3 ×</strong> Integration coaching sessions</li>
+            <li>1-month AWKN membership — saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community</li>
+            <li>Access to on-site wellness amenities and events as available</li>
+          `;
+
+      return {
+        subject: `Welcome to Within Center — ${proposalTitle}`,
+        html: `
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
+
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">WITHIN CENTER</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">at AWKN Ranch · Austin, Texas</div>
+  </div>
+
+  <!-- Welcome hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Welcome · ${proposalTitle}</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">We're honored to walk this with you, ${firstName}.</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">You're in good hands. Our whole team — medical, integration, guides, care, and operations — is here to hold you through this, mind, body, and spirit.</p>
+  </div>
+
+  <!-- What's included -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Outpatient Program Includes</div>
+      <ul style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.85;margin:0;padding-left:18px;">
+        ${includedItems}
+      </ul>
+    </div>
+  </div>
+
+  <!-- First session details -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="border:1px solid rgba(201,148,62,0.25);border-radius:4px;padding:20px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;">First Session</td>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;text-align:right;">Arrive By</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#1c1618;font-weight:500;">${sessionDate}</td>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#c9943e;font-weight:500;text-align:right;">${arrivalTime}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;padding-top:10px;">Plan for <strong style="color:#1c1618;">3–4 hours</strong> on site. Leslie will send your full schedule separately.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fasting window -->
+  <div style="padding:0 40px 16px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">The Most Important Part</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Your fasting window</h2>
+  </div>
+
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:26px 30px;">
+      <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.25);">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No solid food</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">6 hours before your session</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">Non-negotiable. If you've eaten inside the window, we must reschedule — ketamine on a full stomach risks nausea and aspiration.</div>
+      </div>
+      <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.25);">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No clear liquids</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">2 hours before your session</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">Water, herbal tea, or black coffee is fine up until two hours prior. A small sip for required medication is okay.</div>
+      </div>
+      <div style="padding-top:16px;">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">Hydrate the day before</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">Drink water all day prior</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">A light, clean dinner the night before. Nothing heavy, spicy, or alcoholic.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week leading in -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">The Week Leading In</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 18px 0;">Prepare the vessel</h2>
+    <ul style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.9;margin:0;padding-left:20px;">
+      <li><strong>No alcohol or cannabis for 48 hours</strong> before. They dull the nervous system and muddy the experience.</li>
+      <li><strong>Continue your prescribed medications</strong> as normal unless our clinician has told you otherwise. Confirm timing with us if you're on benzodiazepines, lamotrigine, or stimulants.</li>
+      <li><strong>Sit with your intention.</strong> One honest question or feeling — not a list of fixes.</li>
+      <li><strong>Arrange your ride home</strong> in advance. You cannot drive for the rest of the day. Staying on the ranch? We'll walk you to your room.</li>
+      <li><strong>Protect the day after.</strong> No big meetings, no hard conversations. Integration happens in rest.</li>
+    </ul>
+  </div>
+
+  <!-- What to bring / Morning of -->
+  <div style="padding:0 40px 32px 40px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td width="50%" valign="top" style="padding-right:12px;">
+          <div style="background:#faf8f5;border:1px solid rgba(201,148,62,0.18);border-radius:4px;padding:18px 20px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">What to Bring</div>
+            <ul style="font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Loose, warm, layered clothing</li>
+              <li>Cozy socks</li>
+              <li>A grounding object (photo, stone, note)</li>
+              <li>A journal for after</li>
+              <li>Current medication list</li>
+            </ul>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:#6b4c3b;line-height:1.6;margin-top:10px;">Eye masks, blankets, music, tea, water — all provided.</div>
+          </div>
+        </td>
+        <td width="50%" valign="top" style="padding-left:12px;">
+          <div style="background:#faf8f5;border:1px solid rgba(201,148,62,0.18);border-radius:4px;padding:18px 20px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">The Morning Of</div>
+            <ul style="font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;line-height:1.7;margin:0;padding-left:16px;">
+              <li>Shower if it helps you arrive in your body</li>
+              <li>Skip heavy perfume or oils</li>
+              <li>Come a little early — slow down before we begin</li>
+              <li>Feel sick or feverish? Call us. Rescheduling is fine.</li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Finding us -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Finding Us</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 16px 0;">Check-in at the retreat house</h2>
+    <div style="background:#1c1618;border-radius:4px;padding:22px 26px;text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;line-height:1.4;">7600 Grove Crest Circle<br>Austin, TX</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);margin-top:10px;">Gate code: <strong style="color:#c9943e;letter-spacing:0.05em;">2321#</strong> (enter)</div>
+    </div>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Maps sometimes routes through the commercial gate off 71 — we prefer the neighborhood entrance. Through the gate, <strong style="color:#1c1618;">go straight (don't turn left)</strong>, come up to the retreat house next to the yurts, and park there. We're a secluded ranch, 15 minutes from downtown. Trouble finding it? Call Shannon.</p>
+  </div>
+
+  <!-- Your team -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Your Core Team</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Who to reach, for what</h2>
+    <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Leslie Glace</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Clinic Scheduler &amp; Client Care</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your schedule and any appointment changes. She'll follow up with your full schedule. <a href="mailto:leslie@within.center" style="color:#c9943e;text-decoration:none;">leslie@within.center</a></div>
+    </div>
+    <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Shannon Grossman</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Admissions</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding services to your experience, or help finding the ranch on your first visit.</div>
+    </div>
+    <div style="padding-top:16px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — a phone call away. <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a></div>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, retreat care, and operations — the whole team looks forward to meeting you.</p>
+  </div>
+
+  <!-- WhatsApp community -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:28px 30px;text-align:center;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Stay Connected</div>
+      <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:500;color:#ffffff;margin:0 0 10px 0;line-height:1.3;">Join the Within Center WhatsApp community</h3>
+      <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:15px;color:rgba(255,255,255,0.75);line-height:1.6;margin:0 0 18px 0;">Where we share weekly classes, retreats, gatherings, events, and member-only specials. Schedule posted every week.</p>
+      <a href="https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:12px 26px;border-radius:3px;">Join the Community</a>
+      <p style="font-family:'Inter',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);line-height:1.6;margin:16px 0 0 0;">Times, classes, and facilitators may occasionally change as we adapt to community needs.</p>
+    </div>
+  </div>
+
+  <!-- Signoff -->
+  <div style="padding:0 40px 36px 40px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#1c1618;line-height:1.7;margin:0 0 20px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+      We're honored to walk beside you on this journey of self-discovery and healing. Thank you for trusting us with your care — we can't wait to support your transformation.
+    </p>
+    <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.8;">
+      <a href="mailto:info@within.center" style="color:#c9943e;text-decoration:none;">info@within.center</a> &nbsp;·&nbsp;
+      <a href="tel:5129692399" style="color:#c9943e;text-decoration:none;">512-969-2399</a>
+    </div>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#1c1618;margin:20px 0 0 0;">With care,<br><em style="color:#6b4c3b;">The Within Center Team</em></p>
+  </div>
+
+  <!-- Footer disclaimer -->
+  <div style="padding:0 40px 32px 40px;text-align:center;font-family:'Inter',sans-serif;font-size:11px;color:rgba(28,22,24,0.45);line-height:1.7;">
+    <strong style="color:rgba(28,22,24,0.6);">MEDICAL DISCLAIMER</strong> · These are general preparation instructions. If our medical team has given you different guidance, follow theirs. Not medical advice.
+    <br><br>
+    © 2026 Hearth Space Health, Inc. · 7600 Grove Crest Circle, Austin, TX<br>
+    Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(28,22,24,0.5);text-decoration:underline;">AWKN Ranch</a>
+  </div>
+
+</div>
+        `,
+        text: `Welcome to Within Center — ${proposalTitle}
+
+Hi ${firstName},
+
+We're honored to walk this with you. You're in good hands.
+
+YOUR OUTPATIENT PROGRAM INCLUDES
+${lineItems.length > 0
+  ? lineItems.map((li: any) => `- ${Number(li.quantity || 1) > 1 ? Number(li.quantity) + ' × ' : ''}${li.description}`).join('\n')
+  : `- 3 × Personalized guided ketamine sessions\n- 3 × Integration coaching sessions\n- 1-month AWKN membership\n- Access to on-site wellness amenities`}
+
+FIRST SESSION
+${sessionDate} — arrive by ${arrivalTime}. Plan for 3–4 hours on site.
+
+YOUR FASTING WINDOW (THE MOST IMPORTANT PART)
+- No solid food: 6 hours before your session (non-negotiable)
+- No clear liquids: 2 hours before your session
+- Hydrate the day before, light clean dinner the night before
+
+THE WEEK LEADING IN
+- No alcohol or cannabis for 48 hours before
+- Continue prescribed medications as normal unless told otherwise
+- Sit with your intention
+- Arrange your ride home in advance — you cannot drive the rest of the day
+- Protect the day after
+
+WHAT TO BRING
+Loose warm clothing, cozy socks, a grounding object, a journal, current medication list.
+Eye masks, blankets, music, tea, water — all provided.
+
+FINDING US
+7600 Grove Crest Circle, Austin, TX
+Gate code: 2321# (enter)
+Through the gate, go straight (don't turn left), come up to the retreat house next to the yurts, and park there.
+
+YOUR CORE TEAM
+- Leslie Glace — Clinic Scheduler & Client Care · leslie@within.center
+- Shannon Grossman — Admissions
+- Justin De La Cruz — Managing Director · justin@within.center
+
+JOIN THE WHATSAPP COMMUNITY
+https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt
+
+Questions? info@within.center · 512-969-2399
+
+With care,
+The Within Center Team`,
+      };
+    }
+
     case "custom":
       if (!data.html) throw new Error("Custom email requires data.html");
       return {
@@ -2710,6 +2972,7 @@ serve(async (req) => {
       "custom",            // raw HTML passthrough
       "staff_invitation",  // has its own full branded layout
       "proposal_sent",     // has its own full branded layout
+      "welcome_letter",    // Within Center welcome letter — self-contained layout
       "pai_email_reply",   // PAI-branded layout
       "payment_statement", // has its own full layout
     ];
