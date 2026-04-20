@@ -2608,7 +2608,7 @@ async function sendProposalNow(proposalId) {
 
   const { data: lead, error: lErr } = await supabase
     .from('crm_leads')
-    .select('id, first_name, last_name, email')
+    .select('id, first_name, last_name, email, business_line')
     .eq('id', proposal.lead_id)
     .single();
   if (lErr || !lead?.email) throw new Error('Lead is missing an email address');
@@ -2671,6 +2671,7 @@ async function sendProposalNow(proposalId) {
       to: lead.email,
       data: {
         recipient_first_name: lead.first_name || '',
+        business_line: lead.business_line || null,
         proposal_number: proposal.proposal_number,
         title: proposal.title,
         event_type: proposal.event_type,

@@ -886,20 +886,41 @@ Questions or trouble signing in? Email admin@awknranch.com.
       const validUntil = data.valid_until
         ? new Date(data.valid_until + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
         : '';
-      const logoUrl = "https://laurenbur2.github.io/awkn-ranch/assets/branding/wordmark-black-tight.png";
+      const isWithin = data.business_line === 'within';
+      const brand = isWithin
+        ? {
+            name: 'Within Center',
+            logoUrl: 'https://laurenbur2.github.io/awkn-ranch/assets/branding/within-wordmark-black-tight.png',
+            logoWidth: 320,
+            logoHeight: 88,
+            accent: '#2a1f23',
+            supportEmail: 'admin@within.center',
+            tagline: 'Rest. Reset. Return.',
+            defaultTitle: 'Your Retreat at Within Center',
+          }
+        : {
+            name: 'AWKN Ranch',
+            logoUrl: 'https://laurenbur2.github.io/awkn-ranch/assets/branding/wordmark-black-tight.png',
+            logoWidth: 400,
+            logoHeight: 109,
+            accent: '#8a6f44',
+            supportEmail: 'admin@awknranch.com',
+            tagline: 'Where the herd gathers',
+            defaultTitle: 'Your Event at AWKN Ranch',
+          };
       return {
-        subject: `Proposal ${data.proposal_number} from AWKN Ranch — ${data.title}`,
+        subject: `Proposal ${data.proposal_number} from ${brand.name} — ${data.title}`,
         html: `
           <div style="max-width:640px;margin:0 auto;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
             <div style="background:linear-gradient(180deg,#faf6ed 0%,#f0e6d2 100%);border-bottom:1px solid #e5d9bf;padding:40px 32px 28px;text-align:center;">
-              <img src="${logoUrl}" alt="AWKN Ranch" width="400" height="109" style="display:block;margin:0 auto 16px;max-width:100%;height:auto;border:0;outline:none;" />
-              <p style="margin:0;color:#8a6f44;font-size:13px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
-              <h1 style="margin:10px 0 0;color:#2c1d0f;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || 'Your Event at AWKN Ranch')}</h1>
+              <img src="${brand.logoUrl}" alt="${brand.name}" width="${brand.logoWidth}" height="${brand.logoHeight}" style="display:block;margin:0 auto 16px;max-width:100%;height:auto;border:0;outline:none;" />
+              <p style="margin:0;color:${brand.accent};font-size:13px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
+              <h1 style="margin:10px 0 0;color:#2c1d0f;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || brand.defaultTitle)}</h1>
             </div>
 
             <div style="padding:32px;">
               <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">Hi ${String(data.recipient_first_name || 'there')},</p>
-              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 24px;">Thanks for considering AWKN Ranch. Here's your proposal${eventDate ? ` for <strong>${eventDate}</strong>` : ''}. Review the details below and tap the button to secure your date.</p>
+              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 24px;">Thanks for considering ${brand.name}. Here's your proposal${eventDate ? ` for <strong>${eventDate}</strong>` : ''}. Review the details below and tap the button to secure your date.</p>
 
               ${eventDate || data.guest_count || data.event_type ? `
               <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:18px 22px;margin:0 0 24px;">
@@ -926,11 +947,11 @@ Questions or trouble signing in? Email admin@awknranch.com.
                 </tbody>
               </table>` : ''}
 
-              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid #8a6f44;">
+              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid ${brand.accent};">
                 ${data.subtotal !== undefined ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Subtotal: <strong style="color:#334155;">${fmtCurrency(data.subtotal)}</strong></p>` : ''}
                 ${data.discount_amount && Number(data.discount_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Discount: <strong style="color:#334155;">−${fmtCurrency(data.discount_amount)}</strong></p>` : ''}
                 ${data.tax_amount && Number(data.tax_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Tax: <strong style="color:#334155;">${fmtCurrency(data.tax_amount)}</strong></p>` : ''}
-                <p style="margin:8px 0 0;color:#8a6f44;font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
+                <p style="margin:8px 0 0;color:${brand.accent};font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
               </div>
 
               <div style="text-align:center;margin:32px 0 16px;">
@@ -950,12 +971,12 @@ Questions or trouble signing in? Email admin@awknranch.com.
                 <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0;white-space:pre-wrap;">${String(data.terms)}</p>
               </div>` : ''}
 
-              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:28px 0 0;">Questions? Reply to this email or write <a href="mailto:admin@awknranch.com" style="color:#c2410c;">admin@awknranch.com</a>.</p>
+              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:28px 0 0;">Questions? Reply to this email or write <a href="mailto:${brand.supportEmail}" style="color:#c2410c;">${brand.supportEmail}</a>.</p>
             </div>
 
             <div style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;color:#94a3b8;font-size:12px;">AWKN Ranch</p>
-              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">Where the herd gathers</p>
+              <p style="margin:0;color:#94a3b8;font-size:12px;">${brand.name}</p>
+              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">${brand.tagline}</p>
             </div>
           </div>
         `,
@@ -963,7 +984,7 @@ Questions or trouble signing in? Email admin@awknranch.com.
 
 Hi ${data.recipient_first_name || 'there'},
 
-Thanks for considering AWKN Ranch. Here's your proposal${eventDate ? ` for ${eventDate}` : ''}.
+Thanks for considering ${brand.name}. Here's your proposal${eventDate ? ` for ${eventDate}` : ''}.
 
 ${data.event_type ? `Event type: ${data.event_type}\n` : ''}${data.guest_count ? `Guest count: ${data.guest_count}\n` : ''}
 Line items:
@@ -974,9 +995,9 @@ ${data.subtotal !== undefined ? `Subtotal: ${fmtCurrency(data.subtotal)}\n` : ''
 Pay & secure your date: ${data.payment_link_url || ''}
 ${validUntil ? `Valid until ${validUntil}` : ''}
 
-${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.terms}\n\n` : ''}Questions? Reply to this email or write admin@awknranch.com.
+${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.terms}\n\n` : ''}Questions? Reply to this email or write ${brand.supportEmail}.
 
-— The AWKN Ranch Team`
+— The ${brand.name} Team`
       };
     }
 
