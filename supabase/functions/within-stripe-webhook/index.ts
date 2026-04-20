@@ -1,16 +1,17 @@
 /**
- * Within Center Stripe Webhook
+ * Stripe Webhook (shared across business lines)
  *
- * Receives webhook events from Stripe for the Within Center deposit flow.
- * On `checkout.session.completed` (with metadata.source === 'within-deposit'),
- * fires the deposit confirmation email via send-within-deposit-email.
+ * On `checkout.session.completed`, dispatches based on session.metadata.source:
+ *   - 'within-deposit'  → fires send-within-deposit-email
+ *   - 'crm-proposal'    → marks crm_proposals row paid and logs activity
  *
- * Deploy with: supabase functions deploy within-stripe-webhook --no-verify-jwt --project-ref gatsnhekviqooafddzey
+ * Deploy with: supabase functions deploy within-stripe-webhook --no-verify-jwt --project-ref lnqxarwqckpmirpmixcw
  *
  * Required env vars on the Supabase project:
- *   STRIPE_WEBHOOK_SECRET   - whsec_... from the Stripe Dashboard webhook endpoint
- *   SUPABASE_URL            - (auto-injected by Supabase)
- *   SUPABASE_ANON_KEY       - (auto-injected) used to call the email function
+ *   STRIPE_WEBHOOK_SECRET       - whsec_... from the Stripe Dashboard webhook endpoint
+ *   SUPABASE_URL                - (auto-injected)
+ *   SUPABASE_ANON_KEY           - (auto-injected) used to call other edge functions
+ *   SUPABASE_SERVICE_ROLE_KEY   - needed to update crm_proposals server-side
  */
 
 const corsHeaders = {
@@ -52,6 +53,72 @@ async function verifyStripeSignature(rawBody: string, header: string | null, sec
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
   return expected === parsed.v1;
+}
+
+async function markProposalPaid(session: Record<string, unknown>): Promise<void> {
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+    console.error('markProposalPaid: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    return;
+  }
+
+  const metadata = (session.metadata || {}) as Record<string, string>;
+  const proposalId = metadata.proposal_id;
+  if (!proposalId) {
+    console.warn('crm-proposal session missing metadata.proposal_id', session.id);
+    return;
+  }
+
+  const amountTotal = typeof session.amount_total === 'number' ? session.amount_total : 0;
+  const sessionId = typeof session.id === 'string' ? session.id : null;
+  const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : null;
+
+  // 1. Mark the proposal paid via PostgREST.
+  const updateRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/crm_proposals?id=eq.${encodeURIComponent(proposalId)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+        paid_amount_cents: amountTotal,
+        stripe_checkout_session_id: sessionId,
+        stripe_payment_intent_id: paymentIntentId,
+      }),
+    },
+  );
+  const updated = await updateRes.json().catch(() => []);
+  if (!updateRes.ok) {
+    console.error('markProposalPaid: update failed', updateRes.status, updated);
+    return;
+  }
+  const proposal = Array.isArray(updated) ? updated[0] : null;
+  console.log('Proposal marked paid:', proposalId, 'amount_cents:', amountTotal);
+
+  // 2. Log a CRM activity on the lead (best-effort).
+  if (proposal?.lead_id) {
+    const dollars = (amountTotal / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    await fetch(`${SUPABASE_URL}/rest/v1/crm_activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+      },
+      body: JSON.stringify({
+        lead_id: proposal.lead_id,
+        activity_type: 'payment',
+        description: `Proposal ${proposal.proposal_number || proposalId} paid — $${dollars}`,
+      }),
+    }).catch(err => console.warn('activity log failed:', err));
+  }
 }
 
 async function fireDepositEmail(session: Record<string, unknown>): Promise<void> {
@@ -168,8 +235,10 @@ Deno.serve(async (req) => {
       const metadata = (session.metadata || {}) as Record<string, string>;
       if (metadata.source === 'within-deposit') {
         await fireDepositEmail(session);
+      } else if (metadata.source === 'crm-proposal') {
+        await markProposalPaid(session);
       } else {
-        console.log('Ignoring non-within checkout.session.completed');
+        console.log('checkout.session.completed: unknown metadata.source', metadata.source);
       }
     } else {
       console.log('Unhandled event type:', event.type);

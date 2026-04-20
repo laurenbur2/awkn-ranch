@@ -48,14 +48,14 @@ serve(async (req) => {
       );
     }
 
-    // Check role (admin/staff only)
+    // Check role (admin/staff/oracle only)
     const { data: appUser } = await supabase
       .from("app_users")
       .select("role")
-      .eq("supabase_auth_id", user.id)
-      .single();
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
 
-    if (!appUser || !["admin", "staff"].includes(appUser.role)) {
+    if (!appUser || !["admin", "staff", "oracle"].includes(appUser.role)) {
       return new Response(
         JSON.stringify({ error: "Admin or staff role required" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -72,16 +72,20 @@ serve(async (req) => {
       );
     }
 
-    // Get Stripe secret key from DB
-    const { data: stripeConfig } = await supabase
-      .from("stripe_config")
-      .select("secret_key, is_active, test_mode")
-      .eq("id", 1)
-      .single();
-
-    if (!stripeConfig?.secret_key || !stripeConfig.is_active) {
+    // Get Stripe secret key: prefer env var, fall back to the active stripe_config row.
+    let stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    if (!stripeSecretKey) {
+      const { data: stripeConfig } = await supabase
+        .from("stripe_config")
+        .select("secret_key, is_active")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+      if (stripeConfig?.secret_key) stripeSecretKey = stripeConfig.secret_key;
+    }
+    if (!stripeSecretKey) {
       return new Response(
-        JSON.stringify({ error: "Stripe is not configured or inactive" }),
+        JSON.stringify({ error: "Stripe is not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -117,7 +121,7 @@ serve(async (req) => {
     const stripeResponse = await fetch(`${STRIPE_API_BASE}/payment_links`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${stripeConfig.secret_key}`,
+        "Authorization": `Bearer ${stripeSecretKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),

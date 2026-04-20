@@ -2212,6 +2212,34 @@ function renderProposalsTable() {
   html += '</tbody></table></div>';
   html += `<div class="crm-table-footer">${filtered.length} proposal${filtered.length !== 1 ? 's' : ''}</div>`;
   panel.innerHTML = html;
+
+  // Row actions
+  panel.querySelectorAll('[data-view-proposal]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = proposals.find(x => x.id === btn.dataset.viewProposal);
+      if (p) openProposalModal(p);
+    });
+  });
+  panel.querySelectorAll('[data-send-proposal]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const proposalId = btn.dataset.sendProposal;
+      const p = proposals.find(x => x.id === proposalId);
+      if (!p) return;
+      if (!confirm(`Send proposal ${p.proposal_number} to the lead? This will generate a Stripe payment link and email them.`)) return;
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        await sendProposalNow(proposalId);
+        await loadAllData();
+        renderAll();
+      } catch (err) {
+        console.error('Send proposal error:', err);
+        showToast('Error sending proposal: ' + (err.message || err), 'error');
+        btn.disabled = false;
+        btn.textContent = 'Send';
+      }
+    });
+  });
 }
 
 // =============================================
@@ -2497,8 +2525,20 @@ async function saveProposal(existingProposal, status) {
   const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
   const total = subtotal - discount + tax;
 
+  // When sending, require a lead so we know who to email.
+  const leadId = document.getElementById('prop-lead').value || null;
+  if (status === 'sent' && !leadId) {
+    showToast('Select a lead before sending', 'error');
+    return;
+  }
+  if (status === 'sent' && total <= 0) {
+    showToast('Total must be greater than $0 to send', 'error');
+    return;
+  }
+
+  // Save as draft first; promote to "sent" only after payment link + email succeed.
   const payload = {
-    lead_id: document.getElementById('prop-lead').value || null,
+    lead_id: leadId,
     proposal_number: document.getElementById('prop-number').value,
     title,
     event_type: document.getElementById('prop-event-type').value || null,
@@ -2512,7 +2552,7 @@ async function saveProposal(existingProposal, status) {
     discount_amount: discount,
     tax_amount: tax,
     total,
-    status,
+    status: 'draft',
     valid_until: document.getElementById('prop-valid-until').value || null,
     notes: document.getElementById('prop-notes').value.trim() || null,
     terms: document.getElementById('prop-terms').value.trim() || null,
@@ -2539,14 +2579,133 @@ async function saveProposal(existingProposal, status) {
       if (liError) throw liError;
     }
 
-    showToast(status === 'sent' ? 'Proposal sent' : 'Proposal saved as draft', 'success');
+    if (status === 'sent') {
+      await sendProposalNow(proposalId);
+    } else {
+      showToast('Proposal saved as draft', 'success');
+    }
+
     await loadAllData();
     renderAll();
     closeModal();
   } catch (err) {
     console.error('Save proposal error:', err);
-    showToast('Error saving proposal', 'error');
+    showToast('Error saving proposal: ' + (err.message || err), 'error');
   }
+}
+
+// Generate Stripe payment link, email the recipient, and flip proposal to status='sent'.
+// Called both from the modal "Send Proposal" button and the table row "Send" shortcut.
+async function sendProposalNow(proposalId) {
+  const { data: proposal, error: pErr } = await supabase
+    .from('crm_proposals')
+    .select('*, items:crm_proposal_items(*)')
+    .eq('id', proposalId)
+    .single();
+  if (pErr || !proposal) throw new Error('Proposal not found');
+
+  if (!proposal.lead_id) throw new Error('Proposal has no lead — cannot send');
+
+  const { data: lead, error: lErr } = await supabase
+    .from('crm_leads')
+    .select('id, first_name, last_name, email')
+    .eq('id', proposal.lead_id)
+    .single();
+  if (lErr || !lead?.email) throw new Error('Lead is missing an email address');
+
+  const { data: sessionWrap } = await supabase.auth.getSession();
+  const token = sessionWrap?.session?.access_token;
+  if (!token) throw new Error('Not authenticated');
+
+  const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+  // 1. Stripe payment link
+  const linkResp = await fetch(supabaseUrl + '/functions/v1/create-payment-link', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+      'apikey': anonKey,
+    },
+    body: JSON.stringify({
+      amount: Number(proposal.total),
+      description: `${proposal.proposal_number} — ${proposal.title}`,
+      person_name: `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
+      person_email: lead.email,
+      category: 'crm_proposal',
+      metadata: {
+        source: 'crm-proposal',
+        proposal_id: proposal.id,
+        proposal_number: proposal.proposal_number,
+        lead_id: lead.id,
+      },
+    }),
+  });
+  const linkData = await linkResp.json().catch(() => ({}));
+  if (!linkResp.ok || !linkData.url) {
+    throw new Error('Payment link failed: ' + (linkData.error || linkResp.status));
+  }
+
+  // 2. Stamp proposal with payment link + sent state before email (so the row is accurate
+  //    even if the email send has a transient failure).
+  await supabase.from('crm_proposals').update({
+    payment_link_id: linkData.payment_link_id,
+    payment_link_url: linkData.url,
+    sent_at: new Date().toISOString(),
+    sent_to_email: lead.email,
+    status: 'sent',
+  }).eq('id', proposal.id);
+
+  // 3. Send the branded email
+  const items = (proposal.items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  const emailResp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+      'apikey': anonKey,
+    },
+    body: JSON.stringify({
+      type: 'proposal_sent',
+      to: lead.email,
+      data: {
+        recipient_first_name: lead.first_name || '',
+        proposal_number: proposal.proposal_number,
+        title: proposal.title,
+        event_type: proposal.event_type,
+        event_date: proposal.event_date,
+        guest_count: proposal.guest_count,
+        subtotal: proposal.subtotal,
+        discount_amount: proposal.discount_amount,
+        tax_amount: proposal.tax_amount,
+        total: proposal.total,
+        valid_until: proposal.valid_until,
+        notes: proposal.notes,
+        terms: proposal.terms,
+        payment_link_url: linkData.url,
+        line_items: items.map(li => ({
+          description: li.description,
+          quantity: li.quantity,
+          unit_price: li.unit_price,
+          total: li.total,
+        })),
+      },
+    }),
+  });
+  if (!emailResp.ok) {
+    const err = await emailResp.json().catch(() => ({}));
+    throw new Error('Email send failed: ' + (err.error || emailResp.status));
+  }
+
+  // 4. Log activity + advance lead stage to proposal_sent if it exists for this business line.
+  await addActivity(lead.id, 'email', `Proposal ${proposal.proposal_number} sent to ${lead.email}`);
+  const proposalSentStage = stages.find(s => s.slug === 'proposal_sent');
+  if (proposalSentStage) {
+    await moveLeadToStage(lead.id, proposalSentStage.id);
+  }
+
+  showToast('Proposal sent — payment link delivered', 'success');
 }
 
 // =============================================

@@ -43,6 +43,8 @@ type EmailType =
   | "general_invitation"
   | "staff_invitation"
   | "prospect_invitation"
+  // CRM proposal sent (with Stripe payment link)
+  | "proposal_sent"
   // Admin notifications
   | "admin_event_request"
   | "admin_rental_application"
@@ -859,6 +861,121 @@ Getting Started:
 3. That's it — you'll have immediate access
 
 Questions or trouble signing in? Email admin@awknranch.com.
+
+— The AWKN Ranch Team`
+      };
+    }
+
+    case "proposal_sent": {
+      const fmtCurrency = (n: number) =>
+        `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
+      const lineItemRows = lineItems.map((li: any) => `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:14px;">${String(li.description || '')}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:14px;text-align:center;">${Number(li.quantity || 1)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:14px;text-align:right;">${fmtCurrency(li.unit_price)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:14px;font-weight:600;text-align:right;">${fmtCurrency(li.total)}</td>
+        </tr>`).join('');
+      const lineItemRowsText = lineItems.map((li: any) =>
+        `  ${li.description}  ×${li.quantity}  @ ${fmtCurrency(li.unit_price)}  = ${fmtCurrency(li.total)}`
+      ).join('\n');
+      const eventDate = data.event_date
+        ? new Date(data.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const validUntil = data.valid_until
+        ? new Date(data.valid_until + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const bannerUrl = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/ai-gen/invite-banner-ghibli.png";
+      return {
+        subject: `Proposal ${data.proposal_number} from AWKN Ranch — ${data.title}`,
+        html: `
+          <div style="max-width:640px;margin:0 auto;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+            <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:40px 32px 24px;text-align:center;">
+              <p style="margin:0;color:#94a3b8;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
+              <h1 style="margin:8px 0 0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || 'Your Event at AWKN Ranch')}</h1>
+            </div>
+
+            <div style="padding:32px;">
+              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">Hi ${String(data.recipient_first_name || 'there')},</p>
+              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 24px;">Thanks for considering AWKN Ranch. Here's your proposal${eventDate ? ` for <strong>${eventDate}</strong>` : ''}. Review the details below and tap the button to secure your date.</p>
+
+              ${eventDate || data.guest_count || data.event_type ? `
+              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:18px 22px;margin:0 0 24px;">
+                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 10px;">Event Details</p>
+                <table style="width:100%;border-collapse:collapse;">
+                  ${eventDate ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;width:120px;">Date</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;">${eventDate}</td></tr>` : ''}
+                  ${data.event_type ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;">Event type</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;text-transform:capitalize;">${String(data.event_type)}</td></tr>` : ''}
+                  ${data.guest_count ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;">Guest count</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;">${data.guest_count}</td></tr>` : ''}
+                </table>
+              </div>` : ''}
+
+              ${lineItems.length > 0 ? `
+              <table style="width:100%;border-collapse:collapse;margin:0 0 8px;">
+                <thead>
+                  <tr style="background:#f1f5f9;">
+                    <th style="padding:10px 12px;text-align:left;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Description</th>
+                    <th style="padding:10px 12px;text-align:center;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Qty</th>
+                    <th style="padding:10px 12px;text-align:right;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Unit</th>
+                    <th style="padding:10px 12px;text-align:right;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${lineItemRows}
+                </tbody>
+              </table>` : ''}
+
+              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid #0f3460;">
+                ${data.subtotal !== undefined ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Subtotal: <strong style="color:#334155;">${fmtCurrency(data.subtotal)}</strong></p>` : ''}
+                ${data.discount_amount && Number(data.discount_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Discount: <strong style="color:#334155;">−${fmtCurrency(data.discount_amount)}</strong></p>` : ''}
+                ${data.tax_amount && Number(data.tax_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Tax: <strong style="color:#334155;">${fmtCurrency(data.tax_amount)}</strong></p>` : ''}
+                <p style="margin:8px 0 0;color:#0f3460;font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
+              </div>
+
+              <div style="text-align:center;margin:32px 0 16px;">
+                <a href="${String(data.payment_link_url || '#')}" style="background:linear-gradient(135deg,#c2410c 0%,#ea580c 100%);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:16px;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(194,65,12,0.3);">Pay &amp; Secure Your Date</a>
+                <p style="margin:10px 0 0;color:#94a3b8;font-size:12px;">Secure bank transfer (ACH) via Stripe • ${validUntil ? `Valid until ${validUntil}` : 'Pay anytime'}</p>
+              </div>
+
+              ${data.notes ? `
+              <div style="background:#fef9c3;border-left:3px solid #eab308;padding:14px 18px;margin:24px 0 0;border-radius:4px;">
+                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Notes</p>
+                <p style="color:#334155;font-size:14px;line-height:1.5;margin:0;white-space:pre-wrap;">${String(data.notes)}</p>
+              </div>` : ''}
+
+              ${data.terms ? `
+              <div style="margin:24px 0 0;">
+                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Terms</p>
+                <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0;white-space:pre-wrap;">${String(data.terms)}</p>
+              </div>` : ''}
+
+              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:28px 0 0;">Questions? Reply to this email or write <a href="mailto:admin@awknranch.com" style="color:#c2410c;">admin@awknranch.com</a>.</p>
+            </div>
+
+            <div style="padding:0;"><img src="${bannerUrl}" alt="AWKN Ranch" style="width:100%;display:block;" /></div>
+
+            <div style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+              <p style="margin:0;color:#94a3b8;font-size:12px;">AWKN Ranch</p>
+              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">Where the herd gathers</p>
+            </div>
+          </div>
+        `,
+        text: `Proposal ${data.proposal_number} — ${data.title}
+
+Hi ${data.recipient_first_name || 'there'},
+
+Thanks for considering AWKN Ranch. Here's your proposal${eventDate ? ` for ${eventDate}` : ''}.
+
+${data.event_type ? `Event type: ${data.event_type}\n` : ''}${data.guest_count ? `Guest count: ${data.guest_count}\n` : ''}
+Line items:
+${lineItemRowsText}
+
+${data.subtotal !== undefined ? `Subtotal: ${fmtCurrency(data.subtotal)}\n` : ''}${data.discount_amount && Number(data.discount_amount) > 0 ? `Discount: −${fmtCurrency(data.discount_amount)}\n` : ''}${data.tax_amount && Number(data.tax_amount) > 0 ? `Tax: ${fmtCurrency(data.tax_amount)}\n` : ''}Total Due: ${fmtCurrency(data.total)}
+
+Pay & secure your date: ${data.payment_link_url || ''}
+${validUntil ? `Valid until ${validUntil}` : ''}
+
+${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.terms}\n\n` : ''}Questions? Reply to this email or write admin@awknranch.com.
 
 — The AWKN Ranch Team`
       };
@@ -2570,6 +2687,7 @@ serve(async (req) => {
     const SKIP_BRAND_WRAP: EmailType[] = [
       "custom",            // raw HTML passthrough
       "staff_invitation",  // has its own full branded layout
+      "proposal_sent",     // has its own full branded layout
       "pai_email_reply",   // PAI-branded layout
       "payment_statement", // has its own full layout
     ];
