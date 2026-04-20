@@ -2629,7 +2629,7 @@ This is an automated weekly schedule report from AWKN Ranch.`
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — a phone call away. <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a></div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — an email away. <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a></div>
     </div>
     <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, retreat care, and operations — the whole team looks forward to meeting you.</p>
   </div>
