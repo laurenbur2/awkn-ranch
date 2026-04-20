@@ -1325,14 +1325,22 @@ The ${bizLabel} Team</textarea>
           <input type="text" class="crm-input" id="welcome-arrival-time" placeholder="e.g. 9:30 AM">
         </div>
       </div>
+      <div class="crm-form-field" style="margin-top:6px;padding-top:12px;border-top:1px dashed rgba(0,0,0,0.1);">
+        <label>Send test copy to (any email)</label>
+        <div style="display:flex;gap:8px;">
+          <input type="email" class="crm-input" id="welcome-test-to" placeholder="you@within.center" style="flex:1;">
+          <button class="crm-btn crm-btn-sm" id="btn-send-welcome-test">Send Test</button>
+        </div>
+        <div class="crm-muted" style="font-size:12px;margin-top:4px;">Sends the actual email to the address above — useful for previewing in your own inbox before sending to the client.</div>
+      </div>
       <div class="crm-form-actions">
         <button class="crm-btn crm-btn-sm" id="btn-preview-welcome">Preview Email</button>
-        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-welcome">Send Welcome Letter</button>
+        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-welcome">Send to ${escapeHtml(lead.email)}</button>
         <button class="crm-btn crm-btn-sm" id="btn-cancel-welcome">Cancel</button>
       </div>
     `;
 
-    const buildPayload = (preview) => {
+    const buildPayload = ({ preview, toOverride } = {}) => {
       const proposalId = document.getElementById('welcome-proposal')?.value;
       const proposal = leadProposals.find(p => p.id === proposalId);
       const items = (proposal?.items || [])
@@ -1340,7 +1348,7 @@ The ${bizLabel} Team</textarea>
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
       return {
         type: 'welcome_letter',
-        to: lead.email,
+        to: toOverride || lead.email,
         preview: preview || undefined,
         data: {
           recipient_first_name: lead.first_name || 'there',
@@ -1370,7 +1378,7 @@ The ${bizLabel} Team</textarea>
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
-          body: JSON.stringify(buildPayload(true)),
+          body: JSON.stringify(buildPayload({ preview: true })),
         });
         const result = await resp.json().catch(() => ({}));
         if (!resp.ok || !result.html) throw new Error(result.error || 'Preview failed (HTTP ' + resp.status + ')');
@@ -1389,8 +1397,12 @@ The ${bizLabel} Team</textarea>
       }
     });
 
-    document.getElementById('btn-confirm-send-welcome').addEventListener('click', async () => {
-      const btn = document.getElementById('btn-confirm-send-welcome');
+    // Send test copy to an arbitrary address (no activity log, no lead touch)
+    document.getElementById('btn-send-welcome-test').addEventListener('click', async () => {
+      const testTo = document.getElementById('welcome-test-to').value.trim();
+      if (!testTo) { showToast('Enter an email address to send the test to', 'error'); return; }
+      const btn = document.getElementById('btn-send-welcome-test');
+      const prevLabel = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Sending…';
       try {
@@ -1402,7 +1414,37 @@ The ${bizLabel} Team</textarea>
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
-          body: JSON.stringify(buildPayload(false)),
+          body: JSON.stringify(buildPayload({ toOverride: testTo })),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || 'Send failed (HTTP ' + resp.status + ')');
+        }
+        showToast(`Test copy sent to ${testTo}`, 'success');
+      } catch (err) {
+        console.error('Welcome test send error:', err);
+        showToast('Test send failed: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+      }
+    });
+
+    document.getElementById('btn-confirm-send-welcome').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-confirm-send-welcome');
+      const prevLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        const token = session?.session?.access_token;
+        if (!token) throw new Error('Not authenticated');
+        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          body: JSON.stringify(buildPayload({})),
         });
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({}));
@@ -1416,7 +1458,7 @@ The ${bizLabel} Team</textarea>
         console.error('Welcome send error:', err);
         showToast('Send failed: ' + (err.message || err), 'error');
         btn.disabled = false;
-        btn.textContent = 'Send Welcome Letter';
+        btn.textContent = prevLabel;
       }
     });
 
