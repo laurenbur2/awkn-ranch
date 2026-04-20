@@ -2540,7 +2540,7 @@ This is an automated weekly schedule report from AWKN Ranch.`
     <div style="background:#1c1618;border-radius:4px;padding:26px 30px;">
       <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.25);">
         <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No solid food</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">6 hours before your session</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">3 hours before your session</div>
         <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">Non-negotiable. If you've eaten inside the window, we must reschedule — ketamine on a full stomach risks nausea and aspiration.</div>
       </div>
       <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.25);">
@@ -2682,7 +2682,7 @@ FIRST SESSION
 ${sessionDate} — arrive by ${arrivalTime}. Plan for 3–4 hours on site.
 
 YOUR FASTING WINDOW (THE MOST IMPORTANT PART)
-- No solid food: 6 hours before your session (non-negotiable)
+- No solid food: 3 hours before your session (non-negotiable)
 - No clear liquids: 2 hours before your session
 - Hydrate the day before, light clean dinner the night before
 
