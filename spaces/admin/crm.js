@@ -1288,20 +1288,81 @@ The ${bizLabel} Team</textarea>
     });
   });
 
-  // Send Welcome Letter — Within Center HEAL package welcome with prep instructions.
-  // "What's included" pulls from the most recently sent proposal's line items.
+  // Send Welcome Letter — Within Center welcome with prep instructions.
+  // Package is selected from a preset list, with a custom option for ad-hoc items.
   document.getElementById('btn-send-welcome-letter')?.addEventListener('click', () => {
     const form = openInlineActionForm();
-    const leadProposals = proposals
-      .filter(p => p.lead_id === lead.id)
-      .sort((a, b) => new Date(b.sent_at || b.created_at || 0) - new Date(a.sent_at || a.created_at || 0));
 
-    const proposalOptions = leadProposals.length > 0
-      ? leadProposals.map((p, i) => {
-          const label = `${p.proposal_number || 'Draft'} — ${p.title || 'Untitled'} · ${p.status || 'draft'}`;
-          return `<option value="${p.id}" ${i === 0 ? 'selected' : ''}>${escapeHtml(label)}</option>`;
-        }).join('')
-      : '';
+    // Package presets — each maps to a title + line items that render in the
+    // "Your Outpatient Program Includes" section. Edit here to change what
+    // gets listed per package.
+    const WELCOME_PACKAGES = {
+      heal: {
+        title: 'HEAL Package',
+        items: [
+          { description: 'Personalized guided ketamine sessions', quantity: 3 },
+          { description: 'Integration coaching sessions', quantity: 3 },
+          { description: '1-month AWKN membership — saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+          { description: 'Access to on-site wellness amenities and events as available', quantity: 1 },
+        ],
+      },
+      discover: {
+        title: 'DISCOVER Package',
+        items: [
+          { description: 'Private guided ketamine ceremony (fully held — prep, ceremony, integration)', quantity: 1 },
+          { description: 'Integration coaching session', quantity: 1 },
+          { description: '1-month AWKN membership — saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+        ],
+      },
+      awkn: {
+        title: 'AWKN Package',
+        items: [
+          { description: 'Personalized guided ketamine ceremonies over 3–6 months', quantity: 6 },
+          { description: 'Integration coaching sessions', quantity: 6 },
+          { description: '3-month AWKN membership — saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+          { description: 'Access to on-site wellness amenities and events as available', quantity: 1 },
+        ],
+      },
+      'twin-flame': {
+        title: 'Couples Reset',
+        items: [
+          { description: 'Shared guided ketamine ceremony for both partners', quantity: 1 },
+          { description: 'Joint integration coaching session', quantity: 1 },
+          { description: 'Private reflection session for each partner', quantity: 2 },
+          { description: '1-month AWKN membership', quantity: 1 },
+        ],
+      },
+      'immersive-6day': {
+        title: 'Six-Day Immersive Retreat',
+        items: [
+          { description: 'Private guided ketamine ceremonies during the retreat', quantity: 2 },
+          { description: 'Nights of residential stay at AWKN Ranch', quantity: 5 },
+          { description: 'Group integration circles and daily practices', quantity: 1 },
+          { description: 'Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space', quantity: 1 },
+          { description: 'All meals and on-site care', quantity: 1 },
+        ],
+      },
+      'immersive-3day': {
+        title: 'Three-Day Immersive Retreat',
+        items: [
+          { description: 'Private guided ketamine ceremony during the retreat', quantity: 1 },
+          { description: 'Nights of residential stay at AWKN Ranch', quantity: 2 },
+          { description: 'Integration circle and daily practices', quantity: 1 },
+          { description: 'Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space', quantity: 1 },
+          { description: 'All meals and on-site care', quantity: 1 },
+        ],
+      },
+    };
+
+    const packageOptions = [
+      '<option value="heal" selected>HEAL — 3 ceremonies + integration</option>',
+      '<option value="discover">DISCOVER — 1 ceremony + integration</option>',
+      '<option value="awkn">AWKN — 6 ceremonies (deepest offering)</option>',
+      '<option value="twin-flame">Couples Reset — shared journey for partners</option>',
+      '<option value="immersive-6day">Six-Day Immersive Retreat</option>',
+      '<option value="immersive-3day">Three-Day Immersive Retreat</option>',
+      '<option value="custom">Custom — build your own list</option>',
+    ].join('');
 
     form.innerHTML = `
       <h4 class="crm-inline-form-title">Send Welcome Letter</h4>
@@ -1310,10 +1371,18 @@ The ${bizLabel} Team</textarea>
         <input type="email" class="crm-input" id="welcome-to" value="${escapeHtml(lead.email || '')}" readonly style="background:#f3f4f6">
       </div>
       <div class="crm-form-field">
-        <label>Pull package from proposal</label>
-        ${leadProposals.length > 0
-          ? `<select class="crm-select" id="welcome-proposal">${proposalOptions}</select>`
-          : `<div class="crm-muted" style="font-size:13px;padding:6px 0;">No proposals on this lead yet — will send with the default HEAL package list. Create a proposal first to customize.</div>`}
+        <label>Package</label>
+        <select class="crm-select" id="welcome-package">${packageOptions}</select>
+      </div>
+      <div class="crm-form-field">
+        <label>Package title (appears in the welcome header)</label>
+        <input type="text" class="crm-input" id="welcome-package-title" placeholder="e.g. HEAL Package">
+      </div>
+      <div class="crm-form-field">
+        <label>Your Outpatient Program Includes</label>
+        <div id="welcome-items-wrap" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <button type="button" class="crm-btn crm-btn-sm" id="btn-welcome-add-item" style="margin-top:8px;">+ Add item</button>
+        <div class="crm-muted" style="font-size:12px;margin-top:4px;">Quantity × description. Quantity of 1 hides the "1 ×" prefix in the email.</div>
       </div>
       <div class="crm-form-row" style="display:flex;gap:12px;">
         <div class="crm-form-field" style="flex:1;">
@@ -1340,12 +1409,53 @@ The ${bizLabel} Team</textarea>
       </div>
     `;
 
+    const itemsWrap = document.getElementById('welcome-items-wrap');
+    const renderItemRow = (item) => {
+      const row = document.createElement('div');
+      row.className = 'crm-welcome-item';
+      row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+      row.innerHTML = `
+        <input type="number" class="crm-input crm-welcome-qty" value="${Number(item.quantity || 1)}" min="1" step="1" style="width:70px;">
+        <input type="text" class="crm-input crm-welcome-desc" value="${escapeHtml(item.description || '')}" placeholder="Description" style="flex:1;">
+        <button type="button" class="crm-btn crm-btn-xs crm-btn-danger crm-welcome-remove" title="Remove">&times;</button>
+      `;
+      row.querySelector('.crm-welcome-remove').addEventListener('click', () => row.remove());
+      return row;
+    };
+
+    const loadPackageItems = (packageKey) => {
+      itemsWrap.innerHTML = '';
+      const pkg = WELCOME_PACKAGES[packageKey];
+      if (pkg) {
+        document.getElementById('welcome-package-title').value = pkg.title;
+        pkg.items.forEach(item => itemsWrap.appendChild(renderItemRow(item)));
+      } else {
+        // Custom — start empty, prompt user to add items
+        document.getElementById('welcome-package-title').value = '';
+        itemsWrap.appendChild(renderItemRow({ quantity: 1, description: '' }));
+      }
+    };
+
+    loadPackageItems('heal');
+
+    document.getElementById('welcome-package').addEventListener('change', (e) => {
+      loadPackageItems(e.target.value);
+    });
+
+    document.getElementById('btn-welcome-add-item').addEventListener('click', () => {
+      itemsWrap.appendChild(renderItemRow({ quantity: 1, description: '' }));
+    });
+
+    const collectItems = () => {
+      return Array.from(itemsWrap.querySelectorAll('.crm-welcome-item'))
+        .map(row => ({
+          description: row.querySelector('.crm-welcome-desc').value.trim(),
+          quantity: Math.max(1, parseInt(row.querySelector('.crm-welcome-qty').value, 10) || 1),
+        }))
+        .filter(item => item.description);
+    };
+
     const buildPayload = ({ preview, toOverride } = {}) => {
-      const proposalId = document.getElementById('welcome-proposal')?.value;
-      const proposal = leadProposals.find(p => p.id === proposalId);
-      const items = (proposal?.items || [])
-        .slice()
-        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
       return {
         type: 'welcome_letter',
         to: toOverride || lead.email,
@@ -1353,13 +1463,10 @@ The ${bizLabel} Team</textarea>
         data: {
           recipient_first_name: lead.first_name || 'there',
           business_line: lead.business_line || 'within',
-          proposal_title: proposal?.title || 'Your Program',
+          proposal_title: document.getElementById('welcome-package-title').value.trim() || 'Your Program',
           session_date: document.getElementById('welcome-session-date')?.value || null,
           arrival_time: document.getElementById('welcome-arrival-time')?.value.trim() || null,
-          line_items: items.map(li => ({
-            description: li.description,
-            quantity: li.quantity,
-          })),
+          line_items: collectItems(),
         },
       };
     };
