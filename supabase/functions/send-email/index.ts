@@ -790,7 +790,7 @@ the AWKN Ranch property AI agent`
       };
       const roleLabel = roleLabels[data.role as string] ?? "a user";
       const roleDescription = roleDescriptions[data.role as string] ?? "access to the platform";
-      const bannerUrl = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/ai-gen/invite-banner-ghibli.png";
+      const bannerUrl = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/hero-ranch.jpg";
       return {
         subject: "You're Invited to the AWKN Team Portal",
         html: `
@@ -886,14 +886,15 @@ Questions or trouble signing in? Email admin@awknranch.com.
       const validUntil = data.valid_until
         ? new Date(data.valid_until + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
         : '';
-      const bannerUrl = "https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/ai-gen/invite-banner-ghibli.png";
+      const logoUrl = "https://laurenbur2.github.io/awkn-ranch/assets/branding/wordmark-black-tight.png";
       return {
         subject: `Proposal ${data.proposal_number} from AWKN Ranch — ${data.title}`,
         html: `
           <div style="max-width:640px;margin:0 auto;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-            <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);padding:40px 32px 24px;text-align:center;">
-              <p style="margin:0;color:#94a3b8;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
-              <h1 style="margin:8px 0 0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || 'Your Event at AWKN Ranch')}</h1>
+            <div style="background:linear-gradient(180deg,#faf6ed 0%,#f0e6d2 100%);border-bottom:1px solid #e5d9bf;padding:40px 32px 28px;text-align:center;">
+              <img src="${logoUrl}" alt="AWKN Ranch" width="400" height="109" style="display:block;margin:0 auto 16px;max-width:100%;height:auto;border:0;outline:none;" />
+              <p style="margin:0;color:#8a6f44;font-size:13px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
+              <h1 style="margin:10px 0 0;color:#2c1d0f;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || 'Your Event at AWKN Ranch')}</h1>
             </div>
 
             <div style="padding:32px;">
@@ -925,11 +926,11 @@ Questions or trouble signing in? Email admin@awknranch.com.
                 </tbody>
               </table>` : ''}
 
-              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid #0f3460;">
+              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid #8a6f44;">
                 ${data.subtotal !== undefined ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Subtotal: <strong style="color:#334155;">${fmtCurrency(data.subtotal)}</strong></p>` : ''}
                 ${data.discount_amount && Number(data.discount_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Discount: <strong style="color:#334155;">−${fmtCurrency(data.discount_amount)}</strong></p>` : ''}
                 ${data.tax_amount && Number(data.tax_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Tax: <strong style="color:#334155;">${fmtCurrency(data.tax_amount)}</strong></p>` : ''}
-                <p style="margin:8px 0 0;color:#0f3460;font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
+                <p style="margin:8px 0 0;color:#8a6f44;font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
               </div>
 
               <div style="text-align:center;margin:32px 0 16px;">
@@ -951,8 +952,6 @@ Questions or trouble signing in? Email admin@awknranch.com.
 
               <p style="color:#94a3b8;font-size:13px;text-align:center;margin:28px 0 0;">Questions? Reply to this email or write <a href="mailto:admin@awknranch.com" style="color:#c2410c;">admin@awknranch.com</a>.</p>
             </div>
-
-            <div style="padding:0;"><img src="${bannerUrl}" alt="AWKN Ranch" style="width:100%;display:block;" /></div>
 
             <div style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
               <p style="margin:0;color:#94a3b8;font-size:12px;">AWKN Ranch</p>
