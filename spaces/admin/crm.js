@@ -2380,6 +2380,7 @@ async function openProposalModal(proposal = null, lead = null) {
         <div class="crm-modal-footer">
           <button class="crm-btn" id="btn-cancel-proposal">Cancel</button>
           <div>
+            <button class="crm-btn" id="btn-preview-proposal">Preview Email</button>
             <button class="crm-btn crm-btn-primary" id="btn-save-proposal-draft">Save Draft</button>
             <button class="crm-btn crm-btn-success" id="btn-send-proposal">Send Proposal</button>
           </div>
@@ -2420,6 +2421,9 @@ async function openProposalModal(proposal = null, lead = null) {
 
   // Send proposal
   document.getElementById('btn-send-proposal').addEventListener('click', () => saveProposal(proposal, 'sent'));
+
+  // Preview email — renders via send-email edge function with preview flag
+  document.getElementById('btn-preview-proposal').addEventListener('click', () => previewProposalEmail());
 
   // Recalculate totals
   document.getElementById('prop-discount')?.addEventListener('input', recalcProposalTotals);
@@ -2707,6 +2711,113 @@ async function sendProposalNow(proposalId) {
   }
 
   showToast('Proposal sent — payment link delivered', 'success');
+}
+
+// Render the proposal email in a modal iframe using the live send-email template,
+// without persisting a draft or sending anything. Reads directly from the form so the
+// preview reflects unsaved edits.
+async function previewProposalEmail() {
+  const title = document.getElementById('prop-title').value.trim() || 'Your Event at AWKN Ranch';
+  const leadId = document.getElementById('prop-lead').value || null;
+  const lead = leadId ? leads.find(l => l.id === leadId) : null;
+
+  const lineItems = getProposalLineItemsFromForm();
+  const subtotal = lineItems.reduce((s, li) => s + li.total, 0);
+  const discount = parseFloat(document.getElementById('prop-discount').value) || 0;
+  const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
+  const total = subtotal - discount + tax;
+
+  const { data: sessionWrap } = await supabase.auth.getSession();
+  const token = sessionWrap?.session?.access_token;
+  if (!token) { showToast('Not authenticated', 'error'); return; }
+
+  const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+  const btn = document.getElementById('btn-preview-proposal');
+  const prevLabel = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading preview…'; }
+
+  try {
+    const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'apikey': anonKey,
+      },
+      body: JSON.stringify({
+        type: 'proposal_sent',
+        to: lead?.email || 'preview@example.com',
+        preview: true,
+        data: {
+          recipient_first_name: lead?.first_name || 'there',
+          business_line: lead?.business_line || 'awkn_ranch',
+          proposal_number: document.getElementById('prop-number').value || 'PROP-PREVIEW',
+          title,
+          event_type: document.getElementById('prop-event-type').value || null,
+          event_date: document.getElementById('prop-event-date').value || null,
+          guest_count: parseInt(document.getElementById('prop-guest-count').value) || null,
+          subtotal,
+          discount_amount: discount,
+          tax_amount: tax,
+          total,
+          valid_until: document.getElementById('prop-valid-until').value || null,
+          notes: document.getElementById('prop-notes').value.trim() || null,
+          terms: document.getElementById('prop-terms').value.trim() || null,
+          payment_link_url: '#preview-no-payment-link',
+          line_items: lineItems.map(li => ({
+            description: li.description,
+            quantity: li.quantity,
+            unit_price: li.unit_price,
+            total: li.total,
+          })),
+        },
+      }),
+    });
+    const result = await resp.json().catch(() => ({}));
+    if (!resp.ok || !result.html) {
+      throw new Error(result.error || 'Preview failed (HTTP ' + resp.status + ')');
+    }
+    showProposalPreviewModal(result.subject || 'Proposal preview', result.html);
+  } catch (err) {
+    console.error('Preview error:', err);
+    showToast('Preview failed: ' + (err.message || err), 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = prevLabel; }
+  }
+}
+
+function showProposalPreviewModal(subject, html) {
+  const existing = document.getElementById('crm-preview-modal');
+  if (existing) existing.remove();
+
+  const wrap = document.createElement('div');
+  wrap.id = 'crm-preview-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:#fff;width:100%;max-width:720px;max-height:90vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Email subject</div>
+          <div style="color:#1e293b;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(subject)}</div>
+        </div>
+        <button type="button" id="crm-preview-close" class="crm-btn">Close</button>
+      </div>
+      <iframe id="crm-preview-iframe" style="flex:1;width:100%;border:0;background:#eef1f5;min-height:500px;"></iframe>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const iframe = wrap.querySelector('#crm-preview-iframe');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;padding:24px 16px;background:#eef1f5;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}</style></head><body>${html}</body></html>`);
+  doc.close();
+
+  const close = () => wrap.remove();
+  wrap.querySelector('#crm-preview-close').addEventListener('click', close);
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
 }
 
 // =============================================

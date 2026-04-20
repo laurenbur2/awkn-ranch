@@ -109,6 +109,8 @@ interface EmailRequest {
   reply_to?: string;
   cc?: string | string[];
   bcc?: string | string[];
+  // When true, render the template and return { html, subject, text } without sending
+  preview?: boolean;
 }
 
 interface EmailTemplate {
@@ -2688,7 +2690,7 @@ serve(async (req) => {
     }
 
     const body: EmailRequest = await req.json();
-    const { type, to, data, subject: customSubject, from, reply_to, cc, bcc } = body;
+    const { type, to, data, subject: customSubject, from, reply_to, cc, bcc, preview } = body;
 
     if (!type || !to || !data) {
       return new Response(
@@ -2737,6 +2739,22 @@ serve(async (req) => {
     // Don't BCC if it's already a recipient
     if (toArray.includes(ARCHIVE_BCC)) bccSet.delete(ARCHIVE_BCC);
     const bccArray = [...bccSet];
+
+    // === PREVIEW SHORT-CIRCUIT ===
+    // When preview=true, return rendered HTML/subject/text without sending, archiving,
+    // approval gating, metadata injection, or usage logging.
+    if (preview) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          preview: true,
+          subject: customSubject || rendered.subject,
+          html: finalHtml,
+          text: rendered.text,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // === INJECT HIDDEN METADATA for reply context ===
     // This invisible block lets PAI understand replies: what email type triggered
