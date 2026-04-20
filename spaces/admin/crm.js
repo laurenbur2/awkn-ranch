@@ -1477,14 +1477,11 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Loading preview…';
       try {
-        const { data: session } = await supabase.auth.getSession();
-        const token = session?.session?.access_token;
-        if (!token) throw new Error('Not authenticated');
         const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
         const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
           body: JSON.stringify(buildPayload({ preview: true })),
         });
         const result = await resp.json().catch(() => ({}));
@@ -1513,14 +1510,11 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Sending…';
       try {
-        const { data: session } = await supabase.auth.getSession();
-        const token = session?.session?.access_token;
-        if (!token) throw new Error('Not authenticated');
         const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
         const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
           body: JSON.stringify(buildPayload({ toOverride: testTo })),
         });
         if (!resp.ok) {
@@ -1543,14 +1537,11 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Sending…';
       try {
-        const { data: session } = await supabase.auth.getSession();
-        const token = session?.session?.access_token;
-        if (!token) throw new Error('Not authenticated');
         const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
         const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': anonKey },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
           body: JSON.stringify(buildPayload({})),
         });
         if (!resp.ok) {

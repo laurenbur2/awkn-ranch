@@ -2994,13 +2994,23 @@ serve(async (req) => {
 
     // === ALWAYS BCC archive inbox ===
     const ARCHIVE_BCC = "justin@within.center";
+    // Type-specific BCC: welcome letter always goes to Within team
+    const TYPE_BCC: Partial<Record<EmailType, string[]>> = {
+      welcome_letter: [
+        "shannon@within.center",
+        "william@within.center",
+        "leslie@within.center",
+        "justin@within.center",
+      ],
+    };
     const toArray = Array.isArray(to) ? to : [to];
     const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : undefined;
     const userBcc = bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : [];
-    // Always include archive BCC (deduplicate if already present)
-    const bccSet = new Set([...userBcc, ARCHIVE_BCC]);
-    // Don't BCC if it's already a recipient
-    if (toArray.includes(ARCHIVE_BCC)) bccSet.delete(ARCHIVE_BCC);
+    const typeBcc = TYPE_BCC[type] || [];
+    // Always include archive BCC plus any type-specific addresses (dedupe)
+    const bccSet = new Set([...userBcc, ...typeBcc, ARCHIVE_BCC]);
+    // Don't BCC anyone who is already a to-recipient
+    for (const addr of toArray) bccSet.delete(addr);
     const bccArray = [...bccSet];
 
     // === PREVIEW SHORT-CIRCUIT ===
