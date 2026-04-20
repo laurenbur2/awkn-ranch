@@ -2741,8 +2741,10 @@ serve(async (req) => {
     const bccArray = [...bccSet];
 
     // === PREVIEW SHORT-CIRCUIT ===
-    // When preview=true, return rendered HTML/subject/text without sending, archiving,
-    // approval gating, metadata injection, or usage logging.
+    // When preview=true, return rendered HTML/subject/text/from/to/reply_to without
+    // sending, archiving, approval gating, metadata injection, or usage logging.
+    // The html returned here is exactly what Resend delivers (minus the trailing
+    // ALPACAPPS_META comment, which is an invisible HTML comment added later).
     if (preview) {
       return new Response(
         JSON.stringify({
@@ -2751,6 +2753,9 @@ serve(async (req) => {
           subject: customSubject || rendered.subject,
           html: finalHtml,
           text: rendered.text,
+          from: from || sender.from,
+          to: Array.isArray(to) ? to : [to],
+          reply_to: reply_to || sender.reply_to,
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

@@ -2779,7 +2779,12 @@ async function previewProposalEmail() {
     if (!resp.ok || !result.html) {
       throw new Error(result.error || 'Preview failed (HTTP ' + resp.status + ')');
     }
-    showProposalPreviewModal(result.subject || 'Proposal preview', result.html);
+    showProposalPreviewModal({
+      subject: result.subject || 'Proposal preview',
+      html: result.html,
+      from: result.from || '',
+      to: (result.to && result.to[0]) || lead?.email || 'preview@example.com',
+    });
   } catch (err) {
     console.error('Preview error:', err);
     showToast('Preview failed: ' + (err.message || err), 'error');
@@ -2788,7 +2793,7 @@ async function previewProposalEmail() {
   }
 }
 
-function showProposalPreviewModal(subject, html) {
+function showProposalPreviewModal({ subject, html, from, to }) {
   const existing = document.getElementById('crm-preview-modal');
   if (existing) existing.remove();
 
@@ -2796,15 +2801,21 @@ function showProposalPreviewModal(subject, html) {
   wrap.id = 'crm-preview-modal';
   wrap.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   wrap.innerHTML = `
-    <div style="background:#fff;width:100%;max-width:720px;max-height:90vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
-      <div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;">
-        <div style="flex:1;min-width:0;">
-          <div style="color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Email subject</div>
-          <div style="color:#1e293b;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(subject)}</div>
+    <div style="background:#fff;width:100%;max-width:760px;max-height:92vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;background:#f8fafc;">
+        <div style="flex:1;min-width:0;font-size:12px;color:#475569;line-height:1.5;">
+          <div><strong style="color:#1e293b;">Preview</strong> — exactly what the recipient will see. No email sent.</div>
         </div>
         <button type="button" id="crm-preview-close" class="crm-btn">Close</button>
       </div>
-      <iframe id="crm-preview-iframe" style="flex:1;width:100%;border:0;background:#eef1f5;min-height:500px;"></iframe>
+      <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#334155;">
+        <div style="font-size:17px;font-weight:600;color:#0f172a;margin-bottom:6px;line-height:1.3;">${escapeHtml(subject)}</div>
+        <div style="display:grid;grid-template-columns:60px 1fr;gap:2px 10px;">
+          <div style="color:#94a3b8;">From:</div><div>${escapeHtml(from)}</div>
+          <div style="color:#94a3b8;">To:</div><div>${escapeHtml(to)}</div>
+        </div>
+      </div>
+      <iframe id="crm-preview-iframe" style="flex:1;width:100%;border:0;min-height:520px;background:#ffffff;"></iframe>
     </div>
   `;
   document.body.appendChild(wrap);
@@ -2812,7 +2823,9 @@ function showProposalPreviewModal(subject, html) {
   const iframe = wrap.querySelector('#crm-preview-iframe');
   const doc = iframe.contentDocument || iframe.contentWindow.document;
   doc.open();
-  doc.write(`<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;padding:24px 16px;background:#eef1f5;font-family:-apple-system,BlinkMacSystemFont,sans-serif;}</style></head><body>${html}</body></html>`);
+  // Render the body HTML verbatim — no wrapping styles. This matches what Resend
+  // delivers to the recipient; their email client provides its own chrome.
+  doc.write(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`);
   doc.close();
 
   const close = () => wrap.remove();
