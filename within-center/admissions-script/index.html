@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admissions Call Script | Within Center</title>
+  <meta name="description" content="Internal admissions call script for retreat inquiries at Within Center / AWKN Ranch.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9943e;
+      --gold-dark: #a67a2e;
+      --gold-glow: rgba(201,148,62,0.15);
+      --gold-soft: rgba(201,148,62,0.08);
+      --brown: #6b4c3b;
+      --grey: #6b6569;
+      --grey-soft: rgba(28,22,24,0.55);
+      --dark: #1c1618;
+      --cream: #faf8f5;
+      --cream-warm: #f5f1ea;
+      --white: #ffffff;
+      --border: rgba(28,22,24,0.08);
+      --border-soft: rgba(28,22,24,0.05);
+      --shadow-sm: 0 1px 3px rgba(28,22,24,0.04);
+      --shadow-md: 0 4px 20px rgba(28,22,24,0.06);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--dark);
+      background: var(--cream);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    }
+
+    /* ── PAGE SHELL ────────────────────────────────── */
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 5rem 2rem 6rem;
+    }
+    @media (max-width: 640px) { .page { padding: 3rem 1.25rem 4rem; } }
+
+    /* ── HEADER ────────────────────────────────────── */
+    .doc-header {
+      text-align: center;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3.5rem;
+    }
+    .doc-eyebrow {
+      display: inline-block;
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      padding: 0.4rem 1.1rem;
+      border: 1px solid rgba(201,148,62,0.4);
+      border-radius: 999px;
+      margin-bottom: 1.6rem;
+    }
+    .doc-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--dark);
+      letter-spacing: -0.01em;
+    }
+    .doc-title em {
+      font-style: italic;
+      color: var(--gold-dark);
+    }
+    .doc-subtitle {
+      margin-top: 1.3rem;
+      font-size: 0.95rem;
+      color: var(--grey-soft);
+      font-style: italic;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+    .doc-brand {
+      margin-top: 2rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+    .doc-brand .sep { display: inline-block; margin: 0 0.7rem; color: rgba(201,148,62,0.5); }
+
+    /* ── SECTIONS ─────────────────────────────────── */
+    section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 2rem;
+    }
+    section:last-child { margin-bottom: 0; }
+
+    .section-num {
+      display: inline-block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+      line-height: 1.2;
+      color: var(--dark);
+      margin-bottom: 0.7rem;
+      letter-spacing: -0.005em;
+    }
+    h2 em { font-style: italic; color: var(--gold-dark); }
+    .section-lede {
+      font-size: 1.02rem;
+      color: var(--grey-soft);
+      margin-bottom: 2rem;
+      max-width: 680px;
+      line-height: 1.7;
+    }
+    h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.5rem;
+      color: var(--dark);
+      margin: 2.2rem 0 1rem;
+    }
+    h3 em { font-style: italic; color: var(--gold-dark); font-weight: 500; }
+    h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 1.8rem 0 0.9rem;
+    }
+
+    p { margin-bottom: 1.1rem; font-size: 1rem; color: var(--dark); }
+    p.subtle { color: var(--grey-soft); font-style: italic; font-size: 0.93rem; }
+
+    /* ── OPENING NOTE (soft cream callout) ─────────── */
+    .tone-card {
+      background: var(--cream-warm);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 10px 10px 0;
+      padding: 1.8rem 2rem;
+      margin: 1.2rem 0 2rem;
+    }
+    .tone-card p:last-child { margin-bottom: 0; }
+
+    /* ── RULES LIST ────────────────────────────────── */
+    ol.rules {
+      list-style: none;
+      counter-reset: rules;
+      margin: 1.5rem 0;
+    }
+    ol.rules li {
+      counter-increment: rules;
+      position: relative;
+      padding-left: 3.2rem;
+      margin-bottom: 1.4rem;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    ol.rules li::before {
+      content: counter(rules);
+      position: absolute;
+      left: 0;
+      top: -0.1rem;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      color: var(--gold-dark);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    ol.rules strong { color: var(--gold-dark); font-weight: 600; }
+
+    /* ── NEVER LIST ────────────────────────────────── */
+    ul.never-list {
+      list-style: none;
+      margin: 1rem 0 1.5rem;
+      padding: 0;
+    }
+    ul.never-list li {
+      position: relative;
+      padding-left: 1.8rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.97rem;
+      color: var(--dark);
+    }
+    ul.never-list li::before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 400;
+    }
+
+    /* ── QUOTE BLOCK (spoken lines) ────────────────── */
+    .spoken {
+      position: relative;
+      padding: 1.6rem 2rem 1.6rem 2.4rem;
+      background: var(--white);
+      border-left: 2px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      margin: 1.2rem 0 1.4rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.18rem;
+      font-style: italic;
+      line-height: 1.65;
+      color: var(--dark);
+      box-shadow: var(--shadow-sm);
+    }
+    .spoken::before {
+      content: "“";
+      position: absolute;
+      left: 0.6rem;
+      top: 0.2rem;
+      font-size: 2.8rem;
+      color: var(--gold);
+      opacity: 0.35;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      line-height: 1;
+    }
+    .stage {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+    }
+    .pause {
+      display: block;
+      margin: 0.8rem 0;
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--grey);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .pause::before, .pause::after {
+      content: "·";
+      margin: 0 0.7rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* ── DISCOVERY QUESTIONS ──────────────────────── */
+    ol.questions {
+      list-style: none;
+      counter-reset: q;
+      margin: 1.5rem 0;
+    }
+    ol.questions li {
+      counter-increment: q;
+      position: relative;
+      padding: 1rem 1.2rem 1rem 3.5rem;
+      margin-bottom: 0.5rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      line-height: 1.55;
+      color: var(--dark);
+      border-bottom: 1px dashed var(--border-soft);
+    }
+    ol.questions li:last-child { border-bottom: none; }
+    ol.questions li::before {
+      content: counter(q, decimal-leading-zero);
+      position: absolute;
+      left: 0.8rem;
+      top: 1.1rem;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    ol.questions li .note {
+      display: block;
+      margin-top: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--grey-soft);
+      letter-spacing: 0;
+    }
+
+    /* ── PACKAGE CARDS ────────────────────────────── */
+    .pkg {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 2rem 1.8rem;
+      margin: 1.5rem 0;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .pkg::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.55;
+    }
+    .pkg-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 0.4rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .pkg-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--dark);
+      letter-spacing: 0.01em;
+    }
+    .pkg-name .accent { color: var(--gold-dark); font-style: italic; }
+    .pkg-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .pkg-price .small {
+      display: block;
+      font-size: 0.72rem;
+      font-family: 'Inter', sans-serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--grey-soft);
+      letter-spacing: 0.04em;
+      text-align: right;
+      margin-top: 0.15rem;
+    }
+    .pkg-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      background: var(--gold-soft);
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .pkg-frame {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+      color: var(--grey-soft);
+      font-style: italic;
+    }
+    .pkg-frame strong {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--gold-dark);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      margin-right: 0.5rem;
+    }
+
+    /* ── DIVIDER ──────────────────────────────────── */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--gold);
+      padding: 0 1.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── OBJECTION TABLE ─────────────────────────── */
+    .dialog-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0;
+      font-size: 0.95rem;
+    }
+    .dialog-table th {
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dialog-table td {
+      padding: 1rem;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border-soft);
+      line-height: 1.65;
+    }
+    .dialog-table td:first-child {
+      color: var(--dark);
+      font-weight: 400;
+      width: 32%;
+    }
+    .dialog-table td:last-child {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      color: var(--dark);
+      font-size: 1.03rem;
+    }
+    .dialog-table tr:last-child td { border-bottom: none; }
+    @media (max-width: 640px) {
+      .dialog-table, .dialog-table tbody, .dialog-table tr, .dialog-table td { display: block; width: 100%; }
+      .dialog-table thead { display: none; }
+      .dialog-table tr {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        padding: 1rem 1.2rem;
+      }
+      .dialog-table td { border: none !important; padding: 0.4rem 0 !important; }
+      .dialog-table td:first-child {
+        width: 100% !important;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+    }
+
+    /* ── CLOSE VARIANTS ──────────────────────────── */
+    .close-variant {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .close-variant-label {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--gold-dark);
+      margin-bottom: 0.9rem;
+    }
+    .close-variant-label .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .close-variant .spoken {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    /* ── CHECKLIST (after-call) ──────────────────── */
+    ul.checklist {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+    ul.checklist li {
+      position: relative;
+      padding: 0.6rem 0 0.6rem 2rem;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.97rem;
+      line-height: 1.7;
+    }
+    ul.checklist li:last-child { border-bottom: none; }
+    ul.checklist li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1.1rem;
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--gold);
+      border-radius: 3px;
+      background: transparent;
+    }
+    ul.checklist li strong { color: var(--gold-dark); font-weight: 600; }
+
+    /* ── FINAL REMINDER ──────────────────────────── */
+    .final-reminder {
+      background: var(--dark);
+      color: var(--cream);
+      border-radius: 14px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .final-reminder p {
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      line-height: 1.75;
+      max-width: 520px;
+      margin: 0 auto 1.5rem;
+      font-style: italic;
+    }
+    .final-reminder .mantra {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(201,148,62,0.3);
+    }
+    .final-reminder .mantra span {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    /* ── PRINT ──────────────────────────────────── */
+    @media print {
+      body { background: white; }
+      .page { padding: 0; max-width: 100%; }
+      .pkg, .close-variant, .spoken, .tone-card {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+      .final-reminder { background: var(--cream-warm); color: var(--dark); }
+      .final-reminder p, .final-reminder .mantra span { color: var(--dark); }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="page">
+
+  <!-- ── HEADER ──────────────────────────────────── -->
+  <header class="doc-header">
+    <span class="doc-eyebrow">Internal · Admissions</span>
+    <h1 class="doc-title">The Call Is the <em>First Session</em></h1>
+    <p class="doc-subtitle">A guide for answering inquiries about our retreats, ceremonies, and day packages. Know it, then put it down.</p>
+    <div class="doc-brand">
+      Within Center <span class="sep">·</span> AWKN Ranch
+    </div>
+  </header>
+
+  <!-- ── 0. TONE ─────────────────────────────────── -->
+  <section>
+    <span class="section-num">— 00 —</span>
+    <h2>Before You Pick Up · <em>The Tone</em></h2>
+    <p class="section-lede">The person calling is almost always in a tender place. Depression, grief, burnout, a relationship ending, a parent dying, addiction, trauma, a crisis of meaning. They've been thinking about making this call for weeks.</p>
+
+    <div class="tone-card">
+      <p>The way you answer the phone matters more than the words you say.</p>
+    </div>
+
+    <h4>Three rules, in order</h4>
+    <ol class="rules">
+      <li><strong>Slow down.</strong> Speak at about 70% of your normal pace. Let sentences land. A calm voice regulates their nervous system before the conversation even starts.</li>
+      <li><strong>Leave space.</strong> After you ask a question, count to three before you say anything else. Silence is not awkward — it is the container. Most callers will fill it with the real reason they're calling if you let them.</li>
+      <li><strong>Match, then lead.</strong> Start at their energy, then gently bring it down. If they're frantic, don't match frantic — acknowledge it warmly, then soften your pace and they'll follow.</li>
+    </ol>
+
+    <h4>Never</h4>
+    <ul class="never-list">
+      <li>Never interrupt. Even when you know where the sentence is going.</li>
+      <li>Never use sales words: "awesome," "perfect," "absolutely," "no worries," "boom," "100%." They break the spell.</li>
+      <li>Never laugh at something that isn't funny to fill space.</li>
+      <li>Never read the script.</li>
+    </ul>
+
+    <p class="subtle">Breath check: before you pick up, take one slow breath in, one slow breath out. Your body is the instrument.</p>
+  </section>
+
+  <!-- ── 1. OPENING ───────────────────────────────── -->
+  <section>
+    <span class="section-num">— 01 —</span>
+    <h2>The <em>Opening</em></h2>
+    <p class="section-lede">Warm, unhurried. Smile gently — they can hear it.</p>
+
+    <div class="spoken">
+      Hi, thank you for calling Within Center. This is [Name]… how can I support you today?
+    </div>
+    <p class="pause">pause · let them talk · don't rush to answer</p>
+
+    <p>If they're hesitant or apologetic — <em>"sorry, I don't even know why I'm calling"</em> — say:</p>
+    <div class="spoken">
+      You don't have to have it figured out. A lot of people call us feeling exactly like that. Take your time.
+    </div>
+  </section>
+
+  <!-- ── 2. DISCOVERY ─────────────────────────────── -->
+  <section>
+    <span class="section-num">— 02 —</span>
+    <h2>Discovery · <em>Listen Before You Offer</em></h2>
+    <p class="section-lede">Ask gently. One question, then silence. Don't stack questions.</p>
+
+    <ol class="questions">
+      <li>What's been going on in your life that brought you to pick up the phone today?</li>
+      <li>After they answer — Thank you for sharing that with me.<span class="note">This line, said simply, matters more than you think.</span></li>
+      <li>Have you done any ketamine or psychedelic work before?</li>
+      <li>Are you currently working with a therapist or a coach?</li>
+      <li>When you imagine coming here — are you picturing a single visit to see what this is like, or something longer, where you step out of your life for a few days and stay on the land?</li>
+      <li>And are you thinking of doing this on your own, or with a partner or a friend?</li>
+      <li>Is there anything medically I should be aware of — heart, blood pressure, medications, pregnancy?</li>
+      <li>What's your timeline feeling like — weeks, or more like a season?</li>
+    </ol>
+
+    <p class="subtle">If they cry, don't rush past it. Say: "Take your time. I'm right here."</p>
+  </section>
+
+  <!-- ── 3. MATCHING ──────────────────────────────── -->
+  <section>
+    <span class="section-num">— 03 —</span>
+    <h2>Match Them to <em>One</em> Path</h2>
+    <p class="section-lede">Lead with the single best fit. If they ask for options, offer a second. Never list all six at once — it's overwhelming and it breaks the softness.</p>
+
+    <div class="divider"><span>The Immersive Retreats</span></div>
+    <p style="text-align:center; font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; color:var(--grey-soft); font-size:1.1rem; margin-bottom:1rem;">"Leave the world behind. Come back changed."</p>
+    <p class="subtle" style="text-align:center; margin-bottom:2rem;">When someone needs to step out of their life — not just fit a session into their week — guide them here first.</p>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">6 Days / <span class="accent">5 Nights</span></span>
+        <span class="pkg-price">$3,999 <span class="small">private · $3,499 shared</span></span>
+      </div>
+      <div class="spoken">
+        A single ceremony can open the door. Staying on the land is what lets you walk through it. Six days with us includes two guided ketamine ceremonies, two integration sessions, all of your meals cooked by our chef, sound baths, yoga, IV vitamin therapy, and evening ritual. You'll have the sauna, the cold plunge, the hot tub, the pool, the hammock garden — all of it. It's the container we've built for deep, sustained work.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> trauma · addiction recovery · burnout where someone has lost themselves · major life transition · grief</span>
+    </div>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">3 Days / <span class="accent">2 Nights</span></span>
+        <span class="pkg-price">$1,699 <span class="small">private · $1,499 shared</span></span>
+      </div>
+      <div class="spoken">
+        If six days feels like a lot, we also hold a shorter immersion — three days, two nights, one ceremony with integration, and the same care and the same land. It's a beautiful way to begin.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> first-time immersion · can't take a full week away · reset weekend</span>
+    </div>
+
+    <div class="divider"><span>The Day Packages</span></div>
+    <p class="subtle" style="text-align:center; margin-bottom:2rem;">For people staying local.</p>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">Discover <span class="pkg-badge">April Special</span></span>
+        <span class="pkg-price">$799 <span class="small">normally $1,250</span></span>
+      </div>
+      <div class="spoken">
+        DISCOVER is your first step. One guided ketamine ceremony, one integration session, medical clearance, and a week of ranch access so you can come back to use the pool and the saunas while you integrate. Right now through April it's 799.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> curious · skeptical · first-timers · "I just want to try this"</span>
+    </div>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">Heal <span class="pkg-badge">Most Popular</span></span>
+        <span class="pkg-price">$3,300</span>
+      </div>
+      <div class="spoken">
+        HEAL is for someone who's ready to move beyond a single experience. Three ceremonies, three integration sessions, and a month at the ranch. It's the program most people choose when they're ready to actually do the work.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> a specific hard season · breakup · loss · burnout · depression they want to move through</span>
+    </div>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">Awkn</span>
+        <span class="pkg-price">$5,500</span>
+      </div>
+      <div class="spoken">
+        AWKN is the full container — six ceremonies, six integration sessions, two months on the land, and our weekly group therapy. This is for someone ready to peel back layers and come home to themselves.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> long-standing depression · trauma · addiction · "I've tried everything"</span>
+    </div>
+
+    <div class="divider"><span>For Two</span></div>
+
+    <div class="pkg">
+      <div class="pkg-head">
+        <span class="pkg-name">Journey <span class="accent">for Two</span></span>
+        <span class="pkg-price">$1,650</span>
+      </div>
+      <div class="spoken">
+        If you're calling with someone in mind — a partner, a sibling, a close friend — we hold a package called Journey for Two. One shared ceremony, two individual integration sessions, a week of ranch access. The idea is simple: heal together, integrate individually.
+      </div>
+      <span class="pkg-frame"><strong>Frame for</strong> couples at a turning point · siblings processing a loss · close friends doing parallel work</span>
+    </div>
+  </section>
+
+  <!-- ── 4. DIFFERENCE ────────────────────────────── -->
+  <section>
+    <span class="section-num">— 04 —</span>
+    <h2>What Makes Us <em>Different</em></h2>
+    <p class="section-lede">When they ask "what makes you different from [other clinic]" — say this, slowly.</p>
+
+    <div class="spoken">
+      <span class="stage">soft · certain · unhurried</span>
+      A lot of places will give you the medicine. What we do is hold the container around it. You're on twelve acres in Austin. Yurts, a dome temple, pool, hot tub, two cold plunges, saunas, a garden. Our clinicians have held over fifteen hundred ketamine sessions with a perfect safety record. The medicine opens the door. The land and the integration are what change your life.
+    </div>
+    <p class="pause">then pause · let it land · don't fill the silence</p>
+  </section>
+
+  <!-- ── 5. TENDER MOMENTS ────────────────────────── -->
+  <section>
+    <span class="section-num">— 05 —</span>
+    <h2>Handling <em>Tender Moments</em></h2>
+    <p class="section-lede">Said softly. Always.</p>
+
+    <table class="dialog-table">
+      <thead>
+        <tr>
+          <th>They say</th>
+          <th>You say</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><em>(crying)</em></td>
+          <td>Take your time. There's no hurry here.</td>
+        </tr>
+        <tr>
+          <td>"That's more than I can afford."</td>
+          <td>I hear that. Can I ask — do you want me to tell you what might fit, or would it be more helpful if I sent you a few options by email and you sit with them?</td>
+        </tr>
+        <tr>
+          <td>"Is ketamine safe?"</td>
+          <td>That's a good question to ask. It's FDA-approved, we screen medically before anyone starts, and a clinician is present for every session. Fifteen hundred sessions, perfect safety record. I'll send you our medical intake so you can review it with your own doctor.</td>
+        </tr>
+        <tr>
+          <td>"I'm scared."</td>
+          <td>Of course you are. Most people who call us are a little scared. That's usually a sign that something real is ready to move. You don't have to decide anything today.</td>
+        </tr>
+        <tr>
+          <td>"I need to talk to my partner / therapist."</td>
+          <td>Please do. I'll send you a one-pager you can share with them. And if they have questions, I'm happy to be on a call with both of you.</td>
+        </tr>
+        <tr>
+          <td>"I just want to stay at the ranch, not do a program."</td>
+          <td>You can. Nightly lodging in the retreat house is 349 to 499. Yurts are 699. The HoneyComb Dome is 599. Within Center clients get ten percent off.</td>
+        </tr>
+        <tr>
+          <td>"Can I bring my partner / friend?"</td>
+          <td>Yes. The six-day retreat can be shared or private rooms, and we also hold Journey for Two if you want to do a shared ceremony with individual integration.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 6. THE CLOSE ─────────────────────────────── -->
+  <section>
+    <span class="section-num">— 06 —</span>
+    <h2>The Close · <em>Send the Intake Forms</em></h2>
+    <p class="section-lede">Every path ends the same way: intake forms. That's the one clear next step. Everything else is optional.</p>
+
+    <div class="spoken">
+      <span class="stage">softly · unhurried</span>
+      The next step on my side is simple — I'll send you our intake forms by email. They take about 15 to 20 minutes to fill out. It's a medical history, a little bit about what you're looking for, and a consent form our clinician reviews before we confirm anything. You don't commit to a date or a package by filling them out — it just lets our clinical team make sure this is the right fit for you, and lets me hold a spot while you're deciding.
+    </div>
+    <p class="pause">pause · let them sit with it</p>
+
+    <div class="spoken">
+      Is it okay if I send those over to <em>[read their email back to them]</em>?
+    </div>
+
+    <h3>Framing the intake — so it doesn't feel like <em>homework</em></h3>
+    <p>The caller is often in a tender state. "Paperwork" lands badly. Reframe it.</p>
+    <ul class="never-list">
+      <li><em>Not</em> "fill out these forms"</li>
+      <li style="color:var(--gold-dark);"><strong style="color:var(--gold-dark);">Instead</strong> "share a little of your story with our clinical team so they can hold you well"</li>
+    </ul>
+    <div class="spoken">
+      The forms are less about intake and more about us getting to know you before you arrive. The more you share, the better we can prepare — everything you write is read by a real clinician, not a computer.
+    </div>
+
+    <h3>Three versions of the close · <em>matched to warmth</em></h3>
+
+    <div class="close-variant">
+      <div class="close-variant-label"><span class="dot"></span>Warm · ready</div>
+      <div class="spoken">
+        I'm going to send the intake over right now. Once you get it back to me, I'll book you a 15-minute call with one of our clinicians this week, and after that call we can hold your retreat dates. Sound good?
+      </div>
+    </div>
+
+    <div class="close-variant">
+      <div class="close-variant-label"><span class="dot"></span>Lukewarm · still deciding</div>
+      <div class="spoken">
+        Let me send you the intake forms along with our retreat overview. There's no pressure to finish them — a lot of people start, save it, and come back to it in a few days when they're ready. When you send them back, I'll be here.
+      </div>
+    </div>
+
+    <div class="close-variant">
+      <div class="close-variant-label"><span class="dot"></span>Very tender · not ready</div>
+      <div class="spoken">
+        I'm not going to push anything today. I'll send you the intake forms and some information about the land. Sit with it. You can open them tomorrow, next week, next month — whenever it feels right. And if you want to talk again before that, call me directly. My name is [Name].
+      </div>
+    </div>
+
+    <h3>Hold the spot · <em>soft urgency, not pressure</em></h3>
+    <p>If the retreat they want has limited dates (especially 6-day immersions), say this <em>after</em> they've agreed to the intake:</p>
+    <div class="spoken">
+      One thing I can do on my end — once you send the intake back, I'll put a soft hold on the dates we talked about. It's not a booking, it just means I'm not giving that room to someone else while you're deciding. Most of our retreats fill about three to four weeks out.
+    </div>
+
+    <h3>If they hesitate about the <em>intake itself</em></h3>
+    <table class="dialog-table">
+      <thead>
+        <tr>
+          <th>They say</th>
+          <th>You say</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"Can't I just book?"</td>
+          <td>I wish I could — our clinical team requires the intake before any ceremony. It's what keeps everyone safe. It really is short.</td>
+        </tr>
+        <tr>
+          <td>"What if I don't qualify?"</td>
+          <td>That happens sometimes. If it's not the right fit medically, our clinician will get on a call with you, explain why, and help you find what is. You won't be left hanging.</td>
+        </tr>
+        <tr>
+          <td>"Is my information private?"</td>
+          <td>Completely. It's stored in our medical system, only our clinicians see it, and we never share it.</td>
+        </tr>
+        <tr>
+          <td>"I don't have time right now."</td>
+          <td>Totally understandable. I'll send it — just open it when you have a quiet twenty minutes. Tea, no phone. It's actually a nice way to start the process.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Close every call with this</h3>
+    <div class="spoken">
+      Before we hang up — is there anything you didn't tell me that you want our clinical team to know when they read your intake?
+    </div>
+    <p class="pause">wait · this often surfaces the real reason they called</p>
+  </section>
+
+  <!-- ── 7. AFTER THE CALL ────────────────────────── -->
+  <section>
+    <span class="section-num">— 07 —</span>
+    <h2>After You <em>Hang Up</em></h2>
+    <p class="section-lede">The warmth of the call is a small window. Move with it.</p>
+
+    <ul class="checklist">
+      <li><strong>Within 10 minutes</strong> send the intake forms plus a short personal email. Use their name. Reference one thing they shared — <em>"I'm glad you reached out today — it sounds like this past year has been a lot."</em> Attach or link the retreat overview.</li>
+      <li><strong>Soft-hold</strong> the dates or package in the CRM, with a 7-day expiration.</li>
+      <li><strong>CRM note</strong> in their own words — what they said, not what you interpreted. Example: <em>"running on fumes, mom passed in Feb, husband supportive, leaning 6-day private room, sent intake 2:14pm."</em></li>
+      <li><strong>Follow up at 48 hours</strong> if the intake hasn't been returned. Don't pressure — say: <em>"Just checking in — wanted to make sure the intake landed in your inbox and didn't end up in spam. No rush on sending it back. I'm here when you're ready."</em></li>
+      <li><strong>When the intake returns</strong> hand off to the clinical team the same day and email the caller to confirm receipt and what happens next.</li>
+    </ul>
+  </section>
+
+  <!-- ── 8. MANTRA ────────────────────────────────── -->
+  <section>
+    <div class="final-reminder">
+      <p>You are often the first human voice someone hears after weeks of pain. The call is not a sale. The call is the first session.</p>
+      <div class="mantra">
+        <span>Slower.</span>
+        <span>Softer.</span>
+        <span>Silence is the container.</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Within Center <span class="sep" style="color:rgba(201,148,62,0.5);margin:0 0.7rem;">·</span> AWKN Ranch <span class="sep" style="color:rgba(201,148,62,0.5);margin:0 0.7rem;">·</span> Admissions
+  </footer>
+
+</main>
+
+</body>
+</html>
