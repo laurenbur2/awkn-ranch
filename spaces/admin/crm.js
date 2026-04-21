@@ -2952,13 +2952,15 @@ async function sendProposalNow(proposalId) {
     status: 'sent',
   }).eq('id', proposal.id);
 
-  // 3. Send the branded email
+  // 3. Send the branded email — anon key in Authorization (matches the rest of this
+  // file). send-email doesn't read the user token; it just needs a valid JWT for the
+  // gateway. Using the user's ES256 session here would hit the gateway bug.
   const items = (proposal.items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   const emailResp = await fetch(supabaseUrl + '/functions/v1/send-email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Bearer ' + anonKey,
       'apikey': anonKey,
     },
     body: JSON.stringify({
