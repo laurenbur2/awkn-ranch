@@ -266,8 +266,11 @@ serve(async (req) => {
     ];
     obligations.forEach((o, i) => drawParagraph(`${i + 1}. ${o}`, { indent: 8 }));
 
-    // --- Signature page ---
+    // --- Signature page --- we track page/y here so we can send explicit field
+    // coordinates to SignWell. text_tags are unreliable (they failed on our first
+    // attempt — recipients ended up with no fields and the doc was unsignable).
     newPage();
+    const sigPageNumber = pdf.getPageCount(); // 1-indexed for SignWell
     page.drawText("SIGNATURES", { x: MARGIN, y, size: 14, font: bold });
     y -= 24;
     drawParagraph(
@@ -281,25 +284,29 @@ serve(async (req) => {
     page.drawText(`Name: ${clientName}`, { x: MARGIN, y, size: 10, font });
     y -= LINE_H + 20;
 
-    // SignWell text tags: visible text like {{Signature}} + {{Date}} get detected
-    // when text_tags: true is passed. We use the default tag syntax so the field
-    // appears exactly where drawn. Client is recipient #1.
-    // Documented at https://developers.signwell.com/reference/text-tags
-    const sigTag = "{{Sig_Client}}";
-    const dateTag = "{{Date_Client}}";
+    // Capture coordinates for the signature + date fields. pdf-lib uses BOTTOM-LEFT
+    // origin; SignWell uses TOP-LEFT origin. Convert: top = PAGE_H - y.
     page.drawText("Signature:", { x: MARGIN, y, size: 10, font });
-    page.drawText(sigTag, { x: MARGIN + 70, y, size: 10, font, color: rgb(1, 1, 1) });
     page.drawLine({
       start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 320, y: y - 2 },
       thickness: 0.5, color: rgb(0, 0, 0),
     });
+    const sigFieldX = MARGIN + 70;
+    const sigFieldY = PAGE_H - y - 18; // top-left origin, 18pt tall
+    const sigFieldW = 250;
+    const sigFieldH = 22;
+
     y -= LINE_H + 18;
     page.drawText("Date:", { x: MARGIN, y, size: 10, font });
-    page.drawText(dateTag, { x: MARGIN + 70, y, size: 10, font, color: rgb(1, 1, 1) });
     page.drawLine({
       start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 200, y: y - 2 },
       thickness: 0.5, color: rgb(0, 0, 0),
     });
+    const dateFieldX = MARGIN + 70;
+    const dateFieldY = PAGE_H - y - 14;
+    const dateFieldW = 130;
+    const dateFieldH = 18;
+
     y -= LINE_H + 30;
 
     // Company block (pre-signed text, no field)
@@ -318,13 +325,16 @@ serve(async (req) => {
     // `embedded_signing: false` + `send_email: false` → SignWell returns a shareable
     // `signing_url` on the recipient that we can email ourselves. embedded_signing URLs
     // only work inside SignWell's JS widget; they 404 when opened directly.
+    //
+    // Fields are passed explicitly (NOT via text_tags) — text_tags silently failed
+    // to create fields on our first attempt, making the doc unsignable.
+    // SignWell field coordinates: top-left origin, page is 1-indexed.
     const swBody = {
       test_mode: false,
       name: `${proposal.proposal_number} — ${clientName} — Rental Agreement`,
       subject: `Sign your AWKN Ranch rental agreement — ${proposal.proposal_number}`,
       message: `Hi ${lead.first_name || "there"}, please review and sign your rental agreement for ${eventDate}.`,
       embedded_signing: false,
-      text_tags: true,
       draft: false,
       recipients: [
         {
@@ -340,6 +350,28 @@ serve(async (req) => {
           name: `${proposal.proposal_number}-rental-agreement.pdf`,
           file_base64: pdfBase64,
         },
+      ],
+      fields: [
+        [
+          {
+            type: "signature",
+            x: sigFieldX,
+            y: sigFieldY,
+            page: sigPageNumber,
+            required: true,
+            recipient_id: "1",
+            api_id: "sig_client",
+          },
+          {
+            type: "date_signed",
+            x: dateFieldX,
+            y: dateFieldY,
+            page: sigPageNumber,
+            required: true,
+            recipient_id: "1",
+            api_id: "date_client",
+          },
+        ],
       ],
       metadata: {
         source: "crm-proposal",
