@@ -3018,10 +3018,6 @@ async function previewProposalEmail() {
   const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
   const total = subtotal - discount + tax;
 
-  const { data: sessionWrap } = await supabase.auth.getSession();
-  const token = sessionWrap?.session?.access_token;
-  if (!token) { showToast('Not authenticated', 'error'); return; }
-
   const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
@@ -3030,11 +3026,14 @@ async function previewProposalEmail() {
   if (btn) { btn.disabled = true; btn.textContent = 'Loading preview…'; }
 
   try {
+    // Preview uses anon key in Authorization (matches the Welcome Letter preview
+    // pattern). Nothing is sent/archived, just rendered — no user auth needed.
+    // Using the user session token here would hit the ES256 gateway rejection.
     const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token,
+        'Authorization': 'Bearer ' + anonKey,
         'apikey': anonKey,
       },
       body: JSON.stringify({
