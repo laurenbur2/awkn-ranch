@@ -2939,9 +2939,6 @@ async function sendProposalNow(proposalId) {
     // Gateway rejections surface as { code, message }; function errors as { error, detail }.
     const msg = [linkData.error, linkData.detail, linkData.message, linkData.code]
       .filter(Boolean).join(' — ') || linkResp.status;
-    if (linkResp.status === 401) {
-      throw new Error('Payment link failed: session expired — please sign out and sign back in (' + msg + ')');
-    }
     throw new Error('Payment link failed: ' + msg);
   }
 
