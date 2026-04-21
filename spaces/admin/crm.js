@@ -2912,41 +2912,54 @@ async function sendProposalNow(proposalId) {
   const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
-  // 1. Stripe payment link
-  const linkResp = await fetch(supabaseUrl + '/functions/v1/create-payment-link', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token,
-      'apikey': anonKey,
-    },
-    body: JSON.stringify({
-      amount: Number(proposal.total),
-      description: `${proposal.proposal_number} — ${proposal.title}`,
-      person_name: `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
-      person_email: lead.email,
-      category: 'crm_proposal',
-      metadata: {
-        source: 'crm-proposal',
-        proposal_id: proposal.id,
-        proposal_number: proposal.proposal_number,
-        lead_id: lead.id,
+  // 1. Stripe payment links — one ACH (base amount), one card (+3% surcharge disclosed
+  // in the email). Customer picks. Surcharge ≈ Stripe's card cost of acceptance, legal
+  // in TX per card-network rules when disclosed pre-purchase.
+  const baseTotal = Number(proposal.total);
+  const cardTotal = Math.round(baseTotal * 1.03 * 100) / 100;
+
+  async function makeLink(amount, method, labelSuffix) {
+    const r = await fetch(supabaseUrl + '/functions/v1/create-payment-link', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'apikey': anonKey,
       },
-    }),
-  });
-  const linkData = await linkResp.json().catch(() => ({}));
-  if (!linkResp.ok || !linkData.url) {
-    // Gateway rejections surface as { code, message }; function errors as { error, detail }.
-    const msg = [linkData.error, linkData.detail, linkData.message, linkData.code]
-      .filter(Boolean).join(' — ') || linkResp.status;
-    throw new Error('Payment link failed: ' + msg);
+      body: JSON.stringify({
+        amount,
+        description: `${proposal.proposal_number} — ${proposal.title}${labelSuffix}`,
+        person_name: `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
+        person_email: lead.email,
+        category: 'crm_proposal',
+        payment_method: method,
+        metadata: {
+          source: 'crm-proposal',
+          proposal_id: proposal.id,
+          proposal_number: proposal.proposal_number,
+          lead_id: lead.id,
+          payment_method: method,
+        },
+      }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.url) {
+      const msg = [d.error, d.detail, d.message, d.code].filter(Boolean).join(' — ') || r.status;
+      throw new Error(`Payment link (${method}) failed: ${msg}`);
+    }
+    return d;
   }
 
-  // 2. Stamp proposal with payment link + sent state before email (so the row is accurate
-  //    even if the email send has a transient failure).
+  const linkData = await makeLink(baseTotal, 'ach', '');
+  const cardLinkData = await makeLink(cardTotal, 'card', ' (card)');
+
+  // 2. Stamp proposal with payment links + sent state before email (so the row is
+  //    accurate even if the email send has a transient failure).
   await supabase.from('crm_proposals').update({
     payment_link_id: linkData.payment_link_id,
     payment_link_url: linkData.url,
+    payment_link_card_id: cardLinkData.payment_link_id,
+    payment_link_card_url: cardLinkData.url,
     sent_at: new Date().toISOString(),
     sent_to_email: lead.email,
     status: 'sent',
@@ -2982,6 +2995,8 @@ async function sendProposalNow(proposalId) {
         notes: proposal.notes,
         terms: proposal.terms,
         payment_link_url: linkData.url,
+        payment_link_card_url: cardLinkData.url,
+        card_total: cardTotal,
         line_items: items.map(li => ({
           description: li.description,
           quantity: li.quantity,
@@ -3058,6 +3073,8 @@ async function previewProposalEmail() {
           notes: document.getElementById('prop-notes').value.trim() || null,
           terms: document.getElementById('prop-terms').value.trim() || null,
           payment_link_url: '#preview-no-payment-link',
+          payment_link_card_url: '#preview-no-payment-link',
+          card_total: Math.round(total * 1.03 * 100) / 100,
           line_items: lineItems.map(li => ({
             description: li.description,
             quantity: li.quantity,

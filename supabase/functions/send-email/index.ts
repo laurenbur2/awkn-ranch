@@ -972,11 +972,17 @@ Questions or trouble signing in? Email admin@awknranch.com.
     </div>
   </div>
 
-  <!-- CTA -->
+  <!-- CTA: ACH (base amount) + optional card (with 3% surcharge disclosed) -->
   <div style="padding:0 40px 8px 40px;text-align:center;">
-    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Pay &amp; Secure Your Date</a>
-    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:14px 0 0 0;">Secure bank transfer (ACH) via Stripe${validUntil ? ` · Valid until ${validUntil}` : ''}</p>
+    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Pay by Bank — ${fmtCurrency(data.total)}</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure bank transfer (ACH) via Stripe · no processing fee</p>
   </div>
+  ${data.payment_link_card_url ? `
+  <div style="padding:14px 40px 8px 40px;text-align:center;">
+    <a href="${String(data.payment_link_card_url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;">Pay by Card — ${fmtCurrency(data.card_total || (Number(data.total || 0) * 1.03))}</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Includes a 3% credit card processing surcharge</p>
+  </div>` : ''}
+  ${validUntil ? `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:14px 0 0 0;text-align:center;">Valid until ${validUntil}</p>` : ''}
 
   ${isWithin ? `
   <!-- Available Add-Ons -->

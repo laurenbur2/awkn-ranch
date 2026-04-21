@@ -17,6 +17,7 @@ interface PaymentLinkRequest {
   category?: string;       // Ledger category (rent, security_deposit, etc.)
   assignment_id?: string;  // Optional: link to assignment
   metadata?: Record<string, string>; // Optional extra metadata
+  payment_method?: 'ach' | 'card'; // Defaults to 'ach' (low fees). 'card' uses card networks.
 }
 
 serve(async (req) => {
@@ -69,7 +70,8 @@ serve(async (req) => {
     }
 
     const body: PaymentLinkRequest = await req.json();
-    const { amount, description, person_id, person_name, person_email, category, assignment_id, metadata } = body;
+    const { amount, description, person_id, person_name, person_email, category, assignment_id, metadata, payment_method } = body;
+    const methodType = payment_method === 'card' ? 'card' : 'us_bank_account';
 
     if (!amount || !description) {
       return new Response(
@@ -105,8 +107,10 @@ serve(async (req) => {
     params.append("line_items[0][price_data][product_data][name]", description);
     params.append("line_items[0][quantity]", "1");
 
-    // ACH only — low fees (0.8% capped at $5) vs card (2.9% + $0.30)
-    params.append("payment_method_types[0]", "us_bank_account");
+    // Default is ACH (low fees: 0.8% capped at $5). Pass payment_method:'card' to
+    // issue a card-only link — used alongside the ACH link for proposals so the
+    // customer can choose (we surcharge the card total upstream to cover ~2.9% + $0.30).
+    params.append("payment_method_types[0]", methodType);
 
     // Add metadata for tracking
     if (person_id) params.append("metadata[person_id]", person_id);
