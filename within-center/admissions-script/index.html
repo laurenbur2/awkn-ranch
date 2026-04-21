@@ -1421,7 +1421,7 @@
     analyzeBtn.disabled = true;
     analysisEl.style.display = 'none';
     analysisEl.innerHTML = '';
-    showStatus('<span class="spinner"></span> Listening to the call \u2014 this usually takes 30\u201390 seconds (longer for bigger files)\u2026');
+    showStatus('<span class="spinner"></span> Uploading the call\u2026');
 
     var fd = new FormData();
     fd.append('file', currentFile);
@@ -1434,13 +1434,39 @@
       });
       var data = await resp.json();
       if (!resp.ok) throw new Error(data.error || ('Server returned ' + resp.status));
-      renderAnalysis(data.analysis);
+      if (!data.job_id) throw new Error('No job id returned from server.');
+
+      var analysis = await pollForResult(data.job_id);
+      renderAnalysis(analysis);
       hideStatus();
     } catch (err) {
       showStatus('Something went wrong: ' + (err && err.message ? err.message : 'unknown error'), true);
     } finally {
       analyzeBtn.disabled = false;
     }
+  }
+
+  async function pollForResult(jobId) {
+    var pollUrl = SUPABASE_URL + '/functions/v1/get-admissions-analysis?id=' + encodeURIComponent(jobId);
+    var startedAt = Date.now();
+    var maxMs = 6 * 60 * 1000; // 6 minutes
+    var attempt = 0;
+    while (Date.now() - startedAt < maxMs) {
+      attempt += 1;
+      var elapsed = Math.round((Date.now() - startedAt) / 1000);
+      showStatus('<span class="spinner"></span> Listening to the call\u2026 (' + elapsed + 's)');
+
+      var resp = await fetch(pollUrl, {
+        headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      });
+      if (resp.ok) {
+        var data = await resp.json();
+        if (data.status === 'done') return data.result;
+        if (data.status === 'error') throw new Error(data.error || 'Analysis failed.');
+      }
+      await new Promise(function (r) { setTimeout(r, attempt < 5 ? 2000 : 4000); });
+    }
+    throw new Error('Timed out waiting for analysis (6 min). The job may still be running \u2014 try refreshing in a minute.');
   }
 
   function esc(s) {

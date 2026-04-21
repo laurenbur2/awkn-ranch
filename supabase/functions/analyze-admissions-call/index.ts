@@ -1,17 +1,19 @@
 /**
- * Analyze Admissions Call Edge Function
+ * Analyze Admissions Call Edge Function (async job pattern)
  *
- * Accepts an audio file of an admissions call, sends it to Gemini 2.5 with
- * the Within Center admissions guidelines, and returns a structured analysis
- * of how the call went — tone adherence, sections covered, what went well,
- * what to improve.
+ * Accepts an audio file of an admissions call. Inserts a row into
+ * public.admissions_analyses with status='processing', kicks off the
+ * Gemini pipeline in the background via EdgeRuntime.waitUntil, and
+ * returns a job_id immediately. The client polls
+ * get-admissions-analysis for the result.
+ *
+ * This avoids 504 gateway timeouts on long (>60s) Gemini runs.
  *
  * Deploy with: supabase functions deploy analyze-admissions-call --no-verify-jwt
- * (verify_jwt:false because this project uses ES256 JWT and the gateway
- *  rejects user tokens — see project_es256_jwt_gateway_bug memory)
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,8 +27,8 @@ const GEMINI_GENERATE_URL = `https://generativelanguage.googleapis.com/v1beta/mo
 const GEMINI_UPLOAD_URL = 'https://generativelanguage.googleapis.com/upload/v1beta/files';
 const GEMINI_FILES_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
-const MAX_BYTES = 30 * 1024 * 1024; // 30 MB, uploaded via Files API
-const INLINE_MAX_BYTES = 15 * 1024 * 1024; // below this, skip Files API and send inline (faster, no processing wait)
+const MAX_BYTES = 30 * 1024 * 1024;
+const INLINE_MAX_BYTES = 15 * 1024 * 1024;
 
 const SUPPORTED_AUDIO_TYPES: Record<string, string> = {
   'audio/mpeg': 'audio/mp3',
@@ -136,44 +138,46 @@ Listen to the audio and assess:
 
 Return strict JSON. Use direct quotes from the call whenever possible.
 Be honest but compassionate — this is feedback to help someone grow.
+
+For the transcript, keep it concise — 6–10 of the most important exchanges,
+not the full verbatim call. Focus on moments that matter for feedback.
 `.trim();
 
 const RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
-    overall_score: { type: 'NUMBER', description: '0-100 score for the call overall' },
-    letter_grade: { type: 'STRING', description: 'A+, A, A-, B+, B, B-, C+, C, C-, D, F' },
-    one_line_summary: { type: 'STRING', description: 'Under 30 words.' },
-    duration_estimate: { type: 'STRING', description: "Estimated call duration e.g. '12 minutes'" },
+    overall_score: { type: 'NUMBER' },
+    letter_grade: { type: 'STRING' },
+    one_line_summary: { type: 'STRING' },
+    duration_estimate: { type: 'STRING' },
     caller_context: {
       type: 'OBJECT',
       properties: {
-        presenting_concern: { type: 'STRING', description: 'Why the caller said they called, in their own words.' },
-        emotional_state: { type: 'STRING', description: 'e.g. tender, grieving, curious, skeptical, anxious' },
-        experience_level: { type: 'STRING', description: 'first-timer / some experience / experienced' },
+        presenting_concern: { type: 'STRING' },
+        emotional_state: { type: 'STRING' },
+        experience_level: { type: 'STRING' },
       },
       required: ['presenting_concern', 'emotional_state', 'experience_level'],
     },
     tone_scores: {
       type: 'OBJECT',
       properties: {
-        pace: { type: 'NUMBER', description: '0-100, was the rep speaking slowly enough' },
-        silence: { type: 'NUMBER', description: '0-100, did the rep leave space after questions' },
-        warmth: { type: 'NUMBER', description: '0-100, overall warmth and softness' },
-        matching: { type: 'NUMBER', description: '0-100, did the rep match then lead energy' },
-        notes: { type: 'STRING', description: '1-2 sentences on tone overall.' },
+        pace: { type: 'NUMBER' },
+        silence: { type: 'NUMBER' },
+        warmth: { type: 'NUMBER' },
+        matching: { type: 'NUMBER' },
+        notes: { type: 'STRING' },
       },
       required: ['pace', 'silence', 'warmth', 'matching', 'notes'],
     },
     violations: {
       type: 'ARRAY',
-      description: 'Specific moments where a rule was broken — interruptions, sales words, rushing, etc.',
       items: {
         type: 'OBJECT',
         properties: {
-          rule: { type: 'STRING', description: 'Which rule was broken' },
-          quote: { type: 'STRING', description: 'The exact words the rep said' },
-          approx_timestamp: { type: 'STRING', description: 'e.g. 03:42' },
+          rule: { type: 'STRING' },
+          quote: { type: 'STRING' },
+          approx_timestamp: { type: 'STRING' },
         },
         required: ['rule', 'quote'],
       },
@@ -182,8 +186,8 @@ const RESPONSE_SCHEMA = {
       type: 'OBJECT',
       properties: {
         opening: { type: 'BOOLEAN' },
-        discovery_questions_asked: { type: 'NUMBER', description: 'Out of 8 expected' },
-        discovery_notes: { type: 'STRING', description: 'Which were missed, which were done well.' },
+        discovery_questions_asked: { type: 'NUMBER' },
+        discovery_notes: { type: 'STRING' },
         matching_offered_single_path: { type: 'BOOLEAN' },
         recommended_package: { type: 'STRING' },
         tender_moments_handled_well: { type: 'BOOLEAN' },
@@ -201,7 +205,6 @@ const RESPONSE_SCHEMA = {
     },
     strong_moments: {
       type: 'ARRAY',
-      description: '2-4 moments where the rep held space well, asked a great question, or matched tone.',
       items: {
         type: 'OBJECT',
         properties: {
@@ -213,7 +216,6 @@ const RESPONSE_SCHEMA = {
     },
     missed_opportunities: {
       type: 'ARRAY',
-      description: '2-5 specific missed opportunities with what the rep could have said instead.',
       items: {
         type: 'OBJECT',
         properties: {
@@ -224,12 +226,8 @@ const RESPONSE_SCHEMA = {
         required: ['moment', 'what_happened', 'what_to_try'],
       },
     },
-    top_three_improvements: {
-      type: 'ARRAY',
-      description: 'Top 3 things to focus on for the next call, ordered by importance.',
-      items: { type: 'STRING' },
-    },
-    transcript: { type: 'STRING', description: 'Full transcript with speaker labels (REP / CALLER) and approximate timestamps.' },
+    top_three_improvements: { type: 'ARRAY', items: { type: 'STRING' } },
+    transcript: { type: 'STRING' },
   },
   required: [
     'overall_score', 'letter_grade', 'one_line_summary',
@@ -242,22 +240,21 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
-
   if (req.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405);
   }
-
   if (!GEMINI_API_KEY) {
     return json({ error: 'GEMINI_API_KEY not configured on server' }, 500);
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
-
-    if (!file) {
-      return json({ error: 'No audio file provided. Attach it as the "file" field.' }, 400);
-    }
+    if (!file) return json({ error: 'No audio file provided. Attach it as the "file" field.' }, 400);
 
     const mimeType = SUPPORTED_AUDIO_TYPES[file.type] || null;
     if (!mimeType) {
@@ -265,20 +262,58 @@ serve(async (req) => {
         error: `Unsupported audio format: ${file.type || 'unknown'}. Use MP3, WAV, M4A, OGG, or WebM.`,
       }, 400);
     }
-
     if (file.size > MAX_BYTES) {
       return json({
-        error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 30 MB. Try trimming or compressing the recording.`,
+        error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 30 MB.`,
       }, 413);
     }
 
     const buffer = await file.arrayBuffer();
     const bytes = new Uint8Array(buffer);
+    const fileName = file.name || 'admissions-call';
 
-    // Decide path: small files go inline (no upload/polling round-trip);
-    // larger files use the Files API (up to 2 GB / 2 hrs of audio supported).
+    // Create the job row
+    const { data: row, error: insErr } = await supabase
+      .from('admissions_analyses')
+      .insert({
+        status: 'processing',
+        model: GEMINI_MODEL,
+        file_name: fileName,
+        file_size_bytes: file.size,
+      })
+      .select('id')
+      .single();
+
+    if (insErr || !row?.id) {
+      console.error('insert failed:', insErr);
+      return json({ error: 'Failed to create job' }, 500);
+    }
+
+    const jobId = row.id as string;
+
+    // Kick off the analysis in the background — do NOT await.
+    // The response returns immediately; client polls get-admissions-analysis.
+    // @ts-ignore EdgeRuntime is Supabase-runtime-global
+    EdgeRuntime.waitUntil(runAnalysis(supabase, jobId, bytes, mimeType, fileName, file.size));
+
+    return json({ job_id: jobId, status: 'processing' });
+  } catch (err) {
+    console.error('unexpected error:', err);
+    return json({ error: 'Server error', detail: (err as Error).message }, 500);
+  }
+});
+
+async function runAnalysis(
+  supabase: ReturnType<typeof createClient>,
+  jobId: string,
+  bytes: Uint8Array,
+  mimeType: string,
+  fileName: string,
+  fileSize: number,
+): Promise<void> {
+  try {
     let audioPart: Record<string, unknown>;
-    if (file.size <= INLINE_MAX_BYTES) {
+    if (fileSize <= INLINE_MAX_BYTES) {
       let binary = '';
       const chunkSize = 0x8000;
       for (let i = 0; i < bytes.length; i += chunkSize) {
@@ -287,7 +322,7 @@ serve(async (req) => {
       const base64 = btoa(binary);
       audioPart = { inlineData: { mimeType, data: base64 } };
     } else {
-      const uploaded = await uploadToGeminiFilesApi(bytes, mimeType, file.name || 'admissions-call');
+      const uploaded = await uploadToGeminiFilesApi(bytes, mimeType, fileName);
       audioPart = { fileData: { mimeType: uploaded.mimeType || mimeType, fileUri: uploaded.uri } };
     }
 
@@ -302,7 +337,7 @@ serve(async (req) => {
       }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 32768, // room for long transcript + structured JSON
+        maxOutputTokens: 16384,
         responseMimeType: 'application/json',
         responseSchema: RESPONSE_SCHEMA,
       },
@@ -316,8 +351,7 @@ serve(async (req) => {
 
     if (!gResp.ok) {
       const errBody = await gResp.text();
-      console.error('Gemini API error:', errBody);
-      return json({ error: 'Gemini analysis failed', detail: errBody.slice(0, 500) }, 502);
+      throw new Error(`Gemini error (${gResp.status}): ${errBody.slice(0, 400)}`);
     }
 
     const gResult = await gResp.json();
@@ -326,38 +360,32 @@ serve(async (req) => {
     const text = candidate?.content?.parts?.[0]?.text;
 
     if (!text) {
-      console.error('Empty Gemini response:', JSON.stringify(gResult).slice(0, 800));
-      const reason = finishReason ? ` (finishReason: ${finishReason})` : '';
-      return json({ error: `Empty response from Gemini${reason}.` }, 502);
+      throw new Error(`Empty response from Gemini (finishReason: ${finishReason || 'unknown'})`);
     }
 
     let analysis;
     try {
       analysis = JSON.parse(text);
-    } catch (e) {
-      console.error('JSON parse error:', (e as Error).message, 'finishReason:', finishReason, 'text length:', text.length, 'preview:', text.slice(0, 300), '...tail:', text.slice(-300));
+    } catch {
       const hint = finishReason === 'MAX_TOKENS'
-        ? 'Analysis was truncated — try a shorter call (under 30 minutes) or re-upload.'
-        : `Analysis could not be parsed (finishReason: ${finishReason || 'unknown'}).`;
-      return json({ error: hint, preview: text.slice(0, 300) }, 502);
+        ? 'Analysis was truncated — try a shorter call.'
+        : `Could not parse analysis (finishReason: ${finishReason || 'unknown'})`;
+      throw new Error(hint);
     }
 
-    const usage = gResult.usageMetadata || {};
-
-    return json({
-      analysis,
-      usage: {
-        prompt_tokens: usage.promptTokenCount || 0,
-        output_tokens: usage.candidatesTokenCount || 0,
-        total_tokens: usage.totalTokenCount || 0,
-      },
-      model: GEMINI_MODEL,
-    });
+    await supabase
+      .from('admissions_analyses')
+      .update({ status: 'done', result: analysis, completed_at: new Date().toISOString() })
+      .eq('id', jobId);
   } catch (err) {
-    console.error('Unexpected error:', err);
-    return json({ error: 'Server error', detail: (err as Error).message }, 500);
+    const msg = (err as Error).message || 'Unknown error';
+    console.error(`job ${jobId} failed:`, msg);
+    await supabase
+      .from('admissions_analyses')
+      .update({ status: 'error', error: msg, completed_at: new Date().toISOString() })
+      .eq('id', jobId);
   }
-});
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -366,17 +394,11 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-/**
- * Upload an audio file to Gemini's Files API via the resumable protocol,
- * then poll until the file is ACTIVE (audio needs a few seconds of processing).
- * Returns { name, uri, mimeType } when ready.
- */
 async function uploadToGeminiFilesApi(
   bytes: Uint8Array,
   mimeType: string,
   displayName: string,
 ): Promise<{ name: string; uri: string; mimeType: string }> {
-  // Step 1 — start a resumable upload session and get the upload URL.
   const startResp = await fetch(`${GEMINI_UPLOAD_URL}?key=${GEMINI_API_KEY}`, {
     method: 'POST',
     headers: {
@@ -389,15 +411,11 @@ async function uploadToGeminiFilesApi(
     body: JSON.stringify({ file: { display_name: displayName } }),
   });
   if (!startResp.ok) {
-    const err = await startResp.text();
-    throw new Error(`Files API start failed: ${err.slice(0, 300)}`);
+    throw new Error(`Files API start failed: ${(await startResp.text()).slice(0, 300)}`);
   }
   const uploadUrl = startResp.headers.get('X-Goog-Upload-URL') || startResp.headers.get('x-goog-upload-url');
-  if (!uploadUrl) {
-    throw new Error('Files API: no upload URL returned.');
-  }
+  if (!uploadUrl) throw new Error('Files API: no upload URL returned.');
 
-  // Step 2 — upload bytes and finalize.
   const uploadResp = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
@@ -408,8 +426,7 @@ async function uploadToGeminiFilesApi(
     body: bytes,
   });
   if (!uploadResp.ok) {
-    const err = await uploadResp.text();
-    throw new Error(`Files API upload failed: ${err.slice(0, 300)}`);
+    throw new Error(`Files API upload failed: ${(await uploadResp.text()).slice(0, 300)}`);
   }
   const uploadResult = await uploadResp.json();
   const fileMeta = uploadResult.file;
@@ -417,18 +434,16 @@ async function uploadToGeminiFilesApi(
     throw new Error('Files API: malformed upload response.');
   }
 
-  // Step 3 — poll until state is ACTIVE (audio requires processing).
   let state: string = fileMeta.state || 'PROCESSING';
   let currentMime: string = fileMeta.mimeType || mimeType;
   let currentUri: string = fileMeta.uri;
-  const maxPolls = 30; // ~60s total
+  const maxPolls = 60; // up to ~2 min of processing
   const pollInterval = 2000;
   for (let i = 0; i < maxPolls && state === 'PROCESSING'; i++) {
     await new Promise((r) => setTimeout(r, pollInterval));
     const statusResp = await fetch(`${GEMINI_FILES_URL}/${fileMeta.name}?key=${GEMINI_API_KEY}`);
     if (!statusResp.ok) {
-      const err = await statusResp.text();
-      throw new Error(`Files API status check failed: ${err.slice(0, 300)}`);
+      throw new Error(`Files API status check failed: ${(await statusResp.text()).slice(0, 300)}`);
     }
     const statusResult = await statusResp.json();
     state = statusResult.state || state;
@@ -438,6 +453,5 @@ async function uploadToGeminiFilesApi(
   if (state !== 'ACTIVE') {
     throw new Error(`Files API: file did not become ACTIVE (state=${state}). Try a shorter clip.`);
   }
-
   return { name: fileMeta.name, uri: currentUri, mimeType: currentMime };
 }
