@@ -2,53 +2,29 @@
 const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
-// Wait for Supabase to be available (handles race condition with script loading)
-function waitForSupabase(maxAttempts = 50) {
-  return new Promise((resolve, reject) => {
-    let attempts = 0;
-    const check = () => {
-      if (window.supabase?.createClient) {
-        resolve(window.supabase);
-      } else if (attempts >= maxAttempts) {
-        reject(new Error('Supabase library failed to load'));
-      } else {
-        attempts++;
-        setTimeout(check, 100);
-      }
-    };
-    check();
-  });
+// Classic <script src=".../supabase.min.js"> tags in <body> always finish before
+// deferred module scripts start evaluating, so window.supabase.createClient is
+// guaranteed to exist here. If it doesn't, the UMD tag is missing from the page
+// — throw loudly so Safari surfaces a real error instead of hanging on a silent
+// top-level-await rejection.
+if (!window.supabase?.createClient) {
+  const err = new Error(
+    'Supabase UMD script not loaded — the page is missing <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"> before its module scripts.'
+  );
+  console.error('[supabase.js]', err);
+  throw err;
 }
 
-// Initialize Supabase client with auth configuration
-let supabase;
-
-// If supabase is already available, create client immediately
-if (window.supabase?.createClient) {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      storageKey: 'awkn-ranch-auth',
-      flowType: 'pkce',
-    },
-  });
-} else {
-  // Wait for it to load
-  await waitForSupabase();
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      storageKey: 'awkn-ranch-auth',
-      flowType: 'pkce',
-    },
-  });
-}
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage,
+    storageKey: 'awkn-ranch-auth',
+    flowType: 'pkce',
+  },
+});
 
 /**
  * Lightweight connectivity probe (HEAD request to REST endpoint).
