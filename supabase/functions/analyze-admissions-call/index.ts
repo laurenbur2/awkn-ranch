@@ -302,7 +302,7 @@ serve(async (req) => {
       }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 32768, // room for long transcript + structured JSON
         responseMimeType: 'application/json',
         responseSchema: RESPONSE_SCHEMA,
       },
@@ -322,19 +322,24 @@ serve(async (req) => {
 
     const gResult = await gResp.json();
     const candidate = gResult.candidates?.[0];
+    const finishReason = candidate?.finishReason;
     const text = candidate?.content?.parts?.[0]?.text;
 
     if (!text) {
-      console.error('Empty Gemini response:', JSON.stringify(gResult).slice(0, 500));
-      return json({ error: 'Empty response from Gemini.' }, 502);
+      console.error('Empty Gemini response:', JSON.stringify(gResult).slice(0, 800));
+      const reason = finishReason ? ` (finishReason: ${finishReason})` : '';
+      return json({ error: `Empty response from Gemini${reason}.` }, 502);
     }
 
     let analysis;
     try {
       analysis = JSON.parse(text);
     } catch (e) {
-      console.error('JSON parse error:', e, 'text:', text.slice(0, 500));
-      return json({ error: 'Gemini returned non-JSON output.' }, 502);
+      console.error('JSON parse error:', (e as Error).message, 'finishReason:', finishReason, 'text length:', text.length, 'preview:', text.slice(0, 300), '...tail:', text.slice(-300));
+      const hint = finishReason === 'MAX_TOKENS'
+        ? 'Analysis was truncated — try a shorter call (under 30 minutes) or re-upload.'
+        : `Analysis could not be parsed (finishReason: ${finishReason || 'unknown'}).`;
+      return json({ error: hint, preview: text.slice(0, 300) }, 502);
     }
 
     const usage = gResult.usageMetadata || {};
