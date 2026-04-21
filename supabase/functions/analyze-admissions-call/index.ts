@@ -21,9 +21,12 @@ const corsHeaders = {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
 const GEMINI_MODEL = 'gemini-2.5-flash';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_GENERATE_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_UPLOAD_URL = 'https://generativelanguage.googleapis.com/upload/v1beta/files';
+const GEMINI_FILES_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
-const MAX_BYTES = 20 * 1024 * 1024; // 20 MB inline limit
+const MAX_BYTES = 30 * 1024 * 1024; // 30 MB, uploaded via Files API
+const INLINE_MAX_BYTES = 15 * 1024 * 1024; // below this, skip Files API and send inline (faster, no processing wait)
 
 const SUPPORTED_AUDIO_TYPES: Record<string, string> = {
   'audio/mpeg': 'audio/mp3',
@@ -265,26 +268,35 @@ serve(async (req) => {
 
     if (file.size > MAX_BYTES) {
       return json({
-        error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 20 MB. Try trimming or compressing the recording.`,
+        error: `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 30 MB. Try trimming or compressing the recording.`,
       }, 413);
     }
 
-    // Base64-encode the audio for inline Gemini submission.
     const buffer = await file.arrayBuffer();
     const bytes = new Uint8Array(buffer);
-    let binary = '';
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+
+    // Decide path: small files go inline (no upload/polling round-trip);
+    // larger files use the Files API (up to 2 GB / 2 hrs of audio supported).
+    let audioPart: Record<string, unknown>;
+    if (file.size <= INLINE_MAX_BYTES) {
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+      }
+      const base64 = btoa(binary);
+      audioPart = { inlineData: { mimeType, data: base64 } };
+    } else {
+      const uploaded = await uploadToGeminiFilesApi(bytes, mimeType, file.name || 'admissions-call');
+      audioPart = { fileData: { mimeType: uploaded.mimeType || mimeType, fileUri: uploaded.uri } };
     }
-    const base64 = btoa(binary);
 
     const geminiBody = {
       contents: [{
         role: 'user',
         parts: [
           { text: GUIDELINES },
-          { inlineData: { mimeType, data: base64 } },
+          audioPart,
           { text: 'Evaluate the audio above against the guidelines. Return the structured JSON per the schema. Be specific — quote the call directly whenever you can.' },
         ],
       }],
@@ -296,7 +308,7 @@ serve(async (req) => {
       },
     };
 
-    const gResp = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    const gResp = await fetch(`${GEMINI_GENERATE_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(geminiBody),
@@ -347,4 +359,80 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+/**
+ * Upload an audio file to Gemini's Files API via the resumable protocol,
+ * then poll until the file is ACTIVE (audio needs a few seconds of processing).
+ * Returns { name, uri, mimeType } when ready.
+ */
+async function uploadToGeminiFilesApi(
+  bytes: Uint8Array,
+  mimeType: string,
+  displayName: string,
+): Promise<{ name: string; uri: string; mimeType: string }> {
+  // Step 1 — start a resumable upload session and get the upload URL.
+  const startResp = await fetch(`${GEMINI_UPLOAD_URL}?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: {
+      'X-Goog-Upload-Protocol': 'resumable',
+      'X-Goog-Upload-Command': 'start',
+      'X-Goog-Upload-Header-Content-Length': String(bytes.byteLength),
+      'X-Goog-Upload-Header-Content-Type': mimeType,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ file: { display_name: displayName } }),
+  });
+  if (!startResp.ok) {
+    const err = await startResp.text();
+    throw new Error(`Files API start failed: ${err.slice(0, 300)}`);
+  }
+  const uploadUrl = startResp.headers.get('X-Goog-Upload-URL') || startResp.headers.get('x-goog-upload-url');
+  if (!uploadUrl) {
+    throw new Error('Files API: no upload URL returned.');
+  }
+
+  // Step 2 — upload bytes and finalize.
+  const uploadResp = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Length': String(bytes.byteLength),
+      'X-Goog-Upload-Offset': '0',
+      'X-Goog-Upload-Command': 'upload, finalize',
+    },
+    body: bytes,
+  });
+  if (!uploadResp.ok) {
+    const err = await uploadResp.text();
+    throw new Error(`Files API upload failed: ${err.slice(0, 300)}`);
+  }
+  const uploadResult = await uploadResp.json();
+  const fileMeta = uploadResult.file;
+  if (!fileMeta?.name || !fileMeta?.uri) {
+    throw new Error('Files API: malformed upload response.');
+  }
+
+  // Step 3 — poll until state is ACTIVE (audio requires processing).
+  let state: string = fileMeta.state || 'PROCESSING';
+  let currentMime: string = fileMeta.mimeType || mimeType;
+  let currentUri: string = fileMeta.uri;
+  const maxPolls = 30; // ~60s total
+  const pollInterval = 2000;
+  for (let i = 0; i < maxPolls && state === 'PROCESSING'; i++) {
+    await new Promise((r) => setTimeout(r, pollInterval));
+    const statusResp = await fetch(`${GEMINI_FILES_URL}/${fileMeta.name}?key=${GEMINI_API_KEY}`);
+    if (!statusResp.ok) {
+      const err = await statusResp.text();
+      throw new Error(`Files API status check failed: ${err.slice(0, 300)}`);
+    }
+    const statusResult = await statusResp.json();
+    state = statusResult.state || state;
+    currentMime = statusResult.mimeType || currentMime;
+    currentUri = statusResult.uri || currentUri;
+  }
+  if (state !== 'ACTIVE') {
+    throw new Error(`Files API: file did not become ACTIVE (state=${state}). Try a shorter clip.`);
+  }
+
+  return { name: fileMeta.name, uri: currentUri, mimeType: currentMime };
 }
