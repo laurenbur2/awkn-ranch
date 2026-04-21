@@ -147,7 +147,7 @@ async function syncTabPermissions() {
   if (_permSyncDone) return false;
   _permSyncDone = true;
   try {
-    const tabPermKeys = [...new Set(ALL_ADMIN_TABS.map(t => t.permission))];
+    const tabPermKeys = [...new Set(ALL_ADMIN_TABS.map(t => t.permission).filter(Boolean))];
     const { data: existing } = await supabase
       .from('permissions')
       .select('key')
