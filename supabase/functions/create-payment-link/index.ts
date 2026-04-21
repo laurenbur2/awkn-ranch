@@ -42,8 +42,14 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
+      console.error("[auth] getUser failed", {
+        tokenLen: token.length,
+        tokenPrefix: token.slice(0, 12),
+        tokenSuffix: token.slice(-12),
+        authError: authError ? { name: authError.name, message: authError.message, status: (authError as any).status } : null,
+      });
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Unauthorized", detail: authError?.message || "no user for token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

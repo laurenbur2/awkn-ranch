@@ -2926,7 +2926,8 @@ async function sendProposalNow(proposalId) {
   });
   const linkData = await linkResp.json().catch(() => ({}));
   if (!linkResp.ok || !linkData.url) {
-    throw new Error('Payment link failed: ' + (linkData.error || linkResp.status));
+    const msg = [linkData.error, linkData.detail].filter(Boolean).join(' — ') || linkResp.status;
+    throw new Error('Payment link failed: ' + msg);
   }
 
   // 2. Stamp proposal with payment link + sent state before email (so the row is accurate
