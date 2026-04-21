@@ -2639,10 +2639,15 @@ async function openProposalModal(proposal = null, lead = null) {
                 <label>Tax Amount</label>
                 <input type="number" class="crm-input" id="prop-tax" value="${proposal?.tax_amount || 0}" step="0.01" min="0">
               </div>
+              <div class="crm-form-field">
+                <label>Deposit % <span style="font-weight:normal;color:#888;">(due to confirm booking)</span></label>
+                <input type="number" class="crm-input" id="prop-deposit-percent" value="${proposal?.deposit_percent ?? 50}" step="1" min="0" max="100">
+              </div>
             </div>
             <div class="crm-totals-display">
               <div>Subtotal: <strong id="prop-subtotal">${formatCurrency(proposal?.subtotal || 0)}</strong></div>
               <div>Total: <strong id="prop-total">${formatCurrency(proposal?.total || 0)}</strong></div>
+              <div>Deposit Due Now: <strong id="prop-deposit-display">${formatCurrency(((proposal?.total || 0) * (proposal?.deposit_percent ?? 50) / 100))}</strong></div>
             </div>
           </div>
 
@@ -2706,6 +2711,7 @@ async function openProposalModal(proposal = null, lead = null) {
   // Recalculate totals
   document.getElementById('prop-discount')?.addEventListener('input', recalcProposalTotals);
   document.getElementById('prop-tax')?.addEventListener('input', recalcProposalTotals);
+  document.getElementById('prop-deposit-percent')?.addEventListener('input', recalcProposalTotals);
 
   // Set up existing line item listeners
   document.querySelectorAll('#prop-line-items .crm-line-item').forEach(el => setupProposalLineItemListeners(el));
@@ -2772,6 +2778,12 @@ function recalcProposalTotals() {
   const totalEl = document.getElementById('prop-total');
   if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
   if (totalEl) totalEl.textContent = formatCurrency(total);
+
+  const depositEl = document.getElementById('prop-deposit-display');
+  if (depositEl) {
+    const pct = parseFloat(document.getElementById('prop-deposit-percent')?.value) || 0;
+    depositEl.textContent = formatCurrency(total * pct / 100);
+  }
 }
 
 function getProposalLineItemsFromForm() {
@@ -2838,6 +2850,7 @@ async function saveProposal(existingProposal, status) {
     valid_until: document.getElementById('prop-valid-until').value || null,
     notes: document.getElementById('prop-notes').value.trim() || null,
     terms: document.getElementById('prop-terms').value.trim() || null,
+    deposit_percent: Math.max(0, Math.min(100, parseInt(document.getElementById('prop-deposit-percent')?.value) || 50)),
     created_by: authState?.user?.id || null,
   };
 
@@ -2912,10 +2925,38 @@ async function sendProposalNow(proposalId) {
   const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
-  // 1. Stripe payment links — one ACH (base amount), one card (+3% surcharge disclosed
-  // in the email). Customer picks. Surcharge ≈ Stripe's card cost of acceptance, legal
-  // in TX per card-network rules when disclosed pre-purchase.
-  const baseTotal = Number(proposal.total);
+  // 1a. AWKN Ranch proposals require a signed rental agreement — create the SignWell
+  // document first so we can include the Sign button in the email. The deposit %
+  // stored on the proposal drives the amount the client pays now; the balance is due
+  // 30 days before the event (handled by a separate reminder later).
+  const isAwkn = lead.business_line === 'awkn_ranch';
+  let signingUrl = null;
+  let depositPct = 100;
+  let depositAmt = Number(proposal.total);
+  if (isAwkn) {
+    const contractResp = await fetch(supabaseUrl + '/functions/v1/create-proposal-contract', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'apikey': anonKey,
+      },
+      body: JSON.stringify({ proposal_id: proposal.id }),
+    });
+    const c = await contractResp.json().catch(() => ({}));
+    if (!contractResp.ok) {
+      const msg = [c.error, c.detail, c.message, c.code].filter(Boolean).join(' — ') || contractResp.status;
+      throw new Error(`Contract creation failed: ${msg}`);
+    }
+    signingUrl = c.signing_url;
+    depositPct = c.deposit_percent ?? (proposal.deposit_percent ?? 50);
+    depositAmt = c.deposit_amount ?? Math.round(Number(proposal.total) * depositPct) / 100;
+  }
+
+  // 1b. Stripe payment links — one ACH (deposit amount), one card (+3% surcharge
+  // disclosed in the email). Customer picks. Surcharge ≈ Stripe's card cost of
+  // acceptance, legal in TX when disclosed pre-purchase.
+  const baseTotal = isAwkn ? depositAmt : Number(proposal.total);
   const cardTotal = Math.round(baseTotal * 1.03 * 100) / 100;
 
   async function makeLink(amount, method, labelSuffix) {
@@ -2997,6 +3038,10 @@ async function sendProposalNow(proposalId) {
         payment_link_url: linkData.url,
         payment_link_card_url: cardLinkData.url,
         card_total: cardTotal,
+        signing_url: signingUrl,
+        deposit_percent: isAwkn ? depositPct : null,
+        deposit_amount: isAwkn ? depositAmt : null,
+        balance_due: isAwkn ? Math.round((Number(proposal.total) - depositAmt) * 100) / 100 : null,
         line_items: items.map(li => ({
           description: li.description,
           quantity: li.quantity,
@@ -3074,7 +3119,15 @@ async function previewProposalEmail() {
           terms: document.getElementById('prop-terms').value.trim() || null,
           payment_link_url: '#preview-no-payment-link',
           payment_link_card_url: '#preview-no-payment-link',
-          card_total: Math.round(total * 1.03 * 100) / 100,
+          signing_url: '#preview-no-signing-link',
+          deposit_percent: parseInt(document.getElementById('prop-deposit-percent')?.value) || 50,
+          deposit_amount: Math.round(total * ((parseInt(document.getElementById('prop-deposit-percent')?.value) || 50) / 100) * 100) / 100,
+          balance_due: Math.round((total - (total * ((parseInt(document.getElementById('prop-deposit-percent')?.value) || 50) / 100))) * 100) / 100,
+          card_total: (function(){
+            const depPct = parseInt(document.getElementById('prop-deposit-percent')?.value) || 50;
+            const base = Math.round(total * depPct) / 100;
+            return Math.round(base * 1.03 * 100) / 100;
+          })(),
           line_items: lineItems.map(li => ({
             description: li.description,
             quantity: li.quantity,

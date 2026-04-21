@@ -107,15 +107,53 @@ Deno.serve(async (req) => {
       .eq('signwell_document_id', documentId)
       .single();
 
+    // Try to find a CRM proposal (AWKN Ranch venue-rental flow) with this document ID.
+    // Proposals are a lighter model than rental_applications / event_hosting_requests:
+    // just stamp the signed-at timestamp + signer info and log an activity — the
+    // deposit payment flow is owned by Stripe, not the webhook.
+    const { data: crmProposal } = await supabase
+      .from('crm_proposals')
+      .select('id, proposal_number, lead_id, total, deposit_percent, event_date')
+      .eq('signwell_document_id', documentId)
+      .maybeSingle();
+
     // Determine which type of document this is
     const isRental = !rentalError && rentalApp;
     const isEvent = !eventError && eventRequest;
+    const isProposal = !!crmProposal;
 
-    if (!isRental && !isEvent) {
-      console.error('No matching application/request found for document:', documentId);
+    if (!isRental && !isEvent && !isProposal) {
+      console.error('No matching application/request/proposal found for document:', documentId);
       return new Response(
         JSON.stringify({ error: 'Document not found in system' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Short-circuit for CRM proposals: record the signature and return.
+    if (isProposal) {
+      const signer = (payload.recipients || []).find(r => r.status === 'completed') || payload.recipients?.[0];
+      await supabase
+        .from('crm_proposals')
+        .update({
+          contract_signed_at: payload.completed_at || new Date().toISOString(),
+          contract_signed_by_name: signer?.name || null,
+          contract_signed_by_email: signer?.email || null,
+        })
+        .eq('id', crmProposal.id);
+
+      if (crmProposal.lead_id) {
+        await supabase.from('crm_activities').insert({
+          lead_id: crmProposal.lead_id,
+          activity_type: 'note',
+          description: `Rental agreement signed (${crmProposal.proposal_number}) by ${signer?.name || signer?.email || 'client'}`,
+        });
+      }
+
+      console.log('Proposal contract signed:', { proposal_id: crmProposal.id, documentId });
+      return new Response(
+        JSON.stringify({ success: true, type: 'proposal', proposal_id: crmProposal.id }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

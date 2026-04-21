@@ -960,26 +960,42 @@ Questions or trouble signing in? Email admin@awknranch.com.
     </table>
   </div>
 
-  <!-- Total Due (black box) -->
+  <!-- Total Due (black box). For AWKN Ranch (venue rental): shows Deposit + Balance
+  split; otherwise shows the full Total Due -->
   <div style="padding:12px 40px 28px 40px;">
     <div style="background:#1c1618;border-radius:4px;padding:22px 28px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${data.deposit_amount ? `
+        <tr>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;">Deposit to Confirm (${String(data.deposit_percent || 50)}%)</td>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#ffffff;text-align:right;">${fmtCurrency(data.deposit_amount)}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding-top:6px;font-family:'Inter',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);">Balance of ${fmtCurrency(data.balance_due || 0)} due 30 days before event · Event total ${fmtCurrency(data.total)}</td>
+        </tr>` : `
         <tr>
           <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;">Total Due</td>
           <td style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#ffffff;text-align:right;">${fmtCurrency(data.total)}</td>
-        </tr>
+        </tr>`}
       </table>
     </div>
   </div>
 
-  <!-- CTA: ACH (base amount) + optional card (with 3% surcharge disclosed) -->
+  ${data.signing_url ? `
+  <!-- Sign contract CTA (AWKN Ranch venue rentals only) -->
+  <div style="padding:0 40px 18px 40px;text-align:center;">
+    <a href="${String(data.signing_url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#1c1618;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Step 1 · Sign Rental Agreement</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure e-signature via SignWell · takes about 2 minutes</p>
+  </div>` : ''}
+
+  <!-- CTA: ACH (deposit or full total) + optional card (+3% surcharge disclosed) -->
   <div style="padding:0 40px 8px 40px;text-align:center;">
-    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Pay by Bank — ${fmtCurrency(data.total)}</a>
+    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">${data.signing_url ? 'Step 2 · ' : ''}Pay by Bank — ${fmtCurrency(data.deposit_amount || data.total)}</a>
     <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure bank transfer (ACH) via Stripe · no processing fee</p>
   </div>
   ${data.payment_link_card_url ? `
   <div style="padding:14px 40px 8px 40px;text-align:center;">
-    <a href="${String(data.payment_link_card_url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;">Pay by Card — ${fmtCurrency(data.card_total || (Number(data.total || 0) * 1.03))}</a>
+    <a href="${String(data.payment_link_card_url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;">Pay by Card — ${fmtCurrency(data.card_total || ((Number(data.deposit_amount || data.total || 0)) * 1.03))}</a>
     <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Includes a 3% credit card processing surcharge</p>
   </div>` : ''}
   ${validUntil ? `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:14px 0 0 0;text-align:center;">Valid until ${validUntil}</p>` : ''}
