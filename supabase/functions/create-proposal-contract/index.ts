@@ -315,12 +315,15 @@ serve(async (req) => {
     const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
 
     // --- Upload to SignWell ---
+    // `embedded_signing: false` + `send_email: false` → SignWell returns a shareable
+    // `signing_url` on the recipient that we can email ourselves. embedded_signing URLs
+    // only work inside SignWell's JS widget; they 404 when opened directly.
     const swBody = {
       test_mode: false,
       name: `${proposal.proposal_number} — ${clientName} — Rental Agreement`,
       subject: `Sign your AWKN Ranch rental agreement — ${proposal.proposal_number}`,
       message: `Hi ${lead.first_name || "there"}, please review and sign your rental agreement for ${eventDate}.`,
-      embedded_signing: true,
+      embedded_signing: false,
       text_tags: true,
       draft: false,
       recipients: [
@@ -366,9 +369,15 @@ serve(async (req) => {
 
     const signwellDocumentId = swData.id;
     const signingUrl =
+      swData?.recipients?.[0]?.signing_url ||
       swData?.recipients?.[0]?.embedded_signing_url ||
       swData?.signing_url ||
       null;
+    console.log("SignWell doc created:", {
+      id: signwellDocumentId,
+      signing_url: signingUrl,
+      recipient_keys: swData?.recipients?.[0] ? Object.keys(swData.recipients[0]) : [],
+    });
 
     // Persist on the proposal row
     await supabase
