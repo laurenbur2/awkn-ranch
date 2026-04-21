@@ -2895,9 +2895,19 @@ async function sendProposalNow(proposalId) {
     .single();
   if (lErr || !lead?.email) throw new Error('Lead is missing an email address');
 
-  const { data: sessionWrap } = await supabase.auth.getSession();
-  const token = sessionWrap?.session?.access_token;
-  if (!token) throw new Error('Not authenticated');
+  // Refresh the session so we don't hit a stale/expired JWT mid-flow.
+  // The Supabase gateway rejects expired tokens with { code, message } — NOT
+  // { error, detail } — so a bare 401 here was very uninformative.
+  let token = null;
+  try {
+    const { data: refreshed } = await supabase.auth.refreshSession();
+    token = refreshed?.session?.access_token || null;
+  } catch (_) { /* fall through to getSession */ }
+  if (!token) {
+    const { data: sessionWrap } = await supabase.auth.getSession();
+    token = sessionWrap?.session?.access_token || null;
+  }
+  if (!token) throw new Error('Not signed in — reload and sign in again.');
 
   const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
   const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
@@ -2926,7 +2936,12 @@ async function sendProposalNow(proposalId) {
   });
   const linkData = await linkResp.json().catch(() => ({}));
   if (!linkResp.ok || !linkData.url) {
-    const msg = [linkData.error, linkData.detail].filter(Boolean).join(' — ') || linkResp.status;
+    // Gateway rejections surface as { code, message }; function errors as { error, detail }.
+    const msg = [linkData.error, linkData.detail, linkData.message, linkData.code]
+      .filter(Boolean).join(' — ') || linkResp.status;
+    if (linkResp.status === 401) {
+      throw new Error('Payment link failed: session expired — please sign out and sign back in (' + msg + ')');
+    }
     throw new Error('Payment link failed: ' + msg);
   }
 
