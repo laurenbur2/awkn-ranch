@@ -874,13 +874,16 @@ Questions or trouble signing in? Email admin@awknranch.com.
       const fmtCurrency = (n: number) =>
         `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
-      const lineItemRows = lineItems.map((li: any) => `
+      const lineItemRows = lineItems.map((li: any) => {
+        const qty = Number(li.quantity || 1);
+        const desc = String(li.description || '');
+        const qtyPrefix = qty > 1 ? `<strong style="color:#1c1618;">${qty} ×</strong> ` : '';
+        return `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:14px;">${String(li.description || '')}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:14px;text-align:center;">${Number(li.quantity || 1)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:14px;text-align:right;">${fmtCurrency(li.unit_price)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;font-size:14px;font-weight:600;text-align:right;">${fmtCurrency(li.total)}</td>
-        </tr>`).join('');
+          <td style="padding:12px 0;border-bottom:1px solid rgba(201,148,62,0.18);font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;line-height:1.5;vertical-align:top;">${qtyPrefix}${desc}</td>
+          <td style="padding:12px 0;border-bottom:1px solid rgba(201,148,62,0.18);font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;text-align:right;white-space:nowrap;vertical-align:top;">${fmtCurrency(li.total)}</td>
+        </tr>`;
+      }).join('');
       const lineItemRowsText = lineItems.map((li: any) =>
         `  ${li.description}  ×${li.quantity}  @ ${fmtCurrency(li.unit_price)}  = ${fmtCurrency(li.total)}`
       ).join('\n');
@@ -894,95 +897,165 @@ Questions or trouble signing in? Email admin@awknranch.com.
       const brand = isWithin
         ? {
             name: 'Within Center',
-            logoUrl: 'https://laurenbur2.github.io/awkn-ranch/assets/branding/within-wordmark-black-tight.png',
-            logoWidth: 320,
-            logoHeight: 88,
-            accent: '#2a1f23',
+            wordmark: 'WITHIN CENTER',
+            subheader: 'at AWKN Ranch · Austin, Texas',
             supportEmail: 'admin@within.center',
-            tagline: 'Rest. Reset. Return.',
-            defaultTitle: 'Your Retreat at Within Center',
+            defaultTitle: 'Your Program at Within Center',
           }
         : {
             name: 'AWKN Ranch',
-            logoUrl: 'https://laurenbur2.github.io/awkn-ranch/assets/branding/wordmark-black-tight.png',
-            logoWidth: 400,
-            logoHeight: 109,
-            accent: '#8a6f44',
+            wordmark: 'AWKN RANCH',
+            subheader: 'Austin, Texas',
             supportEmail: 'admin@awknranch.com',
-            tagline: 'Where the herd gathers',
             defaultTitle: 'Your Event at AWKN Ranch',
           };
       return {
         subject: `Proposal ${data.proposal_number} from ${brand.name} — ${data.title}`,
         html: `
-          <div style="max-width:640px;margin:0 auto;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-            <div style="background:linear-gradient(180deg,#faf6ed 0%,#f0e6d2 100%);border-bottom:1px solid #e5d9bf;padding:40px 32px 28px;text-align:center;">
-              <img src="${brand.logoUrl}" alt="${brand.name}" width="${brand.logoWidth}" height="${brand.logoHeight}" style="display:block;margin:0 auto 16px;max-width:100%;height:auto;border:0;outline:none;" />
-              <p style="margin:0;color:${brand.accent};font-size:13px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;">Proposal ${String(data.proposal_number || '')}</p>
-              <h1 style="margin:10px 0 0;color:#2c1d0f;font-size:26px;font-weight:700;letter-spacing:-0.3px;">${String(data.title || brand.defaultTitle)}</h1>
-            </div>
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
 
-            <div style="padding:32px;">
-              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">Hi ${String(data.recipient_first_name || 'there')},</p>
-              <p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 24px;">Thanks for considering ${brand.name}. Here's your proposal${eventDate ? ` for <strong>${eventDate}</strong>` : ''}. Review the details below and tap the button to secure your date.</p>
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">${brand.wordmark}</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">${brand.subheader}</div>
+  </div>
 
-              ${eventDate || data.guest_count || data.event_type ? `
-              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:18px 22px;margin:0 0 24px;">
-                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 10px;">Event Details</p>
-                <table style="width:100%;border-collapse:collapse;">
-                  ${eventDate ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;width:120px;">Date</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;">${eventDate}</td></tr>` : ''}
-                  ${data.event_type ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;">Event type</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;text-transform:capitalize;">${String(data.event_type)}</td></tr>` : ''}
-                  ${data.guest_count ? `<tr><td style="padding:3px 0;color:#64748b;font-size:14px;">Guest count</td><td style="padding:3px 0;color:#334155;font-size:14px;font-weight:600;">${data.guest_count}</td></tr>` : ''}
-                </table>
-              </div>` : ''}
+  <!-- Proposal hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Proposal ${String(data.proposal_number || '')}</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">${String(data.title || brand.defaultTitle)}</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">Hi ${String(data.recipient_first_name || 'there')} — thank you for considering ${brand.name}. Your proposal is ready below.</p>
+  </div>
 
-              ${lineItems.length > 0 ? `
-              <table style="width:100%;border-collapse:collapse;margin:0 0 8px;">
-                <thead>
-                  <tr style="background:#f1f5f9;">
-                    <th style="padding:10px 12px;text-align:left;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Description</th>
-                    <th style="padding:10px 12px;text-align:center;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Qty</th>
-                    <th style="padding:10px 12px;text-align:right;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Unit</th>
-                    <th style="padding:10px 12px;text-align:right;color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${lineItemRows}
-                </tbody>
-              </table>` : ''}
+  ${eventDate || data.guest_count || data.event_type ? `
+  <!-- Event details -->
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Event Details</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;">
+        ${eventDate ? `<tr><td style="padding:4px 0;color:#6b4c3b;width:120px;">Date</td><td style="padding:4px 0;font-weight:600;">${eventDate}</td></tr>` : ''}
+        ${data.event_type ? `<tr><td style="padding:4px 0;color:#6b4c3b;">Event type</td><td style="padding:4px 0;font-weight:600;text-transform:capitalize;">${String(data.event_type)}</td></tr>` : ''}
+        ${data.guest_count ? `<tr><td style="padding:4px 0;color:#6b4c3b;">Guest count</td><td style="padding:4px 0;font-weight:600;">${data.guest_count}</td></tr>` : ''}
+      </table>
+    </div>
+  </div>` : ''}
 
-              <div style="text-align:right;margin:16px 0 0;padding:14px 12px;border-top:2px solid ${brand.accent};">
-                ${data.subtotal !== undefined ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Subtotal: <strong style="color:#334155;">${fmtCurrency(data.subtotal)}</strong></p>` : ''}
-                ${data.discount_amount && Number(data.discount_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Discount: <strong style="color:#334155;">−${fmtCurrency(data.discount_amount)}</strong></p>` : ''}
-                ${data.tax_amount && Number(data.tax_amount) > 0 ? `<p style="margin:0 0 4px;color:#64748b;font-size:14px;">Tax: <strong style="color:#334155;">${fmtCurrency(data.tax_amount)}</strong></p>` : ''}
-                <p style="margin:8px 0 0;color:${brand.accent};font-size:20px;font-weight:700;">Total Due: ${fmtCurrency(data.total)}</p>
-              </div>
+  ${lineItems.length > 0 ? `
+  <!-- Line items -->
+  <div style="padding:0 40px 8px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:14px;">What's Included</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+      <tbody>
+        ${lineItemRows}
+      </tbody>
+    </table>
+  </div>` : ''}
 
-              <div style="text-align:center;margin:32px 0 16px;">
-                <a href="${String(data.payment_link_url || '#')}" style="background:linear-gradient(135deg,#c2410c 0%,#ea580c 100%);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:700;font-size:16px;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(194,65,12,0.3);">Pay &amp; Secure Your Date</a>
-                <p style="margin:10px 0 0;color:#94a3b8;font-size:12px;">Secure bank transfer (ACH) via Stripe • ${validUntil ? `Valid until ${validUntil}` : 'Pay anytime'}</p>
-              </div>
+  <!-- Totals -->
+  <div style="padding:20px 40px 8px 40px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;">
+      ${data.subtotal !== undefined ? `<tr><td style="padding:3px 0;text-align:right;">Subtotal</td><td style="padding:3px 0;text-align:right;width:120px;color:#1c1618;font-weight:500;">${fmtCurrency(data.subtotal)}</td></tr>` : ''}
+      ${data.discount_amount && Number(data.discount_amount) > 0 ? `<tr><td style="padding:3px 0;text-align:right;">Discount</td><td style="padding:3px 0;text-align:right;color:#1c1618;font-weight:500;">−${fmtCurrency(data.discount_amount)}</td></tr>` : ''}
+      ${data.tax_amount && Number(data.tax_amount) > 0 ? `<tr><td style="padding:3px 0;text-align:right;">Tax</td><td style="padding:3px 0;text-align:right;color:#1c1618;font-weight:500;">${fmtCurrency(data.tax_amount)}</td></tr>` : ''}
+    </table>
+  </div>
 
-              ${data.notes ? `
-              <div style="background:#fef9c3;border-left:3px solid #eab308;padding:14px 18px;margin:24px 0 0;border-radius:4px;">
-                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Notes</p>
-                <p style="color:#334155;font-size:14px;line-height:1.5;margin:0;white-space:pre-wrap;">${String(data.notes)}</p>
-              </div>` : ''}
+  <!-- Total Due (black box) -->
+  <div style="padding:12px 40px 28px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:22px 28px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;">Total Due</td>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#ffffff;text-align:right;">${fmtCurrency(data.total)}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
-              ${data.terms ? `
-              <div style="margin:24px 0 0;">
-                <p style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 6px;">Terms</p>
-                <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0;white-space:pre-wrap;">${String(data.terms)}</p>
-              </div>` : ''}
+  <!-- CTA -->
+  <div style="padding:0 40px 8px 40px;text-align:center;">
+    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Pay &amp; Secure Your Date</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:14px 0 0 0;">Secure bank transfer (ACH) via Stripe${validUntil ? ` · Valid until ${validUntil}` : ''}</p>
+  </div>
 
-              <p style="color:#94a3b8;font-size:13px;text-align:center;margin:28px 0 0;">Questions? Reply to this email or write <a href="mailto:${brand.supportEmail}" style="color:#c2410c;">${brand.supportEmail}</a>.</p>
-            </div>
+  ${isWithin ? `
+  <!-- Available Add-Ons -->
+  <div style="padding:32px 40px 0 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:6px;">Enhance Your Experience</div>
+      <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.3;">Available Add-Ons</h3>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tr>
+          <td width="50%" valign="top" style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">60-Minute Massage</td>
+          <td valign="top" style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$175</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Additional Integration Coaching</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$200</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Human Design Reading</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$250</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Licensed Therapy Session</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$250</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Astrology Session</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$200</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Hap&eacute; Ceremony</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$75</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Internal Family System Session</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$200</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;border-bottom:1px solid rgba(201,148,62,0.18);">Private Sound Journey</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;border-bottom:1px solid rgba(201,148,62,0.18);">$200</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 10px 6px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;">Pickleball Lesson</td>
+          <td style="padding:6px 0 6px 10px;font-family:'Inter',sans-serif;font-size:13px;color:#c9943e;font-weight:600;text-align:right;">$50</td>
+        </tr>
+      </table>
+      <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:14px 0 0 0;">Reply to this email or contact Shannon in admissions to add any of these to your experience.</p>
+    </div>
+  </div>` : ''}
 
-            <div style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;color:#94a3b8;font-size:12px;">${brand.name}</p>
-              <p style="margin:6px 0 0;color:#cbd5e1;font-size:11px;">${brand.tagline}</p>
-            </div>
-          </div>
+  ${data.notes ? `
+  <!-- Notes -->
+  <div style="padding:28px 40px 0 40px;">
+    <div style="background:#faf8f5;border:1px solid rgba(201,148,62,0.18);border-radius:4px;padding:18px 22px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Notes</div>
+      <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.6;margin:0;white-space:pre-wrap;">${String(data.notes)}</p>
+    </div>
+  </div>` : ''}
+
+  ${data.terms ? `
+  <!-- Terms -->
+  <div style="padding:20px 40px 0 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:8px;">Terms</div>
+    <p style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;margin:0;white-space:pre-wrap;">${String(data.terms)}</p>
+  </div>` : ''}
+
+  <!-- Signoff -->
+  <div style="padding:32px 40px 36px 40px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:#1c1618;line-height:1.7;margin:0 0 16px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+      Questions? Reply to this email or write <a href="mailto:${brand.supportEmail}" style="color:#c9943e;text-decoration:none;">${brand.supportEmail}</a>.
+    </p>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#1c1618;margin:0;">With care,<br><em style="color:#6b4c3b;">The ${brand.name} Team</em></p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:0 40px 32px 40px;text-align:center;font-family:'Inter',sans-serif;font-size:11px;color:rgba(28,22,24,0.45);line-height:1.7;">
+    © 2026 Hearth Space Health, Inc. · 7600 Grove Crest Circle, Austin, TX
+  </div>
+
+</div>
         `,
         text: `Proposal ${data.proposal_number} — ${data.title}
 
