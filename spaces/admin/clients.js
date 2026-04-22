@@ -25,6 +25,10 @@ let activeClientStageId = null;
 let lodgingSpaces = [];     // spaces where space_type='lodging'
 let beds = [];              // all non-archived beds
 
+// Schedule modal state
+let sessionSpaces = [];     // spaces where space_type='session' (treatment rooms)
+let staffList = [];         // app_users with role admin/staff/oracle, not archived
+
 // House tab state
 let houseSelectedDate = new Date().toISOString().slice(0, 10);
 
@@ -78,11 +82,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAllData() {
   // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
-  const [servicesRes, stagesRes, lodgingRes, bedsRes] = await Promise.all([
+  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes] = await Promise.all([
     supabase.from('services').select('*').order('sort_order').order('name'),
     supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
-    supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('space_type', 'lodging').eq('is_archived', false),
+    supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
+    supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
   ]);
 
   if (servicesRes.error) console.error('services load error:', servicesRes.error);
@@ -91,8 +96,11 @@ async function loadAllData() {
   const withinStage = (stagesRes.data || []).find(s => s.business_line === 'within');
   activeClientStageId = withinStage?.id || null;
 
-  lodgingSpaces = lodgingRes.data || [];
+  const allSpaces = spacesRes.data || [];
+  lodgingSpaces = allSpaces.filter(s => s.space_type === 'lodging');
+  sessionSpaces = allSpaces.filter(s => s.space_type === 'session');
   beds = bedsRes.data || [];
+  staffList = staffRes.data || [];
 
   // Step 2: load clients + their packages + stays (needs activeClientStageId)
   await loadClientsData();
@@ -372,11 +380,7 @@ function renderPackageList(pkgs) {
         </div>
         ${sessions.length ? `
           <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">
-            ${sessions.map(s => `
-              <span title="${escapeHtml(getServiceName(s.service_id))} \u00b7 ${s.status}" style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sessionPillBg(s.status)};color:${sessionPillFg(s.status)};">
-                ${escapeHtml(getServiceName(s.service_id))}${s.scheduled_at ? ` \u00b7 ${formatDateShort(s.scheduled_at)}` : ''}
-              </span>
-            `).join('')}
+            ${sessions.map(s => renderSessionPill(s)).join('')}
           </div>
         ` : ''}
       </div>
@@ -389,6 +393,18 @@ function sessionPillBg(status) {
 }
 function sessionPillFg(status) {
   return { completed: '#15803d', scheduled: '#4338ca', unscheduled: '#64748b', cancelled: '#b91c1c' }[status] || '#64748b';
+}
+function renderSessionPill(s) {
+  const svc = escapeHtml(getServiceName(s.service_id));
+  const when = s.scheduled_at ? ` \u00b7 ${formatDateShort(s.scheduled_at)}` : '';
+  const tip = `${svc} \u00b7 ${s.status}`;
+  const clickable = s.status === 'unscheduled';
+  const cursor = clickable ? 'cursor:pointer;' : '';
+  const label = clickable ? `${svc} \u00b7 schedule` : `${svc}${when}`;
+  const attrs = clickable
+    ? `data-action="schedule-session" data-session-id="${s.id}"`
+    : '';
+  return `<span ${attrs} title="${tip}" style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sessionPillBg(s.status)};color:${sessionPillFg(s.status)};${cursor}">${label}</span>`;
 }
 
 function renderStayList(clientStays) {
@@ -674,6 +690,169 @@ async function saveStay(leadId) {
   openClientDetail(leadId);
 }
 
+// ---------- Schedule session modal (Phase 4) ----------
+
+function findSessionContext(sessionId) {
+  for (const p of packages) {
+    const sess = (p.sessions || []).find(x => x.id === sessionId);
+    if (sess) return { session: sess, pkg: p };
+  }
+  return null;
+}
+
+function openScheduleSessionModal(sessionId) {
+  const ctx = findSessionContext(sessionId);
+  if (!ctx) { showToast('Session not found', 'error'); return; }
+  const { session, pkg } = ctx;
+
+  const client = clients.find(c => c.id === pkg.lead_id);
+  const service = services.find(s => s.id === session.service_id);
+  const clientName = client ? `${client.first_name || ''} ${client.last_name || ''}`.trim() : 'Client';
+
+  // Default: tomorrow at 10:00 local time
+  const def = new Date();
+  def.setDate(def.getDate() + 1);
+  def.setHours(10, 0, 0, 0);
+  const pad = n => String(n).padStart(2, '0');
+  const defaultStart = `${def.getFullYear()}-${pad(def.getMonth() + 1)}-${pad(def.getDate())}T${pad(def.getHours())}:${pad(def.getMinutes())}`;
+
+  const schedulableStaff = staffList.filter(u => u.role === 'admin' || u.role === 'oracle' || u.can_schedule);
+  if (!schedulableStaff.length) {
+    showToast('No staff with scheduling permission. Enable "can_schedule" on a user first.', 'error');
+    return;
+  }
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <h2>Schedule Session \u2014 ${escapeHtml(clientName)}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div style="padding:10px 12px;background:var(--bg,#faf9f6);border-radius:8px;margin-bottom:14px;font-size:12px;color:var(--text-muted,#666);">
+            ${escapeHtml(service?.name || 'Service')} &middot; ${service?.duration_minutes || 60} min &middot; package &ldquo;${escapeHtml(pkg.name)}&rdquo;
+          </div>
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>Staff *</label>
+              <select class="crm-select" id="sched-staff" required>
+                <option value="">\u2014 pick staff \u2014</option>
+                ${schedulableStaff.map(u => {
+                  const n = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || '—';
+                  return `<option value="${u.id}">${escapeHtml(n)}</option>`;
+                }).join('')}
+              </select>
+            </div>
+            <div class="crm-form-field">
+              <label>Start *</label>
+              <input class="crm-input" type="datetime-local" id="sched-start" value="${defaultStart}" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Duration (min)</label>
+              <input class="crm-input" type="number" id="sched-duration" min="15" step="15" value="${service?.duration_minutes || 60}">
+            </div>
+            <div class="crm-form-field">
+              <label>Room (optional)</label>
+              <select class="crm-select" id="sched-space">
+                <option value="">\u2014 no room \u2014</option>
+                ${sessionSpaces.map(sp => `<option value="${sp.id}">${escapeHtml(sp.name)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="crm-form-field" style="grid-column:1 / -1;">
+              <label>Notes</label>
+              <textarea class="crm-textarea" id="sched-notes" rows="3" placeholder="Optional context"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          <button class="crm-btn" id="sched-cancel">Cancel</button>
+          <button class="crm-btn crm-btn-primary" id="sched-save" data-session-id="${session.id}">Book session</button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', () => openClientDetail(pkg.lead_id));
+  document.getElementById('sched-cancel').addEventListener('click', () => openClientDetail(pkg.lead_id));
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') openClientDetail(pkg.lead_id);
+  });
+  document.getElementById('sched-save').addEventListener('click', () => saveScheduledSession(session.id));
+}
+
+async function saveScheduledSession(sessionId) {
+  const ctx = findSessionContext(sessionId);
+  if (!ctx) { showToast('Session not found', 'error'); return; }
+  const { session, pkg } = ctx;
+
+  const staffId = document.getElementById('sched-staff').value;
+  const startLocal = document.getElementById('sched-start').value;
+  const duration = parseInt(document.getElementById('sched-duration').value, 10) || 0;
+  const spaceId = document.getElementById('sched-space').value || null;
+  const notes = document.getElementById('sched-notes').value.trim() || null;
+
+  if (!staffId) { showToast('Pick a staff member', 'error'); return; }
+  if (!startLocal) { showToast('Pick a start time', 'error'); return; }
+
+  // datetime-local is local time — convert to ISO in the user's timezone
+  const startDate = new Date(startLocal);
+  if (isNaN(startDate.getTime())) { showToast('Invalid start time', 'error'); return; }
+
+  const saveBtn = document.getElementById('sched-save');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Booking\u2026';
+
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+    const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+    const resp = await fetch(supabaseUrl + '/functions/v1/admin-book-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'apikey': anonKey,
+      },
+      body: JSON.stringify({
+        lead_id: pkg.lead_id,
+        service_id: session.service_id,
+        staff_user_id: staffId,
+        start_datetime: startDate.toISOString(),
+        duration_minutes: duration || undefined,
+        space_id: spaceId,
+        package_session_id: session.id,
+        notes,
+      }),
+    });
+    const json = await resp.json().catch(() => ({}));
+
+    if (!resp.ok) {
+      if (json.error === 'slot_taken') {
+        showToast('That time slot is already booked for this staff member.', 'error');
+      } else {
+        showToast('Booking failed: ' + (json.error || resp.status), 'error');
+      }
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Book session';
+      return;
+    }
+
+    showToast('Session scheduled', 'success');
+    await loadClientsData();
+    openClientDetail(pkg.lead_id);
+  } catch (e) {
+    console.error('admin-book-session call failed:', e);
+    showToast('Booking failed: ' + e.message, 'error');
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Book session';
+  }
+}
+
 // ---------- Schedule tab preview (Phase 4 + 5) ----------
 function renderSchedulePreview() {
   const panel = document.getElementById('clients-panel-schedule');
@@ -703,7 +882,7 @@ function renderSchedulePreview() {
   `).join('');
 
   panel.innerHTML = `
-    ${previewBanner('Phase 4 + 5', 'Final version: weekly grid of all staff-booked sessions, admin "Schedule Session" button that picks client \u2192 service \u2192 staff \u2192 time slot, double-booking blocked atomically.')}
+    ${previewBanner('Phase 5', 'Weekly grid of all booked sessions \u2014 live data coming next. Booking already works today: open a client \u2192 click an unscheduled session pill.')}
     <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
       <button class="crm-btn crm-btn-primary" disabled>+ Schedule Session</button>
       <span style="color:var(--text-muted,#888);font-size:13px;margin-left:8px;">Apr 21 \u2013 Apr 27</span>
@@ -1080,6 +1259,15 @@ function setupEventListeners() {
     panelsContainer.addEventListener('change', handlePanelChanges);
     panelsContainer.addEventListener('input', handlePanelInputs);
   }
+  // Modal container is a sibling, not a child — wire the same delegated
+  // handlers so data-action buttons rendered inside modals (new-package,
+  // new-stay, schedule-session) still fire.
+  const modalContainer = document.getElementById('clients-modal');
+  if (modalContainer) {
+    modalContainer.addEventListener('click', handlePanelClicks);
+    modalContainer.addEventListener('change', handlePanelChanges);
+    modalContainer.addEventListener('input', handlePanelInputs);
+  }
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
@@ -1109,6 +1297,10 @@ function handlePanelClicks(e) {
   const actionBtn = target.closest('[data-action]');
   if (actionBtn) {
     e.stopPropagation();
+    if (actionBtn.dataset.action === 'schedule-session') {
+      openScheduleSessionModal(actionBtn.dataset.sessionId);
+      return;
+    }
     const leadId = actionBtn.dataset.clientId;
     if (actionBtn.dataset.action === 'new-package') openPackageModal(leadId);
     if (actionBtn.dataset.action === 'new-stay')    openStayModal(leadId);
