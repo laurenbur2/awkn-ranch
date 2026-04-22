@@ -221,141 +221,184 @@ serve(async (req) => {
 
     const drawSpacer = (h = 8) => { y -= h; };
 
-    // --- Title ---
-    page.drawText("AWKN RANCH EVENT SPACE RENTAL AGREEMENT", {
-      x: MARGIN, y, size: 16, font: bold, color: rgb(0, 0, 0)
-    });
-    y -= 24;
-    page.drawText(`Agreement Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`, {
-      x: MARGIN, y, size: 10, font, color: rgb(0.3, 0.3, 0.3)
-    });
-    y -= 20;
+    // Helper to render a labeled "Label: Value" line.
+    const drawKV = (label: string, value: string) => {
+      ensure(LINE_H);
+      page.drawText(label, { x: MARGIN, y, size: BODY_SIZE, font: bold });
+      const labelW = bold.widthOfTextAtSize(label, BODY_SIZE) + 4;
+      const maxW = PAGE_W - MARGIN * 2 - labelW;
+      const lines = wrap(value || "", maxW);
+      if (lines.length === 0) { y -= LINE_H; return; }
+      page.drawText(lines[0], { x: MARGIN + labelW, y, size: BODY_SIZE, font });
+      y -= LINE_H;
+      for (let i = 1; i < lines.length; i++) {
+        ensure(LINE_H);
+        page.drawText(lines[i], { x: MARGIN + labelW, y, size: BODY_SIZE, font });
+        y -= LINE_H;
+      }
+    };
 
-    drawParagraph(
-      `This Rental Agreement ("Agreement") is made by and between the Revocable Trust of Subhash Sonnad (dba AWKN Ranch) ("Company"), and ${clientName} ("Client" or "Renter").`
-    );
-    drawSpacer();
-    drawParagraph(`Email: ${lead.email}`);
-    if (lead.phone) drawParagraph(`Phone: ${lead.phone}`);
+    const drawBullet = (text: string) => {
+      ensure(LINE_H);
+      const indent = 14;
+      const maxW = PAGE_W - MARGIN * 2 - indent;
+      const lines = wrap(text, maxW);
+      page.drawText("\u2022", { x: MARGIN, y, size: BODY_SIZE, font });
+      lines.forEach((line, i) => {
+        if (i > 0) { y -= LINE_H; ensure(LINE_H); }
+        page.drawText(line, { x: MARGIN + indent, y, size: BODY_SIZE, font });
+      });
+      y -= LINE_H;
+    };
 
-    drawHeading("RENTAL VENUE");
-    drawParagraph(
-      "Company agrees to rent to Client the spaces at 7600 Stillridge Dr (aka the Austin AWKN Ranch) as set forth in the Event Details Summary attached hereto."
-    );
-
-    drawHeading("RENTAL PERIOD");
     const eventDate = fmtDate(proposal.event_date);
     const startT = fmtTime(proposal.event_start);
     const endT = fmtTime(proposal.event_end);
-    drawParagraph(`The rental period is ${eventDate} from ${startT} to ${endT}.`);
-    if (proposal.setup_time || proposal.teardown_time) {
-      drawParagraph(`Setup begins ${fmtTime(proposal.setup_time)}; teardown complete by ${fmtTime(proposal.teardown_time)}.`);
-    }
+    const guestCountStr = proposal.guest_count ? `${proposal.guest_count}` : "";
 
-    drawHeading("FEES");
-    drawParagraph(`Total Rental Fee: ${fmtMoney(total)}.`);
-    drawParagraph(`A ${depositPct}% deposit of ${fmtMoney(depositAmt)} is due to confirm the booking. The remaining balance of ${fmtMoney(balanceDue)} is due no later than 30 days before the event date.`);
-    drawParagraph("If the event is canceled less than 14 days before the scheduled date, the deposit will not be refunded.");
+    // Derive Event Space description from proposal line items (venue category first).
+    const items: any[] = Array.isArray(proposal.items) ? proposal.items : [];
+    const venueItems = items.filter(i => (i.category || "").toLowerCase() === "venue");
+    const spaceItems = venueItems.length ? venueItems : items;
+    const eventSpaceStr = spaceItems.map(i => i.description || "").filter(Boolean).join("; ");
 
-    drawHeading("GUEST LIMIT");
-    const guestCount = proposal.guest_count ? `${proposal.guest_count}` : "the agreed-upon";
+    // Cleaning fee: any line item with "clean" in the description (default $0).
+    const cleaningFee = items
+      .filter(i => /clean/i.test(i.description || ""))
+      .reduce((s, i) => s + Number(i.total || 0), 0);
+
+    const rentalFee = total - cleaningFee;
+    const agreementDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+    // --- Title ---
+    const title = "AWKN EVENT SPACE RENTAL AGREEMENT";
+    const titleW = bold.widthOfTextAtSize(title, 16);
+    page.drawText(title, { x: (PAGE_W - titleW) / 2, y, size: 16, font: bold });
+    y -= 28;
+
     drawParagraph(
-      `Client agrees no more than ${guestCount} people including volunteers and paid attendees will attend. Client agrees to pay $15 per additional person over the limit and to candidly report attendance.`
+      `This Event Space Rental Agreement ("Agreement") is made and entered into on this ${agreementDate}, by and between:`
     );
+    drawSpacer();
 
-    drawHeading("WARRANTY DISCLAIMER");
-    drawParagraph(
-      "Client acknowledges that the rental property is of a size, design, and capacity selected by Client, and that Company disclaims all warranties express or implied with respect to the rental property, including any express or implied warranties as to condition, fitness for a particular purpose or durability."
-    );
+    // OWNER block
+    page.drawText("OWNER:", { x: MARGIN, y, size: 11, font: bold });
+    y -= LINE_H + 2;
+    drawParagraph("AWKN Ranch", { indent: 8 });
+    drawParagraph("Address: 7600 Stillridge Dr, Austin, TX 78736", { indent: 8 });
+    drawParagraph("Phone: 831-713-7698", { indent: 8 });
+    drawParagraph("Email: jeri@within.center", { indent: 8 });
+    drawSpacer();
 
-    drawHeading("DAMAGED OR MISSING ITEMS");
-    drawParagraph(
-      "Damages include chipped, cracked or broken items, stained or dirtied upholstery beyond normal wear, and loss or damage due to theft, misuse, abuse, or Client's failure to care for the Rental Items. Any damages after delivery are the sole responsibility of Client. In the event of rain or inclement conditions, Client is responsible for shielding goods from the elements."
-    );
+    // RENTER block
+    page.drawText("RENTER:", { x: MARGIN, y, size: 11, font: bold });
+    y -= LINE_H + 2;
+    drawKV("Name/Organization: ", clientName);
+    drawKV("Phone: ", lead.phone || "");
+    drawKV("Email: ", lead.email || "");
 
-    drawHeading("PHOTOGRAPHY & BRANDING");
-    drawParagraph(
-      "Client agrees that any photography of their event at the AWKN Ranch will not be publicly posted without permission. The name \"AWKN Ranch\" will only be used in describing the location and not as a host of the event."
-    );
+    // 1. EVENT DETAILS
+    drawHeading("1. EVENT DETAILS");
+    drawParagraph("Renter agrees to rent the event space owned by AWKN Ranch under the following terms:");
+    drawKV("Event Name/Type: ", proposal.title || proposal.event_type || "");
+    drawKV("Event Date(s): ", eventDate);
+    drawKV("Event Start Time: ", `${startT}    |   End Time: ${endT}`);
+    drawKV("Expected Number of Guests: ", guestCountStr);
+    drawKV("Event Space: ", eventSpaceStr);
 
-    drawHeading("INDEMNIFICATION");
-    drawParagraph(
-      "Client hereby voluntarily and expressly releases, indemnifies, forever discharges and holds harmless Company from any and all liability, claims, demands, causes or rights of action whether personal to Client, including those allegedly attributed to negligent acts or omissions. Should Company be required to incur attorney fees and costs to enforce this agreement, Client expressly agrees to indemnify and hold harmless Company for all such fees and costs."
-    );
+    // 2. RENTAL FEES & PAYMENT SCHEDULE
+    drawHeading("2. RENTAL FEES & PAYMENT SCHEDULE");
+    drawKV("Rental Fee: ", fmtMoney(rentalFee));
+    drawKV("Cleaning Fee: ", cleaningFee > 0 ? fmtMoney(cleaningFee) : "Included");
+    drawKV("Deposit: ", fmtMoney(depositAmt));
+    drawParagraph(`${depositPct}% of Rental Fee to Secure the Space`, { indent: 8 });
+    drawKV("Total Due at Signing: ", fmtMoney(depositAmt));
+    drawKV(`Remaining ${100 - depositPct}% Due 30 Days before event date: `, fmtMoney(balanceDue));
+    drawSpacer();
+    drawParagraph("Payment Methods:", { font: bold });
+    drawParagraph("Payments may be made via Check, Credit Card, or Bank Transfer via Quickbooks", { indent: 8 });
+    drawParagraph("All fees are non-refundable unless otherwise stated in this Agreement.");
 
-    drawHeading("DISPUTE RESOLUTION & APPLICABLE LAW");
-    drawParagraph(
-      "If a dispute arises under this Agreement, the parties agree to first try to resolve the dispute with the help of a mutually agreed-upon mediator in Travis County, TX. This Agreement shall be governed by the laws of the State of Texas, and any disputes arising from it must be handled exclusively in the federal and state courts located in Travis County, TX."
-    );
+    // 3. CANCELLATION POLICY
+    drawHeading("3. CANCELLATION POLICY");
+    drawBullet("75+ Days Before Event: 100% of deposit refundable.");
+    drawBullet("30–59 Days Before Event: 50% of deposit refundable.");
+    drawBullet("Less Than 30 Days Before Event: Deposit is non-refundable, and the full balance remains due.");
 
-    drawHeading("ENTIRE AGREEMENT");
-    drawParagraph(
-      "This Agreement (including attachments) contains the entire agreement of the parties and supersedes any prior written or oral agreements. This Agreement may be modified only in writing, signed by all parties."
-    );
+    // 4. RULES AND REGULATIONS
+    drawHeading("4. RULES AND REGULATIONS");
+    drawParagraph("Renter agrees to comply with the following rules:");
+    drawBullet("Event Capacity: Shall not exceed 50 people.");
+    drawBullet("Smoking/Substance Use: No smoking or illegal substances are allowed on the premises.");
+    drawBullet("Decorations: Must not damage walls, floors, or fixtures. Use of nails, staples, or adhesives is prohibited.");
+    drawBullet("Noise Ordinance: Noise levels must comply with City of Austin local noise laws.");
+    drawBullet("Event End Time: Guests must vacate the premises by the designated end time.");
+    drawBullet("Alcohol: Alcohol is not permitted.");
 
-    drawHeading("FORCE MAJEURE");
-    drawParagraph(
-      "Neither party shall be liable for any failure of or delay in performance if such failure or delay is due to unforeseeable causes beyond its reasonable control, including acts of God, war, strikes, embargoes, pandemics, or government orders. A Force Majeure Event cannot be used to excuse Client's payment obligations; however, any amounts paid may be transferred to another event within one year of the originally scheduled date."
-    );
+    // 5. LIABILITY & INSURANCE
+    drawHeading("5. LIABILITY & INSURANCE");
+    drawParagraph("Renter assumes full responsibility for all damages, injuries, or losses caused by themselves, guests, vendors, or third parties.");
+    drawParagraph("AWKN Ranch shall not be liable for loss, theft, or damage to personal property.");
 
-    drawHeading("CLIENT OBLIGATIONS");
-    const obligations = [
-      "Staffing: Pre-event Setup to arrive 90 minutes before start. Post-event cleaners are required. Parking must be managed at all times guests are arriving and during the event to prevent parking on neighbors' property.",
-      "Address Privacy: Client agrees NOT to post the venue address in any distributed materials (texts, emails, social media, printed materials). Instead use awknranch.com/visiting. $100 fee if address is posted.",
-      "Parking Management: $150 penalty per neighbor complaint regarding parking on their property.",
-      "Noise: Outside noise and music levels must be kept low after 9:30pm. $100 fee if neighbors complain about noise after this time. No outdoor PA speakers at high volume after 9:30pm.",
-      "Cleaning Timeline: Cleaners arrive at least 90 minutes before event start. All cleaning must be complete by 1:01pm the day after the event. Late cleaning billed at $30 + $30/hour.",
-      "Propane Usage: Propane used for heating, display, or hot tubs will be reimbursed from the damage deposit (if applicable).",
-      "No Alcohol or Cooking Meat Inside: No alcohol inside the house. No cooking or storing meat in the kitchen. Meat may be cooked on the back patio.",
-      "No RVs onsite at any time. $100 fee if this occurs.",
-      "Linens & Furniture: Used linens/towels must be washed and returned. Any moved furniture must be returned to its original location.",
-      "No Animals indoors or in the backyard. $100 fee per occurrence.",
-    ];
-    obligations.forEach((o, i) => drawParagraph(`${i + 1}. ${o}`, { indent: 8 }));
+    // 6. CLEANUP & DAMAGE POLICY
+    drawHeading("6. CLEANUP & DAMAGE POLICY");
+    drawParagraph("Renter agrees to leave the event space in its original condition.");
+    drawParagraph("All decorations, trash, and personal belongings must be removed by the agreed breakdown time.");
+    drawParagraph("Renter agrees to enforce respect for the land, our staff, and the space to all attendees.");
+    drawParagraph("Damages beyond normal wear and tear will be deducted from the Security Deposit. If damages exceed the deposit, Renter is liable for the balance.");
 
-    // --- Signature page --- we track page/y here so we can send explicit field
-    // coordinates to SignWell. text_tags are unreliable (they failed on our first
-    // attempt — recipients ended up with no fields and the doc was unsignable).
+    // 7. INDEMNIFICATION
+    drawHeading("7. INDEMNIFICATION");
+    drawParagraph("Renter agrees to indemnify, defend, and hold harmless AWKN Ranch, its owners, employees, and agents from any claims, losses, damages, or expenses arising from:");
+    drawBullet("Renter's use of the premises.");
+    drawBullet("Any negligence or misconduct by Renter, guests, or vendors.");
+    drawBullet("Any violation of this Agreement or applicable laws.");
+
+    // 8. FORCE MAJEURE
+    drawHeading("8. FORCE MAJEURE");
+    drawParagraph("Neither party shall be held liable for failure to perform due to circumstances beyond their control, including:");
+    drawBullet("Acts of God (e.g., floods, hurricanes, wildfires).");
+    drawBullet("Government mandates or regulations.");
+    drawBullet("Other unforeseen circumstances rendering the event impossible.");
+    drawParagraph("If such events occur, both parties agree to reschedule the event where possible or negotiate partial refunds.");
+
+    // 9. MISCELLANEOUS
+    drawHeading("9. MISCELLANEOUS");
+    drawParagraph("Entire Agreement: This Agreement constitutes the full understanding between both parties.");
+    drawParagraph("Amendments: Any amendments must be made in writing and signed by both parties.");
+    drawParagraph("Governing Law: This Agreement shall be governed by and interpreted in accordance with the laws of the State of Texas.");
+    drawParagraph("Severability: If any provision of this Agreement is deemed unenforceable, the remaining provisions remain in full effect.");
+    drawParagraph("Rule of Threes: The enforceability of this contract is ensured by:");
+    drawBullet("Clear written obligations.");
+    drawBullet("Written signatures of both parties.");
+    drawBullet("Exchange of consideration (deposit and rental fees).");
+
+    // 10. SIGNATURES — on a fresh page so the signature field is easy to find.
     newPage();
     const sigPageNumber = pdf.getPageCount(); // 1-indexed for SignWell
-    page.drawText("SIGNATURES", { x: MARGIN, y, size: 14, font: bold });
-    y -= 24;
-    drawParagraph(
-      "By signing below, Client acknowledges that they have read and understood the entire Rental Agreement and agrees to its terms. Electronic signatures shall have the same force and effect as original signatures."
-    );
-    drawSpacer(20);
+    page.drawText("10. SIGNATURES", { x: MARGIN, y, size: 14, font: bold });
+    y -= 22;
 
-    // Client block
-    page.drawText("CLIENT:", { x: MARGIN, y, size: 11, font: bold });
-    y -= LINE_H + 4;
-    page.drawText(`Name: ${clientName}`, { x: MARGIN, y, size: 10, font });
-    y -= LINE_H + 20;
+    page.drawText("RENTER", { x: MARGIN, y, size: 11, font: bold });
+    y -= LINE_H + 6;
+    drawKV("Name: ", clientName);
+    y -= 14;
 
-    // Capture coordinates for the signature field. pdf-lib uses BOTTOM-LEFT
-    // origin; SignWell uses TOP-LEFT origin. Convert: top = PAGE_H - y.
-    // We only render a signature field — SignWell stamps the signed-at timestamp
-    // on the completed PDF automatically and we also record contract_signed_at
-    // in the DB via webhook. Adding a separate date field caused SignWell to
-    // reject the create with "type can't be blank" on the date_signed field.
+    // Signature field. pdf-lib uses BOTTOM-LEFT origin; SignWell uses TOP-LEFT.
     page.drawText("Signature:", { x: MARGIN, y, size: 10, font });
     page.drawLine({
-      start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 320, y: y - 2 },
+      start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 340, y: y - 2 },
       thickness: 0.5, color: rgb(0, 0, 0),
     });
     const sigFieldX = MARGIN + 70;
     const sigFieldY = PAGE_H - y - 18;
-    const sigFieldW = 250;
+    const sigFieldW = 270;
     const sigFieldH = 22;
 
-    y -= LINE_H + 30;
-
-    // Company block (pre-signed text, no field)
-    page.drawText("COMPANY: AWKN Ranch (dba Revocable Trust of Subhash Sonnad)", {
-      x: MARGIN, y, size: 11, font: bold,
-    });
-    y -= LINE_H + 4;
-    page.drawText("Rahul Sonnad, Administrator — 7600 Stillridge Dr, Austin, TX 78736", {
-      x: MARGIN, y, size: 10, font,
+    page.drawText("Date:", { x: MARGIN + 360, y, size: 10, font });
+    page.drawLine({
+      start: { x: MARGIN + 390, y: y - 2 }, end: { x: MARGIN + 500, y: y - 2 },
+      thickness: 0.5, color: rgb(0, 0, 0),
     });
 
     const pdfBytes = await pdf.save();
