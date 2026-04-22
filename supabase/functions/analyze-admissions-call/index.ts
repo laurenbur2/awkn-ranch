@@ -343,15 +343,28 @@ async function runAnalysis(
       },
     };
 
-    const gResp = await fetch(`${GEMINI_GENERATE_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiBody),
-    });
-
-    if (!gResp.ok) {
-      const errBody = await gResp.text();
-      throw new Error(`Gemini error (${gResp.status}): ${errBody.slice(0, 400)}`);
+    // Retry on transient Gemini errors (503 overloaded, 429 rate-limit, 500).
+    const maxAttempts = 5;
+    let gResp: Response | undefined;
+    let lastErrBody = '';
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      gResp = await fetch(`${GEMINI_GENERATE_URL}?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geminiBody),
+      });
+      if (gResp.ok) break;
+      lastErrBody = await gResp.text();
+      const transient = gResp.status === 503 || gResp.status === 429 || gResp.status === 500;
+      if (!transient || attempt === maxAttempts) {
+        throw new Error(`Gemini error (${gResp.status}): ${lastErrBody.slice(0, 400)}`);
+      }
+      const delayMs = Math.min(30000, 2000 * Math.pow(2, attempt - 1)) + Math.floor(Math.random() * 1000);
+      console.log(`Gemini ${gResp.status} (attempt ${attempt}/${maxAttempts}) — retrying in ${delayMs}ms`);
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    if (!gResp || !gResp.ok) {
+      throw new Error(`Gemini unavailable after ${maxAttempts} attempts: ${lastErrBody.slice(0, 400)}`);
     }
 
     const gResult = await gResp.json();
