@@ -29,8 +29,22 @@ let beds = [];              // all non-archived beds
 let sessionSpaces = [];     // spaces where space_type='session' (treatment rooms)
 let staffList = [];         // app_users with role admin/staff/oracle, not archived
 
+// Schedule tab state
+let scheduleWeekStart = mondayOf(new Date()); // local Date @ 00:00 on Mon of viewed week
+let scheduleBookings = [];
+let scheduleStaffFilter = 'all';  // 'all' | staff_user_id | 'unassigned'
+
 // House tab state
 let houseSelectedDate = new Date().toISOString().slice(0, 10);
+
+function mondayOf(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const dow = d.getDay(); // 0=Sun..6=Sat
+  const diff = dow === 0 ? -6 : 1 - dow;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
 
 // =============================================
 // UTILITIES
@@ -189,7 +203,7 @@ function renderCurrentPanel() {
 
   if (currentSubtab === 'services') renderServicesPanel();
   else if (currentSubtab === 'clients') renderClientsPanel();
-  else if (currentSubtab === 'schedule') renderSchedulePreview();
+  else if (currentSubtab === 'schedule') { renderSchedulePanel(); loadScheduleWeek(); }
   else if (currentSubtab === 'house') renderHousePanel();
 }
 
@@ -844,6 +858,10 @@ async function saveScheduledSession(sessionId) {
 
     showToast('Session scheduled', 'success');
     await loadClientsData();
+    // Jump the weekly grid to the week of the new booking so it's visible when
+    // the user switches to the Schedule tab.
+    scheduleWeekStart = mondayOf(startDate);
+    loadScheduleWeek();
     openClientDetail(pkg.lead_id);
   } catch (e) {
     console.error('admin-book-session call failed:', e);
@@ -853,73 +871,179 @@ async function saveScheduledSession(sessionId) {
   }
 }
 
-// ---------- Schedule tab preview (Phase 4 + 5) ----------
-function renderSchedulePreview() {
+// ---------- Schedule tab (Phase 5, live weekly grid) ----------
+
+const SCHEDULE_START_HOUR = 8;  // 8am
+const SCHEDULE_END_HOUR = 21;   // 9pm (exclusive)
+const SCHEDULE_CELL_PX = 40;    // pixels per 30-min slot
+
+function serviceColor(serviceId) {
+  const name = (services.find(s => s.id === serviceId)?.name || '').toLowerCase();
+  if (name.includes('ketamine')) return '#d4883a';
+  if (name.includes('integration')) return '#16a34a';
+  if (name.includes('massage')) return '#8b5cf6';
+  if (name.includes('consult')) return '#0ea5e9';
+  const palette = ['#dc2626', '#ea580c', '#ca8a04', '#059669', '#2563eb', '#7c3aed', '#db2777'];
+  let h = 0;
+  for (const ch of String(serviceId || 'x')) h = (h * 31 + ch.charCodeAt(0)) | 0;
+  return palette[Math.abs(h) % palette.length];
+}
+
+function formatHourLabel(h) {
+  if (h === 0) return '12a';
+  if (h === 12) return '12p';
+  return h < 12 ? `${h}a` : `${h - 12}p`;
+}
+
+function formatWeekRange(start) {
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  const sameMonth = start.getMonth() === end.getMonth();
+  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endStr = sameMonth
+    ? end.toLocaleDateString('en-US', { day: 'numeric' })
+    : end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return `${startStr} \u2013 ${endStr}`;
+}
+
+function getStaffName(userId) {
+  const u = staffList.find(x => x.id === userId);
+  if (!u) return null;
+  return u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || null;
+}
+
+async function loadScheduleWeek() {
+  const start = new Date(scheduleWeekStart);
+  const end = new Date(scheduleWeekStart);
+  end.setDate(end.getDate() + 7);
+
+  const { data, error } = await supabase
+    .from('scheduling_bookings')
+    .select('id, start_datetime, end_datetime, staff_user_id, service_id, lead_id, booker_name, space_id, status, cancelled_at, package_session_id')
+    .gte('start_datetime', start.toISOString())
+    .lt('start_datetime', end.toISOString())
+    .is('cancelled_at', null)
+    .order('start_datetime');
+
+  if (error) {
+    console.error('schedule load error:', error);
+    showToast('Failed to load schedule', 'error');
+    scheduleBookings = [];
+  } else {
+    scheduleBookings = data || [];
+  }
+  renderSchedulePanel();
+}
+
+function renderSchedulePanel() {
   const panel = document.getElementById('clients-panel-schedule');
   if (!panel) return;
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const hours = ['9a', '10a', '11a', '12p', '1p', '2p', '3p', '4p'];
-  const mockBookings = [
-    { day: 0, start: 1, span: 2, label: 'Ketamine &middot; S. Chen', color: '#d4883a' },
-    { day: 1, start: 4, span: 1, label: 'Integration &middot; J. Rivers', color: '#16a34a' },
-    { day: 3, start: 0, span: 2, label: 'Ketamine &middot; M. Holloway', color: '#d4883a' },
-    { day: 3, start: 5, span: 1, label: 'Massage &middot; P. Patel', color: '#8b5cf6' },
-    { day: 5, start: 2, span: 2, label: 'Ketamine &middot; P. Patel', color: '#d4883a' },
-  ];
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(scheduleWeekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
 
-  const cellSize = 56;
-  let cells = '';
-  for (let d = 0; d < 7; d++) {
-    for (let h = 0; h < hours.length; h++) {
-      cells += `<div style="border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);height:${cellSize}px;"></div>`;
-    }
+  const hours = [];
+  for (let h = SCHEDULE_START_HOUR; h < SCHEDULE_END_HOUR; h++) hours.push(h);
+  const totalSlots = (SCHEDULE_END_HOUR - SCHEDULE_START_HOUR) * 2; // 30-min slots
+  const gridHeight = totalSlots * SCHEDULE_CELL_PX;
+
+  const filtered = scheduleBookings.filter(b => {
+    if (scheduleStaffFilter === 'all') return true;
+    if (scheduleStaffFilter === 'unassigned') return !b.staff_user_id;
+    return b.staff_user_id === scheduleStaffFilter;
+  });
+
+  const pillsByDay = Array.from({ length: 7 }, () => []);
+  for (const b of filtered) {
+    const start = new Date(b.start_datetime);
+    const end = new Date(b.end_datetime);
+    const startDay = new Date(start);
+    startDay.setHours(0, 0, 0, 0);
+    const dayIdx = Math.round((startDay - scheduleWeekStart) / 86400000);
+    if (dayIdx < 0 || dayIdx > 6) continue;
+
+    const minutesFromGridStart = (start.getHours() - SCHEDULE_START_HOUR) * 60 + start.getMinutes();
+    const durationMin = Math.max(15, Math.round((end - start) / 60000));
+    const topPx = Math.max(0, (minutesFromGridStart / 30) * SCHEDULE_CELL_PX);
+    const heightPx = Math.max(SCHEDULE_CELL_PX - 4, (durationMin / 30) * SCHEDULE_CELL_PX - 2);
+
+    const svc = escapeHtml(getServiceName(b.service_id) || 'Session');
+    const client = escapeHtml(b.booker_name || 'Client');
+    const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
+    const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const color = serviceColor(b.service_id);
+    const clickAttr = b.lead_id ? `data-sched-lead="${b.lead_id}"` : '';
+    const cursor = b.lead_id ? 'cursor:pointer;' : '';
+
+    pillsByDay[dayIdx].push(`
+      <div ${clickAttr} title="${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}"
+        style="position:absolute;left:2px;right:2px;top:${topPx}px;height:${heightPx}px;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow:hidden;${cursor}">
+        <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svc}</div>
+        <div style="opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
+        <div style="opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(staff)}</div>
+      </div>
+    `);
   }
-  const bookingPills = mockBookings.map(b => `
-    <div style="position:absolute;left:calc(60px + ${b.day} * (100% - 60px) / 7 + 4px);top:${b.start * cellSize + 4}px;width:calc((100% - 60px) / 7 - 8px);height:${b.span * cellSize - 8}px;background:${b.color};color:#fff;border-radius:6px;padding:6px 8px;font-size:11px;font-weight:600;line-height:1.3;box-shadow:0 1px 3px rgba(0,0,0,.12);">
-      ${b.label}
-    </div>
-  `).join('');
+
+  const schedulableStaff = staffList.filter(u => u.role === 'admin' || u.role === 'oracle' || u.can_schedule);
+  const staffOptions = [
+    `<option value="all">All staff</option>`,
+    `<option value="unassigned">Unassigned</option>`,
+    ...schedulableStaff.map(u => {
+      const n = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || '\u2014';
+      const sel = scheduleStaffFilter === u.id ? 'selected' : '';
+      return `<option value="${u.id}" ${sel}>${escapeHtml(n)}</option>`;
+    }),
+  ].join('');
+
+  const dayHeader = days.map((d, i) => {
+    const isToday = d.getTime() === today.getTime();
+    return `<div style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:${isToday ? '#2a1f23' : 'var(--text-muted,#666)'};background:${isToday ? '#fff8ec' : 'transparent'};">
+      <div>${dayLabels[i]}</div>
+      <div style="font-size:11px;font-weight:500;opacity:.8;">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+    </div>`;
+  }).join('');
 
   panel.innerHTML = `
-    ${previewBanner('Phase 5', 'Weekly grid of all booked sessions \u2014 live data coming next. Booking already works today: open a client \u2192 click an unscheduled session pill.')}
-    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
-      <button class="crm-btn crm-btn-primary" disabled>+ Schedule Session</button>
-      <span style="color:var(--text-muted,#888);font-size:13px;margin-left:8px;">Apr 21 \u2013 Apr 27</span>
-      <button class="crm-btn crm-btn-sm" disabled>&laquo; Prev</button>
-      <button class="crm-btn crm-btn-sm" disabled>Next &raquo;</button>
-      <select class="crm-select" style="margin-left:auto;" disabled><option>All staff</option></select>
-      <select class="crm-select" disabled><option>All services</option></select>
+    <div class="crm-pipeline-toolbar">
+      <button class="crm-btn crm-btn-sm" id="sched-today">Today</button>
+      <button class="crm-btn crm-btn-sm" id="sched-prev">&laquo; Prev</button>
+      <button class="crm-btn crm-btn-sm" id="sched-next">Next &raquo;</button>
+      <span style="color:var(--text-muted,#666);font-size:13px;margin-left:8px;font-weight:600;">${formatWeekRange(scheduleWeekStart)}</span>
+      <select class="crm-select" id="sched-staff-filter" style="margin-left:auto;">${staffOptions}</select>
+      <span style="font-size:12px;color:var(--text-muted,#888);">
+        ${filtered.length} booking${filtered.length === 1 ? '' : 's'}
+      </span>
     </div>
 
     <div style="border:1px solid var(--border-color,#eee);border-radius:8px;overflow:hidden;background:#fff;">
-      <!-- Day header -->
       <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);background:var(--bg,#faf9f6);border-bottom:1px solid var(--border-color,#eee);">
         <div></div>
-        ${days.map(d => `<div style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:var(--text-muted,#666);">${d}</div>`).join('')}
+        ${dayHeader}
       </div>
-      <!-- Grid body -->
-      <div style="position:relative;">
-        <!-- Hour labels column -->
-        <div style="position:absolute;left:0;top:0;width:60px;">
-          ${hours.map(h => `<div style="height:${cellSize}px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text-muted,#888);border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);">${h}</div>`).join('')}
+      <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);">
+        <div>
+          ${hours.map(h => `<div style="height:${SCHEDULE_CELL_PX * 2}px;border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text-muted,#888);">${formatHourLabel(h)}</div>`).join('')}
         </div>
-        <!-- Cells grid -->
-        <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);">
-          <div></div>
-          <div style="grid-column:2 / span 7;display:grid;grid-template-columns:repeat(7, 1fr);grid-template-rows:repeat(${hours.length}, ${cellSize}px);">
-            ${Array.from({length: 7 * hours.length}).map(() => `<div style="border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);"></div>`).join('')}
+        ${pillsByDay.map(dayPills => `
+          <div style="position:relative;height:${gridHeight}px;border-right:1px solid var(--border-color,#eee);">
+            ${hours.map(() => `<div style="height:${SCHEDULE_CELL_PX * 2}px;border-bottom:1px solid var(--border-color,#eee);"></div>`).join('')}
+            ${dayPills.join('')}
           </div>
-        </div>
-        <!-- Booking pills overlaid -->
-        ${bookingPills}
+        `).join('')}
       </div>
     </div>
 
-    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
-      <strong style="color:var(--text,#2a1f23);">Scheduling flow:</strong>
-      admin picks a client &rarr; selects service (Ketamine / Massage / Integration) &rarr; sees available staff &#38; rooms &rarr; picks a time slot. On save, writes scheduling_bookings + (if ketamine) links a package session credit. UNIQUE(staff_id, start_time) prevents double-booking.
-    </div>
+    ${filtered.length === 0 ? `
+      <div style="margin-top:16px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);">
+        No bookings this week${scheduleStaffFilter !== 'all' ? ' for the selected filter' : ''}. Open a client and click an unscheduled session pill to book.
+      </div>
+    ` : ''}
   `;
 }
 
@@ -1335,6 +1459,25 @@ function handlePanelClicks(e) {
     showToast('Weekly email lands in Phase 7 \u2014 coming next.', 'info');
     return;
   }
+
+  // ----- Schedule -----
+  if (target.id === 'sched-today') {
+    scheduleWeekStart = mondayOf(new Date());
+    loadScheduleWeek();
+    return;
+  }
+  if (target.id === 'sched-prev' || target.id === 'sched-next') {
+    const d = new Date(scheduleWeekStart);
+    d.setDate(d.getDate() + (target.id === 'sched-prev' ? -7 : 7));
+    scheduleWeekStart = d;
+    loadScheduleWeek();
+    return;
+  }
+  const schedPill = target.closest('[data-sched-lead]');
+  if (schedPill) {
+    openClientDetail(schedPill.dataset.schedLead);
+    return;
+  }
 }
 
 function handlePanelChanges(e) {
@@ -1346,6 +1489,11 @@ function handlePanelChanges(e) {
   if (e.target.id === 'house-date') {
     houseSelectedDate = e.target.value;
     renderHousePanel();
+    return;
+  }
+  if (e.target.id === 'sched-staff-filter') {
+    scheduleStaffFilter = e.target.value;
+    renderSchedulePanel();
     return;
   }
 }
