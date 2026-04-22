@@ -2850,10 +2850,20 @@ async function saveProposal(existingProposal, status) {
     return;
   }
 
+  // Backfill proposal_number if missing (older drafts were saved without one).
+  let proposalNum = document.getElementById('prop-number').value;
+  if (!proposalNum) {
+    try {
+      const { data } = await supabase.rpc('generate_crm_number', { p_prefix: 'PROP' });
+      if (data) proposalNum = data;
+    } catch (_) {}
+    if (!proposalNum) proposalNum = `PROP-${Date.now()}`;
+  }
+
   // Save as draft first; promote to "sent" only after payment link + email succeed.
   const payload = {
     lead_id: leadId,
-    proposal_number: document.getElementById('prop-number').value,
+    proposal_number: proposalNum,
     title,
     event_type: document.getElementById('prop-event-type').value || null,
     event_date: document.getElementById('prop-event-date').value || null,

@@ -125,6 +125,10 @@ serve(async (req) => {
     // Idempotency: if a SignWell document already exists for this proposal, reuse it
     // instead of creating a new one. Prevents duplicate docs (and burning SignWell
     // quota) when "Send" is clicked twice or the proposal is re-sent.
+    //
+    // Only reuse a doc that has a real signer recipient + signing_url. Earlier buggy
+    // code created docs where the person ended up in `copied_contacts` (no signer,
+    // no signing_url). Reusing those would email a dead button to the client.
     if (proposal.signwell_document_id) {
       const existing = await fetch(
         `https://www.signwell.com/api/v1/documents/${proposal.signwell_document_id}/`,
@@ -135,19 +139,33 @@ serve(async (req) => {
         const signingUrl =
           data?.recipients?.[0]?.signing_url ||
           data?.recipients?.[0]?.embedded_signing_url ||
-          data?.signing_url || null;
-        return new Response(JSON.stringify({
-          success: true,
-          signwell_document_id: proposal.signwell_document_id,
-          signing_url: signingUrl,
-          deposit_amount: depositAmt,
-          balance_due: balanceDue,
-          deposit_percent: depositPct,
-          reused: true,
-        }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          null;
+        const recipientCount = Array.isArray(data?.recipients) ? data.recipients.length : 0;
+        if (signingUrl && recipientCount > 0) {
+          return new Response(JSON.stringify({
+            success: true,
+            signwell_document_id: proposal.signwell_document_id,
+            signing_url: signingUrl,
+            deposit_amount: depositAmt,
+            balance_due: balanceDue,
+            deposit_percent: depositPct,
+            reused: true,
+          }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        // Stored doc is unusable — delete it and recreate. Best-effort delete; ignore failures.
+        console.warn("Stored SignWell doc has no valid signer, deleting and recreating:", proposal.signwell_document_id);
+        await fetch(
+          `https://www.signwell.com/api/v1/documents/${proposal.signwell_document_id}/`,
+          { method: "DELETE", headers: { "X-Api-Key": signwellKey } }
+        ).catch(() => {});
+      } else {
+        console.warn("Stored signwell_document_id not found on SignWell, recreating:", proposal.signwell_document_id);
       }
-      // If SignWell 404s the stored id (e.g., doc was deleted), fall through and recreate.
-      console.warn("Stored signwell_document_id not found on SignWell, recreating:", proposal.signwell_document_id);
+      // Clear the stale id so a fresh doc replaces it cleanly.
+      await supabase
+        .from("crm_proposals")
+        .update({ signwell_document_id: null })
+        .eq("id", proposal.id);
     }
 
     // --- Build the PDF ---
