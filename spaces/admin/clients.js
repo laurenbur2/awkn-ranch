@@ -1307,12 +1307,15 @@ async function loadScheduleWeek() {
   const end = new Date(scheduleWeekStart);
   end.setDate(end.getDate() + 7);
 
+  // Only show bookings tied to an AWKN client (lead_id set). Public-booking-page
+  // events and Google-synced calendar holds have lead_id null and don't belong here.
   const { data, error } = await supabase
     .from('scheduling_bookings')
-    .select('id, start_datetime, end_datetime, staff_user_id, service_id, lead_id, booker_name, space_id, status, cancelled_at, package_session_id')
+    .select('id, start_datetime, end_datetime, staff_user_id, service_id, lead_id, booker_name, booker_email, booker_phone, space_id, status, cancelled_at, package_session_id, notes')
     .gte('start_datetime', start.toISOString())
     .lt('start_datetime', end.toISOString())
     .is('cancelled_at', null)
+    .not('lead_id', 'is', null)
     .order('start_datetime');
 
   if (error) {
