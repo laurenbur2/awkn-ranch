@@ -232,6 +232,7 @@ function renderClientsPanel() {
 
   let html = `
     <div class="crm-pipeline-toolbar">
+      <button class="crm-btn crm-btn-primary" id="btn-new-client">+ New Client</button>
       <input class="crm-search" id="clients-search" placeholder="Search clients by name, email, phone\u2026" value="${escapeHtml(clientSearch)}">
       <span style="margin-left:auto;font-size:12px;color:var(--text-muted,#888);">
         ${filtered.length} of ${clients.length} active client${clients.length === 1 ? '' : 's'}
@@ -307,6 +308,226 @@ function renderClientRow(c) {
       <td style="color:var(--text-muted,#888);font-size:12px;">${formatDateShort(c.created_at)}</td>
     </tr>
   `;
+}
+
+// ---------- Add Client modal (new lead OR promote existing CRM lead) ----------
+
+let pipelineStagesCache = [];    // stages for all 'within' leads — name lookup for match cards
+let addClientMatches = [];       // results from last CRM search
+let addClientSearchInFlight = 0; // monotonic token so stale responses don't clobber fresh ones
+let _addClientSearchDebounce = null;
+
+async function ensurePipelineStagesCache() {
+  if (pipelineStagesCache.length) return;
+  const { data } = await supabase
+    .from('crm_pipeline_stages')
+    .select('id, slug, name, business_line')
+    .eq('business_line', 'within');
+  pipelineStagesCache = data || [];
+}
+
+function openAddClientModal() {
+  ensurePipelineStagesCache();
+  addClientMatches = [];
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content" style="max-width:640px;">
+        <div class="crm-modal-header">
+          <h2>Add Client</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div style="margin-bottom:14px;">
+            <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Find existing CRM lead</label>
+            <input type="text" class="crm-input" id="add-client-crm-search" placeholder="Type a name, email, or phone\u2026" style="margin-top:6px;" autofocus>
+            <div id="add-client-matches" style="margin-top:10px;"></div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
+            <div style="flex:1;height:1px;background:var(--border-color,#eee);"></div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Or create new</div>
+            <div style="flex:1;height:1px;background:var(--border-color,#eee);"></div>
+          </div>
+
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>First name *</label>
+              <input type="text" class="crm-input" id="new-client-first" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Last name</label>
+              <input type="text" class="crm-input" id="new-client-last">
+            </div>
+            <div class="crm-form-field">
+              <label>Email</label>
+              <input type="email" class="crm-input" id="new-client-email">
+            </div>
+            <div class="crm-form-field">
+              <label>Phone</label>
+              <input type="text" class="crm-input" id="new-client-phone">
+            </div>
+            <div class="crm-form-field">
+              <label>City</label>
+              <input type="text" class="crm-input" id="new-client-city">
+            </div>
+            <div class="crm-form-field">
+              <label>State</label>
+              <input type="text" class="crm-input" id="new-client-state" maxlength="2" style="text-transform:uppercase;">
+            </div>
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          <span></span>
+          <div>
+            <button class="crm-btn" id="btn-cancel-add-client">Cancel</button>
+            <button class="crm-btn crm-btn-primary" id="btn-save-new-client">Create client</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  const closeModalBack = () => {
+    modal.style.display = 'none';
+    modal.innerHTML = '';
+  };
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeModalBack);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeModalBack();
+  });
+  document.getElementById('btn-cancel-add-client').addEventListener('click', closeModalBack);
+  document.getElementById('btn-save-new-client').addEventListener('click', saveNewClient);
+}
+
+async function searchCrmLeads(query) {
+  const q = query.trim();
+  const myToken = ++addClientSearchInFlight;
+  if (!q) {
+    addClientMatches = [];
+    renderAddClientMatches('');
+    return;
+  }
+
+  // Tokenize on spaces so "john smith" matches "Smith, John" too.
+  const terms = q.split(/\s+/).filter(Boolean);
+  let req = supabase
+    .from('crm_leads')
+    .select('id, first_name, last_name, email, phone, city, state, stage_id, business_line, created_at')
+    .eq('business_line', 'within')
+    .order('created_at', { ascending: false })
+    .limit(8);
+
+  // Build an OR filter across name/email/phone for each term, AND-ed across terms.
+  for (const t of terms) {
+    const esc = t.replace(/%/g, '\\%').replace(/,/g, '');
+    req = req.or(`first_name.ilike.%${esc}%,last_name.ilike.%${esc}%,email.ilike.%${esc}%,phone.ilike.%${esc}%`);
+  }
+
+  const { data, error } = await req;
+  if (myToken !== addClientSearchInFlight) return; // stale response
+  if (error) {
+    console.error('CRM lead search error:', error);
+    addClientMatches = [];
+  } else {
+    addClientMatches = data || [];
+  }
+  renderAddClientMatches(q);
+}
+
+function renderAddClientMatches(query) {
+  const el = document.getElementById('add-client-matches');
+  if (!el) return;
+  if (!query.trim()) { el.innerHTML = ''; return; }
+  if (!addClientMatches.length) {
+    el.innerHTML = `<div style="padding:12px;font-size:13px;color:var(--text-muted,#888);background:var(--bg,#faf9f6);border-radius:6px;">No matching CRM leads. Fill out the form below to create a new one.</div>`;
+    return;
+  }
+  el.innerHTML = addClientMatches.map(lead => {
+    const name = `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || '(no name)';
+    const contactBits = [lead.email, lead.phone].filter(Boolean).join(' \u00b7 ');
+    const stage = pipelineStagesCache.find(s => s.id === lead.stage_id);
+    const isAlreadyActive = stage?.slug === 'active_client';
+    const stageLabel = stage ? stage.name : 'No stage';
+    const stageColor = isAlreadyActive ? '#16a34a' : '#6b7280';
+    const cta = isAlreadyActive
+      ? `<button class="crm-btn crm-btn-sm" data-add-client-open="${lead.id}">Open</button>`
+      : `<button class="crm-btn crm-btn-sm crm-btn-primary" data-add-client-promote="${lead.id}">Use this lead</button>`;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border-color,#eee);border-radius:6px;margin-bottom:6px;background:#fff;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:14px;">${escapeHtml(name)}</div>
+          ${contactBits ? `<div style="font-size:12px;color:var(--text-muted,#666);">${escapeHtml(contactBits)}</div>` : ''}
+          <div style="font-size:11px;color:${stageColor};margin-top:2px;">Stage: ${escapeHtml(stageLabel)}</div>
+        </div>
+        ${cta}
+      </div>
+    `;
+  }).join('');
+}
+
+async function promoteLeadToActiveClient(leadId) {
+  if (!activeClientStageId) {
+    showToast('Active Client stage not found', 'error');
+    return;
+  }
+  const { error } = await supabase
+    .from('crm_leads')
+    .update({ stage_id: activeClientStageId, updated_at: new Date().toISOString() })
+    .eq('id', leadId);
+  if (error) {
+    showToast('Failed to promote lead: ' + error.message, 'error');
+    return;
+  }
+  showToast('Client added', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
+}
+
+async function saveNewClient() {
+  const first = document.getElementById('new-client-first').value.trim();
+  const last = document.getElementById('new-client-last').value.trim();
+  if (!first) { showToast('First name is required', 'error'); return; }
+  if (!activeClientStageId) { showToast('Active Client stage not found', 'error'); return; }
+
+  const email = document.getElementById('new-client-email').value.trim() || null;
+  const phone = document.getElementById('new-client-phone').value.trim() || null;
+  const city = document.getElementById('new-client-city').value.trim() || null;
+  const stateInput = document.getElementById('new-client-state').value.trim().toUpperCase() || null;
+
+  const saveBtn = document.getElementById('btn-save-new-client');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Creating\u2026';
+
+  const { data, error } = await supabase
+    .from('crm_leads')
+    .insert({
+      business_line: 'within',
+      stage_id: activeClientStageId,
+      first_name: first,
+      last_name: last,
+      email,
+      phone,
+      city,
+      state: stateInput,
+      status: 'open',
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('create client error:', error);
+    showToast('Failed to create client: ' + error.message, 'error');
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Create client';
+    return;
+  }
+
+  showToast('Client created', 'success');
+  await loadClientsData();
+  openClientDetail(data.id);
 }
 
 // ---------- Client detail drawer ----------
@@ -1418,6 +1639,19 @@ function handlePanelClicks(e) {
   }
 
   // ----- Clients -----
+  if (target.id === 'btn-new-client') { openAddClientModal(); return; }
+
+  const promoteBtn = target.closest('[data-add-client-promote]');
+  if (promoteBtn) {
+    promoteLeadToActiveClient(promoteBtn.dataset.addClientPromote);
+    return;
+  }
+  const openLeadBtn = target.closest('[data-add-client-open]');
+  if (openLeadBtn) {
+    openClientDetail(openLeadBtn.dataset.addClientOpen);
+    return;
+  }
+
   const actionBtn = target.closest('[data-action]');
   if (actionBtn) {
     e.stopPropagation();
@@ -1512,5 +1746,12 @@ function handlePanelInputs(e) {
       const input = document.getElementById('clients-search');
       if (input) { input.focus(); input.setSelectionRange(val.length, val.length); }
     }, 180);
+    return;
+  }
+  if (e.target.id === 'add-client-crm-search') {
+    clearTimeout(_addClientSearchDebounce);
+    const val = e.target.value;
+    _addClientSearchDebounce = setTimeout(() => searchCrmLeads(val), 200);
+    return;
   }
 }
