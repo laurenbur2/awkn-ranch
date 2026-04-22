@@ -2965,7 +2965,8 @@ async function sendProposalNow(proposalId) {
     });
     const c = await contractResp.json().catch(() => ({}));
     if (!contractResp.ok) {
-      const msg = [c.error, c.detail, c.message, c.code].filter(Boolean).join(' — ') || contractResp.status;
+      const stringify = (v) => typeof v === 'string' ? v : (v != null ? JSON.stringify(v) : '');
+      const msg = [c.error, stringify(c.detail), c.message, c.code].filter(Boolean).join(' — ') || contractResp.status;
       throw new Error(`Contract creation failed: ${msg}`);
     }
     signingUrl = c.signing_url;

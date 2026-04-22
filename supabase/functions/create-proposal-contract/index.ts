@@ -419,12 +419,18 @@ serve(async (req) => {
       body: JSON.stringify(swBody),
     });
 
-    const swData = await swResp.json();
+    const swText = await swResp.text();
+    let swData: any;
+    try { swData = JSON.parse(swText); } catch { swData = { raw: swText }; }
     if (!swResp.ok) {
-      console.error("SignWell create failed:", swData);
+      console.error("SignWell create failed:", swResp.status, swData);
+      const detailStr = typeof swData === "string" ? swData
+        : (swData?.errors ? JSON.stringify(swData.errors)
+        : swData?.message || JSON.stringify(swData));
       return new Response(JSON.stringify({
         error: "SignWell document creation failed",
-        detail: swData?.errors || swData?.message || swData,
+        status: swResp.status,
+        detail: detailStr,
       }), { status: swResp.status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
