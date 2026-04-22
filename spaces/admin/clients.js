@@ -1367,12 +1367,9 @@ function renderSchedulePanel() {
     const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
     const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     const color = serviceColor(b.service_id);
-    const clickAttr = b.lead_id ? `data-sched-lead="${b.lead_id}"` : '';
-    const cursor = b.lead_id ? 'cursor:pointer;' : '';
-
     pillsByDay[dayIdx].push(`
-      <div ${clickAttr} title="${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}"
-        style="position:absolute;left:2px;right:2px;top:${topPx}px;height:${heightPx}px;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow:hidden;${cursor}">
+      <div data-sched-booking="${b.id}" title="${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}"
+        style="position:absolute;left:2px;right:2px;top:${topPx}px;height:${heightPx}px;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow:hidden;cursor:pointer;">
         <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svc}</div>
         <div style="opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
         <div style="opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(staff)}</div>
@@ -1435,6 +1432,87 @@ function renderSchedulePanel() {
       </div>
     ` : ''}
   `;
+}
+
+function openBookingDetail(bookingId) {
+  const b = scheduleBookings.find(x => x.id === bookingId);
+  if (!b) { showToast('Booking not found', 'error'); return; }
+
+  const svc = services.find(s => s.id === b.service_id);
+  const svcName = svc?.name || 'Session';
+  const durationMin = svc?.duration_minutes || Math.round((new Date(b.end_datetime) - new Date(b.start_datetime)) / 60000);
+
+  const start = new Date(b.start_datetime);
+  const end = new Date(b.end_datetime);
+  const dateLabel = start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const timeLabel = `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} \u2013 ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+
+  const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
+  const client = b.lead_id ? clients.find(c => c.id === b.lead_id) : null;
+  const clientName = client
+    ? `${client.first_name || ''} ${client.last_name || ''}`.trim() || b.booker_name || 'Client'
+    : (b.booker_name || 'Client');
+  const clientContact = client
+    ? [client.email, client.phone].filter(Boolean).join(' \u00b7 ')
+    : [b.booker_email, b.booker_phone].filter(Boolean).join(' \u00b7 ');
+
+  const space = b.space_id ? sessionSpaces.find(s => s.id === b.space_id) : null;
+  const spaceLabel = space?.name || (b.space_id ? 'Assigned room' : '\u2014');
+
+  const statusLabel = b.status || 'scheduled';
+  const color = serviceColor(b.service_id);
+
+  const row = (label, value) => `
+    <div style="display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-color,#eee);">
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted,#888);text-transform:uppercase;letter-spacing:.5px;">${escapeHtml(label)}</div>
+      <div style="font-size:14px;">${value}</div>
+    </div>
+  `;
+
+  const openClientBtn = b.lead_id
+    ? `<button class="crm-btn crm-btn-primary" id="btn-booking-open-client">Open client</button>`
+    : '';
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header" style="border-left:4px solid ${color};">
+          <h2>${escapeHtml(svcName)}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          ${row('When', `${escapeHtml(dateLabel)}<div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${escapeHtml(timeLabel)} &middot; ${durationMin} min</div>`)}
+          ${row('Client', `<div>${escapeHtml(clientName)}</div>${clientContact ? `<div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${escapeHtml(clientContact)}</div>` : ''}`)}
+          ${row('Staff', escapeHtml(staff))}
+          ${row('Room', escapeHtml(spaceLabel))}
+          ${row('Status', `<span style="text-transform:capitalize;">${escapeHtml(statusLabel)}</span>`)}
+          ${b.notes ? row('Notes', escapeHtml(b.notes)) : ''}
+        </div>
+        <div class="crm-modal-footer">
+          <span></span>
+          <div>
+            <button class="crm-btn" id="btn-booking-close">Close</button>
+            ${openClientBtn}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  const close = () => { modal.style.display = 'none'; modal.innerHTML = ''; };
+  document.getElementById('clients-modal-close-btn').addEventListener('click', close);
+  document.getElementById('btn-booking-close').addEventListener('click', close);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') close();
+  });
+  if (b.lead_id) {
+    document.getElementById('btn-booking-open-client').addEventListener('click', () => {
+      close();
+      openClientDetail(b.lead_id);
+    });
+  }
 }
 
 // ---------- House tab (Phase 6, live) ----------
@@ -1876,9 +1954,9 @@ function handlePanelClicks(e) {
     loadScheduleWeek();
     return;
   }
-  const schedPill = target.closest('[data-sched-lead]');
+  const schedPill = target.closest('[data-sched-booking]');
   if (schedPill) {
-    openClientDetail(schedPill.dataset.schedLead);
+    openBookingDetail(schedPill.dataset.schedBooking);
     return;
   }
 }
