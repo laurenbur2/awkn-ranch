@@ -1831,7 +1831,12 @@ function openLeadModal(lead = null) {
       }
       await loadAllData();
       renderAll();
-      closeModal();
+      if (isEdit) {
+        closeModal();
+        await openLeadDetail(lead.id);
+      } else {
+        closeModal();
+      }
     } catch (err) {
       console.error('Save lead error:', err);
       showToast('Error saving lead', 'error');
