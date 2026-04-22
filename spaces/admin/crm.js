@@ -2470,6 +2470,11 @@ function renderProposalsTable() {
   } else {
     for (const p of filtered) {
       const statusClass = `crm-prop-status-${p.status}`;
+      const contractBadge = p.contract_signed_at
+        ? `<span title="Contract signed ${new Date(p.contract_signed_at).toLocaleDateString()}" style="color:#3d8b7a;font-weight:600;margin-left:6px;">✓ Signed</span>`
+        : (p.signwell_document_id
+            ? `<span title="Contract sent — awaiting signature" style="color:#d4883a;margin-left:6px;">⏳ Unsigned</span>`
+            : '');
       html += `
         <tr>
           <td>${escapeHtml(p.proposal_number || '')}</td>
@@ -2477,7 +2482,7 @@ function renderProposalsTable() {
           <td>${formatDate(p.event_date)}</td>
           <td>${p.guest_count || ''}</td>
           <td>${formatCurrency(p.total)}</td>
-          <td><span class="crm-status-badge ${statusClass}">${escapeHtml(p.status || 'draft')}</span></td>
+          <td><span class="crm-status-badge ${statusClass}">${escapeHtml(p.status || 'draft')}</span>${contractBadge}</td>
           <td class="crm-actions-cell">
             <button class="crm-btn crm-btn-xs" data-view-proposal="${p.id}">View</button>
             ${p.status === 'draft' ? `<button class="crm-btn crm-btn-xs crm-btn-primary" data-send-proposal="${p.id}">Send</button>` : ''}
@@ -2555,6 +2560,20 @@ async function openProposalModal(proposal = null, lead = null) {
   });
 
   const modal = document.getElementById('crm-modal');
+  const signedBanner = proposal?.contract_signed_at ? `
+    <div style="background:#e5f4f1;border-left:4px solid #3d8b7a;padding:12px 16px;margin-bottom:16px;border-radius:4px;">
+      <strong style="color:#3d8b7a;">✓ Rental Agreement Signed</strong><br>
+      <span style="font-size:0.9em;color:#555;">
+        Signed ${new Date(proposal.contract_signed_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+        ${proposal.contract_signed_by_name ? ` by ${escapeHtml(proposal.contract_signed_by_name)}` : ''}
+        ${proposal.contract_signed_by_email ? ` (${escapeHtml(proposal.contract_signed_by_email)})` : ''}
+      </span>
+    </div>
+  ` : (proposal?.signwell_document_id ? `
+    <div style="background:#fdf6ee;border-left:4px solid #d4883a;padding:12px 16px;margin-bottom:16px;border-radius:4px;">
+      <strong style="color:#d4883a;">⏳ Rental Agreement Sent — Awaiting Signature</strong>
+    </div>
+  ` : '');
   modal.innerHTML = `
     <div class="crm-modal-overlay" id="crm-modal-overlay">
       <div class="crm-modal-content crm-modal-large">
@@ -2563,6 +2582,7 @@ async function openProposalModal(proposal = null, lead = null) {
           <button class="crm-modal-close" id="crm-modal-close-btn">&times;</button>
         </div>
         <div class="crm-modal-body">
+          ${signedBanner}
           <div class="crm-form-grid">
             <div class="crm-form-field">
               <label>Proposal Number</label>

@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
     // deposit payment flow is owned by Stripe, not the webhook.
     const { data: crmProposal } = await supabase
       .from('crm_proposals')
-      .select('id, proposal_number, lead_id, total, deposit_percent, event_date')
+      .select('id, proposal_number, lead_id, total, deposit_percent, event_date, payment_link_url, payment_link_card_url, paid_at')
       .eq('signwell_document_id', documentId)
       .maybeSingle();
 
@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Short-circuit for CRM proposals: record the signature and return.
+    // Short-circuit for CRM proposals: record the signature, email the client, return.
     if (isProposal) {
       const signer = (payload.recipients || []).find(r => r.status === 'completed') || payload.recipients?.[0];
       await supabase
@@ -148,6 +148,31 @@ Deno.serve(async (req) => {
           activity_type: 'note',
           description: `Rental agreement signed (${crmProposal.proposal_number}) by ${signer?.name || signer?.email || 'client'}`,
         });
+      }
+
+      // Confirmation email: contract signed, reminder to pay the deposit if not already.
+      if (crmProposal.lead_id && !crmProposal.paid_at) {
+        const { data: lead } = await supabase
+          .from('crm_leads')
+          .select('first_name, last_name, email')
+          .eq('id', crmProposal.lead_id)
+          .single();
+        if (lead?.email) {
+          const total = Number(crmProposal.total || 0);
+          const depositPct = Number(crmProposal.deposit_percent ?? 50);
+          const depositAmt = Math.round(total * depositPct) / 100;
+          await sendProposalSignedEmail({
+            to: lead.email,
+            firstName: lead.first_name || 'there',
+            proposalNumber: crmProposal.proposal_number,
+            eventDate: crmProposal.event_date,
+            depositAmount: depositAmt,
+            depositPercent: depositPct,
+            total,
+            paymentLinkUrl: crmProposal.payment_link_url || null,
+            paymentLinkCardUrl: crmProposal.payment_link_card_url || null,
+          });
+        }
       }
 
       console.log('Proposal contract signed:', { proposal_id: crmProposal.id, documentId });
@@ -754,6 +779,110 @@ AWKN Ranch`,
     }
   } catch (emailErr) {
     console.error('Error sending event email:', emailErr);
+  }
+}
+
+// Send confirmation email after a CRM proposal rental agreement is signed.
+async function sendProposalSignedEmail(args: {
+  to: string;
+  firstName: string;
+  proposalNumber: string;
+  eventDate: string | null;
+  depositAmount: number;
+  depositPercent: number;
+  total: number;
+  paymentLinkUrl: string | null;
+  paymentLinkCardUrl: string | null;
+}) {
+  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+  if (!RESEND_API_KEY) {
+    console.log('RESEND_API_KEY not configured, skipping proposal-signed email');
+    return;
+  }
+
+  const fmtMoney = (n: number) => '$' + Number(n || 0).toFixed(2).replace(/\.00$/, '');
+  const fmtDate = (d: string | null) => {
+    if (!d) return 'your event';
+    try {
+      const [y, m, day] = d.split('-').map(Number);
+      return new Date(y, m - 1, day).toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    } catch { return d; }
+  };
+  const eventDateText = fmtDate(args.eventDate);
+  const balance = Math.round((args.total - args.depositAmount) * 100) / 100;
+
+  const payButtons = (args.paymentLinkUrl || args.paymentLinkCardUrl) ? `
+    <div style="text-align:center;margin:24px 0;">
+      ${args.paymentLinkUrl ? `<a href="${args.paymentLinkUrl}" style="display:inline-block;background:#3d8b7a;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;margin:6px;">Pay ${fmtMoney(args.depositAmount)} Deposit (ACH)</a>` : ''}
+      ${args.paymentLinkCardUrl ? `<a href="${args.paymentLinkCardUrl}" style="display:inline-block;background:#fff;color:#3d8b7a;padding:12px 28px;border:2px solid #3d8b7a;border-radius:8px;text-decoration:none;font-weight:600;margin:6px;">Pay by Card (+3%)</a>` : ''}
+    </div>
+    <p style="font-size:0.9em;color:#666;text-align:center;">ACH is preferred — it's free for you and for us.</p>
+  ` : `<p>Your deposit payment link was included in the original proposal email. Please complete that payment to confirm your booking.</p>`;
+
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'AWKN Ranch <noreply@within.center>',
+        to: [args.to],
+        reply_to: 'team@awknranch.com',
+        bcc: ['justin@within.center'],
+        subject: `Rental Agreement Signed — ${args.proposalNumber}`,
+        html: `
+          <h2>Rental Agreement Signed</h2>
+          <p>Hi ${args.firstName},</p>
+          <p>Thanks for signing your AWKN Ranch rental agreement for ${eventDateText}. We've recorded your signature.</p>
+
+          <div style="background:#f5f5f5;border-radius:8px;padding:20px;margin:20px 0;">
+            <h3 style="margin-top:0;color:#3d8b7a;">Next Step: Deposit</h3>
+            <p>To confirm your booking, please submit your ${args.depositPercent}% deposit:</p>
+            <table style="border-collapse:collapse;width:100%;max-width:400px;">
+              <tr><td style="padding:6px 0;"><strong>Deposit Due Now:</strong></td><td style="padding:6px 0;text-align:right;font-size:1.2em;font-weight:bold;color:#3d8b7a;">${fmtMoney(args.depositAmount)}</td></tr>
+              <tr><td style="padding:6px 0;color:#666;">Balance (due 30 days before event):</td><td style="padding:6px 0;text-align:right;color:#666;">${fmtMoney(balance)}</td></tr>
+              <tr style="border-top:1px solid #ddd;"><td style="padding:6px 0;"><strong>Total:</strong></td><td style="padding:6px 0;text-align:right;font-weight:bold;">${fmtMoney(args.total)}</td></tr>
+            </table>
+          </div>
+
+          ${payButtons}
+
+          <p>Once your deposit is received, your event is locked in. We'll be in touch closer to the date to coordinate logistics.</p>
+          <p>Questions? Reply to this email.</p>
+          <p>Best,<br>AWKN Ranch</p>
+        `,
+        text: `Rental Agreement Signed
+
+Hi ${args.firstName},
+
+Thanks for signing your AWKN Ranch rental agreement for ${eventDateText}.
+
+NEXT STEP: DEPOSIT
+------------------
+Deposit Due Now: ${fmtMoney(args.depositAmount)}
+Balance (due 30 days before event): ${fmtMoney(balance)}
+Total: ${fmtMoney(args.total)}
+
+${args.paymentLinkUrl ? `Pay ${fmtMoney(args.depositAmount)} (ACH): ${args.paymentLinkUrl}\n` : ''}${args.paymentLinkCardUrl ? `Pay by card (+3%): ${args.paymentLinkCardUrl}\n` : ''}
+Once your deposit is received, your event is confirmed.
+
+Questions? Reply to this email.
+
+Best,
+AWKN Ranch`,
+      }),
+    });
+    if (resp.ok) {
+      console.log('Proposal-signed confirmation email sent to', args.to);
+    } else {
+      console.error('Failed to send proposal-signed email:', await resp.json());
+    }
+  } catch (err) {
+    console.error('Error sending proposal-signed email:', err);
   }
 }
 

@@ -117,12 +117,41 @@ serve(async (req) => {
       });
     }
 
-    // --- Build the PDF ---
-    const clientName = `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || "Client";
     const total = Number(proposal.total || 0);
     const depositPct = Number(proposal.deposit_percent ?? 50);
     const depositAmt = Math.round(total * depositPct) / 100;
     const balanceDue = Math.round((total - depositAmt) * 100) / 100;
+
+    // Idempotency: if a SignWell document already exists for this proposal, reuse it
+    // instead of creating a new one. Prevents duplicate docs (and burning SignWell
+    // quota) when "Send" is clicked twice or the proposal is re-sent.
+    if (proposal.signwell_document_id) {
+      const existing = await fetch(
+        `https://www.signwell.com/api/v1/documents/${proposal.signwell_document_id}/`,
+        { headers: { "X-Api-Key": signwellKey } }
+      );
+      if (existing.ok) {
+        const data = await existing.json();
+        const signingUrl =
+          data?.recipients?.[0]?.signing_url ||
+          data?.recipients?.[0]?.embedded_signing_url ||
+          data?.signing_url || null;
+        return new Response(JSON.stringify({
+          success: true,
+          signwell_document_id: proposal.signwell_document_id,
+          signing_url: signingUrl,
+          deposit_amount: depositAmt,
+          balance_due: balanceDue,
+          deposit_percent: depositPct,
+          reused: true,
+        }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      // If SignWell 404s the stored id (e.g., doc was deleted), fall through and recreate.
+      console.warn("Stored signwell_document_id not found on SignWell, recreating:", proposal.signwell_document_id);
+    }
+
+    // --- Build the PDF ---
+    const clientName = `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || "Client";
 
     const pdf = await PDFDocument.create();
     const font = await pdf.embedFont(StandardFonts.Helvetica);
