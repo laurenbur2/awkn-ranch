@@ -105,21 +105,214 @@ function renderCurrentPanel() {
   if (panel) panel.classList.add('active');
 
   if (currentSubtab === 'services') renderServicesPanel();
-  else renderPlaceholderPanel(currentSubtab);
+  else if (currentSubtab === 'clients') renderClientsPreview();
+  else if (currentSubtab === 'schedule') renderSchedulePreview();
+  else if (currentSubtab === 'house') renderHousePreview();
 }
 
-function renderPlaceholderPanel(key) {
-  const panel = document.getElementById(`clients-panel-${key}`);
+function previewBanner(phaseLabel, note) {
+  return `
+    <div style="padding:10px 14px;background:#fff8ec;border:1px solid #f2d69a;border-radius:8px;margin-bottom:16px;font-size:12px;color:#8a5a1a;display:flex;gap:10px;align-items:center;">
+      <span style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Preview &middot; ${escapeHtml(phaseLabel)}</span>
+      <span style="opacity:.8;">${escapeHtml(note)}</span>
+    </div>
+  `;
+}
+
+// ---------- Clients tab preview (Phase 3) ----------
+function renderClientsPreview() {
+  const panel = document.getElementById('clients-panel-clients');
   if (!panel) return;
-  const labels = {
-    clients: 'Client directory and profiles',
-    schedule: 'Admin-initiated session scheduling',
-    house: 'Lodging census and bed assignments',
+
+  const mock = [
+    { name: 'Sarah Chen',      contact: 'sarah.c@email.com',    last: 'Mar 22',  next: 'Apr 29', pkg: '3 of 6 sessions', stay: 'Amethyst &middot; Apr 28\u201330', status: 'active' },
+    { name: 'Marcus Holloway', contact: '(512) 555-0134',       last: 'Apr 02',  next: '—',      pkg: 'Complete',        stay: '—',                            status: 'completed' },
+    { name: 'Priya Patel',     contact: 'priya.patel@email.com', last: '—',       next: 'May 14', pkg: 'Day-of intake',   stay: 'Opal &middot; May 13\u201315',  status: 'upcoming' },
+    { name: 'Jordan Rivers',   contact: '(737) 555-0199',        last: 'Mar 30',  next: 'Apr 27', pkg: '1 of 3 sessions', stay: 'Emerald Bunk 1 top',           status: 'active' },
+  ];
+
+  const statusPill = (s) => {
+    const map = {
+      active:    { bg: '#dcfce7', fg: '#15803d', label: 'Active' },
+      upcoming:  { bg: '#e0e7ff', fg: '#4338ca', label: 'Upcoming' },
+      completed: { bg: '#f1f5f9', fg: '#64748b', label: 'Completed' },
+    };
+    const m = map[s] || map.completed;
+    return `<span style="padding:2px 8px;border-radius:999px;background:${m.bg};color:${m.fg};font-size:11px;font-weight:600;">${m.label}</span>`;
   };
+
   panel.innerHTML = `
-    <div style="padding:48px 24px;text-align:center;color:var(--text-muted,#888);">
-      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Coming soon</div>
-      <div style="font-size:13px;">${escapeHtml(labels[key] || '')}</div>
+    ${previewBanner('Phase 3', 'Final version reads from crm_leads where pipeline stage = active_client. Row click opens a detail drawer with packages, sessions, stays, and notes.')}
+    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
+      <input class="crm-search" placeholder="Search clients by name, email, phone\u2026" disabled>
+      <select class="crm-select" disabled><option>All statuses</option></select>
+      <select class="crm-select" disabled><option>All packages</option></select>
+      <button class="crm-btn crm-btn-primary" disabled>+ New Client</button>
+    </div>
+    <div class="crm-table-wrap">
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>Name</th><th>Contact</th><th>Last session</th><th>Next session</th><th>Package</th><th>Stay</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${mock.map(r => `
+            <tr>
+              <td><strong>${escapeHtml(r.name)}</strong></td>
+              <td style="color:var(--text-muted,#888);">${escapeHtml(r.contact)}</td>
+              <td>${escapeHtml(r.last)}</td>
+              <td>${escapeHtml(r.next)}</td>
+              <td>${escapeHtml(r.pkg)}</td>
+              <td>${r.stay}</td>
+              <td>${statusPill(r.status)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
+      <strong style="color:var(--text,#2a1f23);">Client detail drawer will include:</strong>
+      contact info &middot; intake status &middot; active package with remaining sessions &middot; session history + upcoming bookings &middot; retreat stays &middot; integration notes &middot; quick actions (schedule session, add note, send email).
+    </div>
+  `;
+}
+
+// ---------- Schedule tab preview (Phase 4 + 5) ----------
+function renderSchedulePreview() {
+  const panel = document.getElementById('clients-panel-schedule');
+  if (!panel) return;
+
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const hours = ['9a', '10a', '11a', '12p', '1p', '2p', '3p', '4p'];
+  const mockBookings = [
+    { day: 0, start: 1, span: 2, label: 'Ketamine &middot; S. Chen', color: '#d4883a' },
+    { day: 1, start: 4, span: 1, label: 'Integration &middot; J. Rivers', color: '#16a34a' },
+    { day: 3, start: 0, span: 2, label: 'Ketamine &middot; M. Holloway', color: '#d4883a' },
+    { day: 3, start: 5, span: 1, label: 'Massage &middot; P. Patel', color: '#8b5cf6' },
+    { day: 5, start: 2, span: 2, label: 'Ketamine &middot; P. Patel', color: '#d4883a' },
+  ];
+
+  const cellSize = 56;
+  let cells = '';
+  for (let d = 0; d < 7; d++) {
+    for (let h = 0; h < hours.length; h++) {
+      cells += `<div style="border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);height:${cellSize}px;"></div>`;
+    }
+  }
+  const bookingPills = mockBookings.map(b => `
+    <div style="position:absolute;left:calc(60px + ${b.day} * (100% - 60px) / 7 + 4px);top:${b.start * cellSize + 4}px;width:calc((100% - 60px) / 7 - 8px);height:${b.span * cellSize - 8}px;background:${b.color};color:#fff;border-radius:6px;padding:6px 8px;font-size:11px;font-weight:600;line-height:1.3;box-shadow:0 1px 3px rgba(0,0,0,.12);">
+      ${b.label}
+    </div>
+  `).join('');
+
+  panel.innerHTML = `
+    ${previewBanner('Phase 4 + 5', 'Final version: weekly grid of all staff-booked sessions, admin "Schedule Session" button that picks client \u2192 service \u2192 staff \u2192 time slot, double-booking blocked atomically.')}
+    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
+      <button class="crm-btn crm-btn-primary" disabled>+ Schedule Session</button>
+      <span style="color:var(--text-muted,#888);font-size:13px;margin-left:8px;">Apr 21 \u2013 Apr 27</span>
+      <button class="crm-btn crm-btn-sm" disabled>&laquo; Prev</button>
+      <button class="crm-btn crm-btn-sm" disabled>Next &raquo;</button>
+      <select class="crm-select" style="margin-left:auto;" disabled><option>All staff</option></select>
+      <select class="crm-select" disabled><option>All services</option></select>
+    </div>
+
+    <div style="border:1px solid var(--border-color,#eee);border-radius:8px;overflow:hidden;background:#fff;">
+      <!-- Day header -->
+      <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);background:var(--bg,#faf9f6);border-bottom:1px solid var(--border-color,#eee);">
+        <div></div>
+        ${days.map(d => `<div style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:var(--text-muted,#666);">${d}</div>`).join('')}
+      </div>
+      <!-- Grid body -->
+      <div style="position:relative;">
+        <!-- Hour labels column -->
+        <div style="position:absolute;left:0;top:0;width:60px;">
+          ${hours.map(h => `<div style="height:${cellSize}px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text-muted,#888);border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);">${h}</div>`).join('')}
+        </div>
+        <!-- Cells grid -->
+        <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);">
+          <div></div>
+          <div style="grid-column:2 / span 7;display:grid;grid-template-columns:repeat(7, 1fr);grid-template-rows:repeat(${hours.length}, ${cellSize}px);">
+            ${Array.from({length: 7 * hours.length}).map(() => `<div style="border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);"></div>`).join('')}
+          </div>
+        </div>
+        <!-- Booking pills overlaid -->
+        ${bookingPills}
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
+      <strong style="color:var(--text,#2a1f23);">Scheduling flow:</strong>
+      admin picks a client &rarr; selects service (Ketamine / Massage / Integration) &rarr; sees available staff &#38; rooms &rarr; picks a time slot. On save, writes scheduling_bookings + (if ketamine) links a package session credit. UNIQUE(staff_id, start_time) prevents double-booking.
+    </div>
+  `;
+}
+
+// ---------- House tab preview (Phase 6) ----------
+function renderHousePreview() {
+  const panel = document.getElementById('clients-panel-house');
+  if (!panel) return;
+
+  const rooms = [
+    { name: 'Emerald',  floor: 'downstairs', bath: false, beds: [
+      { label: 'Bunk 1 Top',    who: 'S. Chen' },
+      { label: 'Bunk 1 Bottom', who: 'J. Rivers' },
+      { label: 'Bunk 2 Top',    who: null },
+      { label: 'Bunk 2 Bottom', who: null },
+    ]},
+    { name: 'Quartz',   floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: 'P. Patel' }] },
+    { name: 'Selenite', floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: null }] },
+    { name: 'Amethyst', floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: 'M. Holloway' }] },
+    { name: 'Opal',     floor: 'upstairs',   bath: true,  beds: [{ label: 'King',    who: null }] },
+    { name: 'Celenite', floor: 'upstairs',   bath: false, beds: [{ label: 'Queen 1', who: null }, { label: 'Queen 2', who: null }] },
+    { name: 'Jasper',   floor: 'upstairs',   bath: false, beds: [{ label: 'Queen',   who: null }] },
+  ];
+
+  const totalBeds = rooms.reduce((n, r) => n + r.beds.length, 0);
+  const occupiedBeds = rooms.reduce((n, r) => n + r.beds.filter(b => b.who).length, 0);
+
+  const roomCard = (r) => {
+    const bathBadge = r.bath
+      ? '<span style="font-size:10px;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:999px;font-weight:600;">Private bath</span>'
+      : '<span style="font-size:10px;color:var(--text-muted,#888);background:var(--bg,#faf9f6);padding:1px 6px;border-radius:999px;">Shared bath</span>';
+    return `
+      <div style="border:1px solid var(--border-color,#eee);border-radius:10px;padding:14px;background:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700;font-size:15px;color:var(--text,#2a1f23);">${escapeHtml(r.name)}</div>
+            <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(r.floor)}</div>
+          </div>
+          ${bathBadge}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${r.beds.map(b => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${b.who ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:12px;">
+              <span style="color:var(--text-muted,#666);">${escapeHtml(b.label)}</span>
+              <span style="font-weight:${b.who ? '600' : '400'};color:${b.who ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};">${b.who ? escapeHtml(b.who) : 'available'}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  };
+
+  panel.innerHTML = `
+    ${previewBanner('Phase 6', 'Final version reads real client_stays for the chosen date, showing which client is in which bed. Click a bed \u2192 assign / un-assign a client stay.')}
+    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
+      <label style="font-size:13px;color:var(--text-muted,#666);">Show occupancy on</label>
+      <input type="date" class="crm-input" value="2026-04-22" disabled>
+      <button class="crm-btn crm-btn-sm" disabled>Today</button>
+      <span style="margin-left:auto;font-size:13px;color:var(--text,#2a1f23);font-weight:600;">
+        ${occupiedBeds} / ${totalBeds} beds occupied
+      </span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+      ${rooms.map(roomCard).join('')}
+    </div>
+
+    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
+      <strong style="color:var(--text,#2a1f23);">Weekly email button (Phase 7)</strong> will live here too \u2014 one click sends a summary to staff of who's arriving/departing this week and which beds are occupied.
     </div>
   `;
 }
