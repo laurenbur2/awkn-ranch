@@ -331,28 +331,21 @@ serve(async (req) => {
     page.drawText(`Name: ${clientName}`, { x: MARGIN, y, size: 10, font });
     y -= LINE_H + 20;
 
-    // Capture coordinates for the signature + date fields. pdf-lib uses BOTTOM-LEFT
+    // Capture coordinates for the signature field. pdf-lib uses BOTTOM-LEFT
     // origin; SignWell uses TOP-LEFT origin. Convert: top = PAGE_H - y.
+    // We only render a signature field — SignWell stamps the signed-at timestamp
+    // on the completed PDF automatically and we also record contract_signed_at
+    // in the DB via webhook. Adding a separate date field caused SignWell to
+    // reject the create with "type can't be blank" on the date_signed field.
     page.drawText("Signature:", { x: MARGIN, y, size: 10, font });
     page.drawLine({
       start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 320, y: y - 2 },
       thickness: 0.5, color: rgb(0, 0, 0),
     });
     const sigFieldX = MARGIN + 70;
-    const sigFieldY = PAGE_H - y - 18; // top-left origin, 18pt tall
+    const sigFieldY = PAGE_H - y - 18;
     const sigFieldW = 250;
     const sigFieldH = 22;
-
-    y -= LINE_H + 18;
-    page.drawText("Date:", { x: MARGIN, y, size: 10, font });
-    page.drawLine({
-      start: { x: MARGIN + 70, y: y - 2 }, end: { x: MARGIN + 200, y: y - 2 },
-      thickness: 0.5, color: rgb(0, 0, 0),
-    });
-    const dateFieldX = MARGIN + 70;
-    const dateFieldY = PAGE_H - y - 14;
-    const dateFieldW = 130;
-    const dateFieldH = 18;
 
     y -= LINE_H + 30;
 
@@ -408,15 +401,6 @@ serve(async (req) => {
             required: true,
             recipient_id: "1",
             api_id: "sig_client",
-          },
-          {
-            type: "date_signed",
-            x: dateFieldX,
-            y: dateFieldY,
-            page: sigPageNumber,
-            required: true,
-            recipient_id: "1",
-            api_id: "date_client",
           },
         ],
       ],
