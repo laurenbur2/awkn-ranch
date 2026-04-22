@@ -1,6 +1,5 @@
 // Clients Page - Admin view for AWKN Within ketamine clients.
 // Sub-tabs: Clients / Schedule / House / Services.
-// Phase 2 scope: Services CRUD. Remaining tabs are placeholders for later phases.
 
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage, showToast } from '../../shared/admin-shell.js';
@@ -10,10 +9,24 @@ import { initAdminPage, showToast } from '../../shared/admin-shell.js';
 // =============================================
 
 let authState = null;
-let currentSubtab = localStorage.getItem('clients-subtab') || 'services';
+let currentSubtab = localStorage.getItem('clients-subtab') || 'clients';
 
+// Services catalog
 let services = [];
 let showArchivedServices = false;
+
+// Clients / packages / stays
+let clients = [];           // crm_leads in `active_client` stage (business_line=within)
+let packages = [];          // client_packages + nested sessions
+let stays = [];             // client_stays + nested bed+space
+let activeClientStageId = null;
+
+// Lodging inventory (used by House tab + Stay modal bed picker)
+let lodgingSpaces = [];     // spaces where space_type='lodging'
+let beds = [];              // all non-archived beds
+
+// House tab state
+let houseSelectedDate = new Date().toISOString().slice(0, 10);
 
 // =============================================
 // UTILITIES
@@ -64,16 +77,78 @@ document.addEventListener('DOMContentLoaded', async () => {
 // =============================================
 
 async function loadAllData() {
-  const [servicesRes] = await Promise.all([
+  // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
+  const [servicesRes, stagesRes, lodgingRes, bedsRes] = await Promise.all([
     supabase.from('services').select('*').order('sort_order').order('name'),
+    supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
+    supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('space_type', 'lodging').eq('is_archived', false),
+    supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
   ]);
-  if (servicesRes.error) {
-    console.error('Failed to load services:', servicesRes.error);
-    showToast('Failed to load services', 'error');
-    services = [];
-  } else {
-    services = servicesRes.data || [];
+
+  if (servicesRes.error) console.error('services load error:', servicesRes.error);
+  services = servicesRes.data || [];
+
+  const withinStage = (stagesRes.data || []).find(s => s.business_line === 'within');
+  activeClientStageId = withinStage?.id || null;
+
+  lodgingSpaces = lodgingRes.data || [];
+  beds = bedsRes.data || [];
+
+  // Step 2: load clients + their packages + stays (needs activeClientStageId)
+  await loadClientsData();
+}
+
+async function loadClientsData() {
+  if (!activeClientStageId) {
+    clients = []; packages = []; stays = [];
+    return;
   }
+
+  const [clientsRes, pkgsRes, sessRes, staysRes] = await Promise.all([
+    supabase.from('crm_leads')
+      .select('id, first_name, last_name, email, phone, city, state, created_at, notes, business_line, stage_id')
+      .eq('stage_id', activeClientStageId)
+      .order('created_at', { ascending: false }),
+    supabase.from('client_packages').select('*').order('created_at', { ascending: false }),
+    supabase.from('client_package_sessions').select('*').order('created_at'),
+    supabase.from('client_stays').select('*').order('check_in_at', { ascending: false }),
+  ]);
+
+  if (clientsRes.error) { console.error('clients load error:', clientsRes.error); showToast('Failed to load clients', 'error'); }
+  clients = clientsRes.data || [];
+
+  const allSessions = sessRes.data || [];
+  packages = (pkgsRes.data || []).map(p => ({
+    ...p,
+    sessions: allSessions.filter(s => s.package_id === p.id),
+  }));
+
+  stays = staysRes.data || [];
+}
+
+function getClientPackages(leadId) {
+  return packages.filter(p => p.lead_id === leadId);
+}
+function getClientStays(leadId) {
+  return stays.filter(s => s.lead_id === leadId);
+}
+function getBedLabel(bedId) {
+  const b = beds.find(x => x.id === bedId);
+  if (!b) return 'Unknown bed';
+  const sp = lodgingSpaces.find(s => s.id === b.space_id);
+  return `${sp ? sp.name : 'Room'} \u00b7 ${b.label}`;
+}
+function getServiceName(serviceId) {
+  const s = services.find(x => x.id === serviceId);
+  return s ? s.name : 'Service';
+}
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function formatDateShort(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 // =============================================
@@ -105,9 +180,9 @@ function renderCurrentPanel() {
   if (panel) panel.classList.add('active');
 
   if (currentSubtab === 'services') renderServicesPanel();
-  else if (currentSubtab === 'clients') renderClientsPreview();
+  else if (currentSubtab === 'clients') renderClientsPanel();
   else if (currentSubtab === 'schedule') renderSchedulePreview();
-  else if (currentSubtab === 'house') renderHousePreview();
+  else if (currentSubtab === 'house') renderHousePanel();
 }
 
 function previewBanner(phaseLabel, note) {
@@ -119,63 +194,484 @@ function previewBanner(phaseLabel, note) {
   `;
 }
 
-// ---------- Clients tab preview (Phase 3) ----------
-function renderClientsPreview() {
+// ---------- Clients tab (Phase 3, live) ----------
+let clientSearch = '';
+
+function renderClientsPanel() {
   const panel = document.getElementById('clients-panel-clients');
   if (!panel) return;
 
-  const mock = [
-    { name: 'Sarah Chen',      contact: 'sarah.c@email.com',    last: 'Mar 22',  next: 'Apr 29', pkg: '3 of 6 sessions', stay: 'Amethyst &middot; Apr 28\u201330', status: 'active' },
-    { name: 'Marcus Holloway', contact: '(512) 555-0134',       last: 'Apr 02',  next: '—',      pkg: 'Complete',        stay: '—',                            status: 'completed' },
-    { name: 'Priya Patel',     contact: 'priya.patel@email.com', last: '—',       next: 'May 14', pkg: 'Day-of intake',   stay: 'Opal &middot; May 13\u201315',  status: 'upcoming' },
-    { name: 'Jordan Rivers',   contact: '(737) 555-0199',        last: 'Mar 30',  next: 'Apr 27', pkg: '1 of 3 sessions', stay: 'Emerald Bunk 1 top',           status: 'active' },
-  ];
+  const q = clientSearch.trim().toLowerCase();
+  const filtered = clients.filter(c => {
+    if (!q) return true;
+    const hay = `${c.first_name || ''} ${c.last_name || ''} ${c.email || ''} ${c.phone || ''}`.toLowerCase();
+    return hay.includes(q);
+  });
 
-  const statusPill = (s) => {
-    const map = {
-      active:    { bg: '#dcfce7', fg: '#15803d', label: 'Active' },
-      upcoming:  { bg: '#e0e7ff', fg: '#4338ca', label: 'Upcoming' },
-      completed: { bg: '#f1f5f9', fg: '#64748b', label: 'Completed' },
-    };
-    const m = map[s] || map.completed;
-    return `<span style="padding:2px 8px;border-radius:999px;background:${m.bg};color:${m.fg};font-size:11px;font-weight:600;">${m.label}</span>`;
-  };
-
-  panel.innerHTML = `
-    ${previewBanner('Phase 3', 'Final version reads from crm_leads where pipeline stage = active_client. Row click opens a detail drawer with packages, sessions, stays, and notes.')}
-    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
-      <input class="crm-search" placeholder="Search clients by name, email, phone\u2026" disabled>
-      <select class="crm-select" disabled><option>All statuses</option></select>
-      <select class="crm-select" disabled><option>All packages</option></select>
-      <button class="crm-btn crm-btn-primary" disabled>+ New Client</button>
-    </div>
-    <div class="crm-table-wrap">
-      <table class="crm-table">
-        <thead>
-          <tr>
-            <th>Name</th><th>Contact</th><th>Last session</th><th>Next session</th><th>Package</th><th>Stay</th><th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${mock.map(r => `
-            <tr>
-              <td><strong>${escapeHtml(r.name)}</strong></td>
-              <td style="color:var(--text-muted,#888);">${escapeHtml(r.contact)}</td>
-              <td>${escapeHtml(r.last)}</td>
-              <td>${escapeHtml(r.next)}</td>
-              <td>${escapeHtml(r.pkg)}</td>
-              <td>${r.stay}</td>
-              <td>${statusPill(r.status)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
-      <strong style="color:var(--text,#2a1f23);">Client detail drawer will include:</strong>
-      contact info &middot; intake status &middot; active package with remaining sessions &middot; session history + upcoming bookings &middot; retreat stays &middot; integration notes &middot; quick actions (schedule session, add note, send email).
+  let html = `
+    <div class="crm-pipeline-toolbar">
+      <input class="crm-search" id="clients-search" placeholder="Search clients by name, email, phone\u2026" value="${escapeHtml(clientSearch)}">
+      <span style="margin-left:auto;font-size:12px;color:var(--text-muted,#888);">
+        ${filtered.length} of ${clients.length} active client${clients.length === 1 ? '' : 's'}
+      </span>
     </div>
   `;
+
+  if (clients.length === 0) {
+    html += `
+      <div style="padding:36px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">
+        No active clients yet. In CRM, move a "within" lead into the <strong>Active Client</strong> stage to make them show up here.
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="crm-table-wrap">
+        <table class="crm-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Packages</th>
+              <th>Sessions</th>
+              <th>Upcoming stay</th>
+              <th>Added</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(c => renderClientRow(c)).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  panel.innerHTML = html;
+}
+
+function renderClientRow(c) {
+  const pkgs = getClientPackages(c.id);
+  const activePkgs = pkgs.filter(p => p.status === 'active');
+  const allSessions = pkgs.flatMap(p => p.sessions || []);
+  const completedSessions = allSessions.filter(s => s.status === 'completed').length;
+  const scheduledSessions = allSessions.filter(s => s.status === 'scheduled').length;
+
+  const now = new Date();
+  const upcomingStay = getClientStays(c.id)
+    .filter(s => s.status !== 'cancelled' && new Date(s.check_out_at) >= now)
+    .sort((a, b) => new Date(a.check_in_at) - new Date(b.check_in_at))[0];
+
+  const pkgCell = activePkgs.length
+    ? `<strong>${activePkgs.length}</strong> active${pkgs.length > activePkgs.length ? ` <span style="color:var(--text-muted,#888);">(${pkgs.length - activePkgs.length} past)</span>` : ''}`
+    : (pkgs.length ? `<span style="color:var(--text-muted,#888);">${pkgs.length} past</span>` : '<span style="color:var(--text-muted,#bbb);">\u2014</span>');
+
+  const sessionCell = allSessions.length
+    ? `<strong>${completedSessions}</strong> done${scheduledSessions ? ` &middot; ${scheduledSessions} scheduled` : ''} <span style="color:var(--text-muted,#888);">/ ${allSessions.length}</span>`
+    : '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
+
+  const stayCell = upcomingStay
+    ? `${escapeHtml(getBedLabel(upcomingStay.bed_id))}<div style="font-size:11px;color:var(--text-muted,#888);">${formatDateShort(upcomingStay.check_in_at)} \u2013 ${formatDateShort(upcomingStay.check_out_at)}</div>`
+    : '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
+
+  const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+  const contact = c.email || c.phone || '';
+
+  return `
+    <tr class="clients-client-row" data-client-id="${c.id}" style="cursor:pointer;">
+      <td><strong>${escapeHtml(name)}</strong></td>
+      <td style="color:var(--text-muted,#666);font-size:12px;">${escapeHtml(contact)}</td>
+      <td>${pkgCell}</td>
+      <td>${sessionCell}</td>
+      <td>${stayCell}</td>
+      <td style="color:var(--text-muted,#888);font-size:12px;">${formatDateShort(c.created_at)}</td>
+    </tr>
+  `;
+}
+
+// ---------- Client detail drawer ----------
+
+function openClientDetail(leadId) {
+  const c = clients.find(x => x.id === leadId);
+  if (!c) return;
+
+  const pkgs = getClientPackages(leadId);
+  const clientStays = getClientStays(leadId);
+
+  const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content crm-modal-xlarge" style="display:flex;flex-direction:column;max-height:92vh;">
+        <div class="crm-modal-header">
+          <div>
+            <h2>${escapeHtml(name)}</h2>
+            <div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">
+              ${c.email ? escapeHtml(c.email) : ''}${c.email && c.phone ? ' &middot; ' : ''}${c.phone ? escapeHtml(c.phone) : ''}${(c.city || c.state) ? ` &middot; ${escapeHtml([c.city, c.state].filter(Boolean).join(', '))}` : ''}
+            </div>
+          </div>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body" style="padding:20px;overflow-y:auto;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+            <section>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Packages</h3>
+                <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-package" data-client-id="${c.id}">+ New</button>
+              </div>
+              ${renderPackageList(pkgs)}
+            </section>
+            <section>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Retreat Stays</h3>
+                <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-stay" data-client-id="${c.id}">+ New</button>
+              </div>
+              ${renderStayList(clientStays)}
+            </section>
+          </div>
+          <section>
+            <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Notes</h3>
+            <textarea class="crm-textarea" id="client-notes" rows="4" style="width:100%;" placeholder="Integration notes, intake details, etc.">${escapeHtml(c.notes || '')}</textarea>
+            <div style="margin-top:8px;text-align:right;">
+              <button class="crm-btn crm-btn-sm" id="btn-save-notes" data-client-id="${c.id}">Save notes</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeModal();
+  });
+  document.getElementById('btn-save-notes').addEventListener('click', () => saveClientNotes(leadId));
+}
+
+function renderPackageList(pkgs) {
+  if (!pkgs.length) {
+    return `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No packages yet.</div>`;
+  }
+  return pkgs.map(p => {
+    const sessions = p.sessions || [];
+    const done = sessions.filter(s => s.status === 'completed').length;
+    const scheduled = sessions.filter(s => s.status === 'scheduled').length;
+    const unscheduled = sessions.filter(s => s.status === 'unscheduled').length;
+    const statusColor = p.status === 'active' ? '#16a34a' : (p.status === 'completed' ? '#64748b' : '#dc2626');
+    return `
+      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:6px;">
+          <div>
+            <div style="font-weight:600;font-size:14px;">${escapeHtml(p.name)}</div>
+            <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(p.occupancy_rate)} &middot; ${formatPriceCents(p.price_cents)}${p.paid_at ? ' &middot; paid' : ' &middot; unpaid'}</div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${p.status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted,#666);">
+          ${sessions.length} session${sessions.length === 1 ? '' : 's'} \u00b7 ${done} done${scheduled ? ` \u00b7 ${scheduled} scheduled` : ''}${unscheduled ? ` \u00b7 ${unscheduled} unscheduled` : ''}
+        </div>
+        ${sessions.length ? `
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">
+            ${sessions.map(s => `
+              <span title="${escapeHtml(getServiceName(s.service_id))} \u00b7 ${s.status}" style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sessionPillBg(s.status)};color:${sessionPillFg(s.status)};">
+                ${escapeHtml(getServiceName(s.service_id))}${s.scheduled_at ? ` \u00b7 ${formatDateShort(s.scheduled_at)}` : ''}
+              </span>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function sessionPillBg(status) {
+  return { completed: '#dcfce7', scheduled: '#e0e7ff', unscheduled: '#f1f5f9', cancelled: '#fee2e2' }[status] || '#f1f5f9';
+}
+function sessionPillFg(status) {
+  return { completed: '#15803d', scheduled: '#4338ca', unscheduled: '#64748b', cancelled: '#b91c1c' }[status] || '#64748b';
+}
+
+function renderStayList(clientStays) {
+  if (!clientStays.length) {
+    return `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No stays yet.</div>`;
+  }
+  return clientStays.map(s => {
+    const statusColor = s.status === 'active' ? '#16a34a' : (s.status === 'upcoming' ? '#4338ca' : (s.status === 'completed' ? '#64748b' : '#dc2626'));
+    return `
+      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+          <div>
+            <div style="font-weight:600;font-size:14px;">${escapeHtml(getBedLabel(s.bed_id))}</div>
+            <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
+              ${formatDate(s.check_in_at)} \u2192 ${formatDate(s.check_out_at)}
+            </div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${s.status}</span>
+        </div>
+        ${s.notes ? `<div style="margin-top:6px;font-size:12px;color:var(--text-muted,#666);">${escapeHtml(s.notes)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveClientNotes(leadId) {
+  const notes = document.getElementById('client-notes').value;
+  const { error } = await supabase.from('crm_leads').update({ notes: notes || null }).eq('id', leadId);
+  if (error) { showToast('Failed to save notes', 'error'); return; }
+  const c = clients.find(x => x.id === leadId);
+  if (c) c.notes = notes;
+  showToast('Notes saved', 'success');
+}
+
+// ---------- New Package modal ----------
+
+function openPackageModal(leadId) {
+  const activeServices = services.filter(s => s.is_active);
+  if (!activeServices.length) {
+    showToast('Add a service in the Services tab first.', 'error');
+    return;
+  }
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <h2>New Package</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>Package name *</label>
+              <input type="text" class="crm-input" id="pkg-name" placeholder="e.g. 3-Session Ketamine Package" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Occupancy</label>
+              <select class="crm-select" id="pkg-occupancy">
+                <option value="private">Private</option>
+                <option value="shared">Shared</option>
+              </select>
+            </div>
+            <div class="crm-form-field">
+              <label>Price ($)</label>
+              <input type="number" class="crm-input" id="pkg-price" value="0" step="0.01" min="0">
+            </div>
+            <div class="crm-form-field">
+              <label>&nbsp;</label>
+              <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
+                <input type="checkbox" id="pkg-paid"> Mark as paid now
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:8px;">Session credits</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              ${activeServices.map(s => `
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <label style="flex:1;font-size:13px;">${escapeHtml(s.name)} <span style="color:var(--text-muted,#888);font-size:11px;">(${s.duration_minutes} min)</span></label>
+                  <input type="number" class="crm-input pkg-session-count" data-service-id="${s.id}" value="0" min="0" max="50" style="width:80px;">
+                </div>
+              `).join('')}
+            </div>
+            <div style="margin-top:6px;font-size:11px;color:var(--text-muted,#888);">Each credit creates an unscheduled session row. Schedule them later via the Schedule tab.</div>
+          </div>
+
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label>Notes</label>
+            <textarea class="crm-textarea" id="pkg-notes" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          <span></span>
+          <div>
+            <button class="crm-btn" id="btn-cancel-pkg">Cancel</button>
+            <button class="crm-btn crm-btn-primary" id="btn-save-pkg">Create package</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', () => openClientDetail(leadId));
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') openClientDetail(leadId);
+  });
+  document.getElementById('btn-cancel-pkg').addEventListener('click', () => openClientDetail(leadId));
+  document.getElementById('btn-save-pkg').addEventListener('click', () => savePackage(leadId));
+}
+
+async function savePackage(leadId) {
+  const name = document.getElementById('pkg-name').value.trim();
+  if (!name) { showToast('Package name required', 'error'); return; }
+  const occupancy = document.getElementById('pkg-occupancy').value;
+  const priceDollars = parseFloat(document.getElementById('pkg-price').value) || 0;
+  const priceCents = Math.round(priceDollars * 100);
+  const markPaid = document.getElementById('pkg-paid').checked;
+  const notes = document.getElementById('pkg-notes').value.trim() || null;
+
+  const sessionRows = [];
+  document.querySelectorAll('.pkg-session-count').forEach(input => {
+    const count = parseInt(input.value, 10) || 0;
+    const serviceId = input.dataset.serviceId;
+    for (let i = 0; i < count; i++) {
+      sessionRows.push({ service_id: serviceId, status: 'unscheduled' });
+    }
+  });
+  if (sessionRows.length === 0) {
+    showToast('Add at least one session credit', 'error');
+    return;
+  }
+
+  const pkgPayload = {
+    lead_id: leadId,
+    name,
+    occupancy_rate: occupancy,
+    status: 'active',
+    price_cents: priceCents,
+    paid_at: markPaid ? new Date().toISOString() : null,
+    notes,
+  };
+
+  const pkgRes = await supabase.from('client_packages').insert(pkgPayload).select().single();
+  if (pkgRes.error) { showToast(pkgRes.error.message || 'Failed to create package', 'error'); return; }
+
+  const sessPayload = sessionRows.map(s => ({ ...s, package_id: pkgRes.data.id }));
+  const sessRes = await supabase.from('client_package_sessions').insert(sessPayload);
+  if (sessRes.error) {
+    console.error('Session insert error:', sessRes.error);
+    showToast('Package created but sessions failed: ' + (sessRes.error.message || 'unknown'), 'error');
+  } else {
+    showToast('Package created', 'success');
+  }
+
+  await loadClientsData();
+  openClientDetail(leadId);
+}
+
+// ---------- New Stay modal ----------
+
+function openStayModal(leadId) {
+  if (!beds.length) {
+    showToast('No beds configured yet.', 'error');
+    return;
+  }
+  const client = clients.find(c => c.id === leadId);
+  const pkgs = getClientPackages(leadId).filter(p => p.status === 'active');
+
+  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <h2>New Stay \u2014 ${escapeHtml(`${client?.first_name || ''} ${client?.last_name || ''}`.trim() || 'Client')}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>Room \u00b7 Bed *</label>
+              <select class="crm-select" id="stay-bed" required>
+                <option value="">\u2014 pick a bed \u2014</option>
+                ${lodgingSpaces.map(sp => {
+                  const roomBeds = beds.filter(b => b.space_id === sp.id);
+                  if (!roomBeds.length) return '';
+                  return `<optgroup label="${escapeHtml(sp.name)} (${escapeHtml(sp.floor || '')}${sp.has_private_bath ? ', private bath' : ''})">
+                    ${roomBeds.map(b => `<option value="${b.id}">${escapeHtml(b.label)} (${escapeHtml(b.bed_type)})</option>`).join('')}
+                  </optgroup>`;
+                }).join('')}
+              </select>
+            </div>
+            <div class="crm-form-field">
+              <label>Link to package</label>
+              <select class="crm-select" id="stay-package">
+                <option value="">\u2014 none \u2014</option>
+                ${pkgs.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="crm-form-field">
+              <label>Check-in *</label>
+              <input type="date" class="crm-input" id="stay-checkin" value="${today}" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Check-out *</label>
+              <input type="date" class="crm-input" id="stay-checkout" value="${tomorrow}" required>
+            </div>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label>Notes</label>
+            <textarea class="crm-textarea" id="stay-notes" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          <span></span>
+          <div>
+            <button class="crm-btn" id="btn-cancel-stay">Cancel</button>
+            <button class="crm-btn crm-btn-primary" id="btn-save-stay">Create stay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', () => openClientDetail(leadId));
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') openClientDetail(leadId);
+  });
+  document.getElementById('btn-cancel-stay').addEventListener('click', () => openClientDetail(leadId));
+  document.getElementById('btn-save-stay').addEventListener('click', () => saveStay(leadId));
+}
+
+async function saveStay(leadId) {
+  const bedId = document.getElementById('stay-bed').value;
+  if (!bedId) { showToast('Pick a bed', 'error'); return; }
+  const packageId = document.getElementById('stay-package').value || null;
+  const checkinDate = document.getElementById('stay-checkin').value;
+  const checkoutDate = document.getElementById('stay-checkout').value;
+  if (!checkinDate || !checkoutDate) { showToast('Check-in and check-out required', 'error'); return; }
+  if (new Date(checkoutDate) <= new Date(checkinDate)) { showToast('Check-out must be after check-in', 'error'); return; }
+  const notes = document.getElementById('stay-notes').value.trim() || null;
+
+  // Conflict check (soft, client-side): any existing stay on the same bed overlapping the window?
+  const checkinISO = new Date(checkinDate + 'T15:00:00').toISOString();
+  const checkoutISO = new Date(checkoutDate + 'T11:00:00').toISOString();
+  const conflict = stays.find(s =>
+    s.bed_id === bedId && s.status !== 'cancelled' &&
+    new Date(s.check_in_at) < new Date(checkoutISO) &&
+    new Date(s.check_out_at) > new Date(checkinISO)
+  );
+  if (conflict) {
+    const conflictClient = clients.find(c => c.id === conflict.lead_id);
+    const who = conflictClient ? `${conflictClient.first_name || ''} ${conflictClient.last_name || ''}`.trim() : 'another client';
+    if (!confirm(`This bed overlaps with ${who}'s stay (${formatDateShort(conflict.check_in_at)}\u2013${formatDateShort(conflict.check_out_at)}). Create anyway?`)) return;
+  }
+
+  const now = new Date();
+  const status = new Date(checkinISO) <= now && new Date(checkoutISO) > now
+    ? 'active'
+    : (new Date(checkinISO) > now ? 'upcoming' : 'completed');
+
+  const payload = {
+    lead_id: leadId,
+    bed_id: bedId,
+    package_id: packageId,
+    check_in_at: checkinISO,
+    check_out_at: checkoutISO,
+    status,
+    notes,
+  };
+  const { error } = await supabase.from('client_stays').insert(payload);
+  if (error) { showToast(error.message || 'Failed to create stay', 'error'); return; }
+
+  showToast('Stay created', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
 }
 
 // ---------- Schedule tab preview (Phase 4 + 5) ----------
@@ -248,72 +744,90 @@ function renderSchedulePreview() {
   `;
 }
 
-// ---------- House tab preview (Phase 6) ----------
-function renderHousePreview() {
+// ---------- House tab (Phase 6, live) ----------
+
+function renderHousePanel() {
   const panel = document.getElementById('clients-panel-house');
   if (!panel) return;
 
-  const rooms = [
-    { name: 'Emerald',  floor: 'downstairs', bath: false, beds: [
-      { label: 'Bunk 1 Top',    who: 'S. Chen' },
-      { label: 'Bunk 1 Bottom', who: 'J. Rivers' },
-      { label: 'Bunk 2 Top',    who: null },
-      { label: 'Bunk 2 Bottom', who: null },
-    ]},
-    { name: 'Quartz',   floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: 'P. Patel' }] },
-    { name: 'Selenite', floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: null }] },
-    { name: 'Amethyst', floor: 'downstairs', bath: false, beds: [{ label: 'Queen',   who: 'M. Holloway' }] },
-    { name: 'Opal',     floor: 'upstairs',   bath: true,  beds: [{ label: 'King',    who: null }] },
-    { name: 'Celenite', floor: 'upstairs',   bath: false, beds: [{ label: 'Queen 1', who: null }, { label: 'Queen 2', who: null }] },
-    { name: 'Jasper',   floor: 'upstairs',   bath: false, beds: [{ label: 'Queen',   who: null }] },
-  ];
+  // Treat selected date as the *night* (check-in on or before, check-out after)
+  const d = new Date(houseSelectedDate + 'T12:00:00');
+  const occupancyFor = (bedId) => stays.find(s =>
+    s.bed_id === bedId &&
+    s.status !== 'cancelled' &&
+    new Date(s.check_in_at) <= d &&
+    new Date(s.check_out_at) > d
+  );
 
-  const totalBeds = rooms.reduce((n, r) => n + r.beds.length, 0);
-  const occupiedBeds = rooms.reduce((n, r) => n + r.beds.filter(b => b.who).length, 0);
+  const clientName = (leadId) => {
+    const c = clients.find(x => x.id === leadId);
+    if (!c) return 'Client';
+    return `${c.first_name || ''} ${c.last_name || ''}`.trim() || 'Client';
+  };
 
-  const roomCard = (r) => {
-    const bathBadge = r.bath
+  const roomsSorted = [...lodgingSpaces].sort((a, b) => {
+    const fa = a.floor === 'downstairs' ? 0 : 1;
+    const fb = b.floor === 'downstairs' ? 0 : 1;
+    if (fa !== fb) return fa - fb;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
+  let totalBeds = 0, occupiedBeds = 0;
+  roomsSorted.forEach(sp => {
+    const roomBeds = beds.filter(b => b.space_id === sp.id);
+    totalBeds += roomBeds.length;
+    occupiedBeds += roomBeds.filter(b => occupancyFor(b.id)).length;
+  });
+
+  const roomCard = (sp) => {
+    const roomBeds = beds.filter(b => b.space_id === sp.id).sort((a, b) => a.sort_order - b.sort_order);
+    const bathBadge = sp.has_private_bath
       ? '<span style="font-size:10px;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:999px;font-weight:600;">Private bath</span>'
       : '<span style="font-size:10px;color:var(--text-muted,#888);background:var(--bg,#faf9f6);padding:1px 6px;border-radius:999px;">Shared bath</span>';
     return `
       <div style="border:1px solid var(--border-color,#eee);border-radius:10px;padding:14px;background:#fff;">
         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;">
           <div>
-            <div style="font-weight:700;font-size:15px;color:var(--text,#2a1f23);">${escapeHtml(r.name)}</div>
-            <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(r.floor)}</div>
+            <div style="font-weight:700;font-size:15px;color:var(--text,#2a1f23);">${escapeHtml(sp.name)}</div>
+            <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(sp.floor || '')}</div>
           </div>
           ${bathBadge}
         </div>
         <div style="display:flex;flex-direction:column;gap:4px;">
-          ${r.beds.map(b => `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${b.who ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:12px;">
-              <span style="color:var(--text-muted,#666);">${escapeHtml(b.label)}</span>
-              <span style="font-weight:${b.who ? '600' : '400'};color:${b.who ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};">${b.who ? escapeHtml(b.who) : 'available'}</span>
-            </div>
-          `).join('')}
+          ${roomBeds.map(b => {
+            const occ = occupancyFor(b.id);
+            const name = occ ? clientName(occ.lead_id) : null;
+            return `
+              <div class="${occ ? 'clients-bed-row' : ''}" ${occ ? `data-client-id="${occ.lead_id}" style="cursor:pointer;"` : ''}>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${occ ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:12px;">
+                  <span style="color:var(--text-muted,#666);">${escapeHtml(b.label)}</span>
+                  <span style="font-weight:${occ ? '600' : '400'};color:${occ ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};">${name ? escapeHtml(name) : 'available'}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
   };
 
   panel.innerHTML = `
-    ${previewBanner('Phase 6', 'Final version reads real client_stays for the chosen date, showing which client is in which bed. Click a bed \u2192 assign / un-assign a client stay.')}
-    <div class="crm-pipeline-toolbar" style="pointer-events:none;opacity:.7;">
-      <label style="font-size:13px;color:var(--text-muted,#666);">Show occupancy on</label>
-      <input type="date" class="crm-input" value="2026-04-22" disabled>
-      <button class="crm-btn crm-btn-sm" disabled>Today</button>
+    <div class="crm-pipeline-toolbar">
+      <label style="font-size:13px;color:var(--text-muted,#666);">Night of</label>
+      <input type="date" class="crm-input" id="house-date" value="${escapeHtml(houseSelectedDate)}">
+      <button class="crm-btn crm-btn-sm" id="house-today">Today</button>
+      <button class="crm-btn crm-btn-sm" id="house-prev">&laquo;</button>
+      <button class="crm-btn crm-btn-sm" id="house-next">&raquo;</button>
+      <button class="crm-btn crm-btn-sm" id="house-weekly-email" title="Phase 7 \u2014 coming soon">Send weekly summary</button>
       <span style="margin-left:auto;font-size:13px;color:var(--text,#2a1f23);font-weight:600;">
         ${occupiedBeds} / ${totalBeds} beds occupied
       </span>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
-      ${rooms.map(roomCard).join('')}
-    </div>
-
-    <div style="margin-top:20px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);line-height:1.5;">
-      <strong style="color:var(--text,#2a1f23);">Weekly email button (Phase 7)</strong> will live here too \u2014 one click sends a summary to staff of who's arriving/departing this week and which beds are occupied.
-    </div>
+    ${roomsSorted.length === 0
+      ? `<div style="padding:36px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No lodging rooms configured.</div>`
+      : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">${roomsSorted.map(roomCard).join('')}</div>`
+    }
   `;
 }
 
@@ -564,6 +1078,7 @@ function setupEventListeners() {
   if (panelsContainer) {
     panelsContainer.addEventListener('click', handlePanelClicks);
     panelsContainer.addEventListener('change', handlePanelChanges);
+    panelsContainer.addEventListener('input', handlePanelInputs);
   }
 
   document.addEventListener('keydown', (e) => {
@@ -574,23 +1089,59 @@ function setupEventListeners() {
 function handlePanelClicks(e) {
   const target = e.target;
 
-  if (target.id === 'btn-new-service') {
-    openServiceModal();
-    return;
-  }
-
-  const editBtn = target.closest('[data-edit-service]');
-  if (editBtn) {
+  // ----- Services -----
+  if (target.id === 'btn-new-service') { openServiceModal(); return; }
+  const editSvc = target.closest('[data-edit-service]');
+  if (editSvc) {
     e.stopPropagation();
-    const svc = services.find(s => s.id === editBtn.dataset.editService);
+    const svc = services.find(s => s.id === editSvc.dataset.editService);
+    if (svc) openServiceModal(svc);
+    return;
+  }
+  const svcRow = target.closest('.clients-service-row');
+  if (svcRow) {
+    const svc = services.find(s => s.id === svcRow.dataset.serviceId);
     if (svc) openServiceModal(svc);
     return;
   }
 
-  const row = target.closest('.clients-service-row');
-  if (row) {
-    const svc = services.find(s => s.id === row.dataset.serviceId);
-    if (svc) openServiceModal(svc);
+  // ----- Clients -----
+  const actionBtn = target.closest('[data-action]');
+  if (actionBtn) {
+    e.stopPropagation();
+    const leadId = actionBtn.dataset.clientId;
+    if (actionBtn.dataset.action === 'new-package') openPackageModal(leadId);
+    if (actionBtn.dataset.action === 'new-stay')    openStayModal(leadId);
+    return;
+  }
+  const clientRow = target.closest('.clients-client-row');
+  if (clientRow) {
+    openClientDetail(clientRow.dataset.clientId);
+    return;
+  }
+
+  // ----- House -----
+  const bedRow = target.closest('.clients-bed-row');
+  if (bedRow) {
+    openClientDetail(bedRow.dataset.clientId);
+    return;
+  }
+  if (target.id === 'house-today') {
+    houseSelectedDate = new Date().toISOString().slice(0, 10);
+    renderHousePanel();
+    return;
+  }
+  if (target.id === 'house-prev' || target.id === 'house-next') {
+    const delta = target.id === 'house-prev' ? -1 : 1;
+    const d = new Date(houseSelectedDate + 'T12:00:00');
+    d.setDate(d.getDate() + delta);
+    houseSelectedDate = d.toISOString().slice(0, 10);
+    renderHousePanel();
+    return;
+  }
+  if (target.id === 'house-weekly-email') {
+    showToast('Weekly email lands in Phase 7 \u2014 coming next.', 'info');
+    return;
   }
 }
 
@@ -598,5 +1149,28 @@ function handlePanelChanges(e) {
   if (e.target.id === 'toggle-show-archived-services') {
     showArchivedServices = e.target.checked;
     renderServicesPanel();
+    return;
+  }
+  if (e.target.id === 'house-date') {
+    houseSelectedDate = e.target.value;
+    renderHousePanel();
+    return;
+  }
+}
+
+let _clientSearchDebounce = null;
+function handlePanelInputs(e) {
+  if (e.target.id === 'clients-search') {
+    clearTimeout(_clientSearchDebounce);
+    const val = e.target.value;
+    _clientSearchDebounce = setTimeout(() => {
+      clientSearch = val;
+      const panel = document.getElementById('clients-panel-clients');
+      if (!panel) return;
+      // Only re-render the table body so the search box doesn't lose focus
+      renderClientsPanel();
+      const input = document.getElementById('clients-search');
+      if (input) { input.focus(); input.setSelectionRange(val.length, val.length); }
+    }, 180);
   }
 }
