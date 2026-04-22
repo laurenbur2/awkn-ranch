@@ -15,6 +15,9 @@ let currentSubtab = localStorage.getItem('clients-subtab') || 'clients';
 let services = [];
 let showArchivedServices = false;
 
+// Service package templates (retreat / treatment packages from crm_service_packages)
+let servicePackageTemplates = [];
+
 // Clients / packages / stays
 let clients = [];           // crm_leads in `active_client` stage (business_line=within)
 let packages = [];          // client_packages + nested sessions
@@ -96,16 +99,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAllData() {
   // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
-  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes] = await Promise.all([
+  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes] = await Promise.all([
     supabase.from('services').select('*').order('sort_order').order('name'),
     supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
     supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
     supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
+    supabase.from('crm_service_packages').select('id, name, slug, price_regular, description, includes, business_line, is_active').eq('is_active', true).eq('business_line', 'within').order('sort_order').order('name'),
   ]);
 
   if (servicesRes.error) console.error('services load error:', servicesRes.error);
   services = servicesRes.data || [];
+  servicePackageTemplates = svcPkgRes.data || [];
 
   const withinStage = (stagesRes.data || []).find(s => s.business_line === 'within');
   activeClientStageId = withinStage?.id || null;
@@ -676,12 +681,45 @@ async function saveClientNotes(leadId) {
 
 // ---------- New Package modal ----------
 
+// Parse "6D/5N" or "3D / 2N" from a retreat template name. Returns
+// { days, nights } or null if not a multi-day retreat template.
+function parseRetreatDuration(name) {
+  const m = String(name || '').match(/(\d+)\s*D\s*\/\s*(\d+)\s*N/i);
+  if (!m) return null;
+  return { days: parseInt(m[1], 10), nights: parseInt(m[2], 10) };
+}
+
+// Detect "Private" / "Shared" room in template name.
+function parseRetreatOccupancy(name) {
+  const s = String(name || '').toLowerCase();
+  if (s.includes('private')) return 'private';
+  if (s.includes('shared')) return 'shared';
+  return null;
+}
+
+// Add N days to a YYYY-MM-DD date string, return YYYY-MM-DD.
+function addDaysIso(ymd, days) {
+  if (!ymd) return '';
+  const [y, m, d] = ymd.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + days);
+  const yy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getDate()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}`;
+}
+
 function openPackageModal(leadId) {
   const activeServices = services.filter(s => s.is_active);
   if (!activeServices.length) {
     showToast('Add a service in the Services tab first.', 'error');
     return;
   }
+
+  const retreatTemplates = servicePackageTemplates.filter(t => parseRetreatDuration(t.name));
+  const otherTemplates = servicePackageTemplates.filter(t => !parseRetreatDuration(t.name));
+
+  const today = new Date().toISOString().slice(0, 10);
 
   const modal = document.getElementById('clients-modal');
   modal.innerHTML = `
@@ -692,7 +730,21 @@ function openPackageModal(leadId) {
           <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
         </div>
         <div class="crm-modal-body">
-          <div class="crm-form-grid">
+          <div class="crm-form-field">
+            <label>Start from</label>
+            <select class="crm-select" id="pkg-template">
+              <option value="custom">Custom (build from scratch)</option>
+              ${retreatTemplates.length ? `<optgroup label="Retreats / Immersives">
+                ${retreatTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
+              </optgroup>` : ''}
+              ${otherTemplates.length ? `<optgroup label="Packages">
+                ${otherTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
+              </optgroup>` : ''}
+            </select>
+            <div id="pkg-template-hint" style="margin-top:6px;font-size:11px;color:var(--text-muted,#888);display:none;"></div>
+          </div>
+
+          <div class="crm-form-grid" style="margin-top:12px;">
             <div class="crm-form-field">
               <label>Package name *</label>
               <input type="text" class="crm-input" id="pkg-name" placeholder="e.g. 3-Session Ketamine Package" required>
@@ -716,7 +768,34 @@ function openPackageModal(leadId) {
             </div>
           </div>
 
-          <div style="margin-top:10px;">
+          <div id="pkg-retreat-section" style="display:none;margin-top:14px;padding:12px;background:#fff8ec;border:1px solid #f2d69a;border-radius:8px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a5a1a;margin-bottom:8px;">Retreat stay</div>
+            <div class="crm-form-grid">
+              <div class="crm-form-field">
+                <label>Check-in *</label>
+                <input type="date" class="crm-input" id="pkg-checkin" value="${today}">
+              </div>
+              <div class="crm-form-field">
+                <label>Check-out (auto)</label>
+                <input type="date" class="crm-input" id="pkg-checkout" readonly style="background:#f5f0e3;">
+              </div>
+              <div class="crm-form-field" style="grid-column:1 / -1;">
+                <label>Room &middot; Bed *</label>
+                <select class="crm-select" id="pkg-bed">
+                  <option value="">&mdash; pick a bed &mdash;</option>
+                  ${lodgingSpaces.map(sp => {
+                    const roomBeds = beds.filter(b => b.space_id === sp.id);
+                    if (!roomBeds.length) return '';
+                    return `<optgroup label="${escapeHtml(sp.name)} (${escapeHtml(sp.floor || '')}${sp.has_private_bath ? ', private bath' : ''})">
+                      ${roomBeds.map(b => `<option value="${b.id}">${escapeHtml(b.label)} (${escapeHtml(b.bed_type)})</option>`).join('')}
+                    </optgroup>`;
+                  }).join('')}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
             <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:8px;">Session credits</div>
             <div style="display:flex;flex-direction:column;gap:6px;">
               ${activeServices.map(s => `
@@ -752,6 +831,57 @@ function openPackageModal(leadId) {
   });
   document.getElementById('btn-cancel-pkg').addEventListener('click', () => openClientDetail(leadId));
   document.getElementById('btn-save-pkg').addEventListener('click', () => savePackage(leadId));
+
+  document.getElementById('pkg-template').addEventListener('change', onTemplateChange);
+  document.getElementById('pkg-checkin').addEventListener('change', recomputeCheckout);
+}
+
+function onTemplateChange(e) {
+  const templateId = e.target.value;
+  const nameEl = document.getElementById('pkg-name');
+  const priceEl = document.getElementById('pkg-price');
+  const occEl = document.getElementById('pkg-occupancy');
+  const hintEl = document.getElementById('pkg-template-hint');
+  const retreatSection = document.getElementById('pkg-retreat-section');
+
+  if (templateId === 'custom') {
+    hintEl.style.display = 'none';
+    retreatSection.style.display = 'none';
+    return;
+  }
+
+  const tpl = servicePackageTemplates.find(t => t.id === templateId);
+  if (!tpl) return;
+
+  nameEl.value = tpl.name;
+  priceEl.value = Number(tpl.price_regular || 0).toFixed(2);
+
+  const occ = parseRetreatOccupancy(tpl.name);
+  if (occ) occEl.value = occ;
+
+  const includesList = Array.isArray(tpl.includes) ? tpl.includes : [];
+  const hintParts = [];
+  if (tpl.description) hintParts.push(escapeHtml(tpl.description));
+  if (includesList.length) hintParts.push('Includes: ' + includesList.map(escapeHtml).join(' &middot; '));
+  hintEl.innerHTML = hintParts.join('<br>');
+  hintEl.style.display = hintParts.length ? 'block' : 'none';
+
+  const dur = parseRetreatDuration(tpl.name);
+  if (dur) {
+    retreatSection.style.display = 'block';
+    recomputeCheckout();
+  } else {
+    retreatSection.style.display = 'none';
+  }
+}
+
+function recomputeCheckout() {
+  const templateId = document.getElementById('pkg-template')?.value;
+  const tpl = servicePackageTemplates.find(t => t.id === templateId);
+  const dur = tpl ? parseRetreatDuration(tpl.name) : null;
+  if (!dur) return;
+  const checkin = document.getElementById('pkg-checkin')?.value;
+  document.getElementById('pkg-checkout').value = checkin ? addDaysIso(checkin, dur.nights) : '';
 }
 
 async function savePackage(leadId) {
@@ -763,6 +893,26 @@ async function savePackage(leadId) {
   const markPaid = document.getElementById('pkg-paid').checked;
   const notes = document.getElementById('pkg-notes').value.trim() || null;
 
+  const templateId = document.getElementById('pkg-template').value;
+  const tpl = templateId !== 'custom' ? servicePackageTemplates.find(t => t.id === templateId) : null;
+  const retreatDur = tpl ? parseRetreatDuration(tpl.name) : null;
+
+  let stayPayload = null;
+  if (retreatDur) {
+    const checkinYmd = document.getElementById('pkg-checkin').value;
+    const checkoutYmd = document.getElementById('pkg-checkout').value;
+    const bedId = document.getElementById('pkg-bed').value;
+    if (!checkinYmd || !checkoutYmd) { showToast('Pick a check-in date', 'error'); return; }
+    if (!bedId) { showToast('Pick a room / bed', 'error'); return; }
+    stayPayload = {
+      lead_id: leadId,
+      bed_id: bedId,
+      check_in_at: new Date(`${checkinYmd}T15:00:00`).toISOString(),
+      check_out_at: new Date(`${checkoutYmd}T11:00:00`).toISOString(),
+      status: 'upcoming',
+    };
+  }
+
   const sessionRows = [];
   document.querySelectorAll('.pkg-session-count').forEach(input => {
     const count = parseInt(input.value, 10) || 0;
@@ -771,7 +921,7 @@ async function savePackage(leadId) {
       sessionRows.push({ service_id: serviceId, status: 'unscheduled' });
     }
   });
-  if (sessionRows.length === 0) {
+  if (sessionRows.length === 0 && !stayPayload) {
     showToast('Add at least one session credit', 'error');
     return;
   }
@@ -789,11 +939,30 @@ async function savePackage(leadId) {
   const pkgRes = await supabase.from('client_packages').insert(pkgPayload).select().single();
   if (pkgRes.error) { showToast(pkgRes.error.message || 'Failed to create package', 'error'); return; }
 
-  const sessPayload = sessionRows.map(s => ({ ...s, package_id: pkgRes.data.id }));
-  const sessRes = await supabase.from('client_package_sessions').insert(sessPayload);
-  if (sessRes.error) {
-    console.error('Session insert error:', sessRes.error);
-    showToast('Package created but sessions failed: ' + (sessRes.error.message || 'unknown'), 'error');
+  const packageId = pkgRes.data.id;
+
+  if (sessionRows.length) {
+    const sessPayload = sessionRows.map(s => ({ ...s, package_id: packageId }));
+    const sessRes = await supabase.from('client_package_sessions').insert(sessPayload);
+    if (sessRes.error) {
+      console.error('Session insert error:', sessRes.error);
+      showToast('Package created but sessions failed: ' + (sessRes.error.message || 'unknown'), 'error');
+      await loadClientsData();
+      openClientDetail(leadId);
+      return;
+    }
+  }
+
+  if (stayPayload) {
+    const stayRes = await supabase.from('client_stays').insert({ ...stayPayload, package_id: packageId });
+    if (stayRes.error) {
+      console.error('Stay insert error:', stayRes.error);
+      showToast('Package created but stay failed: ' + (stayRes.error.message || 'unknown'), 'error');
+      await loadClientsData();
+      openClientDetail(leadId);
+      return;
+    }
+    showToast('Package + stay created', 'success');
   } else {
     showToast('Package created', 'success');
   }
