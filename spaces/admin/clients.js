@@ -1527,7 +1527,8 @@ function findSessionContext(sessionId) {
   return null;
 }
 
-function openScheduleSessionModal(sessionId) {
+function openScheduleSessionModal(sessionId, options = {}) {
+  const { prefilledStart = null, returnTo = 'drawer' } = options;
   const ctx = findSessionContext(sessionId);
   if (!ctx) { showToast('Session not found', 'error'); return; }
   const { session, pkg } = ctx;
@@ -1536,12 +1537,26 @@ function openScheduleSessionModal(sessionId) {
   const service = services.find(s => s.id === session.service_id);
   const clientName = client ? `${client.first_name || ''} ${client.last_name || ''}`.trim() : 'Client';
 
-  // Default: tomorrow at 10:00 local time
-  const def = new Date();
-  def.setDate(def.getDate() + 1);
-  def.setHours(10, 0, 0, 0);
+  // Default start: prefilled (calendar-click) if provided, else tomorrow at 10:00 local.
+  const def = prefilledStart ? new Date(prefilledStart) : (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(10, 0, 0, 0);
+    return d;
+  })();
   const pad = n => String(n).padStart(2, '0');
   const defaultStart = `${def.getFullYear()}-${pad(def.getMonth() + 1)}-${pad(def.getDate())}T${pad(def.getHours())}:${pad(def.getMinutes())}`;
+
+  // When invoked from the calendar, dismissing/saving returns to the schedule grid
+  // instead of re-opening the client drawer.
+  const dismiss = () => {
+    if (returnTo === 'schedule') {
+      const modal = document.getElementById('clients-modal');
+      if (modal) { modal.innerHTML = ''; modal.style.display = 'none'; }
+    } else {
+      openClientDetail(pkg.lead_id);
+    }
+  };
 
   const schedulableStaff = staffList.filter(u => u.role === 'admin' || u.role === 'oracle' || u.can_schedule);
   if (!schedulableStaff.length) {
@@ -1602,15 +1617,16 @@ function openScheduleSessionModal(sessionId) {
   `;
   modal.style.display = 'block';
 
-  document.getElementById('clients-modal-close-btn').addEventListener('click', () => openClientDetail(pkg.lead_id));
-  document.getElementById('sched-cancel').addEventListener('click', () => openClientDetail(pkg.lead_id));
+  document.getElementById('clients-modal-close-btn').addEventListener('click', dismiss);
+  document.getElementById('sched-cancel').addEventListener('click', dismiss);
   document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
-    if (e.target.id === 'clients-modal-overlay') openClientDetail(pkg.lead_id);
+    if (e.target.id === 'clients-modal-overlay') dismiss();
   });
-  document.getElementById('sched-save').addEventListener('click', () => saveScheduledSession(session.id));
+  document.getElementById('sched-save').addEventListener('click', () => saveScheduledSession(session.id, { returnTo }));
 }
 
-async function saveScheduledSession(sessionId) {
+async function saveScheduledSession(sessionId, options = {}) {
+  const { returnTo = 'drawer' } = options;
   const ctx = findSessionContext(sessionId);
   if (!ctx) { showToast('Session not found', 'error'); return; }
   const { session, pkg } = ctx;
@@ -1675,13 +1691,206 @@ async function saveScheduledSession(sessionId) {
     // the user switches to the Schedule tab.
     scheduleWeekStart = mondayOf(startDate);
     loadScheduleWeek();
-    openClientDetail(pkg.lead_id);
+    if (returnTo === 'schedule') {
+      const modal = document.getElementById('clients-modal');
+      if (modal) { modal.innerHTML = ''; modal.style.display = 'none'; }
+    } else {
+      openClientDetail(pkg.lead_id);
+    }
   } catch (e) {
     console.error('admin-book-session call failed:', e);
     showToast('Booking failed: ' + e.message, 'error');
     saveBtn.disabled = false;
     saveBtn.textContent = 'Book session';
   }
+}
+
+// ---------- Calendar-click booking picker ----------
+// Entry point when staff clicks an empty slot on the Schedule tab.
+// Step 1: pick a client. Step 2: pick one of that client's unscheduled sessions.
+// Once a session is picked, hand off to openScheduleSessionModal with the clicked
+// time pre-filled and returnTo='schedule' so we land back on the grid on save.
+
+let pickerPrefilledStart = null;
+let pickerSelectedClientId = null;
+let pickerClientSearch = '';
+
+function openBookingPickerModal(options = {}) {
+  pickerPrefilledStart = options.prefilledStart || null;
+  pickerSelectedClientId = null;
+  pickerClientSearch = '';
+  renderBookingPickerClientStep();
+}
+
+function closeBookingPicker() {
+  const modal = document.getElementById('clients-modal');
+  if (modal) { modal.innerHTML = ''; modal.style.display = 'none'; }
+  pickerPrefilledStart = null;
+  pickerSelectedClientId = null;
+  pickerClientSearch = '';
+}
+
+function clientHasUnscheduled(clientId) {
+  return packages.some(p => p.lead_id === clientId && (p.sessions || []).some(s => s.status === 'unscheduled'));
+}
+
+function formatPrefilledStartLabel(date) {
+  if (!date) return '';
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) +
+    ' \u00b7 ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function renderBookingPickerClientStep() {
+  const modal = document.getElementById('clients-modal');
+  if (!modal) return;
+
+  const needle = pickerClientSearch.trim().toLowerCase();
+  const filtered = clients
+    .filter(c => clientHasUnscheduled(c.id))
+    .filter(c => {
+      if (!needle) return true;
+      const name = `${c.first_name || ''} ${c.last_name || ''}`.toLowerCase();
+      const hay = [name, c.email || '', c.phone || ''].join(' ').toLowerCase();
+      return hay.includes(needle);
+    })
+    .sort((a, b) => `${a.first_name || ''} ${a.last_name || ''}`.localeCompare(`${b.first_name || ''} ${b.last_name || ''}`));
+
+  const rows = filtered.length
+    ? filtered.map(c => {
+        const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(unnamed)';
+        const unscheduled = packages
+          .filter(p => p.lead_id === c.id)
+          .reduce((n, p) => n + (p.sessions || []).filter(s => s.status === 'unscheduled').length, 0);
+        return `
+          <button type="button" class="crm-btn" data-picker-client="${c.id}" style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:#fff;">
+            <span>
+              <span style="font-weight:600;">${escapeHtml(name)}</span>
+              <span style="color:var(--text-muted,#888);font-size:12px;margin-left:8px;">${escapeHtml(c.email || c.phone || '')}</span>
+            </span>
+            <span style="font-size:12px;color:var(--text-muted,#666);">${unscheduled} unscheduled</span>
+          </button>
+        `;
+      }).join('')
+    : `<div style="padding:20px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No clients with unscheduled sessions match.</div>`;
+
+  const timeLabel = pickerPrefilledStart ? formatPrefilledStartLabel(pickerPrefilledStart) : 'No time selected';
+
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <div>
+            <h2>Book a session</h2>
+            <div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(timeLabel)} \u00b7 Step 1 of 2: pick a client</div>
+          </div>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <input type="text" class="crm-input" id="picker-client-search" placeholder="Search by name, email, or phone\u2026" value="${escapeHtml(pickerClientSearch)}" style="margin-bottom:10px;">
+          <div style="max-height:420px;overflow-y:auto;">${rows}</div>
+        </div>
+        <div class="crm-modal-footer">
+          <button class="crm-btn" id="picker-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeBookingPicker);
+  document.getElementById('picker-cancel').addEventListener('click', closeBookingPicker);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeBookingPicker();
+  });
+  const searchInput = document.getElementById('picker-client-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      pickerClientSearch = e.target.value;
+      renderBookingPickerClientStep();
+      const fresh = document.getElementById('picker-client-search');
+      if (fresh) { fresh.focus(); fresh.setSelectionRange(fresh.value.length, fresh.value.length); }
+    });
+  }
+  modal.querySelectorAll('[data-picker-client]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pickerSelectedClientId = btn.dataset.pickerClient;
+      renderBookingPickerSessionStep();
+    });
+  });
+}
+
+function renderBookingPickerSessionStep() {
+  const modal = document.getElementById('clients-modal');
+  if (!modal) return;
+  const client = clients.find(c => c.id === pickerSelectedClientId);
+  if (!client) { renderBookingPickerClientStep(); return; }
+
+  const clientName = `${client.first_name || ''} ${client.last_name || ''}`.trim() || '(unnamed)';
+
+  const unscheduled = [];
+  for (const p of packages) {
+    if (p.lead_id !== client.id) continue;
+    for (const s of (p.sessions || [])) {
+      if (s.status === 'unscheduled') unscheduled.push({ session: s, pkg: p });
+    }
+  }
+
+  const rows = unscheduled.length
+    ? unscheduled.map(({ session, pkg }) => {
+        const svc = services.find(x => x.id === session.service_id);
+        return `
+          <button type="button" class="crm-btn" data-picker-session="${session.id}" style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:#fff;">
+            <span>
+              <span style="font-weight:600;">${escapeHtml(svc?.name || 'Session')}</span>
+              <span style="color:var(--text-muted,#888);font-size:12px;margin-left:8px;">${svc?.duration_minutes || 60} min</span>
+            </span>
+            <span style="font-size:12px;color:var(--text-muted,#666);">${escapeHtml(pkg.name || '')}</span>
+          </button>
+        `;
+      }).join('')
+    : `<div style="padding:20px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No unscheduled sessions on this client\u2019s packages.</div>`;
+
+  const timeLabel = pickerPrefilledStart ? formatPrefilledStartLabel(pickerPrefilledStart) : 'No time selected';
+
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <div>
+            <h2>Book a session \u2014 ${escapeHtml(clientName)}</h2>
+            <div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(timeLabel)} \u00b7 Step 2 of 2: pick a session</div>
+          </div>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div style="max-height:420px;overflow-y:auto;">${rows}</div>
+        </div>
+        <div class="crm-modal-footer">
+          <button class="crm-btn" id="picker-back">\u2190 Back</button>
+          <button class="crm-btn" id="picker-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeBookingPicker);
+  document.getElementById('picker-cancel').addEventListener('click', closeBookingPicker);
+  document.getElementById('picker-back').addEventListener('click', renderBookingPickerClientStep);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeBookingPicker();
+  });
+  modal.querySelectorAll('[data-picker-session]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sessionId = btn.dataset.pickerSession;
+      const prefilledStart = pickerPrefilledStart;
+      // Reset picker state before handing off so we don't hold stale refs.
+      pickerPrefilledStart = null;
+      pickerSelectedClientId = null;
+      pickerClientSearch = '';
+      openScheduleSessionModal(sessionId, { prefilledStart, returnTo: 'schedule' });
+    });
+  });
 }
 
 // ---------- Schedule tab (Phase 5, live weekly grid) ----------
@@ -1865,7 +2074,7 @@ function renderSchedulePanel() {
     const isWeekend = dayIdx === 5 || dayIdx === 6;
     const bg = isToday ? '#fffbf2' : (isWeekend ? '#fafafa' : '#fff');
     return `
-      <div style="position:relative;height:${gridHeight}px;border-left:1px solid var(--border-color,#eee);background:${bg};">
+      <div data-empty-slot-day="${dayIdx}" style="position:relative;height:${gridHeight}px;border-left:1px solid var(--border-color,#eee);background:${bg};cursor:cell;">
         ${hours.map(() => `
           <div style="height:${SCHEDULE_CELL_PX}px;border-bottom:1px dashed var(--border-color,#f0f0f0);"></div>
           <div style="height:${SCHEDULE_CELL_PX}px;border-bottom:1px solid var(--border-color,#eee);"></div>
@@ -1890,6 +2099,7 @@ function renderSchedulePanel() {
           ${filtered.length} booking${filtered.length === 1 ? '' : 's'}
         </span>
         <select class="crm-select" id="sched-staff-filter">${staffOptions}</select>
+        <button class="crm-btn crm-btn-sm crm-btn-primary" id="sched-new-booking">+ Book session</button>
       </div>
     </div>
 
@@ -2981,6 +3191,24 @@ function handlePanelClicks(e) {
   const schedPill = target.closest('[data-sched-booking]');
   if (schedPill) {
     openBookingDetail(schedPill.dataset.schedBooking);
+    return;
+  }
+  if (target.id === 'sched-new-booking') {
+    openBookingPickerModal();
+    return;
+  }
+  const daySlot = target.closest('[data-empty-slot-day]');
+  if (daySlot) {
+    const rect = daySlot.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const rawMinutes = (y / SCHEDULE_CELL_PX) * 30;
+    const snapped = Math.max(0, Math.floor(rawMinutes / 15) * 15);
+    const dayIdx = parseInt(daySlot.dataset.emptySlotDay, 10);
+    const start = new Date(scheduleWeekStart);
+    start.setDate(start.getDate() + dayIdx);
+    start.setHours(SCHEDULE_START_HOUR, 0, 0, 0);
+    start.setMinutes(snapped);
+    openBookingPickerModal({ prefilledStart: start });
     return;
   }
 }
