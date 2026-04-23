@@ -1530,6 +1530,28 @@ function findSessionContext(sessionId) {
   return null;
 }
 
+// Find all other clients with an unscheduled session for the same service.
+// Used to populate the attendee multi-select when booking a class.
+function getEligibleClassAttendees(serviceId, excludeLeadId) {
+  const out = [];
+  for (const p of packages) {
+    if (p.lead_id === excludeLeadId) continue;
+    const sess = (p.sessions || []).find(s => s.service_id === serviceId && s.status === 'unscheduled');
+    if (!sess) continue;
+    const c = clients.find(x => x.id === p.lead_id);
+    if (!c) continue;
+    out.push({
+      lead_id: p.lead_id,
+      session_id: sess.id,
+      name: `${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || 'Client',
+      package_name: p.name,
+    });
+  }
+  // Sort by name for stable rendering.
+  out.sort((a, b) => a.name.localeCompare(b.name));
+  return out;
+}
+
 function openScheduleSessionModal(sessionId, options = {}) {
   const { prefilledStart = null, returnTo = 'drawer' } = options;
   const ctx = findSessionContext(sessionId);
@@ -1539,6 +1561,8 @@ function openScheduleSessionModal(sessionId, options = {}) {
   const client = clients.find(c => c.id === pkg.lead_id);
   const service = services.find(s => s.id === session.service_id);
   const clientName = client ? `${client.first_name || ''} ${client.last_name || ''}`.trim() : 'Client';
+  const isClass = !!service?.is_group_class;
+  const eligibleAttendees = isClass ? getEligibleClassAttendees(session.service_id, pkg.lead_id) : [];
 
   // Default start: prefilled (calendar-click) if provided, else tomorrow at 10:00 local.
   const def = prefilledStart ? new Date(prefilledStart) : (() => {
@@ -1567,17 +1591,45 @@ function openScheduleSessionModal(sessionId, options = {}) {
     return;
   }
 
+  const capacityLabel = isClass && service?.max_capacity
+    ? ` &middot; capacity ${service.max_capacity}`
+    : '';
+
+  const attendeeSection = isClass ? `
+            <div class="crm-form-field" style="grid-column:1 / -1;">
+              <label>Additional attendees${service?.max_capacity ? ` (max ${service.max_capacity - 1} more)` : ''}</label>
+              ${eligibleAttendees.length === 0 ? `
+                <div style="padding:10px 12px;background:var(--bg,#faf9f6);border-radius:8px;font-size:12px;color:var(--text-muted,#666);">
+                  No other clients have an unscheduled ${escapeHtml(service?.name || 'class')} credit right now.
+                </div>
+              ` : `
+                <div id="sched-attendees" style="max-height:200px;overflow-y:auto;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:6px 10px;">
+                  ${eligibleAttendees.map(a => `
+                    <label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-weight:400;font-size:13px;cursor:pointer;">
+                      <input type="checkbox" class="sched-attendee-cb" data-lead-id="${a.lead_id}" data-session-id="${a.session_id}">
+                      <span>${escapeHtml(a.name)}</span>
+                      <span style="color:var(--text-muted,#888);font-size:11px;">&middot; ${escapeHtml(a.package_name)}</span>
+                    </label>
+                  `).join('')}
+                </div>
+                <div style="margin-top:4px;font-size:11px;color:var(--text-muted,#888);">
+                  <span id="sched-attendee-count">1</span> attending (including ${escapeHtml(clientName)})
+                </div>
+              `}
+            </div>
+  ` : '';
+
   const modal = document.getElementById('clients-modal');
   modal.innerHTML = `
     <div class="crm-modal-overlay" id="clients-modal-overlay">
       <div class="crm-modal-content">
         <div class="crm-modal-header">
-          <h2>Schedule Session \u2014 ${escapeHtml(clientName)}</h2>
+          <h2>${isClass ? 'Schedule Class' : 'Schedule Session'} \u2014 ${escapeHtml(clientName)}</h2>
           <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
         </div>
         <div class="crm-modal-body">
           <div style="padding:10px 12px;background:var(--bg,#faf9f6);border-radius:8px;margin-bottom:14px;font-size:12px;color:var(--text-muted,#666);">
-            ${escapeHtml(service?.name || 'Service')} &middot; ${service?.duration_minutes || 60} min &middot; package &ldquo;${escapeHtml(pkg.name)}&rdquo;
+            ${escapeHtml(service?.name || 'Service')} &middot; ${service?.duration_minutes || 60} min &middot; package &ldquo;${escapeHtml(pkg.name)}&rdquo;${capacityLabel}
           </div>
           <div class="crm-form-grid">
             <div class="crm-form-field">
@@ -1605,6 +1657,7 @@ function openScheduleSessionModal(sessionId, options = {}) {
                 ${sessionSpaces.map(sp => `<option value="${sp.id}">${escapeHtml(sp.name)}</option>`).join('')}
               </select>
             </div>
+            ${attendeeSection}
             <div class="crm-form-field" style="grid-column:1 / -1;">
               <label>Notes</label>
               <textarea class="crm-textarea" id="sched-notes" rows="3" placeholder="Optional context"></textarea>
@@ -1613,7 +1666,7 @@ function openScheduleSessionModal(sessionId, options = {}) {
         </div>
         <div class="crm-modal-footer">
           <button class="crm-btn" id="sched-cancel">Cancel</button>
-          <button class="crm-btn crm-btn-primary" id="sched-save" data-session-id="${session.id}">Book session</button>
+          <button class="crm-btn crm-btn-primary" id="sched-save" data-session-id="${session.id}">${isClass ? 'Book class' : 'Book session'}</button>
         </div>
       </div>
     </div>
@@ -1626,6 +1679,24 @@ function openScheduleSessionModal(sessionId, options = {}) {
     if (e.target.id === 'clients-modal-overlay') dismiss();
   });
   document.getElementById('sched-save').addEventListener('click', () => saveScheduledSession(session.id, { returnTo }));
+
+  if (isClass && eligibleAttendees.length) {
+    const countEl = document.getElementById('sched-attendee-count');
+    const cap = service?.max_capacity || null;
+    document.querySelectorAll('.sched-attendee-cb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('.sched-attendee-cb:checked').length;
+        const total = checked + 1; // host
+        if (countEl) countEl.textContent = String(total);
+        if (cap && total > cap) {
+          cb.checked = false;
+          showToast(`Capacity is ${cap}`, 'error');
+          const after = document.querySelectorAll('.sched-attendee-cb:checked').length;
+          if (countEl) countEl.textContent = String(after + 1);
+        }
+      });
+    });
+  }
 }
 
 async function saveScheduledSession(sessionId, options = {}) {
@@ -1633,6 +1704,8 @@ async function saveScheduledSession(sessionId, options = {}) {
   const ctx = findSessionContext(sessionId);
   if (!ctx) { showToast('Session not found', 'error'); return; }
   const { session, pkg } = ctx;
+  const service = services.find(s => s.id === session.service_id);
+  const isClass = !!service?.is_group_class;
 
   const facilitatorId = document.getElementById('sched-staff').value;
   const startLocal = document.getElementById('sched-start').value;
@@ -1647,6 +1720,22 @@ async function saveScheduledSession(sessionId, options = {}) {
   const startDate = new Date(startLocal);
   if (isNaN(startDate.getTime())) { showToast('Invalid start time', 'error'); return; }
 
+  // Build the attendees array for classes. Host is always the first entry.
+  let classAttendees = null;
+  if (isClass) {
+    classAttendees = [{ lead_id: pkg.lead_id, package_session_id: session.id }];
+    document.querySelectorAll('.sched-attendee-cb:checked').forEach(cb => {
+      classAttendees.push({
+        lead_id: cb.dataset.leadId,
+        package_session_id: cb.dataset.sessionId,
+      });
+    });
+    if (service?.max_capacity && classAttendees.length > service.max_capacity) {
+      showToast(`Capacity is ${service.max_capacity}`, 'error');
+      return;
+    }
+  }
+
   const saveBtn = document.getElementById('sched-save');
   saveBtn.disabled = true;
   saveBtn.textContent = 'Booking\u2026';
@@ -1657,6 +1746,27 @@ async function saveScheduledSession(sessionId, options = {}) {
     const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
     const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
+    const payload = isClass
+      ? {
+          service_id: session.service_id,
+          facilitator_id: facilitatorId,
+          start_datetime: startDate.toISOString(),
+          duration_minutes: duration || undefined,
+          space_id: spaceId,
+          attendees: classAttendees,
+          notes,
+        }
+      : {
+          lead_id: pkg.lead_id,
+          service_id: session.service_id,
+          facilitator_id: facilitatorId,
+          start_datetime: startDate.toISOString(),
+          duration_minutes: duration || undefined,
+          space_id: spaceId,
+          package_session_id: session.id,
+          notes,
+        };
+
     const resp = await fetch(supabaseUrl + '/functions/v1/admin-book-session', {
       method: 'POST',
       headers: {
@@ -1664,16 +1774,7 @@ async function saveScheduledSession(sessionId, options = {}) {
         'Authorization': 'Bearer ' + token,
         'apikey': anonKey,
       },
-      body: JSON.stringify({
-        lead_id: pkg.lead_id,
-        service_id: session.service_id,
-        facilitator_id: facilitatorId,
-        start_datetime: startDate.toISOString(),
-        duration_minutes: duration || undefined,
-        space_id: spaceId,
-        package_session_id: session.id,
-        notes,
-      }),
+      body: JSON.stringify(payload),
     });
     const json = await resp.json().catch(() => ({}));
 
@@ -1684,11 +1785,11 @@ async function saveScheduledSession(sessionId, options = {}) {
         showToast('Booking failed: ' + (json.error || resp.status), 'error');
       }
       saveBtn.disabled = false;
-      saveBtn.textContent = 'Book session';
+      saveBtn.textContent = isClass ? 'Book class' : 'Book session';
       return;
     }
 
-    showToast('Session scheduled', 'success');
+    showToast(isClass ? `Class booked (${(json.attendee_count || classAttendees?.length || 1)} attending)` : 'Session scheduled', 'success');
     await loadClientsData();
     // Jump the weekly grid to the week of the new booking so it's visible when
     // the user switches to the Schedule tab.
@@ -1954,24 +2055,45 @@ async function loadScheduleWeek() {
   const end = new Date(scheduleWeekStart);
   end.setDate(end.getDate() + 7);
 
-  // Only show bookings tied to an AWKN client (lead_id set). Public-booking-page
-  // events and Google-synced calendar holds have lead_id null and don't belong here.
+  // Admin-created bookings (1:1 or class) have profile_id null. Public-booking-page
+  // events and Google-synced calendar holds have profile_id set and don't belong here.
   const { data, error } = await supabase
     .from('scheduling_bookings')
     .select('id, start_datetime, end_datetime, staff_user_id, facilitator_id, service_id, lead_id, booker_name, booker_email, booker_phone, space_id, status, cancelled_at, package_session_id, notes')
     .gte('start_datetime', start.toISOString())
     .lt('start_datetime', end.toISOString())
     .is('cancelled_at', null)
-    .not('lead_id', 'is', null)
+    .is('profile_id', null)
     .order('start_datetime');
 
   if (error) {
     console.error('schedule load error:', error);
     showToast('Failed to load schedule', 'error');
     scheduleBookings = [];
-  } else {
-    scheduleBookings = data || [];
+    renderSchedulePanel();
+    return;
   }
+  const bookings = data || [];
+
+  // Fetch attendee rosters for any class bookings in this window.
+  const bookingIds = bookings.map(b => b.id);
+  let attendeesByBooking = new Map();
+  if (bookingIds.length) {
+    const { data: attData, error: attErr } = await supabase
+      .from('scheduling_booking_attendees')
+      .select('booking_id, lead_id, package_session_id, status')
+      .in('booking_id', bookingIds)
+      .neq('status', 'cancelled');
+    if (attErr) {
+      console.warn('attendee load error:', attErr);
+    } else {
+      for (const a of attData || []) {
+        if (!attendeesByBooking.has(a.booking_id)) attendeesByBooking.set(a.booking_id, []);
+        attendeesByBooking.get(a.booking_id).push(a);
+      }
+    }
+  }
+  scheduleBookings = bookings.map(b => ({ ...b, attendees: attendeesByBooking.get(b.id) || [] }));
   renderSchedulePanel();
 }
 
@@ -2015,8 +2137,13 @@ function renderSchedulePanel() {
     const heightPx = Math.max(SCHEDULE_CELL_PX - 4, (durationMin / 30) * SCHEDULE_CELL_PX - 2);
     const isShort = heightPx < 54; // 30-min pill
 
-    const svc = escapeHtml(getServiceName(b.service_id) || 'Session');
-    const client = escapeHtml(b.booker_name || 'Client');
+    const svcObj = services.find(s => s.id === b.service_id);
+    const isClassBooking = !!svcObj?.is_group_class;
+    const svc = escapeHtml(svcObj?.name || 'Session');
+    const attendeeCount = (b.attendees || []).length;
+    const client = isClassBooking
+      ? escapeHtml(`${attendeeCount} attending`)
+      : escapeHtml(b.booker_name || 'Client');
     const staff = getAssigneeName(b) || 'Unassigned';
     const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
     const color = serviceColor(b.service_id);
@@ -2153,6 +2280,7 @@ function openBookingDetail(bookingId) {
   const svc = services.find(s => s.id === b.service_id);
   const svcName = svc?.name || 'Session';
   const durationMin = svc?.duration_minutes || Math.round((new Date(b.end_datetime) - new Date(b.start_datetime)) / 60000);
+  const isClassBooking = !!svc?.is_group_class;
 
   const start = new Date(b.start_datetime);
   const end = new Date(b.end_datetime);
@@ -2168,6 +2296,12 @@ function openBookingDetail(bookingId) {
     ? [client.email, client.phone].filter(Boolean).join(' \u00b7 ')
     : [b.booker_email, b.booker_phone].filter(Boolean).join(' \u00b7 ');
 
+  const attendeeRows = (b.attendees || []).map(a => {
+    const c = clients.find(x => x.id === a.lead_id);
+    const n = c ? (`${c.first_name || ''} ${c.last_name || ''}`.trim() || c.email || 'Client') : 'Client';
+    return { id: a.lead_id, name: n };
+  });
+
   const space = b.space_id ? sessionSpaces.find(s => s.id === b.space_id) : null;
   const spaceLabel = space?.name || (b.space_id ? 'Assigned room' : '\u2014');
 
@@ -2181,17 +2315,18 @@ function openBookingDetail(bookingId) {
     </div>
   `;
 
-  const openClientBtn = b.lead_id
+  const openClientBtn = !isClassBooking && b.lead_id
     ? `<button class="crm-btn" id="btn-booking-open-client">Open client</button>`
     : '';
 
   // Only offer cancel/reschedule if the booking is still active (not already cancelled).
   const isActive = !b.cancelled_at && b.status !== 'cancelled';
   const hasPackageSession = !!b.package_session_id;
+  const cancelLabel = isClassBooking ? 'Cancel class' : 'Cancel session';
   const actionBtns = isActive
     ? `
-      <button class="crm-btn" id="btn-booking-cancel" style="color:#b91c1c;border-color:#fca5a5;">Cancel session</button>
-      ${hasPackageSession ? `<button class="crm-btn crm-btn-primary" id="btn-booking-reschedule">Reschedule</button>` : ''}
+      <button class="crm-btn" id="btn-booking-cancel" style="color:#b91c1c;border-color:#fca5a5;">${cancelLabel}</button>
+      ${hasPackageSession && !isClassBooking ? `<button class="crm-btn crm-btn-primary" id="btn-booking-reschedule">Reschedule</button>` : ''}
     `
     : '';
 
@@ -2205,7 +2340,11 @@ function openBookingDetail(bookingId) {
         </div>
         <div class="crm-modal-body">
           ${row('When', `${escapeHtml(dateLabel)}<div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${escapeHtml(timeLabel)} &middot; ${durationMin} min</div>`)}
-          ${row('Client', `<div>${escapeHtml(clientName)}</div>${clientContact ? `<div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${escapeHtml(clientContact)}</div>` : ''}`)}
+          ${isClassBooking
+            ? row('Attendees', attendeeRows.length
+                ? attendeeRows.map(a => `<div data-attendee-open="${a.id}" style="font-size:13px;padding:2px 0;cursor:pointer;color:var(--accent,#2563eb);">${escapeHtml(a.name)}</div>`).join('')
+                : '<span style="color:var(--text-muted,#888);">No attendees</span>')
+            : row('Client', `<div>${escapeHtml(clientName)}</div>${clientContact ? `<div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${escapeHtml(clientContact)}</div>` : ''}`)}
           ${row('Staff', escapeHtml(staff))}
           ${row('Room', escapeHtml(spaceLabel))}
           ${row('Status', `<span style="text-transform:capitalize;">${escapeHtml(statusLabel)}</span>`)}
@@ -2230,15 +2369,24 @@ function openBookingDetail(bookingId) {
   document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'clients-modal-overlay') close();
   });
-  if (b.lead_id) {
+  if (!isClassBooking && b.lead_id) {
     document.getElementById('btn-booking-open-client').addEventListener('click', () => {
       close();
       openClientDetail(b.lead_id);
     });
   }
+  if (isClassBooking) {
+    modal.querySelectorAll('[data-attendee-open]').forEach(el => {
+      el.addEventListener('click', () => {
+        const leadId = el.dataset.attendeeOpen;
+        close();
+        openClientDetail(leadId);
+      });
+    });
+  }
   if (isActive) {
     document.getElementById('btn-booking-cancel').addEventListener('click', () => cancelBooking(b.id, { reschedule: false }));
-    if (hasPackageSession) {
+    if (hasPackageSession && !isClassBooking) {
       document.getElementById('btn-booking-reschedule').addEventListener('click', () => cancelBooking(b.id, { reschedule: true }));
     }
   }
@@ -2251,9 +2399,13 @@ async function cancelBooking(bookingId, { reschedule = false } = {}) {
   const booking = scheduleBookings.find(x => x.id === bookingId);
   if (!booking) { showToast('Booking not found', 'error'); return; }
 
-  if (!reschedule && !confirm('Cancel this session? The session credit will go back to the client\u2019s remaining balance.')) {
-    return;
-  }
+  const svc = services.find(s => s.id === booking.service_id);
+  const isClassBooking = !!svc?.is_group_class;
+
+  const confirmMsg = isClassBooking
+    ? 'Cancel this class? Every attendee gets their session credit back.'
+    : 'Cancel this session? The session credit will go back to the client\u2019s remaining balance.';
+  if (!reschedule && !confirm(confirmMsg)) return;
 
   // 1) Mark the booking cancelled. `cancelled_at IS NULL` is how the schedule
   //    grid filters, so this is enough to hide it from the week view.
@@ -2267,24 +2419,39 @@ async function cancelBooking(bookingId, { reschedule = false } = {}) {
     return;
   }
 
-  // 2) Free the session credit so it shows up again in Sessions Remaining.
-  const sessionId = booking.package_session_id || null;
-  if (sessionId) {
+  // 2) Collect every package_session_id that this booking held — the 1:1 slot
+  //    lives on the booking itself, class slots live on the attendee rows.
+  const sessionIds = [];
+  if (booking.package_session_id) sessionIds.push(booking.package_session_id);
+  for (const a of booking.attendees || []) {
+    if (a.package_session_id) sessionIds.push(a.package_session_id);
+  }
+
+  if (sessionIds.length) {
     const { error: sErr } = await supabase.from('client_package_sessions')
       .update({ status: 'unscheduled', booking_id: null, scheduled_at: null })
-      .eq('id', sessionId);
+      .in('id', sessionIds);
     if (sErr) {
-      console.error('free session error:', sErr);
-      showToast('Booking cancelled, but failed to release session credit.', 'error');
+      console.error('free sessions error:', sErr);
+      showToast('Cancelled, but failed to release some session credits.', 'error');
     }
   }
 
-  showToast(reschedule ? 'Pick a new time' : 'Session cancelled', 'success');
+  // Flip attendee rows themselves to cancelled so they don't reappear in
+  // roster reads if the booking row ever gets reactivated.
+  if (isClassBooking) {
+    await supabase.from('scheduling_booking_attendees')
+      .update({ status: 'cancelled', updated_at: nowIso })
+      .eq('booking_id', bookingId);
+  }
+
+  showToast(reschedule ? 'Pick a new time' : (isClassBooking ? 'Class cancelled' : 'Session cancelled'), 'success');
   await loadClientsData();
   await loadScheduleWeek();
 
-  if (reschedule && sessionId) {
-    openScheduleSessionModal(sessionId);
+  const rescheduleSessionId = booking.package_session_id || null;
+  if (reschedule && rescheduleSessionId && !isClassBooking) {
+    openScheduleSessionModal(rescheduleSessionId);
   } else {
     // Close the modal
     const modal = document.getElementById('clients-modal');
@@ -2426,7 +2593,11 @@ function renderServicesPanel() {
           <tbody>
             ${visible.map(s => `
               <tr class="clients-service-row" data-service-id="${s.id}" style="cursor:pointer;">
-                <td><strong>${escapeHtml(s.name)}</strong>${s.description ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(s.description)}</div>` : ''}</td>
+                <td>
+                  <strong>${escapeHtml(s.name)}</strong>
+                  ${s.is_group_class ? `<span style="margin-left:6px;display:inline-block;padding:1px 6px;border-radius:10px;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:600;">Class${s.max_capacity ? ` · ${s.max_capacity}` : ''}</span>` : ''}
+                  ${s.description ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(s.description)}</div>` : ''}
+                </td>
                 <td><code style="font-size:12px;color:var(--text-muted,#888);">${escapeHtml(s.slug)}</code></td>
                 <td>${s.duration_minutes} min</td>
                 <td>${formatPriceCents(s.default_price_cents)}</td>
@@ -2929,6 +3100,13 @@ function openServiceModal(service = null) {
             <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
               <input type="checkbox" id="service-active" ${service ? (service.is_active ? 'checked' : '') : 'checked'}> Active
             </label>
+            <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
+              <input type="checkbox" id="service-is-class" ${service?.is_group_class ? 'checked' : ''}> Group class (multiple attendees)
+            </label>
+          </div>
+          <div class="crm-form-field" id="service-capacity-wrap" style="margin-top:12px;${service?.is_group_class ? '' : 'display:none;'}">
+            <label>Max capacity (optional)</label>
+            <input type="number" class="crm-input" id="service-capacity" value="${service?.max_capacity ?? ''}" min="1" placeholder="e.g. 8">
           </div>
           <div class="crm-form-field" style="margin-top:12px;">
             <label>Description</label>
@@ -2962,6 +3140,10 @@ function openServiceModal(service = null) {
   });
   document.getElementById('btn-cancel-service').addEventListener('click', closeModal);
   document.getElementById('btn-save-service').addEventListener('click', () => saveService(service));
+  document.getElementById('service-is-class').addEventListener('change', (e) => {
+    const wrap = document.getElementById('service-capacity-wrap');
+    if (wrap) wrap.style.display = e.target.checked ? '' : 'none';
+  });
   if (isEdit) {
     document.getElementById('btn-delete-service').addEventListener('click', () => deleteService(service));
   }
@@ -2982,6 +3164,13 @@ async function saveService(existing) {
   const priceCents = Math.round(priceDollars * 100);
   const requiresUpfront = document.getElementById('service-upfront').checked;
   const isActive = document.getElementById('service-active').checked;
+  const isGroupClass = document.getElementById('service-is-class').checked;
+  const rawCapacity = document.getElementById('service-capacity').value.trim();
+  const maxCapacity = isGroupClass && rawCapacity ? parseInt(rawCapacity, 10) : null;
+  if (isGroupClass && maxCapacity !== null && (!Number.isFinite(maxCapacity) || maxCapacity < 1)) {
+    showToast('Max capacity must be a positive integer', 'error');
+    return;
+  }
   const description = document.getElementById('service-description').value.trim() || null;
 
   const payload = {
@@ -2992,6 +3181,8 @@ async function saveService(existing) {
     default_price_cents: priceCents,
     requires_upfront_payment: requiresUpfront,
     is_active: isActive,
+    is_group_class: isGroupClass,
+    max_capacity: maxCapacity,
     updated_at: new Date().toISOString(),
   };
 
