@@ -284,18 +284,20 @@ function buildClientContext(c, now) {
     .filter(s => new Date(s.check_in_at) > now)
     .sort((a, b) => new Date(a.check_in_at) - new Date(b.check_in_at))[0];
 
-  // Sessions remaining = not completed and not cancelled, across *all* active
-  // packages (keyed by service_id so the drawer can show per-service counts).
+  // Sessions remaining = unscheduled only, across *all* active packages
+  // (keyed by service_id so the drawer can show per-service counts).
+  // Once a session is booked (status='scheduled') it no longer counts as
+  // remaining to schedule.
   const remainingByService = new Map();
   for (const p of activePkgs) {
     for (const s of (p.sessions || [])) {
-      if (s.status === 'completed' || s.status === 'cancelled') continue;
+      if (s.status !== 'unscheduled') continue;
       remainingByService.set(s.service_id, (remainingByService.get(s.service_id) || 0) + 1);
     }
   }
 
   const hasRemainingDaySession = dayPkgs.some(p =>
-    (p.sessions || []).some(s => s.status !== 'completed' && s.status !== 'cancelled')
+    (p.sessions || []).some(s => s.status === 'unscheduled')
   );
 
   return {
@@ -754,11 +756,12 @@ function openClientDetail(leadId) {
   const clientStays = getClientStays(leadId);
 
   // Aggregate sessions remaining per service across all active packages.
+  // Only unscheduled — once booked the session no longer counts as remaining.
   const remainingByService = new Map();
   for (const p of pkgs) {
     if (p.status !== 'active') continue;
     for (const s of (p.sessions || [])) {
-      if (s.status === 'completed' || s.status === 'cancelled') continue;
+      if (s.status !== 'unscheduled') continue;
       remainingByService.set(s.service_id, (remainingByService.get(s.service_id) || 0) + 1);
     }
   }
