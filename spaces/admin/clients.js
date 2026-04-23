@@ -16,7 +16,12 @@ let services = [];
 let showArchivedServices = false;
 
 // Service package templates (retreat / treatment packages from crm_service_packages)
+// servicePackageTemplates = active + 'within' business line only (used by client package modal)
+// allServicePackages = full catalog including inactive (used by admin Packages panel)
 let servicePackageTemplates = [];
+let allServicePackages = [];
+let packageItemsByPkgId = new Map(); // package_id -> [{service_id, quantity, sort_order}]
+let showInactivePackages = false;
 
 // Facilitators directory + their service assignments (facilitator_id -> Set of service_id)
 let facilitators = [];
@@ -104,20 +109,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAllData() {
   // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
-  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes, facRes, facSvcRes] = await Promise.all([
+  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes, pkgItemsRes, facRes, facSvcRes] = await Promise.all([
     supabase.from('services').select('*').order('name'),
     supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
     supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
     supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
-    supabase.from('crm_service_packages').select('id, name, slug, price_regular, description, includes, business_line, is_active').eq('is_active', true).eq('business_line', 'within').order('sort_order').order('name'),
+    supabase.from('crm_service_packages').select('id, name, slug, price_regular, price_promo, description, includes, business_line, is_active, sort_order').eq('business_line', 'within').order('sort_order').order('name'),
+    supabase.from('crm_service_package_items').select('package_id, service_id, quantity, sort_order'),
     supabase.from('facilitators').select('*').order('last_name', { nullsFirst: false }).order('first_name'),
     supabase.from('facilitator_services').select('facilitator_id, service_id'),
   ]);
 
   if (servicesRes.error) console.error('services load error:', servicesRes.error);
   services = servicesRes.data || [];
-  servicePackageTemplates = svcPkgRes.data || [];
+  allServicePackages = svcPkgRes.data || [];
+  servicePackageTemplates = allServicePackages.filter(p => p.is_active);
+  packageItemsByPkgId = new Map();
+  (pkgItemsRes.data || []).forEach(row => {
+    if (!packageItemsByPkgId.has(row.package_id)) packageItemsByPkgId.set(row.package_id, []);
+    packageItemsByPkgId.get(row.package_id).push(row);
+  });
+  packageItemsByPkgId.forEach(arr => arr.sort((a, b) => (a.sort_order ?? 100) - (b.sort_order ?? 100)));
   facilitators = facRes.data || [];
   facilitatorServicesByFacId = new Map();
   (facSvcRes.data || []).forEach(row => {
@@ -859,6 +872,9 @@ function onTemplateChange(e) {
   const hintEl = document.getElementById('pkg-template-hint');
   const retreatSection = document.getElementById('pkg-retreat-section');
 
+  // Always reset session-credit inputs to 0 before applying template items
+  document.querySelectorAll('.pkg-session-count').forEach(inp => { inp.value = 0; });
+
   if (templateId === 'custom') {
     hintEl.style.display = 'none';
     retreatSection.style.display = 'none';
@@ -874,10 +890,28 @@ function onTemplateChange(e) {
   const occ = parseRetreatOccupancy(tpl.name);
   if (occ) occEl.value = occ;
 
-  const includesList = Array.isArray(tpl.includes) ? tpl.includes : [];
+  // Auto-populate session credits from the structured package items catalog
+  const items = packageItemsByPkgId.get(tpl.id) || [];
+  items.forEach(it => {
+    const inp = document.querySelector(`.pkg-session-count[data-service-id="${it.service_id}"]`);
+    if (inp) inp.value = it.quantity;
+  });
+
   const hintParts = [];
   if (tpl.description) hintParts.push(escapeHtml(tpl.description));
-  if (includesList.length) hintParts.push('Includes: ' + includesList.map(escapeHtml).join(' &middot; '));
+  if (items.length) {
+    const svcById = new Map(services.map(s => [s.id, s]));
+    const included = items.map(it => {
+      const svc = svcById.get(it.service_id);
+      if (!svc) return null;
+      return `${it.quantity}\u00d7 ${escapeHtml(svc.name)}`;
+    }).filter(Boolean);
+    if (included.length) hintParts.push('Includes: ' + included.join(' &middot; '));
+  } else {
+    // Fall back to the old free-text includes list when no structured items
+    const includesList = Array.isArray(tpl.includes) ? tpl.includes : [];
+    if (includesList.length) hintParts.push('Includes: ' + includesList.map(escapeHtml).join(' &middot; '));
+  }
   hintEl.innerHTML = hintParts.join('<br>');
   hintEl.style.display = hintParts.length ? 'block' : 'none';
 
@@ -1743,9 +1777,237 @@ function renderServicesPanel() {
     `;
   }
 
+  html += renderPackagesSection();
   html += renderFacilitatorsSection();
 
   panel.innerHTML = html;
+}
+
+function renderPackagesSection() {
+  const visible = showInactivePackages ? allServicePackages : allServicePackages.filter(p => p.is_active);
+  const svcById = new Map(services.map(s => [s.id, s]));
+
+  let html = `
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border,#333);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="margin:0;font-size:16px;">Packages</h3>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted,#888);">
+            <input type="checkbox" id="toggle-show-inactive-packages" ${showInactivePackages ? 'checked' : ''}> Show inactive
+          </label>
+          <button class="crm-btn crm-btn-primary" id="btn-new-package-template">+ New Package</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted,#888);margin-bottom:12px;">
+        Master package catalog. Selecting a package on a client auto-populates the included sessions.
+      </div>
+  `;
+
+  if (visible.length === 0) {
+    html += `
+      <div style="padding:28px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">
+        No packages yet. Click "+ New Package" to add one.
+      </div>
+    </div>`;
+    return html;
+  }
+
+  html += `
+    <div class="crm-table-wrap">
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Includes</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.map(p => {
+            const items = packageItemsByPkgId.get(p.id) || [];
+            const chips = items.map(it => {
+              const svc = svcById.get(it.service_id);
+              if (!svc) return '';
+              const qty = it.quantity > 1 ? `${it.quantity}&times; ` : '';
+              return `<span style="display:inline-block;padding:2px 10px;margin:1px 3px 1px 0;background:#f3ece0;color:#6b4a1f;border:1px solid #e6d9c2;border-radius:999px;font-size:11px;font-weight:500;">${qty}${escapeHtml(svc.name)}</span>`;
+            }).filter(Boolean).join('');
+            const priceDisplay = p.price_regular ? `$${Number(p.price_regular).toLocaleString()}` : '—';
+            return `
+              <tr class="clients-package-row" data-package-id="${p.id}" style="cursor:pointer;">
+                <td><strong>${escapeHtml(p.name)}</strong>${p.description ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(p.description)}</div>` : ''}</td>
+                <td>${priceDisplay}</td>
+                <td style="max-width:420px;">${chips || '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+                <td>${p.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
+                <td><button class="crm-btn crm-btn-xs" data-edit-package="${p.id}">Edit</button></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  `;
+  return html;
+}
+
+function openPackageTemplateModal(pkg = null) {
+  const isEdit = !!pkg;
+  const existingItems = isEdit ? (packageItemsByPkgId.get(pkg.id) || []) : [];
+  const qtyByServiceId = new Map(existingItems.map(it => [it.service_id, it.quantity]));
+  const activeServices = services.filter(s => s.is_active);
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <h2>${isEdit ? 'Edit Package' : 'New Package'}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>Name *</label>
+              <input type="text" class="crm-input" id="pkgt-name" value="${escapeHtml(pkg?.name || '')}" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Slug *</label>
+              <input type="text" class="crm-input" id="pkgt-slug" value="${escapeHtml(pkg?.slug || '')}" placeholder="residential_6d_private" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Price ($)</label>
+              <input type="number" class="crm-input" id="pkgt-price" value="${pkg?.price_regular != null ? Number(pkg.price_regular) : 0}" step="0.01" min="0">
+            </div>
+            <div class="crm-form-field">
+              <label>Promo price ($)</label>
+              <input type="number" class="crm-input" id="pkgt-promo" value="${pkg?.price_promo != null ? Number(pkg.price_promo) : ''}" step="0.01" min="0" placeholder="optional">
+            </div>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label>Description</label>
+            <textarea class="crm-textarea" id="pkgt-desc" rows="2">${escapeHtml(pkg?.description || '')}</textarea>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
+              <input type="checkbox" id="pkgt-active" ${pkg ? (pkg.is_active ? 'checked' : '') : 'checked'}> Active
+            </label>
+          </div>
+
+          <div style="margin-top:16px;">
+            <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Included services</label>
+            <div style="font-size:11px;color:var(--text-muted,#888);margin-bottom:8px;">
+              Set the quantity of each service this package includes. 0 means not included.
+            </div>
+            ${activeServices.length === 0
+              ? `<div style="font-size:12px;color:var(--text-muted,#888);">No active services. Add one above first.</div>`
+              : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+                  ${activeServices.map(s => {
+                    const qty = qtyByServiceId.get(s.id) || 0;
+                    return `
+                      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border,#ddd);border-radius:6px;background:#fff;">
+                        <div style="flex:1;min-width:0;">
+                          <div style="font-size:13px;color:var(--text,#444);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(s.name)}</div>
+                          <div style="font-size:11px;color:var(--text-muted,#888);">${s.duration_minutes} min</div>
+                        </div>
+                        <input type="number" class="crm-input pkgt-item-qty" data-service-id="${s.id}" value="${qty}" min="0" max="50" style="width:64px;">
+                      </div>
+                    `;
+                  }).join('')}
+                </div>`
+            }
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          ${isEdit ? '<button class="crm-btn crm-btn-danger" id="btn-delete-package-template">Delete</button>' : '<span></span>'}
+          <div>
+            <button class="crm-btn" id="btn-cancel-package-template">Cancel</button>
+            <button class="crm-btn crm-btn-primary" id="btn-save-package-template">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeModal();
+  });
+  document.getElementById('btn-cancel-package-template').addEventListener('click', closeModal);
+  document.getElementById('btn-save-package-template').addEventListener('click', () => savePackageTemplate(pkg));
+  if (isEdit) {
+    document.getElementById('btn-delete-package-template').addEventListener('click', () => deletePackageTemplate(pkg));
+  }
+}
+
+async function savePackageTemplate(existing) {
+  const name = document.getElementById('pkgt-name').value.trim();
+  const slug = document.getElementById('pkgt-slug').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  if (!slug) { showToast('Slug is required', 'error'); return; }
+
+  const priceRaw = document.getElementById('pkgt-price').value;
+  const promoRaw = document.getElementById('pkgt-promo').value;
+
+  const payload = {
+    name,
+    slug,
+    price_regular: priceRaw === '' ? 0 : Number(priceRaw),
+    price_promo: promoRaw === '' ? null : Number(promoRaw),
+    description: document.getElementById('pkgt-desc').value.trim() || null,
+    is_active: document.getElementById('pkgt-active').checked,
+    business_line: 'within',
+  };
+
+  let packageId;
+  if (existing) {
+    const { error } = await supabase.from('crm_service_packages').update(payload).eq('id', existing.id);
+    if (error) { console.error(error); showToast(error.message || 'Failed to save', 'error'); return; }
+    packageId = existing.id;
+  } else {
+    const { data, error } = await supabase.from('crm_service_packages').insert(payload).select().single();
+    if (error) { console.error(error); showToast(error.message || 'Failed to save', 'error'); return; }
+    packageId = data.id;
+  }
+
+  // Sync package items: delete all, re-insert with qty > 0
+  const delRes = await supabase.from('crm_service_package_items').delete().eq('package_id', packageId);
+  if (delRes.error) { console.error(delRes.error); showToast('Saved, but failed to update items', 'error'); }
+
+  const itemRows = [];
+  let sortIdx = 10;
+  document.querySelectorAll('.pkgt-item-qty').forEach(input => {
+    const qty = parseInt(input.value, 10) || 0;
+    if (qty > 0) {
+      itemRows.push({ package_id: packageId, service_id: input.dataset.serviceId, quantity: qty, sort_order: sortIdx });
+      sortIdx += 10;
+    }
+  });
+  if (itemRows.length > 0) {
+    const insRes = await supabase.from('crm_service_package_items').insert(itemRows);
+    if (insRes.error) { console.error(insRes.error); showToast('Saved, but failed to set items', 'error'); }
+  }
+
+  showToast(`Package ${existing ? 'updated' : 'created'}`, 'success');
+  closeModal();
+  await loadAllData();
+  renderServicesPanel();
+}
+
+async function deletePackageTemplate(pkg) {
+  if (!pkg) return;
+  const confirmed = confirm(`Delete package "${pkg.name}"? This cannot be undone.\n\nIf you want to keep it around, mark it inactive instead.`);
+  if (!confirmed) return;
+
+  const { error } = await supabase.from('crm_service_packages').delete().eq('id', pkg.id);
+  if (error) { console.error(error); showToast(error.message || 'Failed to delete', 'error'); return; }
+
+  showToast('Package deleted', 'success');
+  closeModal();
+  await loadAllData();
+  renderServicesPanel();
 }
 
 function renderFacilitatorsSection() {
@@ -2176,6 +2438,22 @@ function handlePanelClicks(e) {
     return;
   }
 
+  // ----- Packages (master catalog) -----
+  if (target.id === 'btn-new-package-template') { openPackageTemplateModal(); return; }
+  const editPkg = target.closest('[data-edit-package]');
+  if (editPkg) {
+    e.stopPropagation();
+    const pkg = allServicePackages.find(p => p.id === editPkg.dataset.editPackage);
+    if (pkg) openPackageTemplateModal(pkg);
+    return;
+  }
+  const pkgRow = target.closest('.clients-package-row');
+  if (pkgRow) {
+    const pkg = allServicePackages.find(p => p.id === pkgRow.dataset.packageId);
+    if (pkg) openPackageTemplateModal(pkg);
+    return;
+  }
+
   // ----- Facilitators -----
   if (target.id === 'btn-new-facilitator') { openFacilitatorModal(); return; }
   const editFac = target.closest('[data-edit-facilitator]');
@@ -2276,6 +2554,11 @@ function handlePanelChanges(e) {
   }
   if (e.target.id === 'toggle-show-inactive-facilitators') {
     showInactiveFacilitators = e.target.checked;
+    renderServicesPanel();
+    return;
+  }
+  if (e.target.id === 'toggle-show-inactive-packages') {
+    showInactivePackages = e.target.checked;
     renderServicesPanel();
     return;
   }

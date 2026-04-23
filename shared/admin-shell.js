@@ -62,6 +62,7 @@ const TAB_ICONS = {
   dashboard:  _i('<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'),
   staff:      _i('<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>'),
   jobtitles:  _i('<path d="M20 7h-3V4a1 1 0 00-1-1H8a1 1 0 00-1 1v3H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/><line x1="9" y1="7" x2="15" y2="7"/>'),
+  packages:   _i('<path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'),
 };
 
 // Tab definitions with optional `feature` key for config-driven visibility.
@@ -76,6 +77,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff' },
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff' },
+  { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff' },
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events' },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
