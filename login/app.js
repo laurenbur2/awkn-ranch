@@ -89,6 +89,11 @@ function getRedirectTarget(role) {
   else if ((target === '/awkn-ranch/spaces/admin/' || target === '/awkn-ranch/spaces/admin/dashboard.html') && ['resident', 'associate'].includes(role)) {
     target = '/awkn-ranch/residents/cameras.html';
   }
+  // Team-portal users (oracle/admin/staff) always land on the dashboard, ignoring
+  // any stale redirect (bookmarks, sessionStorage from the old spaces.html default).
+  else if (['oracle', 'admin', 'staff'].includes(role) && target.startsWith('/awkn-ranch/spaces/admin/')) {
+    target = '/awkn-ranch/spaces/admin/dashboard.html';
+  }
   return target;
 }
 
