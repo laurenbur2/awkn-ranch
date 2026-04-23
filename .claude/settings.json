@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(curl -s \"https://api.supabase.com/v1/projects/lnqxarwqckpmirpmixcw/database/query\" -H \"Authorization: Bearer sbp_93ae95b3acf17b0831b2fccf9422ce0c25f47660\" -H \"Content-Type: application/json\" -d '{\"query\": \"SELECT tablename FROM pg_tables WHERE tablename LIKE '\"'\"'%facilitator%'\"'\"';\"}')"
-    ]
-  }
-}

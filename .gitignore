@@ -11,6 +11,8 @@ HOMEAUTOMATION.local.md
 # Nested repo clone (used by bug-fixer on droplet)
 alpacapps/
 .claude/worktrees/
+.claude/settings.json
+.claude/settings.local.json
 
 # Root node_modules (Tailwind CSS build tools)
 node_modules/
