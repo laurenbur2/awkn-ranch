@@ -675,16 +675,16 @@ function renderLeadsTable() {
 
       html += `
         <tr class="crm-lead-row" data-lead-id="${lead.id}">
-          ${currentBizLine === 'all' ? `<td><span class="crm-biz-tag crm-biz-tag-${bizTag}">${bizTag === 'within' ? 'Within' : 'Ranch'}</span></td>` : ''}
-          <td class="crm-lead-name">${name}</td>
-          <td>${escapeHtml(lead.email || '')}</td>
-          <td>${escapeHtml(lead.phone || '')}</td>
-          <td>${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}</td>
-          <td><span class="crm-stage-badge" style="background:${escapeHtml(stageColor)}20;color:${escapeHtml(stageColor)};border:1px solid ${escapeHtml(stageColor)}40">${escapeHtml(stageName)}</span></td>
-          <td>${ownerName ? `<span class="crm-owner-tag">${escapeHtml(ownerName)}</span>` : ''}</td>
-          <td><span class="crm-status-badge ${statusClass}">${escapeHtml(lead.status || 'open')}</span></td>
-          <td>${lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : ''}</td>
-          <td>${formatDate(lead.created_at)}</td>
+          ${currentBizLine === 'all' ? `<td class="crm-col-biz"><span class="crm-biz-tag crm-biz-tag-${bizTag}">${bizTag === 'within' ? 'Within' : 'Ranch'}</span></td>` : ''}
+          <td class="crm-col-name crm-lead-name">${name}</td>
+          <td class="crm-col-email">${escapeHtml(lead.email || '')}</td>
+          <td class="crm-col-phone">${escapeHtml(lead.phone || '')}</td>
+          <td class="crm-col-source">${sourceName ? `<span class="crm-source-badge">${escapeHtml(sourceName)}</span>` : ''}</td>
+          <td class="crm-col-stage"><span class="crm-stage-badge" style="background:${escapeHtml(stageColor)}20;color:${escapeHtml(stageColor)};border:1px solid ${escapeHtml(stageColor)}40">${escapeHtml(stageName)}</span></td>
+          <td class="crm-col-owner">${ownerName ? `<span class="crm-owner-tag">${escapeHtml(ownerName)}</span>` : ''}</td>
+          <td class="crm-col-status"><span class="crm-status-badge ${statusClass}">${escapeHtml(lead.status || 'open')}</span></td>
+          <td class="crm-col-value">${lead.estimated_value > 0 ? formatCurrency(lead.estimated_value) : ''}</td>
+          <td class="crm-col-created">${formatDate(lead.created_at)}</td>
         </tr>
       `;
     }
