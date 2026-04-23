@@ -161,7 +161,16 @@ async function loadClientsData() {
 
   const [clientsRes, pkgsRes, sessRes, staysRes] = await Promise.all([
     supabase.from('crm_leads')
-      .select('id, first_name, last_name, email, phone, city, state, created_at, notes, business_line, stage_id')
+      .select(`
+        id, first_name, last_name, email, phone, city, state, created_at, notes, business_line, stage_id,
+        preferred_name, pronouns,
+        emergency_contact_name, emergency_contact_phone, emergency_contact_relationship,
+        dietary_preferences, dietary_dislikes,
+        room_preferences,
+        arrival_method, arrival_details, arrival_pickup_needed,
+        departure_details, departure_pickup_needed,
+        waiver_signed, intake_completed
+      `)
       .eq('stage_id', activeClientStageId)
       .order('created_at', { ascending: false }),
     supabase.from('client_packages').select('*').order('created_at', { ascending: false }),
@@ -771,6 +780,7 @@ function openClientDetail(leadId) {
         </div>
         <div class="crm-modal-body" style="padding:20px;overflow-y:auto;">
           ${renderSessionsRemainingBlock(remainingByService)}
+          ${renderHospitalityBlock(c)}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
             <section>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -805,6 +815,138 @@ function openClientDetail(leadId) {
     if (e.target.id === 'clients-modal-overlay') closeModal();
   });
   document.getElementById('btn-save-notes').addEventListener('click', () => saveClientNotes(leadId));
+
+  const hospSaveBtn = document.getElementById('btn-save-hospitality');
+  if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
+}
+
+// Editable hospitality / logistics block for the client drawer.
+// Non-PHI only: preferences, emergency contact, arrival logistics, admin flags.
+// Clinical data must live in a separate HIPAA-compliant system, never here.
+function renderHospitalityBlock(c) {
+  const val = v => escapeHtml(v || '');
+  const checked = v => v ? 'checked' : '';
+
+  const field = (id, label, value, { type = 'text', placeholder = '', span = 1 } = {}) => `
+    <div class="crm-form-field" style="grid-column: span ${span};">
+      <label>${escapeHtml(label)}</label>
+      <input type="${type}" class="crm-input" id="${id}" value="${val(value)}" placeholder="${escapeHtml(placeholder)}">
+    </div>
+  `;
+
+  const textArea = (id, label, value, { placeholder = '', rows = 2, span = 2 } = {}) => `
+    <div class="crm-form-field" style="grid-column: span ${span};">
+      <label>${escapeHtml(label)}</label>
+      <textarea class="crm-textarea" id="${id}" rows="${rows}" placeholder="${escapeHtml(placeholder)}">${val(value)}</textarea>
+    </div>
+  `;
+
+  const subhead = (text) => `
+    <div style="grid-column:1 / -1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#b4691f;margin-top:6px;">
+      ${escapeHtml(text)}
+    </div>
+  `;
+
+  const toggle = (id, label, value) => `
+    <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#2a1f23);cursor:pointer;margin-right:18px;">
+      <input type="checkbox" id="${id}" ${checked(value)}>
+      <span>${escapeHtml(label)}</span>
+    </label>
+  `;
+
+  return `
+    <section style="margin-bottom:20px;padding:16px 18px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
+      <h3 style="margin:0 0 4px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Hospitality &amp; Logistics</h3>
+      <div style="font-size:11px;color:var(--text-muted,#aaa);margin-bottom:14px;">Non-clinical only. Medical / diagnosis / medication info belongs in the intake system.</div>
+
+      <div class="crm-form-grid" style="grid-template-columns:repeat(2, 1fr);gap:10px 14px;">
+
+        ${subhead('Identity & Contact')}
+        ${field('hosp-preferred-name', 'Preferred name', c.preferred_name)}
+        ${field('hosp-pronouns',       'Pronouns',       c.pronouns, { placeholder: 'e.g. she/her' })}
+
+        ${subhead('Emergency Contact')}
+        ${field('hosp-ec-name',         'Name',         c.emergency_contact_name)}
+        ${field('hosp-ec-phone',        'Phone',        c.emergency_contact_phone, { type: 'tel' })}
+        ${field('hosp-ec-relationship', 'Relationship', c.emergency_contact_relationship, { placeholder: 'spouse, parent, friend\u2026', span: 2 })}
+
+        ${subhead('Dietary')}
+        ${textArea('hosp-diet-prefs',    'Preferences',    c.dietary_preferences, { placeholder: 'vegan, vegetarian, gluten-free, pescatarian\u2026' })}
+        ${textArea('hosp-diet-dislikes', 'Things to avoid',c.dietary_dislikes,    { placeholder: 'e.g. mushrooms, cilantro, spicy food' })}
+
+        ${subhead('Room')}
+        ${textArea('hosp-room', 'Room preferences', c.room_preferences, { placeholder: 'temperature, extra pillows, private bath preferred\u2026', rows: 2 })}
+
+        ${subhead('Arrival & Departure')}
+        ${field('hosp-arr-method',    'Arrival method',  c.arrival_method, { placeholder: 'flying, driving, rental car\u2026' })}
+        <div class="crm-form-field" style="grid-column: span 1;display:flex;align-items:flex-end;gap:18px;padding-bottom:6px;">
+          ${toggle('hosp-arr-pickup', 'Airport pickup needed', c.arrival_pickup_needed)}
+          ${toggle('hosp-dep-pickup', 'Airport dropoff needed', c.departure_pickup_needed)}
+        </div>
+        ${textArea('hosp-arr-details', 'Arrival details',   c.arrival_details,   { placeholder: 'flight #, ETA, airline\u2026', rows: 2 })}
+        ${textArea('hosp-dep-details', 'Departure details', c.departure_details, { placeholder: 'flight #, departure time\u2026', rows: 2 })}
+
+        ${subhead('Admin')}
+        <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 4px;padding:4px 0 2px;">
+          ${toggle('hosp-waiver',  'Waiver signed',         c.waiver_signed)}
+          ${toggle('hosp-intake',  'Intake call completed', c.intake_completed)}
+        </div>
+      </div>
+
+      <div style="margin-top:12px;text-align:right;">
+        <span id="hosp-save-status" style="font-size:12px;color:var(--text-muted,#888);margin-right:10px;"></span>
+        <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-save-hospitality">Save hospitality details</button>
+      </div>
+    </section>
+  `;
+}
+
+async function saveHospitalityFields(leadId) {
+  const btn = document.getElementById('btn-save-hospitality');
+  const status = document.getElementById('hosp-save-status');
+  const val = id => (document.getElementById(id)?.value ?? '').trim() || null;
+  const checked = id => !!document.getElementById(id)?.checked;
+
+  const payload = {
+    preferred_name:                 val('hosp-preferred-name'),
+    pronouns:                       val('hosp-pronouns'),
+    emergency_contact_name:         val('hosp-ec-name'),
+    emergency_contact_phone:        val('hosp-ec-phone'),
+    emergency_contact_relationship: val('hosp-ec-relationship'),
+    dietary_preferences:            val('hosp-diet-prefs'),
+    dietary_dislikes:               val('hosp-diet-dislikes'),
+    room_preferences:               val('hosp-room'),
+    arrival_method:                 val('hosp-arr-method'),
+    arrival_details:                val('hosp-arr-details'),
+    arrival_pickup_needed:          checked('hosp-arr-pickup'),
+    departure_details:              val('hosp-dep-details'),
+    departure_pickup_needed:        checked('hosp-dep-pickup'),
+    waiver_signed:                  checked('hosp-waiver'),
+    intake_completed:               checked('hosp-intake'),
+  };
+
+  btn.disabled = true;
+  if (status) status.textContent = 'Saving\u2026';
+
+  const { error } = await supabase.from('crm_leads').update(payload).eq('id', leadId);
+  if (error) {
+    console.error('save hospitality error:', error);
+    showToast('Failed to save: ' + error.message, 'error');
+    btn.disabled = false;
+    if (status) status.textContent = '';
+    return;
+  }
+
+  // Update local cache so re-opening the drawer shows the fresh values without a full reload.
+  const c = clients.find(x => x.id === leadId);
+  if (c) Object.assign(c, payload);
+
+  showToast('Hospitality details saved', 'success');
+  btn.disabled = false;
+  if (status) {
+    status.textContent = 'Saved';
+    setTimeout(() => { if (status) status.textContent = ''; }, 1800);
+  }
 }
 
 function renderSessionsRemainingBlock(remainingByService) {
