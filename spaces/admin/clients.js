@@ -18,6 +18,11 @@ let showArchivedServices = false;
 // Service package templates (retreat / treatment packages from crm_service_packages)
 let servicePackageTemplates = [];
 
+// Facilitators directory + their service assignments (facilitator_id -> Set of service_id)
+let facilitators = [];
+let facilitatorServicesByFacId = new Map();
+let showInactiveFacilitators = false;
+
 // Clients / packages / stays
 let clients = [];           // crm_leads in `active_client` stage (business_line=within)
 let packages = [];          // client_packages + nested sessions
@@ -99,18 +104,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAllData() {
   // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
-  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes] = await Promise.all([
+  const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes, facRes, facSvcRes] = await Promise.all([
     supabase.from('services').select('*').order('sort_order').order('name'),
     supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
     supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
     supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
     supabase.from('crm_service_packages').select('id, name, slug, price_regular, description, includes, business_line, is_active').eq('is_active', true).eq('business_line', 'within').order('sort_order').order('name'),
+    supabase.from('facilitators').select('*').order('sort_order').order('first_name'),
+    supabase.from('facilitator_services').select('facilitator_id, service_id'),
   ]);
 
   if (servicesRes.error) console.error('services load error:', servicesRes.error);
   services = servicesRes.data || [];
   servicePackageTemplates = svcPkgRes.data || [];
+  facilitators = facRes.data || [];
+  facilitatorServicesByFacId = new Map();
+  (facSvcRes.data || []).forEach(row => {
+    if (!facilitatorServicesByFacId.has(row.facilitator_id)) {
+      facilitatorServicesByFacId.set(row.facilitator_id, new Set());
+    }
+    facilitatorServicesByFacId.get(row.facilitator_id).add(row.service_id);
+  });
 
   const withinStage = (stagesRes.data || []).find(s => s.business_line === 'within');
   activeClientStageId = withinStage?.id || null;
@@ -1669,7 +1684,218 @@ function renderServicesPanel() {
     `;
   }
 
+  html += renderFacilitatorsSection();
+
   panel.innerHTML = html;
+}
+
+function renderFacilitatorsSection() {
+  const visible = showInactiveFacilitators ? facilitators : facilitators.filter(f => f.is_active);
+  const svcById = new Map(services.map(s => [s.id, s]));
+
+  let html = `
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border,#333);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <h3 style="margin:0;font-size:16px;">Facilitators</h3>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted,#888);">
+            <input type="checkbox" id="toggle-show-inactive-facilitators" ${showInactiveFacilitators ? 'checked' : ''}> Show inactive
+          </label>
+          <button class="crm-btn crm-btn-primary" id="btn-new-facilitator">+ Add Facilitator</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted,#888);margin-bottom:12px;">
+        External practitioners who deliver sessions (massage, astrology, sound journey, etc.).
+      </div>
+  `;
+
+  if (visible.length === 0) {
+    html += `
+      <div style="padding:28px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">
+        No facilitators yet. Click "+ Add Facilitator" to add one.
+      </div>
+    </div>`;
+    return html;
+  }
+
+  html += `
+    <div class="crm-table-wrap">
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Services</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.map(f => {
+            const svcIds = facilitatorServicesByFacId.get(f.id) || new Set();
+            const svcNames = [...svcIds].map(id => svcById.get(id)?.name).filter(Boolean);
+            const fullName = [f.first_name, f.last_name].filter(Boolean).join(' ');
+            return `
+              <tr class="clients-facilitator-row" data-facilitator-id="${f.id}" style="cursor:pointer;">
+                <td><strong>${escapeHtml(fullName)}</strong></td>
+                <td>${f.email ? `<a href="mailto:${escapeHtml(f.email)}" onclick="event.stopPropagation();">${escapeHtml(f.email)}</a>` : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+                <td>${f.phone ? escapeHtml(f.phone) : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+                <td style="max-width:320px;">${svcNames.length ? svcNames.map(n => `<span style="display:inline-block;padding:2px 8px;margin:1px 3px 1px 0;background:var(--surface-subtle,#1f1f1f);border-radius:10px;font-size:11px;">${escapeHtml(n)}</span>`).join('') : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+                <td>${f.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
+                <td><button class="crm-btn crm-btn-xs" data-edit-facilitator="${f.id}">Edit</button></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  `;
+  return html;
+}
+
+function openFacilitatorModal(facilitator = null) {
+  const isEdit = !!facilitator;
+  const assignedIds = isEdit ? (facilitatorServicesByFacId.get(facilitator.id) || new Set()) : new Set();
+  const activeServices = services.filter(s => s.is_active);
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content">
+        <div class="crm-modal-header">
+          <h2>${isEdit ? 'Edit Facilitator' : 'New Facilitator'}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body">
+          <div class="crm-form-grid">
+            <div class="crm-form-field">
+              <label>First name *</label>
+              <input type="text" class="crm-input" id="fac-first-name" value="${escapeHtml(facilitator?.first_name || '')}" required>
+            </div>
+            <div class="crm-form-field">
+              <label>Last name</label>
+              <input type="text" class="crm-input" id="fac-last-name" value="${escapeHtml(facilitator?.last_name || '')}">
+            </div>
+            <div class="crm-form-field">
+              <label>Email</label>
+              <input type="email" class="crm-input" id="fac-email" value="${escapeHtml(facilitator?.email || '')}">
+            </div>
+            <div class="crm-form-field">
+              <label>Phone</label>
+              <input type="tel" class="crm-input" id="fac-phone" value="${escapeHtml(facilitator?.phone || '')}">
+            </div>
+            <div class="crm-form-field">
+              <label>Sort order</label>
+              <input type="number" class="crm-input" id="fac-sort" value="${facilitator?.sort_order ?? 100}" min="0">
+            </div>
+            <div class="crm-form-field">
+              <label>&nbsp;</label>
+              <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
+                <input type="checkbox" id="fac-active" ${facilitator ? (facilitator.is_active ? 'checked' : '') : 'checked'}> Active
+              </label>
+            </div>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label>Notes</label>
+            <textarea class="crm-textarea" id="fac-notes" rows="2">${escapeHtml(facilitator?.notes || '')}</textarea>
+          </div>
+          <div class="crm-form-field" style="margin-top:16px;">
+            <label>Services this facilitator delivers</label>
+            ${activeServices.length === 0
+              ? `<div style="font-size:12px;color:var(--text-muted,#888);">No active services available.</div>`
+              : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;padding:8px;border:1px solid var(--border,#333);border-radius:6px;max-height:240px;overflow-y:auto;">
+                  ${activeServices.map(s => `
+                    <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
+                      <input type="checkbox" class="fac-service-checkbox" value="${s.id}" ${assignedIds.has(s.id) ? 'checked' : ''}>
+                      ${escapeHtml(s.name)}
+                    </label>
+                  `).join('')}
+                </div>`
+            }
+          </div>
+        </div>
+        <div class="crm-modal-footer">
+          ${isEdit ? '<button class="crm-btn crm-btn-danger" id="btn-delete-facilitator">Delete</button>' : '<span></span>'}
+          <div>
+            <button class="crm-btn" id="btn-cancel-facilitator">Cancel</button>
+            <button class="crm-btn crm-btn-primary" id="btn-save-facilitator">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
+  document.getElementById('clients-modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') closeModal();
+  });
+  document.getElementById('btn-cancel-facilitator').addEventListener('click', closeModal);
+  document.getElementById('btn-save-facilitator').addEventListener('click', () => saveFacilitator(facilitator));
+  if (isEdit) {
+    document.getElementById('btn-delete-facilitator').addEventListener('click', () => deleteFacilitator(facilitator));
+  }
+}
+
+async function saveFacilitator(existing) {
+  const firstName = document.getElementById('fac-first-name').value.trim();
+  if (!firstName) { showToast('First name is required', 'error'); return; }
+
+  const payload = {
+    first_name: firstName,
+    last_name: document.getElementById('fac-last-name').value.trim() || null,
+    email: document.getElementById('fac-email').value.trim() || null,
+    phone: document.getElementById('fac-phone').value.trim() || null,
+    notes: document.getElementById('fac-notes').value.trim() || null,
+    sort_order: parseInt(document.getElementById('fac-sort').value, 10) || 100,
+    is_active: document.getElementById('fac-active').checked,
+    updated_at: new Date().toISOString(),
+  };
+
+  const selectedSvcIds = [...document.querySelectorAll('.fac-service-checkbox:checked')].map(cb => cb.value);
+
+  let facilitatorId;
+  if (existing) {
+    const { error } = await supabase.from('facilitators').update(payload).eq('id', existing.id);
+    if (error) { console.error(error); showToast(error.message || 'Failed to save', 'error'); return; }
+    facilitatorId = existing.id;
+  } else {
+    const { data, error } = await supabase.from('facilitators').insert(payload).select().single();
+    if (error) { console.error(error); showToast(error.message || 'Failed to save', 'error'); return; }
+    facilitatorId = data.id;
+  }
+
+  // Sync junction rows: delete all, re-insert selected
+  const delRes = await supabase.from('facilitator_services').delete().eq('facilitator_id', facilitatorId);
+  if (delRes.error) { console.error(delRes.error); showToast('Saved, but failed to update services', 'error'); }
+
+  if (selectedSvcIds.length > 0) {
+    const junctionRows = selectedSvcIds.map(sid => ({ facilitator_id: facilitatorId, service_id: sid }));
+    const insRes = await supabase.from('facilitator_services').insert(junctionRows);
+    if (insRes.error) { console.error(insRes.error); showToast('Saved, but failed to assign services', 'error'); }
+  }
+
+  showToast(`Facilitator ${existing ? 'updated' : 'created'}`, 'success');
+  closeModal();
+  await loadAllData();
+  renderServicesPanel();
+}
+
+async function deleteFacilitator(facilitator) {
+  if (!facilitator) return;
+  const fullName = [facilitator.first_name, facilitator.last_name].filter(Boolean).join(' ');
+  const confirmed = confirm(`Delete "${fullName}"? This cannot be undone.\n\nIf you want to keep history, mark them inactive instead.`);
+  if (!confirmed) return;
+
+  const { error } = await supabase.from('facilitators').delete().eq('id', facilitator.id);
+  if (error) { console.error(error); showToast(error.message || 'Failed to delete', 'error'); return; }
+
+  showToast('Facilitator deleted', 'success');
+  closeModal();
+  await loadAllData();
+  renderServicesPanel();
 }
 
 function openServiceModal(service = null) {
@@ -1888,6 +2114,22 @@ function handlePanelClicks(e) {
     return;
   }
 
+  // ----- Facilitators -----
+  if (target.id === 'btn-new-facilitator') { openFacilitatorModal(); return; }
+  const editFac = target.closest('[data-edit-facilitator]');
+  if (editFac) {
+    e.stopPropagation();
+    const fac = facilitators.find(f => f.id === editFac.dataset.editFacilitator);
+    if (fac) openFacilitatorModal(fac);
+    return;
+  }
+  const facRow = target.closest('.clients-facilitator-row');
+  if (facRow) {
+    const fac = facilitators.find(f => f.id === facRow.dataset.facilitatorId);
+    if (fac) openFacilitatorModal(fac);
+    return;
+  }
+
   // ----- Clients -----
   if (target.id === 'btn-new-client') { openAddClientModal(); return; }
 
@@ -1967,6 +2209,11 @@ function handlePanelClicks(e) {
 function handlePanelChanges(e) {
   if (e.target.id === 'toggle-show-archived-services') {
     showArchivedServices = e.target.checked;
+    renderServicesPanel();
+    return;
+  }
+  if (e.target.id === 'toggle-show-inactive-facilitators') {
+    showInactiveFacilitators = e.target.checked;
     renderServicesPanel();
     return;
   }
