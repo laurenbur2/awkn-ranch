@@ -818,6 +818,18 @@ function openClientDetail(leadId) {
 
   const hospSaveBtn = document.getElementById('btn-save-hospitality');
   if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
+
+  const dietToggle = document.getElementById('hosp-diet-toggle');
+  const dietPanel = document.getElementById('hosp-diet-panel');
+  const dietChevron = document.getElementById('hosp-diet-chevron');
+  if (dietToggle && dietPanel) {
+    dietToggle.addEventListener('click', () => {
+      const open = dietPanel.style.display !== 'none';
+      dietPanel.style.display = open ? 'none' : 'grid';
+      dietToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (dietChevron) dietChevron.style.transform = open ? '' : 'rotate(90deg)';
+    });
+  }
 }
 
 // Editable hospitality / logistics block for the client drawer.
@@ -854,6 +866,15 @@ function renderHospitalityBlock(c) {
     </label>
   `;
 
+  const leadName = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+
+  const readOnlyField = (label, value, { span = 1 } = {}) => `
+    <div class="crm-form-field" style="grid-column: span ${span};">
+      <label>${escapeHtml(label)}</label>
+      <div class="crm-input" style="background:#f7f4ef;color:var(--text,#2a1f23);cursor:default;">${escapeHtml(value)}</div>
+    </div>
+  `;
+
   return `
     <section style="margin-bottom:20px;padding:16px 18px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
       <h3 style="margin:0 0 4px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Hospitality &amp; Logistics</h3>
@@ -862,34 +883,31 @@ function renderHospitalityBlock(c) {
       <div class="crm-form-grid" style="grid-template-columns:repeat(2, 1fr);gap:10px 14px;">
 
         ${subhead('Identity & Contact')}
-        ${field('hosp-preferred-name', 'Preferred name', c.preferred_name)}
-        ${field('hosp-pronouns',       'Pronouns',       c.pronouns, { placeholder: 'e.g. she/her' })}
+        ${readOnlyField('Name', leadName)}
+        ${field('hosp-pronouns', 'Pronouns', c.pronouns, { placeholder: 'e.g. she/her' })}
 
         ${subhead('Emergency Contact')}
         ${field('hosp-ec-name',         'Name',         c.emergency_contact_name)}
         ${field('hosp-ec-phone',        'Phone',        c.emergency_contact_phone, { type: 'tel' })}
         ${field('hosp-ec-relationship', 'Relationship', c.emergency_contact_relationship, { placeholder: 'spouse, parent, friend\u2026', span: 2 })}
 
-        ${subhead('Dietary')}
-        ${textArea('hosp-diet-prefs',    'Preferences',    c.dietary_preferences, { placeholder: 'vegan, vegetarian, gluten-free, pescatarian\u2026' })}
-        ${textArea('hosp-diet-dislikes', 'Things to avoid',c.dietary_dislikes,    { placeholder: 'e.g. mushrooms, cilantro, spicy food' })}
-
-        ${subhead('Room')}
-        ${textArea('hosp-room', 'Room preferences', c.room_preferences, { placeholder: 'temperature, extra pillows, private bath preferred\u2026', rows: 2 })}
+        <div style="grid-column:1 / -1;margin-top:6px;">
+          <button type="button" id="hosp-diet-toggle" class="crm-btn crm-btn-sm" aria-expanded="false" style="display:inline-flex;align-items:center;gap:8px;">
+            <span id="hosp-diet-chevron" style="display:inline-block;transition:transform .15s;">▸</span>
+            <span>Dietary preferences</span>
+          </button>
+          <div id="hosp-diet-panel" style="display:none;grid-template-columns:repeat(2, 1fr);gap:10px 14px;margin-top:10px;">
+            ${textArea('hosp-diet-prefs',    'Preferences',    c.dietary_preferences, { placeholder: 'vegan, vegetarian, gluten-free, pescatarian\u2026' })}
+            ${textArea('hosp-diet-dislikes', 'Things to avoid',c.dietary_dislikes,    { placeholder: 'e.g. mushrooms, cilantro, spicy food' })}
+          </div>
+        </div>
 
         ${subhead('Arrival & Departure')}
-        ${field('hosp-arr-method',    'Arrival method',  c.arrival_method, { placeholder: 'flying, driving, rental car\u2026' })}
-        <div class="crm-form-field" style="grid-column: span 1;display:flex;align-items:flex-end;gap:18px;padding-bottom:6px;">
-          ${toggle('hosp-arr-pickup', 'Airport pickup needed', c.arrival_pickup_needed)}
-          ${toggle('hosp-dep-pickup', 'Airport dropoff needed', c.departure_pickup_needed)}
-        </div>
         ${textArea('hosp-arr-details', 'Arrival details',   c.arrival_details,   { placeholder: 'flight #, ETA, airline\u2026', rows: 2 })}
         ${textArea('hosp-dep-details', 'Departure details', c.departure_details, { placeholder: 'flight #, departure time\u2026', rows: 2 })}
-
-        ${subhead('Admin')}
-        <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 4px;padding:4px 0 2px;">
-          ${toggle('hosp-waiver',  'Waiver signed',         c.waiver_signed)}
-          ${toggle('hosp-intake',  'Intake call completed', c.intake_completed)}
+        <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 24px;padding:4px 0 2px;">
+          ${toggle('hosp-arr-pickup', 'Airport pickup needed', c.arrival_pickup_needed)}
+          ${toggle('hosp-dep-pickup', 'Airport dropoff needed', c.departure_pickup_needed)}
         </div>
       </div>
 
@@ -908,21 +926,16 @@ async function saveHospitalityFields(leadId) {
   const checked = id => !!document.getElementById(id)?.checked;
 
   const payload = {
-    preferred_name:                 val('hosp-preferred-name'),
     pronouns:                       val('hosp-pronouns'),
     emergency_contact_name:         val('hosp-ec-name'),
     emergency_contact_phone:        val('hosp-ec-phone'),
     emergency_contact_relationship: val('hosp-ec-relationship'),
     dietary_preferences:            val('hosp-diet-prefs'),
     dietary_dislikes:               val('hosp-diet-dislikes'),
-    room_preferences:               val('hosp-room'),
-    arrival_method:                 val('hosp-arr-method'),
     arrival_details:                val('hosp-arr-details'),
     arrival_pickup_needed:          checked('hosp-arr-pickup'),
     departure_details:              val('hosp-dep-details'),
     departure_pickup_needed:        checked('hosp-dep-pickup'),
-    waiver_signed:                  checked('hosp-waiver'),
-    intake_completed:               checked('hosp-intake'),
   };
 
   btn.disabled = true;
