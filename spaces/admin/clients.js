@@ -105,13 +105,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAllData() {
   // Step 1: services catalog + pipeline stage lookup + lodging inventory run in parallel
   const [servicesRes, stagesRes, spacesRes, bedsRes, staffRes, svcPkgRes, facRes, facSvcRes] = await Promise.all([
-    supabase.from('services').select('*').order('sort_order').order('name'),
+    supabase.from('services').select('*').order('name'),
     supabase.from('crm_pipeline_stages').select('id, slug, business_line').eq('slug', 'active_client'),
     supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
     supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
     supabase.from('crm_service_packages').select('id, name, slug, price_regular, description, includes, business_line, is_active').eq('is_active', true).eq('business_line', 'within').order('sort_order').order('name'),
-    supabase.from('facilitators').select('*').order('sort_order').order('first_name'),
+    supabase.from('facilitators').select('*').order('last_name', { nullsFirst: false }).order('first_name'),
     supabase.from('facilitator_services').select('facilitator_id, service_id'),
   ]);
 
@@ -1847,16 +1847,11 @@ function openFacilitatorModal(facilitator = null) {
               <label>Phone</label>
               <input type="tel" class="crm-input" id="fac-phone" value="${escapeHtml(facilitator?.phone || '')}">
             </div>
-            <div class="crm-form-field">
-              <label>Sort order</label>
-              <input type="number" class="crm-input" id="fac-sort" value="${facilitator?.sort_order ?? 100}" min="0">
-            </div>
-            <div class="crm-form-field">
-              <label>&nbsp;</label>
-              <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
-                <input type="checkbox" id="fac-active" ${facilitator ? (facilitator.is_active ? 'checked' : '') : 'checked'}> Active
-              </label>
-            </div>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
+              <input type="checkbox" id="fac-active" ${facilitator ? (facilitator.is_active ? 'checked' : '') : 'checked'}> Active
+            </label>
           </div>
           <div class="crm-form-field" style="margin-top:12px;">
             <label>Notes</label>
@@ -1926,7 +1921,6 @@ async function saveFacilitator(existing) {
     email: document.getElementById('fac-email').value.trim() || null,
     phone: document.getElementById('fac-phone').value.trim() || null,
     notes: document.getElementById('fac-notes').value.trim() || null,
-    sort_order: parseInt(document.getElementById('fac-sort').value, 10) || 100,
     is_active: document.getElementById('fac-active').checked,
     updated_at: new Date().toISOString(),
   };
