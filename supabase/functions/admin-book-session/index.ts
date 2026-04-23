@@ -96,7 +96,7 @@ serve(async (req) => {
 
     const { data: lead, error: leadErr } = await supabase
       .from("crm_leads")
-      .select("id, name, email")
+      .select("id, first_name, last_name, email")
       .eq("id", lead_id)
       .maybeSingle();
     if (leadErr || !lead) return json({ error: "lead_not_found" }, 404);
@@ -134,7 +134,7 @@ serve(async (req) => {
       if (!fac.is_active) return json({ error: "facilitator_inactive" }, 400);
     }
 
-    const bookerName = lead.name || "Client";
+    const bookerName = `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || "Client";
     const bookerEmail = (lead.email || "").trim().toLowerCase() || "noreply@within.center";
 
     const { data: booking, error: insErr } = await supabase
