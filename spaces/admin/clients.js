@@ -1348,12 +1348,14 @@ function renderSchedulePanel() {
   if (!panel) return;
 
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const now = new Date();
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(scheduleWeekStart);
     d.setDate(d.getDate() + i);
     return d;
   });
+  const todayIdx = days.findIndex(d => d.getTime() === today.getTime());
 
   const hours = [];
   for (let h = SCHEDULE_START_HOUR; h < SCHEDULE_END_HOUR; h++) hours.push(h);
@@ -1379,18 +1381,32 @@ function renderSchedulePanel() {
     const durationMin = Math.max(15, Math.round((end - start) / 60000));
     const topPx = Math.max(0, (minutesFromGridStart / 30) * SCHEDULE_CELL_PX);
     const heightPx = Math.max(SCHEDULE_CELL_PX - 4, (durationMin / 30) * SCHEDULE_CELL_PX - 2);
+    const isShort = heightPx < 54; // 30-min pill
 
     const svc = escapeHtml(getServiceName(b.service_id) || 'Session');
     const client = escapeHtml(b.booker_name || 'Client');
     const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
-    const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
     const color = serviceColor(b.service_id);
+    const tooltip = `${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}`;
+
+    const body = isShort
+      ? `<div style="display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;">
+           <span style="font-weight:700;">${timeLabel}</span>
+           <span style="opacity:.9;text-overflow:ellipsis;overflow:hidden;">${svc}</span>
+           <span style="opacity:.75;text-overflow:ellipsis;overflow:hidden;">\u00b7 ${client}</span>
+         </div>`
+      : `<div style="font-size:10px;font-weight:700;letter-spacing:.3px;opacity:.9;margin-bottom:1px;">${timeLabel}</div>
+         <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svc}</div>
+         <div style="opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
+         ${heightPx >= 70 ? `<div style="opacity:.82;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${escapeHtml(staff)}</div>` : ''}`;
+
     pillsByDay[dayIdx].push(`
-      <div data-sched-booking="${b.id}" title="${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}"
-        style="position:absolute;left:2px;right:2px;top:${topPx}px;height:${heightPx}px;background:${color};color:#fff;border-radius:6px;padding:4px 6px;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow:hidden;cursor:pointer;">
-        <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svc}</div>
-        <div style="opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${client}</div>
-        <div style="opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(staff)}</div>
+      <div data-sched-booking="${b.id}" title="${tooltip}"
+        style="position:absolute;left:4px;right:4px;top:${topPx}px;height:${heightPx}px;background:${color};color:#fff;border-radius:6px;padding:4px 7px;font-size:11px;line-height:1.25;box-shadow:0 1px 2px rgba(0,0,0,.18), inset 3px 0 0 rgba(255,255,255,.22);overflow:hidden;cursor:pointer;transition:transform .08s ease, box-shadow .08s ease;"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 3px 8px rgba(0,0,0,.25), inset 3px 0 0 rgba(255,255,255,.3)';"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 1px 2px rgba(0,0,0,.18), inset 3px 0 0 rgba(255,255,255,.22)';">
+        ${body}
       </div>
     `);
   }
@@ -1408,48 +1424,93 @@ function renderSchedulePanel() {
 
   const dayHeader = days.map((d, i) => {
     const isToday = d.getTime() === today.getTime();
-    return `<div style="padding:8px 0;text-align:center;font-size:12px;font-weight:600;color:${isToday ? '#2a1f23' : 'var(--text-muted,#666)'};background:${isToday ? '#fff8ec' : 'transparent'};">
-      <div>${dayLabels[i]}</div>
-      <div style="font-size:11px;font-weight:500;opacity:.8;">${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+    const isWeekend = i === 5 || i === 6;
+    return `<div style="padding:10px 0 12px;text-align:center;background:${isToday ? 'linear-gradient(180deg,#fff5e0 0%, #fff8ec 100%)' : 'transparent'};border-bottom:${isToday ? '2px solid #d4883a' : '1px solid var(--border-color,#eee)'};">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:${isToday ? '#b4691f' : isWeekend ? 'var(--text-muted,#999)' : 'var(--text-muted,#666)'};">${dayLabels[i]}</div>
+      <div style="display:inline-flex;align-items:center;justify-content:center;margin-top:4px;width:28px;height:28px;border-radius:50%;font-size:15px;font-weight:${isToday ? '700' : '500'};color:${isToday ? '#fff' : 'var(--text,#222)'};background:${isToday ? '#d4883a' : 'transparent'};">
+        ${d.getDate()}
+      </div>
     </div>`;
   }).join('');
 
+  // "Now" indicator line when today is visible and within grid hours
+  let nowLineHtml = '';
+  if (todayIdx >= 0) {
+    const nowMin = (now.getHours() - SCHEDULE_START_HOUR) * 60 + now.getMinutes();
+    if (nowMin >= 0 && nowMin <= (SCHEDULE_END_HOUR - SCHEDULE_START_HOUR) * 60) {
+      const nowTop = (nowMin / 30) * SCHEDULE_CELL_PX;
+      nowLineHtml = `
+        <div style="position:absolute;top:${nowTop}px;left:0;right:0;z-index:5;pointer-events:none;">
+          <div style="position:absolute;left:0;top:-5px;width:10px;height:10px;border-radius:50%;background:#dc2626;box-shadow:0 0 0 2px #fff;"></div>
+          <div style="height:2px;background:#dc2626;opacity:.85;"></div>
+        </div>`;
+    }
+  }
+
+  const hourLabel = (h) => `
+    <div style="height:${SCHEDULE_CELL_PX * 2}px;display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 8px 0 0;font-size:11px;font-weight:600;color:var(--text-muted,#888);letter-spacing:.3px;">
+      ${formatHourLabel(h)}
+    </div>`;
+
+  const dayColumn = (dayIdx) => {
+    const isToday = dayIdx === todayIdx;
+    const isWeekend = dayIdx === 5 || dayIdx === 6;
+    const bg = isToday ? '#fffbf2' : (isWeekend ? '#fafafa' : '#fff');
+    return `
+      <div style="position:relative;height:${gridHeight}px;border-left:1px solid var(--border-color,#eee);background:${bg};">
+        ${hours.map(() => `
+          <div style="height:${SCHEDULE_CELL_PX}px;border-bottom:1px dashed var(--border-color,#f0f0f0);"></div>
+          <div style="height:${SCHEDULE_CELL_PX}px;border-bottom:1px solid var(--border-color,#eee);"></div>
+        `).join('')}
+        ${isToday ? nowLineHtml : ''}
+        ${pillsByDay[dayIdx].join('')}
+      </div>`;
+  };
+
   panel.innerHTML = `
-    <div class="crm-pipeline-toolbar">
-      <button class="crm-btn crm-btn-sm" id="sched-today">Today</button>
-      <button class="crm-btn crm-btn-sm" id="sched-prev">&laquo; Prev</button>
-      <button class="crm-btn crm-btn-sm" id="sched-next">Next &raquo;</button>
-      <span style="color:var(--text-muted,#666);font-size:13px;margin-left:8px;font-weight:600;">${formatWeekRange(scheduleWeekStart)}</span>
-      <select class="crm-select" id="sched-staff-filter" style="margin-left:auto;">${staffOptions}</select>
-      <span style="font-size:12px;color:var(--text-muted,#888);">
-        ${filtered.length} booking${filtered.length === 1 ? '' : 's'}
-      </span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h2 style="margin:0;font-size:20px;font-weight:700;color:var(--text,#222);">${formatWeekRange(scheduleWeekStart)}</h2>
+        <div style="display:inline-flex;border:1px solid var(--border-color,#e5e5e5);border-radius:6px;overflow:hidden;background:#fff;">
+          <button class="crm-btn crm-btn-sm" id="sched-prev" style="border:none;border-radius:0;padding:4px 10px;" title="Previous week">&laquo;</button>
+          <button class="crm-btn crm-btn-sm" id="sched-today" style="border:none;border-left:1px solid var(--border-color,#e5e5e5);border-right:1px solid var(--border-color,#e5e5e5);border-radius:0;padding:4px 12px;font-weight:600;">Today</button>
+          <button class="crm-btn crm-btn-sm" id="sched-next" style="border:none;border-radius:0;padding:4px 10px;" title="Next week">&raquo;</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:12px;color:var(--text-muted,#888);font-weight:500;">
+          ${filtered.length} booking${filtered.length === 1 ? '' : 's'}
+        </span>
+        <select class="crm-select" id="sched-staff-filter">${staffOptions}</select>
+      </div>
     </div>
 
-    <div style="border:1px solid var(--border-color,#eee);border-radius:8px;overflow:hidden;background:#fff;">
-      <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);background:var(--bg,#faf9f6);border-bottom:1px solid var(--border-color,#eee);">
-        <div></div>
+    <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+      <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);background:var(--bg,#faf9f6);">
+        <div style="border-bottom:1px solid var(--border-color,#eee);"></div>
         ${dayHeader}
       </div>
       <div style="display:grid;grid-template-columns:60px repeat(7, 1fr);">
-        <div>
-          ${hours.map(h => `<div style="height:${SCHEDULE_CELL_PX * 2}px;border-right:1px solid var(--border-color,#eee);border-bottom:1px solid var(--border-color,#eee);display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:11px;color:var(--text-muted,#888);">${formatHourLabel(h)}</div>`).join('')}
+        <div style="border-right:1px solid var(--border-color,#eee);background:#fafafa;">
+          ${hours.map(h => hourLabel(h)).join('')}
         </div>
-        ${pillsByDay.map(dayPills => `
-          <div style="position:relative;height:${gridHeight}px;border-right:1px solid var(--border-color,#eee);">
-            ${hours.map(() => `<div style="height:${SCHEDULE_CELL_PX * 2}px;border-bottom:1px solid var(--border-color,#eee);"></div>`).join('')}
-            ${dayPills.join('')}
-          </div>
-        `).join('')}
+        ${[0,1,2,3,4,5,6].map(i => dayColumn(i)).join('')}
       </div>
     </div>
 
     ${filtered.length === 0 ? `
-      <div style="margin-top:16px;padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:13px;color:var(--text-muted,#666);">
-        No bookings this week${scheduleStaffFilter !== 'all' ? ' for the selected filter' : ''}. Open a client and click an unscheduled session pill to book.
+      <div style="margin-top:16px;padding:18px 20px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:10px;font-size:13px;color:var(--text-muted,#666);text-align:center;">
+        <div style="font-size:14px;font-weight:600;color:var(--text,#444);margin-bottom:2px;">No bookings this week${scheduleStaffFilter !== 'all' ? ' for the selected filter' : ''}.</div>
+        Open a client and click an unscheduled session pill to book.
       </div>
     ` : ''}
   `;
+
+  // Auto-scroll so the current hour (or 8am) is visible near the top
+  if (todayIdx >= 0) {
+    const scrollTarget = panel.querySelector('[data-sched-booking]') || panel;
+    // no-op; pill hover handles focus. Kept as a hook for future scroll-into-view.
+  }
 }
 
 function openBookingDetail(bookingId) {
