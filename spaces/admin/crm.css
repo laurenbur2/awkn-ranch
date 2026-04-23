@@ -104,7 +104,13 @@
 
 /* Rows */
 .crm-lead-row { cursor: pointer; }
-.crm-lead-name { font-weight: 600; }
+.crm-table .crm-lead-name,
+.crm-table .crm-col-name {
+  font-weight: 600;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
 .crm-actions-cell { white-space: nowrap; }
 
 /* Badges */
@@ -240,7 +246,7 @@
 .crm-lead-header-main { display: flex; gap: 14px; align-items: center; min-width: 0; }
 .crm-lead-header-info { min-width: 0; }
 .crm-lead-header-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.crm-lead-name { font-size: 22px; font-weight: 700; margin: 0; color: var(--text, #2a1f23); }
+.crm-lead-header .crm-lead-name { font-size: 22px; font-weight: 700; margin: 0; color: var(--text, #2a1f23); }
 .crm-lead-subline {
   font-size: 13px; color: var(--text-muted, #888); margin-top: 4px;
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
