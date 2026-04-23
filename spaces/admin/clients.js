@@ -45,7 +45,7 @@ let staffList = [];         // app_users with role admin/staff/oracle, not archi
 // Schedule tab state
 let scheduleWeekStart = mondayOf(new Date()); // local Date @ 00:00 on Mon of viewed week
 let scheduleBookings = [];
-let scheduleStaffFilter = 'all';  // 'all' | staff_user_id | 'unassigned'
+let scheduleStaffFilter = 'all';  // 'all' | facilitator_id | 'unassigned'
 
 // House tab state
 let houseSelectedDate = new Date().toISOString().slice(0, 10);
@@ -1558,9 +1558,9 @@ function openScheduleSessionModal(sessionId, options = {}) {
     }
   };
 
-  const schedulableStaff = staffList.filter(u => u.role === 'admin' || u.role === 'oracle' || u.can_schedule);
-  if (!schedulableStaff.length) {
-    showToast('No staff with scheduling permission. Enable "can_schedule" on a user first.', 'error');
+  const activeFacilitators = facilitators.filter(f => f.is_active);
+  if (!activeFacilitators.length) {
+    showToast('No active facilitators. Add one in the Facilitators tab first.', 'error');
     return;
   }
 
@@ -1578,12 +1578,12 @@ function openScheduleSessionModal(sessionId, options = {}) {
           </div>
           <div class="crm-form-grid">
             <div class="crm-form-field">
-              <label>Staff *</label>
+              <label>Staff/Facilitator *</label>
               <select class="crm-select" id="sched-staff" required>
-                <option value="">\u2014 pick staff \u2014</option>
-                ${schedulableStaff.map(u => {
-                  const n = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || '—';
-                  return `<option value="${u.id}">${escapeHtml(n)}</option>`;
+                <option value="">\u2014 pick facilitator \u2014</option>
+                ${activeFacilitators.map(f => {
+                  const n = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || '\u2014';
+                  return `<option value="${f.id}">${escapeHtml(n)}</option>`;
                 }).join('')}
               </select>
             </div>
@@ -1631,13 +1631,13 @@ async function saveScheduledSession(sessionId, options = {}) {
   if (!ctx) { showToast('Session not found', 'error'); return; }
   const { session, pkg } = ctx;
 
-  const staffId = document.getElementById('sched-staff').value;
+  const facilitatorId = document.getElementById('sched-staff').value;
   const startLocal = document.getElementById('sched-start').value;
   const duration = parseInt(document.getElementById('sched-duration').value, 10) || 0;
   const spaceId = document.getElementById('sched-space').value || null;
   const notes = document.getElementById('sched-notes').value.trim() || null;
 
-  if (!staffId) { showToast('Pick a staff member', 'error'); return; }
+  if (!facilitatorId) { showToast('Pick a facilitator', 'error'); return; }
   if (!startLocal) { showToast('Pick a start time', 'error'); return; }
 
   // datetime-local is local time — convert to ISO in the user's timezone
@@ -1664,7 +1664,7 @@ async function saveScheduledSession(sessionId, options = {}) {
       body: JSON.stringify({
         lead_id: pkg.lead_id,
         service_id: session.service_id,
-        staff_user_id: staffId,
+        facilitator_id: facilitatorId,
         start_datetime: startDate.toISOString(),
         duration_minutes: duration || undefined,
         space_id: spaceId,
@@ -1676,7 +1676,7 @@ async function saveScheduledSession(sessionId, options = {}) {
 
     if (!resp.ok) {
       if (json.error === 'slot_taken') {
-        showToast('That time slot is already booked for this staff member.', 'error');
+        showToast('That time slot is already booked for this facilitator.', 'error');
       } else {
         showToast('Booking failed: ' + (json.error || resp.status), 'error');
       }
@@ -1934,6 +1934,18 @@ function getStaffName(userId) {
   return u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || null;
 }
 
+function getFacilitatorName(facilitatorId) {
+  const f = facilitators.find(x => x.id === facilitatorId);
+  if (!f) return null;
+  return `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || null;
+}
+
+function getAssigneeName(booking) {
+  if (booking.facilitator_id) return getFacilitatorName(booking.facilitator_id);
+  if (booking.staff_user_id) return getStaffName(booking.staff_user_id);
+  return null;
+}
+
 async function loadScheduleWeek() {
   const start = new Date(scheduleWeekStart);
   const end = new Date(scheduleWeekStart);
@@ -1943,7 +1955,7 @@ async function loadScheduleWeek() {
   // events and Google-synced calendar holds have lead_id null and don't belong here.
   const { data, error } = await supabase
     .from('scheduling_bookings')
-    .select('id, start_datetime, end_datetime, staff_user_id, service_id, lead_id, booker_name, booker_email, booker_phone, space_id, status, cancelled_at, package_session_id, notes')
+    .select('id, start_datetime, end_datetime, staff_user_id, facilitator_id, service_id, lead_id, booker_name, booker_email, booker_phone, space_id, status, cancelled_at, package_session_id, notes')
     .gte('start_datetime', start.toISOString())
     .lt('start_datetime', end.toISOString())
     .is('cancelled_at', null)
@@ -1981,8 +1993,8 @@ function renderSchedulePanel() {
 
   const filtered = scheduleBookings.filter(b => {
     if (scheduleStaffFilter === 'all') return true;
-    if (scheduleStaffFilter === 'unassigned') return !b.staff_user_id;
-    return b.staff_user_id === scheduleStaffFilter;
+    if (scheduleStaffFilter === 'unassigned') return !b.facilitator_id && !b.staff_user_id;
+    return b.facilitator_id === scheduleStaffFilter || b.staff_user_id === scheduleStaffFilter;
   });
 
   const pillsByDay = Array.from({ length: 7 }, () => []);
@@ -2002,7 +2014,7 @@ function renderSchedulePanel() {
 
     const svc = escapeHtml(getServiceName(b.service_id) || 'Session');
     const client = escapeHtml(b.booker_name || 'Client');
-    const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
+    const staff = getAssigneeName(b) || 'Unassigned';
     const timeLabel = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
     const color = serviceColor(b.service_id);
     const tooltip = `${svc} \u00b7 ${client} \u00b7 ${escapeHtml(staff)} \u00b7 ${timeLabel}`;
@@ -2028,14 +2040,14 @@ function renderSchedulePanel() {
     `);
   }
 
-  const schedulableStaff = staffList.filter(u => u.role === 'admin' || u.role === 'oracle' || u.can_schedule);
+  const activeFacilitators = facilitators.filter(f => f.is_active);
   const staffOptions = [
-    `<option value="all">All staff</option>`,
+    `<option value="all">All staff/facilitators</option>`,
     `<option value="unassigned">Unassigned</option>`,
-    ...schedulableStaff.map(u => {
-      const n = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || '\u2014';
-      const sel = scheduleStaffFilter === u.id ? 'selected' : '';
-      return `<option value="${u.id}" ${sel}>${escapeHtml(n)}</option>`;
+    ...activeFacilitators.map(f => {
+      const n = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || '\u2014';
+      const sel = scheduleStaffFilter === f.id ? 'selected' : '';
+      return `<option value="${f.id}" ${sel}>${escapeHtml(n)}</option>`;
     }),
   ].join('');
 
@@ -2144,7 +2156,7 @@ function openBookingDetail(bookingId) {
   const dateLabel = start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const timeLabel = `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} \u2013 ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
 
-  const staff = b.staff_user_id ? (getStaffName(b.staff_user_id) || 'Staff') : 'Unassigned';
+  const staff = getAssigneeName(b) || 'Unassigned';
   const client = b.lead_id ? clients.find(c => c.id === b.lead_id) : null;
   const clientName = client
     ? `${client.first_name || ''} ${client.last_name || ''}`.trim() || b.booker_name || 'Client'

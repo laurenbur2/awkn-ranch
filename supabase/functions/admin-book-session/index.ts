@@ -8,7 +8,8 @@
 // project_es256_jwt_gateway_bug.
 //
 // Body: {
-//   lead_id, service_id, staff_user_id, start_datetime (iso),
+//   lead_id, service_id, start_datetime (iso),
+//   staff_user_id OR facilitator_id (one is required),
 //   duration_minutes?, space_id?, package_session_id?, notes?
 // }
 
@@ -60,15 +61,22 @@ serve(async (req) => {
 
     const lead_id = String(body.lead_id || "").trim();
     const service_id = String(body.service_id || "").trim();
-    const staff_user_id = String(body.staff_user_id || "").trim();
+    const staff_user_id = body.staff_user_id ? String(body.staff_user_id).trim() : "";
+    const facilitator_id = body.facilitator_id ? String(body.facilitator_id).trim() : "";
     const start_iso = String(body.start_datetime || "").trim();
     const space_id = body.space_id ? String(body.space_id) : null;
     const package_session_id = body.package_session_id ? String(body.package_session_id) : null;
     const notes = body.notes ? String(body.notes) : null;
     const override_duration = body.duration_minutes != null ? Number(body.duration_minutes) : null;
 
-    if (!lead_id || !service_id || !staff_user_id || !start_iso) {
+    if (!lead_id || !service_id || !start_iso) {
       return json({ error: "missing_fields" }, 400);
+    }
+    if (!staff_user_id && !facilitator_id) {
+      return json({ error: "missing_assignee" }, 400);
+    }
+    if (staff_user_id && facilitator_id) {
+      return json({ error: "only_one_assignee" }, 400);
     }
     const startDate = new Date(start_iso);
     if (isNaN(startDate.getTime())) return json({ error: "invalid_start_datetime" }, 400);
@@ -108,13 +116,23 @@ serve(async (req) => {
       }
     }
 
-    const { data: staff } = await supabase
-      .from("app_users")
-      .select("id, display_name, email, can_schedule, role, is_archived")
-      .eq("id", staff_user_id)
-      .maybeSingle();
-    if (!staff) return json({ error: "staff_not_found" }, 404);
-    if (staff.is_archived) return json({ error: "staff_archived" }, 400);
+    if (staff_user_id) {
+      const { data: staff } = await supabase
+        .from("app_users")
+        .select("id, display_name, email, can_schedule, role, is_archived")
+        .eq("id", staff_user_id)
+        .maybeSingle();
+      if (!staff) return json({ error: "staff_not_found" }, 404);
+      if (staff.is_archived) return json({ error: "staff_archived" }, 400);
+    } else {
+      const { data: fac } = await supabase
+        .from("facilitators")
+        .select("id, first_name, last_name, is_active")
+        .eq("id", facilitator_id)
+        .maybeSingle();
+      if (!fac) return json({ error: "facilitator_not_found" }, 404);
+      if (!fac.is_active) return json({ error: "facilitator_inactive" }, 400);
+    }
 
     const bookerName = lead.name || "Client";
     const bookerEmail = (lead.email || "").trim().toLowerCase() || "noreply@within.center";
@@ -124,7 +142,8 @@ serve(async (req) => {
       .insert({
         profile_id: null,
         event_type_id: null,
-        staff_user_id,
+        staff_user_id: staff_user_id || null,
+        facilitator_id: facilitator_id || null,
         lead_id,
         service_id,
         space_id,
