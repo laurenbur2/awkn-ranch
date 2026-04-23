@@ -819,17 +819,20 @@ function openClientDetail(leadId) {
   const hospSaveBtn = document.getElementById('btn-save-hospitality');
   if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
 
-  const dietToggle = document.getElementById('hosp-diet-toggle');
-  const dietPanel = document.getElementById('hosp-diet-panel');
-  const dietChevron = document.getElementById('hosp-diet-chevron');
-  if (dietToggle && dietPanel) {
-    dietToggle.addEventListener('click', () => {
-      const open = dietPanel.style.display !== 'none';
-      dietPanel.style.display = open ? 'none' : 'grid';
-      dietToggle.setAttribute('aria-expanded', open ? 'false' : 'true');
-      if (dietChevron) dietChevron.style.transform = open ? '' : 'rotate(90deg)';
+  const bindCollapsible = (toggleId, panelId, chevronId) => {
+    const toggle = document.getElementById(toggleId);
+    const panel = document.getElementById(panelId);
+    const chevron = document.getElementById(chevronId);
+    if (!toggle || !panel) return;
+    toggle.addEventListener('click', () => {
+      const open = panel.style.display !== 'none';
+      panel.style.display = open ? 'none' : 'grid';
+      toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (chevron) chevron.style.transform = open ? '' : 'rotate(90deg)';
     });
-  }
+  };
+  bindCollapsible('hosp-diet-toggle', 'hosp-diet-panel', 'hosp-diet-chevron');
+  bindCollapsible('hosp-arr-toggle',  'hosp-arr-panel',  'hosp-arr-chevron');
 }
 
 // Editable hospitality / logistics block for the client drawer.
@@ -902,12 +905,19 @@ function renderHospitalityBlock(c) {
           </div>
         </div>
 
-        ${subhead('Arrival & Departure')}
-        ${textArea('hosp-arr-details', 'Arrival details',   c.arrival_details,   { placeholder: 'flight #, ETA, airline\u2026', rows: 2 })}
-        ${textArea('hosp-dep-details', 'Departure details', c.departure_details, { placeholder: 'flight #, departure time\u2026', rows: 2 })}
-        <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 24px;padding:4px 0 2px;">
-          ${toggle('hosp-arr-pickup', 'Airport pickup needed', c.arrival_pickup_needed)}
-          ${toggle('hosp-dep-pickup', 'Airport dropoff needed', c.departure_pickup_needed)}
+        <div style="grid-column:1 / -1;margin-top:6px;">
+          <button type="button" id="hosp-arr-toggle" class="crm-btn crm-btn-sm" aria-expanded="false" style="display:inline-flex;align-items:center;gap:8px;">
+            <span id="hosp-arr-chevron" style="display:inline-block;transition:transform .15s;">▸</span>
+            <span>Arrival &amp; departure</span>
+          </button>
+          <div id="hosp-arr-panel" style="display:none;grid-template-columns:repeat(2, 1fr);gap:10px 14px;margin-top:10px;">
+            ${textArea('hosp-arr-details', 'Arrival details',   c.arrival_details,   { placeholder: 'flight #, ETA, airline\u2026', rows: 2 })}
+            ${textArea('hosp-dep-details', 'Departure details', c.departure_details, { placeholder: 'flight #, departure time\u2026', rows: 2 })}
+            <div style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 24px;padding:4px 0 2px;">
+              ${toggle('hosp-arr-pickup', 'Airport pickup needed', c.arrival_pickup_needed)}
+              ${toggle('hosp-dep-pickup', 'Airport dropoff needed', c.departure_pickup_needed)}
+            </div>
+          </div>
         </div>
       </div>
 
