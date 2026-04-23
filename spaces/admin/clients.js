@@ -1866,14 +1866,16 @@ function openFacilitatorModal(facilitator = null) {
             <label>Services this facilitator delivers</label>
             ${activeServices.length === 0
               ? `<div style="font-size:12px;color:var(--text-muted,#888);">No active services available.</div>`
-              : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;padding:8px;border:1px solid var(--border,#333);border-radius:6px;max-height:240px;overflow-y:auto;">
-                  ${activeServices.map(s => `
-                    <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
-                      <input type="checkbox" class="fac-service-checkbox" value="${s.id}" ${assignedIds.has(s.id) ? 'checked' : ''}>
+              : `<div id="fac-services-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+                  ${activeServices.map(s => {
+                    const on = assignedIds.has(s.id);
+                    return `<button type="button" class="fac-service-pill" data-service-id="${s.id}" data-selected="${on ? '1' : '0'}"
+                      style="padding:6px 12px;border-radius:999px;font-size:13px;cursor:pointer;transition:all .1s ease;border:1px solid ${on ? '#d4883a' : 'var(--border,#ddd)'};background:${on ? '#d4883a' : '#fff'};color:${on ? '#fff' : 'var(--text,#444)'};font-weight:${on ? '600' : '400'};">
                       ${escapeHtml(s.name)}
-                    </label>
-                  `).join('')}
-                </div>`
+                    </button>`;
+                  }).join('')}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted,#888);margin-top:6px;">Click a service to toggle.</div>`
             }
           </div>
         </div>
@@ -1898,6 +1900,20 @@ function openFacilitatorModal(facilitator = null) {
   if (isEdit) {
     document.getElementById('btn-delete-facilitator').addEventListener('click', () => deleteFacilitator(facilitator));
   }
+
+  const pillsWrap = document.getElementById('fac-services-pills');
+  if (pillsWrap) {
+    pillsWrap.addEventListener('click', (e) => {
+      const pill = e.target.closest('.fac-service-pill');
+      if (!pill) return;
+      const on = pill.dataset.selected === '1';
+      pill.dataset.selected = on ? '0' : '1';
+      pill.style.background = on ? '#fff' : '#d4883a';
+      pill.style.color = on ? 'var(--text,#444)' : '#fff';
+      pill.style.borderColor = on ? 'var(--border,#ddd)' : '#d4883a';
+      pill.style.fontWeight = on ? '400' : '600';
+    });
+  }
 }
 
 async function saveFacilitator(existing) {
@@ -1915,7 +1931,7 @@ async function saveFacilitator(existing) {
     updated_at: new Date().toISOString(),
   };
 
-  const selectedSvcIds = [...document.querySelectorAll('.fac-service-checkbox:checked')].map(cb => cb.value);
+  const selectedSvcIds = [...document.querySelectorAll('.fac-service-pill[data-selected="1"]')].map(p => p.dataset.serviceId);
 
   let facilitatorId;
   if (existing) {
