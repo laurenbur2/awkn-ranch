@@ -1802,7 +1802,7 @@ function renderFacilitatorsSection() {
                 <td><strong>${escapeHtml(fullName)}</strong></td>
                 <td>${f.email ? `<a href="mailto:${escapeHtml(f.email)}" onclick="event.stopPropagation();">${escapeHtml(f.email)}</a>` : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
                 <td>${f.phone ? escapeHtml(f.phone) : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
-                <td style="max-width:320px;">${svcNames.length ? svcNames.map(n => `<span style="display:inline-block;padding:2px 8px;margin:1px 3px 1px 0;background:var(--surface-subtle,#1f1f1f);border-radius:10px;font-size:11px;">${escapeHtml(n)}</span>`).join('') : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+                <td style="max-width:320px;">${svcNames.length ? svcNames.map(n => `<span style="display:inline-block;padding:2px 10px;margin:1px 3px 1px 0;background:#f3ece0;color:#6b4a1f;border:1px solid #e6d9c2;border-radius:999px;font-size:11px;font-weight:500;">${escapeHtml(n)}</span>`).join('') : '<span style="color:var(--text-muted,#888);">—</span>'}</td>
                 <td>${f.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
                 <td><button class="crm-btn crm-btn-xs" data-edit-facilitator="${f.id}">Edit</button></td>
               </tr>
