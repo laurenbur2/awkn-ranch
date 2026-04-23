@@ -42,6 +42,10 @@ let beds = [];              // all non-archived beds
 let sessionSpaces = [];     // spaces where space_type='session' (treatment rooms)
 let staffList = [];         // app_users with role admin/staff/oracle, not archived
 
+// Integration notes cache: lead_id -> array of notes (newest first).
+// Loaded on demand when a client drawer opens.
+let integrationNotesByLead = new Map();
+
 // Schedule tab state
 let scheduleWeekStart = mondayOf(new Date()); // local Date @ 00:00 on Mon of viewed week
 let scheduleBookings = [];
@@ -800,12 +804,9 @@ function openClientDetail(leadId) {
               ${renderStayList(clientStays)}
             </section>
           </div>
-          <section>
-            <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Notes</h3>
-            <textarea class="crm-textarea" id="client-notes" rows="4" style="width:100%;" placeholder="Integration notes, intake details, etc.">${escapeHtml(c.notes || '')}</textarea>
-            <div style="margin-top:8px;text-align:right;">
-              <button class="crm-btn crm-btn-sm" id="btn-save-notes" data-client-id="${c.id}">Save notes</button>
-            </div>
+          ${renderLegacyNoteBlock(c)}
+          <section id="integration-notes-section" data-lead-id="${c.id}">
+            <div style="color:var(--text-muted,#888);font-size:13px;padding:8px 0;">Loading integration notes\u2026</div>
           </section>
         </div>
       </div>
@@ -817,7 +818,7 @@ function openClientDetail(leadId) {
   document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'clients-modal-overlay') closeModal();
   });
-  document.getElementById('btn-save-notes').addEventListener('click', () => saveClientNotes(leadId));
+  bootstrapIntegrationNotesSection(leadId);
 
   const hospSaveBtn = document.getElementById('btn-save-hospitality');
   if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
@@ -1075,13 +1076,181 @@ function renderStayList(clientStays) {
   }).join('');
 }
 
-async function saveClientNotes(leadId) {
-  const notes = document.getElementById('client-notes').value;
-  const { error } = await supabase.from('crm_leads').update({ notes: notes || null }).eq('id', leadId);
-  if (error) { showToast('Failed to save notes', 'error'); return; }
-  const c = clients.find(x => x.id === leadId);
-  if (c) c.notes = notes;
-  showToast('Notes saved', 'success');
+// ---------- Integration Notes (EMR-style chart notes) ----------
+// Loaded lazily when a client drawer opens. Notes are authored + timestamped;
+// admins/staff can amend, never delete. Strictly internal -- never rendered in
+// the client portal.
+
+function getStaffDisplayName(appUserId) {
+  if (!appUserId) return 'Unknown';
+  const s = staffList.find(x => x.id === appUserId);
+  if (!s) return 'Unknown';
+  return s.display_name || `${s.first_name || ''} ${s.last_name || ''}`.trim() || s.email || 'Unknown';
+}
+
+function formatDateTimeShort(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  const date = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const time = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return `${date} \u00b7 ${time}`;
+}
+
+// Legacy single-field note from crm_leads.notes. Shown read-only above the
+// integration-notes history so content saved before this feature shipped
+// isn't lost. Once every client's legacy note is migrated, this block can go.
+function renderLegacyNoteBlock(c) {
+  if (!c.notes || !c.notes.trim()) return '';
+  return `
+    <section style="margin-bottom:12px;padding:10px 12px;border:1px dashed var(--border-color,#d6d6d6);border-radius:8px;background:#fbf9f4;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:4px;">Legacy note</div>
+      <div style="font-size:13px;white-space:pre-wrap;color:var(--text,#2a1f23);">${escapeHtml(c.notes)}</div>
+    </section>
+  `;
+}
+
+async function bootstrapIntegrationNotesSection(leadId) {
+  try {
+    const { data, error } = await supabase
+      .from('client_integration_notes')
+      .select('id, lead_id, author_app_user_id, content, created_at, updated_at')
+      .eq('lead_id', leadId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    integrationNotesByLead.set(leadId, data || []);
+  } catch (e) {
+    console.error('load integration notes error:', e);
+    integrationNotesByLead.set(leadId, []);
+    showToast('Failed to load integration notes', 'error');
+  }
+  renderIntegrationNotesSection(leadId);
+}
+
+function renderIntegrationNotesSection(leadId) {
+  const el = document.getElementById('integration-notes-section');
+  if (!el || el.dataset.leadId !== leadId) return; // drawer closed or switched
+  const notes = integrationNotesByLead.get(leadId) || [];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Integration Notes</h3>
+      <span style="font-size:11px;color:var(--text-muted,#aaa);">${notes.length} ${notes.length === 1 ? 'entry' : 'entries'}</span>
+    </div>
+    <div style="border:1px solid var(--border-color,#eee);border-radius:10px;padding:12px;background:#fff;margin-bottom:12px;">
+      <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:6px;">New entry</label>
+      <textarea class="crm-textarea" id="integration-note-new" rows="3" style="width:100%;" placeholder="Observations, plan, follow-up\u2026"></textarea>
+      <div style="margin-top:8px;text-align:right;">
+        <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="add-integration-note">Add note</button>
+      </div>
+    </div>
+    ${notes.length
+      ? `<div style="display:flex;flex-direction:column;gap:8px;">${notes.map(renderIntegrationNoteCard).join('')}</div>`
+      : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No integration notes yet.</div>`}
+  `;
+
+  el.querySelector('[data-action="add-integration-note"]')?.addEventListener('click', () => addIntegrationNote(leadId));
+  el.querySelectorAll('[data-action="edit-integration-note"]').forEach(btn => {
+    btn.addEventListener('click', () => startEditIntegrationNote(leadId, btn.dataset.noteId));
+  });
+}
+
+function renderIntegrationNoteCard(n) {
+  const author = escapeHtml(getStaffDisplayName(n.author_app_user_id));
+  const created = formatDateTimeShort(n.created_at);
+  const edited = n.updated_at && n.updated_at !== n.created_at
+    ? ` \u00b7 edited ${formatDateTimeShort(n.updated_at)}`
+    : '';
+  return `
+    <div class="integration-note-card" data-note-id="${n.id}" style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px 14px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;">
+        <div style="font-size:12px;color:var(--text-muted,#666);">
+          <strong style="color:var(--text,#2a1f23);">${author}</strong> \u00b7 ${created}${edited}
+        </div>
+        <button class="crm-btn crm-btn-sm" data-action="edit-integration-note" data-note-id="${n.id}" style="font-size:11px;">Edit</button>
+      </div>
+      <div class="integration-note-body" style="font-size:13px;white-space:pre-wrap;color:var(--text,#2a1f23);">${escapeHtml(n.content)}</div>
+    </div>
+  `;
+}
+
+async function addIntegrationNote(leadId) {
+  const ta = document.getElementById('integration-note-new');
+  const btn = document.querySelector('[data-action="add-integration-note"]');
+  if (!ta) return;
+  const content = ta.value.trim();
+  if (!content) { showToast('Write something first', 'error'); return; }
+  const authorId = authState?.appUser?.id || null;
+  if (btn) btn.disabled = true;
+
+  const { data, error } = await supabase
+    .from('client_integration_notes')
+    .insert({ lead_id: leadId, author_app_user_id: authorId, content })
+    .select('id, lead_id, author_app_user_id, content, created_at, updated_at')
+    .single();
+
+  if (btn) btn.disabled = false;
+  if (error) {
+    console.error('add integration note error:', error);
+    showToast('Failed to add note: ' + error.message, 'error');
+    return;
+  }
+
+  const list = integrationNotesByLead.get(leadId) || [];
+  list.unshift(data);
+  integrationNotesByLead.set(leadId, list);
+  renderIntegrationNotesSection(leadId);
+  showToast('Note added', 'success');
+}
+
+function startEditIntegrationNote(leadId, noteId) {
+  const list = integrationNotesByLead.get(leadId) || [];
+  const n = list.find(x => x.id === noteId);
+  if (!n) return;
+  const card = document.querySelector(`.integration-note-card[data-note-id="${noteId}"]`);
+  if (!card) return;
+  const body = card.querySelector('.integration-note-body');
+  const header = card.querySelector('[data-action="edit-integration-note"]');
+  if (!body || !header) return;
+
+  body.innerHTML = `<textarea class="crm-textarea" rows="3" style="width:100%;">${escapeHtml(n.content)}</textarea>`;
+  header.outerHTML = `
+    <div style="display:flex;gap:6px;">
+      <button class="crm-btn crm-btn-sm" data-action="cancel-edit-note" data-note-id="${noteId}" style="font-size:11px;">Cancel</button>
+      <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="save-edit-note" data-note-id="${noteId}" style="font-size:11px;">Save</button>
+    </div>
+  `;
+  card.querySelector('[data-action="cancel-edit-note"]').addEventListener('click', () => renderIntegrationNotesSection(leadId));
+  card.querySelector('[data-action="save-edit-note"]').addEventListener('click', () => saveIntegrationNoteEdit(leadId, noteId));
+  card.querySelector('textarea')?.focus();
+}
+
+async function saveIntegrationNoteEdit(leadId, noteId) {
+  const card = document.querySelector(`.integration-note-card[data-note-id="${noteId}"]`);
+  const ta = card?.querySelector('textarea');
+  if (!ta) return;
+  const content = ta.value.trim();
+  if (!content) { showToast('Note cannot be empty', 'error'); return; }
+  const saveBtn = card.querySelector('[data-action="save-edit-note"]');
+  if (saveBtn) saveBtn.disabled = true;
+
+  const { data, error } = await supabase
+    .from('client_integration_notes')
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq('id', noteId)
+    .select('id, lead_id, author_app_user_id, content, created_at, updated_at')
+    .single();
+
+  if (error) {
+    console.error('edit integration note error:', error);
+    showToast('Failed to save: ' + error.message, 'error');
+    if (saveBtn) saveBtn.disabled = false;
+    return;
+  }
+
+  const list = integrationNotesByLead.get(leadId) || [];
+  const idx = list.findIndex(x => x.id === noteId);
+  if (idx !== -1) list[idx] = data;
+  renderIntegrationNotesSection(leadId);
+  showToast('Note updated', 'success');
 }
 
 // ---------- New Package modal ----------
