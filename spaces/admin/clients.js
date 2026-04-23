@@ -1721,7 +1721,6 @@ function renderServicesPanel() {
               <th>Duration</th>
               <th>Default price</th>
               <th>Upfront pay</th>
-              <th>Sort</th>
               <th>Status</th>
               <th></th>
             </tr>
@@ -1734,7 +1733,6 @@ function renderServicesPanel() {
                 <td>${s.duration_minutes} min</td>
                 <td>${formatPriceCents(s.default_price_cents)}</td>
                 <td>${s.requires_upfront_payment ? 'Yes' : 'No'}</td>
-                <td>${s.sort_order}</td>
                 <td>${s.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
                 <td><button class="crm-btn crm-btn-xs" data-edit-service="${s.id}">Edit</button></td>
               </tr>
@@ -1997,23 +1995,18 @@ function openServiceModal(service = null) {
               <label>Default price ($)</label>
               <input type="number" class="crm-input" id="service-price" value="${service ? (service.default_price_cents / 100).toFixed(2) : '0.00'}" step="0.01" min="0">
             </div>
-            <div class="crm-form-field">
-              <label>Sort order</label>
-              <input type="number" class="crm-input" id="service-sort" value="${service?.sort_order ?? 100}" min="0">
-            </div>
-            <div class="crm-form-field">
-              <label>&nbsp;</label>
-              <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
-                <input type="checkbox" id="service-upfront" ${service?.requires_upfront_payment ? 'checked' : ''}> Requires upfront payment
-              </label>
-              <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;margin-top:4px;">
-                <input type="checkbox" id="service-active" ${service ? (service.is_active ? 'checked' : '') : 'checked'}> Active
-              </label>
-            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;margin-top:12px;flex-wrap:wrap;">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
+              <input type="checkbox" id="service-upfront" ${service?.requires_upfront_payment ? 'checked' : ''}> Requires upfront payment
+            </label>
+            <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;font-size:13px;">
+              <input type="checkbox" id="service-active" ${service ? (service.is_active ? 'checked' : '') : 'checked'}> Active
+            </label>
           </div>
           <div class="crm-form-field" style="margin-top:12px;">
             <label>Description</label>
-            <textarea class="crm-textarea" id="service-description" rows="3">${escapeHtml(service?.description || '')}</textarea>
+            <textarea class="crm-textarea" id="service-description" rows="2">${escapeHtml(service?.description || '')}</textarea>
           </div>
         </div>
         <div class="crm-modal-footer">
@@ -2061,7 +2054,6 @@ async function saveService(existing) {
 
   const priceDollars = parseFloat(document.getElementById('service-price').value) || 0;
   const priceCents = Math.round(priceDollars * 100);
-  const sortOrder = parseInt(document.getElementById('service-sort').value, 10) || 0;
   const requiresUpfront = document.getElementById('service-upfront').checked;
   const isActive = document.getElementById('service-active').checked;
   const description = document.getElementById('service-description').value.trim() || null;
@@ -2074,7 +2066,6 @@ async function saveService(existing) {
     default_price_cents: priceCents,
     requires_upfront_payment: requiresUpfront,
     is_active: isActive,
-    sort_order: sortOrder,
     updated_at: new Date().toISOString(),
   };
 
