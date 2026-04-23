@@ -252,23 +252,92 @@ function previewBanner(phaseLabel, note) {
 // ---------- Clients tab (Phase 3, live) ----------
 let clientSearch = '';
 
+// Classify a client package as retreat (immersive, overnight) or day (outpatient).
+// Retreat packages have "residential", "immersion", or "retreat" in the stored name.
+function isRetreatPackage(p) {
+  return /residential|immersion|retreat/i.test(p?.name || '');
+}
+
+// Build a per-client context used by every section: active packages, stays,
+// and sessions remaining per service. Centralizing this keeps the section
+// filters and row renderers consistent.
+function buildClientContext(c, now) {
+  const pkgs = getClientPackages(c.id);
+  const activePkgs = pkgs.filter(p => p.status === 'active');
+  const retreatPkgs = activePkgs.filter(isRetreatPackage);
+  const dayPkgs = activePkgs.filter(p => !isRetreatPackage(p));
+
+  const clientStays = getClientStays(c.id).filter(s => s.status !== 'cancelled');
+  const currentStay = clientStays.find(s =>
+    new Date(s.check_in_at) <= now && new Date(s.check_out_at) > now
+  );
+  const futureStay = clientStays
+    .filter(s => new Date(s.check_in_at) > now)
+    .sort((a, b) => new Date(a.check_in_at) - new Date(b.check_in_at))[0];
+
+  // Sessions remaining = not completed and not cancelled, across *all* active
+  // packages (keyed by service_id so the drawer can show per-service counts).
+  const remainingByService = new Map();
+  for (const p of activePkgs) {
+    for (const s of (p.sessions || [])) {
+      if (s.status === 'completed' || s.status === 'cancelled') continue;
+      remainingByService.set(s.service_id, (remainingByService.get(s.service_id) || 0) + 1);
+    }
+  }
+
+  const hasRemainingDaySession = dayPkgs.some(p =>
+    (p.sessions || []).some(s => s.status !== 'completed' && s.status !== 'cancelled')
+  );
+
+  return {
+    client: c, pkgs, activePkgs, retreatPkgs, dayPkgs,
+    clientStays, currentStay, futureStay,
+    remainingByService, hasRemainingDaySession,
+  };
+}
+
 function renderClientsPanel() {
   const panel = document.getElementById('clients-panel-clients');
   if (!panel) return;
 
   const q = clientSearch.trim().toLowerCase();
-  const filtered = clients.filter(c => {
+  const matchesSearch = c => {
     if (!q) return true;
-    const hay = `${c.first_name || ''} ${c.last_name || ''} ${c.email || ''} ${c.phone || ''}`.toLowerCase();
-    return hay.includes(q);
-  });
+    return `${c.first_name || ''} ${c.last_name || ''} ${c.email || ''} ${c.phone || ''}`
+      .toLowerCase().includes(q);
+  };
+
+  const now = new Date();
+  const inHouse = [];
+  const dayActive = [];
+  const scheduledArrivals = [];
+  const pastClients = [];
+
+  for (const c of clients) {
+    if (!matchesSearch(c)) continue;
+    const ctx = buildClientContext(c, now);
+
+    // Priority order matches the user-facing section order:
+    // In the house > Day package w/ remaining sessions > Scheduled retreat arrival > Past.
+    if (ctx.currentStay && ctx.retreatPkgs.length) {
+      inHouse.push(ctx);
+    } else if (ctx.hasRemainingDaySession) {
+      dayActive.push(ctx);
+    } else if (ctx.retreatPkgs.length) {
+      scheduledArrivals.push(ctx);
+    } else {
+      pastClients.push(ctx);
+    }
+  }
+
+  const totalFiltered = inHouse.length + dayActive.length + scheduledArrivals.length + pastClients.length;
 
   let html = `
     <div class="crm-pipeline-toolbar">
       <button class="crm-btn crm-btn-primary" id="btn-new-client">+ New Client</button>
       <input class="crm-search" id="clients-search" placeholder="Search clients by name, email, phone\u2026" value="${escapeHtml(clientSearch)}">
       <span style="margin-left:auto;font-size:12px;color:var(--text-muted,#888);">
-        ${filtered.length} of ${clients.length} active client${clients.length === 1 ? '' : 's'}
+        ${totalFiltered} of ${clients.length} active client${clients.length === 1 ? '' : 's'}
       </span>
     </div>
   `;
@@ -280,67 +349,170 @@ function renderClientsPanel() {
       </div>
     `;
   } else {
-    html += `
-      <div class="crm-table-wrap">
-        <table class="crm-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Packages</th>
-              <th>Sessions</th>
-              <th>Upcoming stay</th>
-              <th>Added</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filtered.map(c => renderClientRow(c)).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
+    html += renderClientSection({
+      title: 'In the House',
+      accent: '#16a34a',
+      subtitle: 'Actively at AWKN Ranch right now.',
+      ctxs: inHouse,
+      headers: ['Name', 'Contact', 'Room', 'Checked in', 'Checks out', 'Sessions left'],
+      rowFn: renderInHouseRow,
+    });
+    html += renderClientSection({
+      title: 'Day Package Clients \u2014 Sessions Remaining',
+      accent: '#d4883a',
+      subtitle: 'Outpatient clients with unused or upcoming sessions.',
+      ctxs: dayActive,
+      headers: ['Name', 'Contact', 'Packages', 'Sessions left', 'Next session'],
+      rowFn: renderDayActiveRow,
+    });
+    html += renderClientSection({
+      title: 'Scheduled Retreat Arrivals',
+      accent: '#4338ca',
+      subtitle: 'Retreat packages upcoming or awaiting a date.',
+      ctxs: scheduledArrivals,
+      headers: ['Name', 'Contact', 'Package', 'Arrival', 'Room'],
+      rowFn: renderScheduledArrivalRow,
+    });
+    html += renderClientSection({
+      title: 'Past Clients',
+      accent: '#94a3b8',
+      subtitle: 'No active packages.',
+      ctxs: pastClients,
+      headers: ['Name', 'Contact', 'History', 'Last activity'],
+      rowFn: renderPastClientRow,
+    });
   }
 
   panel.innerHTML = html;
 }
 
-function renderClientRow(c) {
-  const pkgs = getClientPackages(c.id);
-  const activePkgs = pkgs.filter(p => p.status === 'active');
-  const allSessions = pkgs.flatMap(p => p.sessions || []);
-  const completedSessions = allSessions.filter(s => s.status === 'completed').length;
-  const scheduledSessions = allSessions.filter(s => s.status === 'scheduled').length;
+function renderClientSection({ title, subtitle, accent, ctxs, headers, rowFn }) {
+  if (!ctxs.length) {
+    return `
+      <div style="margin-top:24px;">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;">
+          <div style="width:4px;height:18px;background:${accent};border-radius:2px;"></div>
+          <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text,#2a1f23);">${escapeHtml(title)}</h3>
+          <span style="font-size:11px;color:var(--text-muted,#aaa);">0</span>
+        </div>
+        <div style="padding:14px 16px;background:var(--bg,#faf9f6);border:1px dashed var(--border-color,#e5e5e5);border-radius:8px;font-size:12px;color:var(--text-muted,#888);">
+          ${escapeHtml(subtitle)} No clients in this group.
+        </div>
+      </div>
+    `;
+  }
+  return `
+    <div style="margin-top:24px;">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;">
+        <div style="width:4px;height:18px;background:${accent};border-radius:2px;"></div>
+        <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text,#2a1f23);">${escapeHtml(title)}</h3>
+        <span style="font-size:11px;color:var(--text-muted,#888);font-weight:600;">${ctxs.length}</span>
+        <span style="font-size:12px;color:var(--text-muted,#999);">${escapeHtml(subtitle)}</span>
+      </div>
+      <div class="crm-table-wrap">
+        <table class="crm-table">
+          <thead>
+            <tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>
+          </thead>
+          <tbody>
+            ${ctxs.map(rowFn).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
 
-  const now = new Date();
-  const upcomingStay = getClientStays(c.id)
-    .filter(s => s.status !== 'cancelled' && new Date(s.check_out_at) >= now)
-    .sort((a, b) => new Date(a.check_in_at) - new Date(b.check_in_at))[0];
-
-  const pkgCell = activePkgs.length
-    ? `<strong>${activePkgs.length}</strong> active${pkgs.length > activePkgs.length ? ` <span style="color:var(--text-muted,#888);">(${pkgs.length - activePkgs.length} past)</span>` : ''}`
-    : (pkgs.length ? `<span style="color:var(--text-muted,#888);">${pkgs.length} past</span>` : '<span style="color:var(--text-muted,#bbb);">\u2014</span>');
-
-  const sessionCell = allSessions.length
-    ? `<strong>${completedSessions}</strong> done${scheduledSessions ? ` &middot; ${scheduledSessions} scheduled` : ''} <span style="color:var(--text-muted,#888);">/ ${allSessions.length}</span>`
-    : '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
-
-  const stayCell = upcomingStay
-    ? `${escapeHtml(getBedLabel(upcomingStay.bed_id))}<div style="font-size:11px;color:var(--text-muted,#888);">${formatDateShort(upcomingStay.check_in_at)} \u2013 ${formatDateShort(upcomingStay.check_out_at)}</div>`
-    : '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
-
+function renderRowShell(ctx, cells) {
+  const c = ctx.client;
   const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
   const contact = c.email || c.phone || '';
-
   return `
     <tr class="clients-client-row" data-client-id="${c.id}" style="cursor:pointer;">
       <td><strong>${escapeHtml(name)}</strong></td>
       <td style="color:var(--text-muted,#666);font-size:12px;">${escapeHtml(contact)}</td>
-      <td>${pkgCell}</td>
-      <td>${sessionCell}</td>
-      <td>${stayCell}</td>
-      <td style="color:var(--text-muted,#888);font-size:12px;">${formatDateShort(c.created_at)}</td>
+      ${cells.join('')}
     </tr>
   `;
+}
+
+function formatRemainingByService(remainingByService) {
+  if (!remainingByService.size) return '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
+  const parts = [];
+  for (const [serviceId, count] of remainingByService) {
+    parts.push(`<span style="display:inline-block;font-size:12px;margin-right:6px;"><strong>${count}</strong> <span style="color:var(--text-muted,#888);">${escapeHtml(getServiceName(serviceId))}</span></span>`);
+  }
+  return parts.join('');
+}
+
+function renderInHouseRow(ctx) {
+  const stay = ctx.currentStay;
+  const bedLabel = stay ? getBedLabel(stay.bed_id) : '\u2014';
+  const checkIn = stay ? formatDateShort(stay.check_in_at) : '\u2014';
+  const checkOut = stay ? formatDateShort(stay.check_out_at) : '\u2014';
+  return renderRowShell(ctx, [
+    `<td>${escapeHtml(bedLabel)}</td>`,
+    `<td style="font-size:12px;color:var(--text-muted,#666);">${checkIn}</td>`,
+    `<td style="font-size:12px;color:var(--text-muted,#666);">${checkOut}</td>`,
+    `<td>${formatRemainingByService(ctx.remainingByService)}</td>`,
+  ]);
+}
+
+function renderDayActiveRow(ctx) {
+  const pkgNames = ctx.dayPkgs.map(p => escapeHtml(p.name)).join(', ') || '\u2014';
+
+  // Next upcoming scheduled session across day packages
+  const now = new Date();
+  const nextScheduled = ctx.dayPkgs
+    .flatMap(p => (p.sessions || []).filter(s => s.status === 'scheduled' && s.scheduled_at && new Date(s.scheduled_at) >= now))
+    .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at))[0];
+  const nextCell = nextScheduled
+    ? `${escapeHtml(getServiceName(nextScheduled.service_id))}<div style="font-size:11px;color:var(--text-muted,#888);">${formatDateShort(nextScheduled.scheduled_at)}</div>`
+    : '<span style="color:var(--text-muted,#bbb);">None scheduled</span>';
+
+  return renderRowShell(ctx, [
+    `<td style="font-size:12px;">${pkgNames}</td>`,
+    `<td>${formatRemainingByService(ctx.remainingByService)}</td>`,
+    `<td>${nextCell}</td>`,
+  ]);
+}
+
+function renderScheduledArrivalRow(ctx) {
+  const pkgNames = ctx.retreatPkgs.map(p => escapeHtml(p.name)).join(', ') || '\u2014';
+  const stay = ctx.futureStay;
+  const arrival = stay
+    ? `${formatDateShort(stay.check_in_at)}<div style="font-size:11px;color:var(--text-muted,#888);">\u2192 ${formatDateShort(stay.check_out_at)}</div>`
+    : '<span style="color:#b4691f;font-weight:600;">Date TBD</span>';
+  const room = stay
+    ? escapeHtml(getBedLabel(stay.bed_id))
+    : '<span style="color:var(--text-muted,#bbb);">\u2014</span>';
+  return renderRowShell(ctx, [
+    `<td style="font-size:12px;">${pkgNames}</td>`,
+    `<td style="font-size:12px;">${arrival}</td>`,
+    `<td style="font-size:12px;">${room}</td>`,
+  ]);
+}
+
+function renderPastClientRow(ctx) {
+  const c = ctx.client;
+  const completedCount = ctx.pkgs.filter(p => p.status === 'completed').length;
+  const cancelledCount = ctx.pkgs.filter(p => p.status === 'cancelled').length;
+  const historyParts = [];
+  if (completedCount) historyParts.push(`${completedCount} completed`);
+  if (cancelledCount) historyParts.push(`${cancelledCount} cancelled`);
+  if (!ctx.pkgs.length) historyParts.push('No packages');
+  const history = historyParts.join(' \u00b7 ');
+
+  const completedStays = ctx.clientStays.filter(s => s.status === 'completed')
+    .sort((a, b) => new Date(b.check_out_at) - new Date(a.check_out_at));
+  const lastActivity = completedStays[0]
+    ? formatDateShort(completedStays[0].check_out_at)
+    : formatDateShort(c.created_at);
+
+  return renderRowShell(ctx, [
+    `<td style="font-size:12px;color:var(--text-muted,#666);">${escapeHtml(history)}</td>`,
+    `<td style="font-size:12px;color:var(--text-muted,#888);">${lastActivity}</td>`,
+  ]);
 }
 
 // ---------- Add Client modal (new lead OR promote existing CRM lead) ----------
@@ -572,6 +744,16 @@ function openClientDetail(leadId) {
   const pkgs = getClientPackages(leadId);
   const clientStays = getClientStays(leadId);
 
+  // Aggregate sessions remaining per service across all active packages.
+  const remainingByService = new Map();
+  for (const p of pkgs) {
+    if (p.status !== 'active') continue;
+    for (const s of (p.sessions || [])) {
+      if (s.status === 'completed' || s.status === 'cancelled') continue;
+      remainingByService.set(s.service_id, (remainingByService.get(s.service_id) || 0) + 1);
+    }
+  }
+
   const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
 
   const modal = document.getElementById('clients-modal');
@@ -588,6 +770,7 @@ function openClientDetail(leadId) {
           <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
         </div>
         <div class="crm-modal-body" style="padding:20px;overflow-y:auto;">
+          ${renderSessionsRemainingBlock(remainingByService)}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
             <section>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -622,6 +805,32 @@ function openClientDetail(leadId) {
     if (e.target.id === 'clients-modal-overlay') closeModal();
   });
   document.getElementById('btn-save-notes').addEventListener('click', () => saveClientNotes(leadId));
+}
+
+function renderSessionsRemainingBlock(remainingByService) {
+  if (!remainingByService.size) {
+    return `
+      <section style="margin-bottom:20px;padding:14px 16px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
+        <h3 style="margin:0 0 6px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Sessions Remaining</h3>
+        <div style="font-size:13px;color:var(--text-muted,#999);">No unused sessions on active packages.</div>
+      </section>
+    `;
+  }
+  const pills = [];
+  for (const [serviceId, count] of remainingByService) {
+    pills.push(`
+      <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#fff8ec;border:1px solid #f0d9ae;border-radius:999px;">
+        <span style="font-weight:700;font-size:14px;color:#b4691f;">${count}\u00d7</span>
+        <span style="font-size:13px;color:var(--text,#2a1f23);">${escapeHtml(getServiceName(serviceId))}</span>
+      </div>
+    `);
+  }
+  return `
+    <section style="margin-bottom:20px;padding:14px 16px;border:1px solid #f0d9ae;border-radius:10px;background:#fffdf6;">
+      <h3 style="margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#b4691f;">Sessions Remaining</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">${pills.join('')}</div>
+    </section>
+  `;
 }
 
 function renderPackageList(pkgs) {
@@ -1583,7 +1792,17 @@ function openBookingDetail(bookingId) {
   `;
 
   const openClientBtn = b.lead_id
-    ? `<button class="crm-btn crm-btn-primary" id="btn-booking-open-client">Open client</button>`
+    ? `<button class="crm-btn" id="btn-booking-open-client">Open client</button>`
+    : '';
+
+  // Only offer cancel/reschedule if the booking is still active (not already cancelled).
+  const isActive = !b.cancelled_at && b.status !== 'cancelled';
+  const hasPackageSession = !!b.package_session_id;
+  const actionBtns = isActive
+    ? `
+      <button class="crm-btn" id="btn-booking-cancel" style="color:#b91c1c;border-color:#fca5a5;">Cancel session</button>
+      ${hasPackageSession ? `<button class="crm-btn crm-btn-primary" id="btn-booking-reschedule">Reschedule</button>` : ''}
+    `
     : '';
 
   const modal = document.getElementById('clients-modal');
@@ -1604,9 +1823,10 @@ function openBookingDetail(bookingId) {
         </div>
         <div class="crm-modal-footer">
           <span></span>
-          <div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="crm-btn" id="btn-booking-close">Close</button>
             ${openClientBtn}
+            ${actionBtns}
           </div>
         </div>
       </div>
@@ -1625,6 +1845,60 @@ function openBookingDetail(bookingId) {
       close();
       openClientDetail(b.lead_id);
     });
+  }
+  if (isActive) {
+    document.getElementById('btn-booking-cancel').addEventListener('click', () => cancelBooking(b.id, { reschedule: false }));
+    if (hasPackageSession) {
+      document.getElementById('btn-booking-reschedule').addEventListener('click', () => cancelBooking(b.id, { reschedule: true }));
+    }
+  }
+}
+
+// Cancel a booking and (optionally) immediately re-open the schedule modal for the
+// underlying package session so the admin can pick a new time without losing the
+// session credit. Frees the session back to 'unscheduled' so it counts as remaining.
+async function cancelBooking(bookingId, { reschedule = false } = {}) {
+  const booking = scheduleBookings.find(x => x.id === bookingId);
+  if (!booking) { showToast('Booking not found', 'error'); return; }
+
+  if (!reschedule && !confirm('Cancel this session? The session credit will go back to the client\u2019s remaining balance.')) {
+    return;
+  }
+
+  // 1) Mark the booking cancelled. `cancelled_at IS NULL` is how the schedule
+  //    grid filters, so this is enough to hide it from the week view.
+  const nowIso = new Date().toISOString();
+  const { error: bErr } = await supabase.from('scheduling_bookings')
+    .update({ cancelled_at: nowIso, status: 'cancelled' })
+    .eq('id', bookingId);
+  if (bErr) {
+    console.error('cancel booking error:', bErr);
+    showToast('Failed to cancel: ' + bErr.message, 'error');
+    return;
+  }
+
+  // 2) Free the session credit so it shows up again in Sessions Remaining.
+  const sessionId = booking.package_session_id || null;
+  if (sessionId) {
+    const { error: sErr } = await supabase.from('client_package_sessions')
+      .update({ status: 'unscheduled', booking_id: null, scheduled_at: null })
+      .eq('id', sessionId);
+    if (sErr) {
+      console.error('free session error:', sErr);
+      showToast('Booking cancelled, but failed to release session credit.', 'error');
+    }
+  }
+
+  showToast(reschedule ? 'Pick a new time' : 'Session cancelled', 'success');
+  await loadClientsData();
+  await loadScheduleWeek();
+
+  if (reschedule && sessionId) {
+    openScheduleSessionModal(sessionId);
+  } else {
+    // Close the modal
+    const modal = document.getElementById('clients-modal');
+    if (modal) { modal.style.display = 'none'; modal.innerHTML = ''; }
   }
 }
 
