@@ -45,6 +45,8 @@ type EmailType =
   | "prospect_invitation"
   // CRM proposal sent (with Stripe payment link)
   | "proposal_sent"
+  // CRM rental agreement e-sign request (AWKN Ranch only, separate from proposal email)
+  | "agreement_to_sign"
   // Within Center welcome letter (HEAL package, prep instructions)
   | "welcome_letter"
   // Admin notifications
@@ -1097,6 +1099,78 @@ ${validUntil ? `Valid until ${validUntil}` : ''}
 ${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.terms}\n\n` : ''}Questions? Reply to this email or write ${brand.supportEmail}.
 
 — The ${brand.name} Team`
+      };
+    }
+
+    case "agreement_to_sign": {
+      const eventDate = data.event_date
+        ? new Date(data.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      return {
+        subject: `Please sign your rental agreement — AWKN Ranch${data.title ? ` · ${data.title}` : ''}`,
+        html: `
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
+
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">AWKN RANCH</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">Austin, Texas</div>
+  </div>
+
+  <!-- Hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Rental Agreement</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">${String(data.title || 'Your Event at AWKN Ranch')}</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">Hi ${String(data.recipient_first_name || 'there')} — your rental agreement is ready for signature.</p>
+  </div>
+
+  ${eventDate ? `
+  <!-- Event details -->
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Event Date</div>
+      <div style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;font-weight:600;">${eventDate}</div>
+    </div>
+  </div>` : ''}
+
+  <!-- Body -->
+  <div style="padding:0 40px 12px 40px;">
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.7;margin:0 0 14px 0;">
+      Please review and sign the rental agreement below. Signing takes about two minutes via SignWell's secure e-signature portal. Once signed, we'll follow up separately with payment details to confirm your date.
+    </p>
+  </div>
+
+  <!-- Sign CTA -->
+  <div style="padding:8px 40px 32px 40px;text-align:center;">
+    <a href="${String(data.signing_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#1c1618;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Sign Rental Agreement</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure e-signature via SignWell</p>
+  </div>
+
+  <!-- Signoff -->
+  <div style="padding:0 40px 36px 40px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:#1c1618;line-height:1.7;margin:0 0 16px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+      Questions? Reply to this email or write <a href="mailto:admin@awknranch.com" style="color:#c9943e;text-decoration:none;">admin@awknranch.com</a>.
+    </p>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#1c1618;margin:0;">With care,<br><em style="color:#6b4c3b;">The AWKN Ranch Team</em></p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:0 40px 32px 40px;text-align:center;font-family:'Inter',sans-serif;font-size:11px;color:rgba(28,22,24,0.45);line-height:1.7;">
+    © 2026 Hearth Space Health, Inc. · 7600 Grove Crest Circle, Austin, TX
+  </div>
+</div>
+        `,
+        text: `Rental Agreement — AWKN Ranch${data.title ? ` · ${data.title}` : ''}
+
+Hi ${data.recipient_first_name || 'there'},
+
+Your rental agreement is ready for signature${eventDate ? ` for ${eventDate}` : ''}. Please review and sign via the secure SignWell link below. Once signed, we'll follow up separately with payment details to confirm your date.
+
+Sign your rental agreement: ${data.signing_url || ''}
+
+Questions? Reply to this email or write admin@awknranch.com.
+
+— The AWKN Ranch Team`
       };
     }
 
@@ -2699,12 +2773,12 @@ This is an automated weekly schedule report from AWKN Ranch.`
   <!-- Finding us -->
   <div style="padding:0 40px 32px 40px;">
     <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Finding Us</div>
-    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 16px 0;">Check-in at the retreat house</h2>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 16px 0;">Check-in at the Wellness Center</h2>
     <div style="background:#1c1618;border-radius:4px;padding:22px 26px;text-align:center;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;line-height:1.4;">7600 Grove Crest Circle<br>Austin, TX</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);margin-top:10px;">Gate code: <strong style="color:#c9943e;letter-spacing:0.05em;">2321#</strong> (enter)</div>
     </div>
-    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Maps sometimes routes through the commercial gate off 71 — we prefer the neighborhood entrance. Through the gate, <strong style="color:#1c1618;">go straight (don't turn left)</strong>, come up to the retreat house next to the yurts, and park there. We're a secluded ranch, 15 minutes from downtown. Trouble finding it or any questions day-of? Call or text Justin at <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a>.</p>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Maps sometimes routes through the commercial gate off 71 — we prefer the neighborhood entrance. Once through the gate, <strong style="color:#1c1618;">turn left</strong> — the Wellness Center is the <strong style="color:#1c1618;">first building on your left</strong>. Park there. We're a secluded ranch, 15 minutes from downtown. Trouble finding it or any questions day-of? Call or text Justin at <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a>.</p>
   </div>
 
   <!-- Your team -->
@@ -2795,7 +2869,7 @@ Eye masks, blankets, music, tea, water — all provided.
 FINDING US
 7600 Grove Crest Circle, Austin, TX
 Gate code: 2321# (enter)
-Through the gate, go straight (don't turn left), come up to the retreat house next to the yurts, and park there.
+Check-in at the Wellness Center. Once through the gate, turn left — the Wellness Center is the first building on your left. Park there.
 Trouble finding it or any questions day-of? Call or text Justin at 512-796-1886.
 
 YOUR CORE TEAM
@@ -3068,6 +3142,7 @@ serve(async (req) => {
       "custom",            // raw HTML passthrough
       "staff_invitation",  // has its own full branded layout
       "proposal_sent",     // has its own full branded layout
+      "agreement_to_sign", // has its own full branded layout
       "welcome_letter",    // Within Center welcome letter — self-contained layout
       "pai_email_reply",   // PAI-branded layout
       "payment_statement", // has its own full layout

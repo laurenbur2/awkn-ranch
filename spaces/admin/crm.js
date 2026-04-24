@@ -3,6 +3,7 @@
 
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage, showToast, setupLightbox } from '../../shared/admin-shell.js';
+import { sendProposalEmail, sendAgreementEmail } from './crm-actions.js';
 
 // =============================================
 // STATE
@@ -1839,7 +1840,8 @@ function openLeadModal(lead = null) {
       }
     } catch (err) {
       console.error('Save lead error:', err);
-      showToast('Error saving lead', 'error');
+      const detail = err?.message || err?.error_description || err?.code || (typeof err === 'string' ? err : '');
+      showToast('Error saving lead' + (detail ? ': ' + detail : ''), 'error');
     }
   });
 
@@ -2556,6 +2558,17 @@ async function openProposalModal(proposal = null, lead = null) {
 
   const existingItems = proposal?.items || [];
 
+  // Defaults pulled from the lead for new proposals (lead form → proposal)
+  const leadDefaults = (lead && !isEdit) ? {
+    title: `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
+    event_type: lead.event_type || '',
+    event_date: lead.event_date || '',
+    guest_count: lead.guest_count || '',
+    event_start: lead.event_start_time || '',
+    event_end: lead.event_end_time || '',
+  } : {};
+  const initialEventType = proposal?.event_type || leadDefaults.event_type || '';
+
   // Group venue catalog by category
   const venueCategories = {};
   venueCatalog.forEach(v => {
@@ -2602,26 +2615,28 @@ async function openProposalModal(proposal = null, lead = null) {
             </div>
             <div class="crm-form-field">
               <label>Title *</label>
-              <input type="text" class="crm-input" id="prop-title" value="${escapeHtml(proposal?.title || '')}">
+              <input type="text" class="crm-input" id="prop-title" value="${escapeHtml(proposal?.title || leadDefaults.title || '')}">
             </div>
             <div class="crm-form-field">
               <label>Event Type</label>
               <select class="crm-select" id="prop-event-type">
                 <option value="">Select...</option>
-                <option value="wedding" ${proposal?.event_type === 'wedding' ? 'selected' : ''}>Wedding</option>
-                <option value="corporate" ${proposal?.event_type === 'corporate' ? 'selected' : ''}>Corporate</option>
-                <option value="birthday" ${proposal?.event_type === 'birthday' ? 'selected' : ''}>Birthday</option>
-                <option value="retreat" ${proposal?.event_type === 'retreat' ? 'selected' : ''}>Retreat</option>
-                <option value="other" ${proposal?.event_type === 'other' ? 'selected' : ''}>Other</option>
+                <option value="wedding" ${initialEventType === 'wedding' ? 'selected' : ''}>Wedding</option>
+                <option value="corporate" ${initialEventType === 'corporate' ? 'selected' : ''}>Corporate</option>
+                <option value="birthday" ${initialEventType === 'birthday' ? 'selected' : ''}>Birthday</option>
+                <option value="retreat" ${initialEventType === 'retreat' ? 'selected' : ''}>Retreat</option>
+                <option value="ceremony" ${initialEventType === 'ceremony' ? 'selected' : ''}>Ceremony</option>
+                <option value="workshop" ${initialEventType === 'workshop' ? 'selected' : ''}>Workshop</option>
+                <option value="other" ${initialEventType === 'other' ? 'selected' : ''}>Other</option>
               </select>
             </div>
             <div class="crm-form-field">
               <label>Event Date</label>
-              <input type="date" class="crm-input" id="prop-event-date" value="${proposal?.event_date || ''}">
+              <input type="date" class="crm-input" id="prop-event-date" value="${proposal?.event_date || leadDefaults.event_date || ''}">
             </div>
             <div class="crm-form-field">
               <label>Guest Count</label>
-              <input type="number" class="crm-input" id="prop-guest-count" value="${proposal?.guest_count || ''}" min="1">
+              <input type="number" class="crm-input" id="prop-guest-count" value="${proposal?.guest_count || leadDefaults.guest_count || ''}" min="1">
             </div>
             <div class="crm-form-field">
               <label>Setup Time</label>
@@ -2629,11 +2644,11 @@ async function openProposalModal(proposal = null, lead = null) {
             </div>
             <div class="crm-form-field">
               <label>Event Start</label>
-              <input type="time" class="crm-input" id="prop-event-start" value="${proposal?.event_start || ''}">
+              <input type="time" class="crm-input" id="prop-event-start" value="${proposal?.event_start || leadDefaults.event_start || ''}">
             </div>
             <div class="crm-form-field">
               <label>Event End</label>
-              <input type="time" class="crm-input" id="prop-event-end" value="${proposal?.event_end || ''}">
+              <input type="time" class="crm-input" id="prop-event-end" value="${proposal?.event_end || leadDefaults.event_end || ''}">
             </div>
             <div class="crm-form-field">
               <label>Teardown Time</label>
@@ -2690,6 +2705,7 @@ async function openProposalModal(proposal = null, lead = null) {
           <div>
             <button class="crm-btn" id="btn-preview-proposal">Preview Email</button>
             <button class="crm-btn crm-btn-primary" id="btn-save-proposal-draft">Save Draft</button>
+            <button class="crm-btn crm-btn-success" id="btn-send-agreement">Send Agreement to Sign</button>
             <button class="crm-btn crm-btn-success" id="btn-send-proposal">Send Proposal</button>
           </div>
         </div>
@@ -2729,6 +2745,9 @@ async function openProposalModal(proposal = null, lead = null) {
 
   // Send proposal
   document.getElementById('btn-send-proposal').addEventListener('click', () => saveProposal(proposal, 'sent'));
+
+  // Send rental agreement for e-signature (separate email from the proposal)
+  document.getElementById('btn-send-agreement').addEventListener('click', () => saveProposal(proposal, 'agreement'));
 
   // Preview email — renders via send-email edge function with preview flag
   document.getElementById('btn-preview-proposal').addEventListener('click', () => previewProposalEmail());
@@ -2844,9 +2863,10 @@ async function saveProposal(existingProposal, status) {
   const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
   const total = subtotal - discount + tax;
 
-  // When sending, require a lead so we know who to email.
+  // When sending (proposal or agreement), require a lead so we know who to email.
   const leadId = document.getElementById('prop-lead').value || null;
-  if (status === 'sent' && !leadId) {
+  const isSending = status === 'sent' || status === 'agreement';
+  if (isSending && !leadId) {
     showToast('Select a lead before sending', 'error');
     return;
   }
@@ -2911,6 +2931,8 @@ async function saveProposal(existingProposal, status) {
 
     if (status === 'sent') {
       await sendProposalNow(proposalId);
+    } else if (status === 'agreement') {
+      await sendAgreementNow(proposalId);
     } else {
       showToast('Proposal saved as draft', 'success');
     }
@@ -2926,180 +2948,25 @@ async function saveProposal(existingProposal, status) {
 
 // Generate Stripe payment link, email the recipient, and flip proposal to status='sent'.
 // Called both from the modal "Send Proposal" button and the table row "Send" shortcut.
+// Delegates to the shared sendProposalEmail; advances lead stage via onAfterSend.
 async function sendProposalNow(proposalId) {
-  const { data: proposal, error: pErr } = await supabase
-    .from('crm_proposals')
-    .select('*, items:crm_proposal_items(*)')
-    .eq('id', proposalId)
-    .single();
-  if (pErr || !proposal) throw new Error('Proposal not found');
-
-  if (!proposal.lead_id) throw new Error('Proposal has no lead — cannot send');
-
-  const { data: lead, error: lErr } = await supabase
-    .from('crm_leads')
-    .select('id, first_name, last_name, email, business_line')
-    .eq('id', proposal.lead_id)
-    .single();
-  if (lErr || !lead?.email) throw new Error('Lead is missing an email address');
-
-  // Refresh the session so we don't hit a stale/expired JWT mid-flow.
-  // The Supabase gateway rejects expired tokens with { code, message } — NOT
-  // { error, detail } — so a bare 401 here was very uninformative.
-  let token = null;
-  try {
-    const { data: refreshed } = await supabase.auth.refreshSession();
-    token = refreshed?.session?.access_token || null;
-  } catch (_) { /* fall through to getSession */ }
-  if (!token) {
-    const { data: sessionWrap } = await supabase.auth.getSession();
-    token = sessionWrap?.session?.access_token || null;
-  }
-  if (!token) throw new Error('Not signed in — reload and sign in again.');
-
-  const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
-
-  // 1a. AWKN Ranch proposals require a signed rental agreement — create the SignWell
-  // document first so we can include the Sign button in the email. The deposit %
-  // stored on the proposal drives the amount the client pays now; the balance is due
-  // 30 days before the event (handled by a separate reminder later).
-  const isAwkn = lead.business_line === 'awkn_ranch';
-  let signingUrl = null;
-  let depositPct = 100;
-  let depositAmt = Number(proposal.total);
-  if (isAwkn) {
-    const contractResp = await fetch(supabaseUrl + '/functions/v1/create-proposal-contract', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token,
-        'apikey': anonKey,
-      },
-      body: JSON.stringify({ proposal_id: proposal.id }),
-    });
-    const c = await contractResp.json().catch(() => ({}));
-    if (!contractResp.ok) {
-      const stringify = (v) => typeof v === 'string' ? v : (v != null ? JSON.stringify(v) : '');
-      const msg = [c.error, stringify(c.detail), c.message, c.code].filter(Boolean).join(' — ') || contractResp.status;
-      throw new Error(`Contract creation failed: ${msg}`);
-    }
-    signingUrl = c.signing_url;
-    depositPct = c.deposit_percent ?? (proposal.deposit_percent ?? 50);
-    depositAmt = c.deposit_amount ?? Math.round(Number(proposal.total) * depositPct) / 100;
-  }
-
-  // 1b. Stripe payment links — one ACH (deposit amount), one card (+3% surcharge
-  // disclosed in the email). Customer picks. Surcharge ≈ Stripe's card cost of
-  // acceptance, legal in TX when disclosed pre-purchase.
-  const baseTotal = isAwkn ? depositAmt : Number(proposal.total);
-  const cardTotal = Math.round(baseTotal * 1.03 * 100) / 100;
-
-  async function makeLink(amount, method, labelSuffix) {
-    const r = await fetch(supabaseUrl + '/functions/v1/create-payment-link', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token,
-        'apikey': anonKey,
-      },
-      body: JSON.stringify({
-        amount,
-        description: `${proposal.proposal_number} — ${proposal.title}${labelSuffix}`,
-        person_name: `${lead.first_name || ''} ${lead.last_name || ''}`.trim(),
-        person_email: lead.email,
-        category: 'crm_proposal',
-        payment_method: method,
-        metadata: {
-          source: 'crm-proposal',
-          proposal_id: proposal.id,
-          proposal_number: proposal.proposal_number,
-          lead_id: lead.id,
-          payment_method: method,
-        },
-      }),
-    });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok || !d.url) {
-      const msg = [d.error, d.detail, d.message, d.code].filter(Boolean).join(' — ') || r.status;
-      throw new Error(`Payment link (${method}) failed: ${msg}`);
-    }
-    return d;
-  }
-
-  const linkData = await makeLink(baseTotal, 'ach', '');
-  const cardLinkData = await makeLink(cardTotal, 'card', ' (card)');
-
-  // 2. Stamp proposal with payment links + sent state before email (so the row is
-  //    accurate even if the email send has a transient failure).
-  await supabase.from('crm_proposals').update({
-    payment_link_id: linkData.payment_link_id,
-    payment_link_url: linkData.url,
-    payment_link_card_id: cardLinkData.payment_link_id,
-    payment_link_card_url: cardLinkData.url,
-    sent_at: new Date().toISOString(),
-    sent_to_email: lead.email,
-    status: 'sent',
-  }).eq('id', proposal.id);
-
-  // 3. Send the branded email — anon key in Authorization (matches the rest of this
-  // file). send-email doesn't read the user token; it just needs a valid JWT for the
-  // gateway. Using the user's ES256 session here would hit the gateway bug.
-  const items = (proposal.items || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-  const emailResp = await fetch(supabaseUrl + '/functions/v1/send-email', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + anonKey,
-      'apikey': anonKey,
+  await sendProposalEmail(proposalId, {
+    authState,
+    onAfterSend: async ({ lead }) => {
+      const proposalSentStage = stages.find(s => s.slug === 'proposal_sent');
+      if (proposalSentStage) {
+        await moveLeadToStage(lead.id, proposalSentStage.id);
+      }
     },
-    body: JSON.stringify({
-      type: 'proposal_sent',
-      to: lead.email,
-      data: {
-        recipient_first_name: lead.first_name || '',
-        business_line: lead.business_line || null,
-        proposal_number: proposal.proposal_number,
-        title: proposal.title,
-        event_type: proposal.event_type,
-        event_date: proposal.event_date,
-        guest_count: proposal.guest_count,
-        subtotal: proposal.subtotal,
-        discount_amount: proposal.discount_amount,
-        tax_amount: proposal.tax_amount,
-        total: proposal.total,
-        valid_until: proposal.valid_until,
-        notes: proposal.notes,
-        terms: proposal.terms,
-        payment_link_url: linkData.url,
-        payment_link_card_url: cardLinkData.url,
-        card_total: cardTotal,
-        signing_url: signingUrl,
-        deposit_percent: isAwkn ? depositPct : null,
-        deposit_amount: isAwkn ? depositAmt : null,
-        balance_due: isAwkn ? Math.round((Number(proposal.total) - depositAmt) * 100) / 100 : null,
-        line_items: items.map(li => ({
-          description: li.description,
-          quantity: li.quantity,
-          unit_price: li.unit_price,
-          total: li.total,
-        })),
-      },
-    }),
   });
-  if (!emailResp.ok) {
-    const err = await emailResp.json().catch(() => ({}));
-    throw new Error('Email send failed: ' + (err.error || emailResp.status));
-  }
-
-  // 4. Log activity + advance lead stage to proposal_sent if it exists for this business line.
-  await addActivity(lead.id, 'email', `Proposal ${proposal.proposal_number} sent to ${lead.email}`);
-  const proposalSentStage = stages.find(s => s.slug === 'proposal_sent');
-  if (proposalSentStage) {
-    await moveLeadToStage(lead.id, proposalSentStage.id);
-  }
-
   showToast('Proposal sent — payment link delivered', 'success');
+}
+
+// Send the rental agreement email (AWKN Ranch only) — standalone SignWell flow,
+// does not advance pipeline stage or flip proposal status.
+async function sendAgreementNow(proposalId) {
+  await sendAgreementEmail(proposalId, { authState });
+  showToast('Agreement sent for signature', 'success');
 }
 
 // Render the proposal email in a modal iframe using the live send-email template,
@@ -3155,7 +3022,6 @@ async function previewProposalEmail() {
           terms: document.getElementById('prop-terms').value.trim() || null,
           payment_link_url: '#preview-no-payment-link',
           payment_link_card_url: '#preview-no-payment-link',
-          signing_url: '#preview-no-signing-link',
           deposit_percent: parseInt(document.getElementById('prop-deposit-percent')?.value) || 50,
           deposit_amount: Math.round(total * ((parseInt(document.getElementById('prop-deposit-percent')?.value) || 50) / 100) * 100) / 100,
           balance_due: Math.round((total - (total * ((parseInt(document.getElementById('prop-deposit-percent')?.value) || 50) / 100))) * 100) / 100,

@@ -3,6 +3,7 @@
 
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage, showToast } from '../../shared/admin-shell.js';
+import { sendProposalEmail } from './crm-actions.js';
 
 // =============================================
 // STATE
@@ -1747,11 +1748,101 @@ function handleClientMoreItem(leadId, item) {
       window.open('crm.html', '_blank');
       return;
     case 'send-invoice':
+      openSendInvoiceModal(leadId);
+      return;
     case 'send-welcome-letter':
     case 'send-intake-link':
     case 'send-reminder':
       showToast('Coming soon \u2014 use the CRM to send for now.', 'info');
       return;
+  }
+}
+
+// ---------- Send Invoice modal ----------
+
+// Pick one of the client's proposals to send. Opens over the drawer; closing
+// (X, backdrop, or Cancel) reopens the drawer so the admin keeps their place.
+function openSendInvoiceModal(leadId) {
+  const c = clients.find(cl => cl.id === leadId);
+  if (!c) { showToast('Client not found', 'error'); return; }
+
+  const modal = document.getElementById('clients-modal');
+  const proposals = proposalsByLead.get(leadId);
+  const loading = proposals === undefined;
+  const sendable = (proposals || []).filter(p => p.status !== 'paid' && p.status !== 'declined');
+
+  const rows = sendable.map(p => {
+    const amt = `$${Number(p.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const sentBadge = p.status === 'sent'
+      ? `<span style="font-size:10px;font-weight:600;color:#4338ca;text-transform:uppercase;letter-spacing:.5px;margin-left:6px;">sent</span>`
+      : p.status === 'accepted'
+        ? `<span style="font-size:10px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:.5px;margin-left:6px;">accepted</span>`
+        : `<span style="font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-left:6px;">${escapeHtml(p.status || 'draft')}</span>`;
+    const resendHint = p.sent_at ? ` \u00b7 last sent ${formatDate(p.sent_at)}` : '';
+    return `
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;background:#fff;margin-bottom:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:13px;">${escapeHtml(p.proposal_number || '')} \u00b7 ${escapeHtml(p.title || '(untitled)')}${sentBadge}</div>
+          <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${amt} \u00b7 ${formatDate(p.created_at)}${resendHint}</div>
+        </div>
+        <button class="crm-btn crm-btn-primary crm-btn-sm" data-action="send-invoice-confirm" data-proposal-id="${p.id}">
+          ${p.sent_at ? 'Resend' : 'Send'}
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content" style="max-width:600px;">
+        <div class="crm-modal-header">
+          <h2>Send invoice to ${escapeHtml(`${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)')}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body" style="padding:20px;">
+          ${loading
+            ? `<div style="color:var(--text-muted,#888);font-size:13px;">Loading proposals\u2026</div>`
+            : sendable.length
+              ? `<div style="color:var(--text-muted,#666);font-size:12px;margin-bottom:12px;">Pick a proposal to email. This generates fresh Stripe payment links and logs the send in the CRM activity feed.</div>${rows}`
+              : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">
+                   No sendable proposals for this client.
+                   <div style="margin-top:8px;"><a href="crm.html" target="_blank" style="color:#4338ca;text-decoration:none;">Create one in the CRM \u2197</a></div>
+                 </div>`}
+        </div>
+        <div class="crm-modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-color,#eee);display:flex;justify-content:flex-end;">
+          <button class="crm-btn" id="send-invoice-cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const backToDrawer = () => openClientDetail(leadId);
+  document.getElementById('clients-modal-close-btn').addEventListener('click', backToDrawer);
+  document.getElementById('send-invoice-cancel-btn').addEventListener('click', backToDrawer);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') backToDrawer();
+  });
+}
+
+async function handleSendInvoiceConfirm(proposalId, leadId, btn) {
+  if (!btn || btn.dataset.busy === '1') return;
+  btn.dataset.busy = '1';
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending\u2026';
+  btn.disabled = true;
+  try {
+    await sendProposalEmail(proposalId, { authState });
+    showToast('Invoice sent', 'success');
+    await loadClientProposals(leadId);
+    openClientDetail(leadId);
+    activeClientTab = 'billing';
+    rerenderActiveTabPanel();
+  } catch (err) {
+    console.error('send invoice error:', err);
+    showToast(`Send failed: ${err.message || err}`, 'error');
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+    delete btn.dataset.busy;
   }
 }
 
@@ -4031,6 +4122,10 @@ function handlePanelClicks(e) {
     }
     if (action === 'client-more-item') {
       handleClientMoreItem(actionBtn.dataset.leadId, actionBtn.dataset.item);
+      return;
+    }
+    if (action === 'send-invoice-confirm') {
+      handleSendInvoiceConfirm(actionBtn.dataset.proposalId, currentDrawerLeadId, actionBtn);
       return;
     }
     const leadId = actionBtn.dataset.clientId;
