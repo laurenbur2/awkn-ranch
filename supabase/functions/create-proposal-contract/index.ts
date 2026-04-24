@@ -183,9 +183,9 @@ serve(async (req) => {
     const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
     const PAGE_W = 612, PAGE_H = 792;
-    const MARGIN = 54;
-    const LINE_H = 13;
-    const BODY_SIZE = 10;
+    const MARGIN = 48;
+    const LINE_H = 11;
+    const BODY_SIZE = 9.5;
 
     let page = pdf.addPage([PAGE_W, PAGE_H]);
     let y = PAGE_H - MARGIN;
@@ -220,13 +220,13 @@ serve(async (req) => {
     };
 
     const drawHeading = (text: string) => {
-      y -= 6;
-      ensure(LINE_H + 4);
-      page.drawText(text, { x: MARGIN, y, size: 12, font: bold, color: rgb(0, 0, 0) });
-      y -= LINE_H + 2;
+      y -= 3;
+      ensure(LINE_H + 2);
+      page.drawText(text, { x: MARGIN, y, size: 11, font: bold, color: rgb(0, 0, 0) });
+      y -= LINE_H + 1;
     };
 
-    const drawSpacer = (h = 8) => { y -= h; };
+    const drawSpacer = (h = 3) => { y -= h; };
 
     // Helper to render a labeled "Label: Value" line.
     const drawKV = (label: string, value: string) => {
@@ -279,9 +279,9 @@ serve(async (req) => {
 
     // --- Title ---
     const title = "AWKN EVENT SPACE RENTAL AGREEMENT";
-    const titleW = bold.widthOfTextAtSize(title, 16);
-    page.drawText(title, { x: (PAGE_W - titleW) / 2, y, size: 16, font: bold });
-    y -= 28;
+    const titleW = bold.widthOfTextAtSize(title, 14);
+    page.drawText(title, { x: (PAGE_W - titleW) / 2, y, size: 14, font: bold });
+    y -= 20;
 
     drawParagraph(
       `This Event Space Rental Agreement ("Agreement") is made and entered into on this ${agreementDate}, by and between:`
@@ -290,7 +290,7 @@ serve(async (req) => {
 
     // OWNER block
     page.drawText("OWNER:", { x: MARGIN, y, size: 11, font: bold });
-    y -= LINE_H + 2;
+    y -= LINE_H + 1;
     drawParagraph("AWKN Ranch", { indent: 8 });
     drawParagraph("Address: 7600 Stillridge Dr, Austin, TX 78736", { indent: 8 });
     drawParagraph("Phone: 831-713-7698", { indent: 8 });
@@ -299,7 +299,7 @@ serve(async (req) => {
 
     // RENTER block
     page.drawText("RENTER:", { x: MARGIN, y, size: 11, font: bold });
-    y -= LINE_H + 2;
+    y -= LINE_H + 1;
     drawKV("Name/Organization: ", clientName);
     drawKV("Phone: ", lead.phone || "");
     drawKV("Email: ", lead.email || "");
@@ -323,7 +323,7 @@ serve(async (req) => {
     drawKV(`Remaining ${100 - depositPct}% Due 30 Days before event date: `, fmtMoney(balanceDue));
     drawSpacer();
     drawParagraph("Payment Methods:", { font: bold });
-    drawParagraph("Payments may be made via Check, Credit Card, or Bank Transfer via Quickbooks", { indent: 8 });
+    drawParagraph("Payments may be made via bank transfer or credit card (additional fee applies for credit card payments).", { indent: 8 });
     drawParagraph("All fees are non-refundable unless otherwise stated in this Agreement.");
 
     // 3. CANCELLATION POLICY
@@ -380,16 +380,19 @@ serve(async (req) => {
     drawBullet("Written signatures of both parties.");
     drawBullet("Exchange of consideration (deposit and rental fees).");
 
-    // 10. SIGNATURES — on a fresh page so the signature field is easy to find.
-    newPage();
+    // 10. SIGNATURES — keep the whole block together (heading + renter name +
+    // signature line + date line ≈ 80pt). `ensure` pushes to the next page
+    // only if the remaining space can't fit the block.
+    ensure(90);
+    y -= 4;
     const sigPageNumber = pdf.getPageCount(); // 1-indexed for SignWell
-    page.drawText("10. SIGNATURES", { x: MARGIN, y, size: 14, font: bold });
-    y -= 22;
+    page.drawText("10. SIGNATURES", { x: MARGIN, y, size: 12, font: bold });
+    y -= LINE_H + 4;
 
-    page.drawText("RENTER", { x: MARGIN, y, size: 11, font: bold });
-    y -= LINE_H + 6;
+    page.drawText("RENTER", { x: MARGIN, y, size: 10, font: bold });
+    y -= LINE_H + 3;
     drawKV("Name: ", clientName);
-    y -= 14;
+    y -= 10;
 
     // Signature field. pdf-lib uses BOTTOM-LEFT origin; SignWell uses TOP-LEFT.
     page.drawText("Signature:", { x: MARGIN, y, size: 10, font });
