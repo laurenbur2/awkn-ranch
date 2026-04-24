@@ -1420,12 +1420,6 @@ async function loadClientProposals(leadId) {
   }
 }
 
-function getFacilitatorName(id) {
-  const f = facilitators.find(x => x.id === id);
-  if (!f) return 'Unknown';
-  return `${f.first_name || ''} ${f.last_name || ''}`.trim() || 'Unknown';
-}
-
 function getSpaceName(id) {
   if (!id) return '';
   const s = [...lodgingSpaces, ...sessionSpaces].find(x => x.id === id);
@@ -1453,7 +1447,7 @@ function renderBookingRow(b) {
   const when = formatDateTimeShort(b.start_datetime);
   const assignee = b.staff_user_id
     ? escapeHtml(getStaffDisplayName(b.staff_user_id))
-    : (b.facilitator_id ? escapeHtml(getFacilitatorName(b.facilitator_id)) : 'Unassigned');
+    : (b.facilitator_id ? escapeHtml(getFacilitatorName(b.facilitator_id) || 'Unknown') : 'Unassigned');
   const space = getSpaceName(b.space_id);
   const statusColor = {
     confirmed: '#15803d', pending: '#4338ca', cancelled: '#b91c1c', completed: '#64748b',
