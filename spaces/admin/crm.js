@@ -1185,9 +1185,10 @@ function setupLeadDetailListeners(lead) {
     openProposalModal(null, lead);
   });
 
-  // Send rental agreement from lead (AWKN). Picks the most recent unsigned,
-  // non-declined proposal; errors if none exist (must create one first).
-  document.getElementById('btn-send-agreement-from-lead')?.addEventListener('click', async () => {
+  // Send rental agreement from lead (AWKN). Opens an inline review panel
+  // showing the info that will populate the contract so the admin can
+  // verify before the SignWell doc is created.
+  document.getElementById('btn-send-agreement-from-lead')?.addEventListener('click', () => {
     const leadProposals = proposals
       .filter(p => p.lead_id === lead.id && !p.contract_signed_at && p.status !== 'declined')
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -1195,17 +1196,7 @@ function setupLeadDetailListeners(lead) {
       showToast('Create a proposal first, then send the agreement', 'error');
       return;
     }
-    const prop = leadProposals[0];
-    if (!confirm(`Send rental agreement for ${prop.proposal_number || 'proposal'} to ${lead.email}?`)) return;
-    try {
-      await sendAgreementEmail(prop.id, { authState });
-      showToast('Agreement sent for signature', 'success');
-      await loadAllData();
-      await openLeadDetail(lead.id);
-    } catch (err) {
-      console.error('Send agreement error:', err);
-      showToast('Error sending agreement: ' + (err.message || err), 'error');
-    }
+    openAgreementReviewForm(lead, leadProposals);
   });
 
   // Send Feedback Form
@@ -1603,6 +1594,159 @@ function openInlineActionForm() {
   form.style.display = 'block';
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   return form;
+}
+
+// Inline review panel shown before sending a rental agreement. Lets the admin
+// verify everything that will populate the SignWell contract (client, event,
+// financials, line items) and flags missing required fields.
+function openAgreementReviewForm(lead, leadProposals) {
+  const form = openInlineActionForm();
+  let selectedIdx = 0;
+
+  const fmtMoney = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmtDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : '—';
+  const fmtTime = (t) => {
+    if (!t) return '—';
+    const [h, m] = t.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const h12 = ((hour + 11) % 12) + 1;
+    return `${h12}:${m} ${ampm}`;
+  };
+
+  const render = () => {
+    const prop = leadProposals[selectedIdx];
+    const items = (prop.items || []).slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    const depositPct = prop.deposit_percent ?? 50;
+    const depositAmt = Math.round(Number(prop.total || 0) * depositPct) / 100;
+    const balanceDue = Math.round((Number(prop.total || 0) - depositAmt) * 100) / 100;
+    const space = lead.space?.name || '—';
+    const phone = lead.phone || '—';
+
+    const warnings = [];
+    if (!prop.title) warnings.push('Proposal title is empty');
+    if (!prop.event_date) warnings.push('Event date is missing');
+    if (!Number(prop.total) || Number(prop.total) <= 0) warnings.push('Proposal total is $0');
+    if (items.length === 0) warnings.push('No line items on the proposal');
+    if (!lead.email) warnings.push('Lead has no email address');
+
+    const picker = leadProposals.length > 1 ? `
+      <div class="crm-form-field" style="margin-bottom:12px;">
+        <label>Proposal</label>
+        <select class="crm-select" id="agreement-proposal-picker">
+          ${leadProposals.map((p, i) => `
+            <option value="${i}" ${i === selectedIdx ? 'selected' : ''}>${escapeHtml(p.proposal_number || '(no number)')} — ${escapeHtml(p.title || '(untitled)')} — ${fmtMoney(p.total)}</option>
+          `).join('')}
+        </select>
+      </div>
+    ` : '';
+
+    const warningBlock = warnings.length ? `
+      <div style="background:#fdf6ee;border-left:3px solid #d4883a;padding:12px 14px;margin-bottom:12px;border-radius:4px;">
+        <strong style="color:#b05f00;">Heads up</strong>
+        <ul style="margin:6px 0 0 18px;padding:0;color:#6b4c3b;font-size:13px;line-height:1.6;">
+          ${warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    const sectionStyle = 'background:#faf8f5;border-left:3px solid #c9943e;padding:14px 18px;border-radius:4px;margin-bottom:12px;';
+    const headStyle = 'font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:8px;';
+    const rowStyle = 'display:flex;justify-content:space-between;padding:3px 0;font-size:13px;';
+    const keyStyle = 'color:#6b4c3b;';
+    const valStyle = 'color:#1c1618;font-weight:600;text-align:right;';
+
+    const lineItemsHtml = items.length ? items.map(li => `
+      <div style="${rowStyle}border-bottom:1px solid rgba(201,148,62,0.15);padding:6px 0;">
+        <span style="${keyStyle};flex:1;">${escapeHtml(li.description || '—')}${Number(li.quantity || 1) > 1 ? ` <span style="color:#9a8576;">× ${li.quantity}</span>` : ''}</span>
+        <span style="${valStyle}">${fmtMoney(li.total)}</span>
+      </div>
+    `).join('') : '<div style="color:#9a8576;font-size:13px;">No line items.</div>';
+
+    form.innerHTML = `
+      <h4 class="crm-inline-form-title">Review Rental Agreement</h4>
+      ${picker}
+      ${warningBlock}
+
+      <div style="${sectionStyle}">
+        <div style="${headStyle}">Client</div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Name</span><span style="${valStyle}">${escapeHtml(`${lead.first_name || ''} ${lead.last_name || ''}`.trim() || '—')}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Email</span><span style="${valStyle}">${escapeHtml(lead.email || '—')}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Phone</span><span style="${valStyle}">${escapeHtml(phone)}</span></div>
+      </div>
+
+      <div style="${sectionStyle}">
+        <div style="${headStyle}">Event</div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Title</span><span style="${valStyle}">${escapeHtml(prop.title || '—')}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Date</span><span style="${valStyle}">${fmtDate(prop.event_date)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Type</span><span style="${valStyle};text-transform:capitalize;">${escapeHtml(prop.event_type || '—')}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Space</span><span style="${valStyle}">${escapeHtml(space)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Guests</span><span style="${valStyle}">${prop.guest_count || '—'}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Setup</span><span style="${valStyle}">${fmtTime(prop.setup_time)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Event window</span><span style="${valStyle}">${fmtTime(prop.event_start)} – ${fmtTime(prop.event_end)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Teardown</span><span style="${valStyle}">${fmtTime(prop.teardown_time)}</span></div>
+      </div>
+
+      <div style="${sectionStyle}">
+        <div style="${headStyle}">Line Items</div>
+        ${lineItemsHtml}
+      </div>
+
+      <div style="${sectionStyle}">
+        <div style="${headStyle}">Financials</div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Subtotal</span><span style="${valStyle}">${fmtMoney(prop.subtotal)}</span></div>
+        ${Number(prop.discount_amount) > 0 ? `<div style="${rowStyle}"><span style="${keyStyle}">Discount</span><span style="${valStyle}">−${fmtMoney(prop.discount_amount)}</span></div>` : ''}
+        ${Number(prop.tax_amount) > 0 ? `<div style="${rowStyle}"><span style="${keyStyle}">Tax</span><span style="${valStyle}">${fmtMoney(prop.tax_amount)}</span></div>` : ''}
+        <div style="${rowStyle};border-top:1px solid rgba(201,148,62,0.3);padding-top:6px;margin-top:4px;"><span style="${keyStyle}">Total</span><span style="${valStyle}">${fmtMoney(prop.total)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Deposit (${depositPct}%)</span><span style="${valStyle}">${fmtMoney(depositAmt)}</span></div>
+        <div style="${rowStyle}"><span style="${keyStyle}">Balance due 30 days pre-event</span><span style="${valStyle}">${fmtMoney(balanceDue)}</span></div>
+      </div>
+
+      <div class="crm-form-actions" style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+        <button class="crm-btn" id="btn-cancel-agreement-review">Cancel</button>
+        <button class="crm-btn" id="btn-edit-proposal-from-review">Edit Proposal</button>
+        <button class="crm-btn crm-btn-success" id="btn-confirm-send-agreement">Send for Signature</button>
+      </div>
+    `;
+
+    document.getElementById('btn-cancel-agreement-review').addEventListener('click', () => {
+      form.style.display = 'none';
+      form.innerHTML = '';
+    });
+
+    document.getElementById('btn-edit-proposal-from-review').addEventListener('click', () => {
+      closeModal();
+      openProposalModal(prop, lead);
+    });
+
+    document.getElementById('btn-confirm-send-agreement').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-confirm-send-agreement');
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        await sendAgreementEmail(prop.id, { authState });
+        showToast('Agreement sent for signature', 'success');
+        await loadAllData();
+        await openLeadDetail(lead.id);
+      } catch (err) {
+        console.error('Send agreement error:', err);
+        showToast('Error sending agreement: ' + (err.message || err), 'error');
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+
+    const picker2 = document.getElementById('agreement-proposal-picker');
+    if (picker2) {
+      picker2.addEventListener('change', (e) => {
+        selectedIdx = parseInt(e.target.value, 10) || 0;
+        render();
+      });
+    }
+  };
+
+  render();
 }
 
 async function sendLeadEmail(lead, body) {
