@@ -776,6 +776,7 @@ async function openLeadDetail(leadId) {
               <div class="crm-menu" id="crm-more-menu" style="display:none">
                 ${lead.business_line === 'within' ? '<button class="crm-menu-item" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
                 ${lead.business_line === 'awkn_ranch' ? '<button class="crm-menu-item" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
+                ${lead.business_line === 'awkn_ranch' && lead.email ? '<button class="crm-menu-item" id="btn-send-agreement-from-lead">Send Agreement to Sign</button>' : ''}
                 ${lead.business_line === 'within' && lead.email ? '<button class="crm-menu-item" id="btn-send-welcome-letter">Send Welcome Letter</button>' : ''}
                 ${lead.email ? '<button class="crm-menu-item" id="btn-send-feedback">Send Feedback Form</button>' : ''}
                 ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-success" id="btn-mark-won">Mark Won</button>' : ''}
@@ -1182,6 +1183,29 @@ function setupLeadDetailListeners(lead) {
   document.getElementById('btn-create-proposal-from-lead')?.addEventListener('click', () => {
     closeModal();
     openProposalModal(null, lead);
+  });
+
+  // Send rental agreement from lead (AWKN). Picks the most recent unsigned,
+  // non-declined proposal; errors if none exist (must create one first).
+  document.getElementById('btn-send-agreement-from-lead')?.addEventListener('click', async () => {
+    const leadProposals = proposals
+      .filter(p => p.lead_id === lead.id && !p.contract_signed_at && p.status !== 'declined')
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    if (leadProposals.length === 0) {
+      showToast('Create a proposal first, then send the agreement', 'error');
+      return;
+    }
+    const prop = leadProposals[0];
+    if (!confirm(`Send rental agreement for ${prop.proposal_number || 'proposal'} to ${lead.email}?`)) return;
+    try {
+      await sendAgreementEmail(prop.id, { authState });
+      showToast('Agreement sent for signature', 'success');
+      await loadAllData();
+      await openLeadDetail(lead.id);
+    } catch (err) {
+      console.error('Send agreement error:', err);
+      showToast('Error sending agreement: ' + (err.message || err), 'error');
+    }
   });
 
   // Send Feedback Form
@@ -2705,7 +2729,6 @@ async function openProposalModal(proposal = null, lead = null) {
           <div>
             <button class="crm-btn" id="btn-preview-proposal">Preview Email</button>
             <button class="crm-btn crm-btn-primary" id="btn-save-proposal-draft">Save Draft</button>
-            <button class="crm-btn crm-btn-success" id="btn-send-agreement">Send Agreement to Sign</button>
             <button class="crm-btn crm-btn-success" id="btn-send-proposal">Send Proposal</button>
           </div>
         </div>
@@ -2745,9 +2768,6 @@ async function openProposalModal(proposal = null, lead = null) {
 
   // Send proposal
   document.getElementById('btn-send-proposal').addEventListener('click', () => saveProposal(proposal, 'sent'));
-
-  // Send rental agreement for e-signature (separate email from the proposal)
-  document.getElementById('btn-send-agreement').addEventListener('click', () => saveProposal(proposal, 'agreement'));
 
   // Preview email — renders via send-email edge function with preview flag
   document.getElementById('btn-preview-proposal').addEventListener('click', () => previewProposalEmail());
@@ -2863,10 +2883,9 @@ async function saveProposal(existingProposal, status) {
   const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
   const total = subtotal - discount + tax;
 
-  // When sending (proposal or agreement), require a lead so we know who to email.
+  // When sending, require a lead so we know who to email.
   const leadId = document.getElementById('prop-lead').value || null;
-  const isSending = status === 'sent' || status === 'agreement';
-  if (isSending && !leadId) {
+  if (status === 'sent' && !leadId) {
     showToast('Select a lead before sending', 'error');
     return;
   }
@@ -2931,8 +2950,6 @@ async function saveProposal(existingProposal, status) {
 
     if (status === 'sent') {
       await sendProposalNow(proposalId);
-    } else if (status === 'agreement') {
-      await sendAgreementNow(proposalId);
     } else {
       showToast('Proposal saved as draft', 'success');
     }
@@ -2960,13 +2977,6 @@ async function sendProposalNow(proposalId) {
     },
   });
   showToast('Proposal sent — payment link delivered', 'success');
-}
-
-// Send the rental agreement email (AWKN Ranch only) — standalone SignWell flow,
-// does not advance pipeline stage or flip proposal status.
-async function sendAgreementNow(proposalId) {
-  await sendAgreementEmail(proposalId, { authState });
-  showToast('Agreement sent for signature', 'success');
 }
 
 // Render the proposal email in a modal iframe using the live send-email template,
