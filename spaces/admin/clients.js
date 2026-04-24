@@ -46,6 +46,14 @@ let staffList = [];         // app_users with role admin/staff/oracle, not archi
 // Loaded on demand when a client drawer opens.
 let integrationNotesByLead = new Map();
 
+// Client drawer state: which tab is showing, which lead is open, and the
+// bookings / proposals caches populated lazily when the drawer opens.
+let activeClientTab = 'overview';
+let currentDrawerLeadId = null;
+let bookingsByLead = new Map();     // lead_id -> array of scheduling_bookings
+let proposalsByLead = new Map();    // lead_id -> array of crm_proposals (incl. items)
+let moreMenuOpen = false;
+
 // Schedule tab state
 let scheduleWeekStart = mondayOf(new Date()); // local Date @ 00:00 on Mon of viewed week
 let scheduleBookings = [];
@@ -752,62 +760,36 @@ async function saveNewClient() {
 
 // ---------- Client detail drawer ----------
 
-function openClientDetail(leadId) {
-  const c = clients.find(x => x.id === leadId);
-  if (!c) return;
-
-  const pkgs = getClientPackages(leadId);
-  const clientStays = getClientStays(leadId);
-
-  // Aggregate sessions remaining per service across all active packages.
-  // Only unscheduled — once booked the session no longer counts as remaining.
-  const remainingByService = new Map();
+// Aggregate unscheduled sessions per service across active packages.
+// Scheduled or completed sessions no longer count as "remaining."
+function computeRemainingByService(pkgs) {
+  const remaining = new Map();
   for (const p of pkgs) {
     if (p.status !== 'active') continue;
     for (const s of (p.sessions || [])) {
       if (s.status !== 'unscheduled') continue;
-      remainingByService.set(s.service_id, (remainingByService.get(s.service_id) || 0) + 1);
+      remaining.set(s.service_id, (remaining.get(s.service_id) || 0) + 1);
     }
   }
+  return remaining;
+}
 
-  const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+function openClientDetail(leadId) {
+  const c = clients.find(x => x.id === leadId);
+  if (!c) return;
+
+  currentDrawerLeadId = leadId;
+  activeClientTab = 'overview';
+  moreMenuOpen = false;
 
   const modal = document.getElementById('clients-modal');
   modal.innerHTML = `
     <div class="crm-modal-overlay" id="clients-modal-overlay">
       <div class="crm-modal-content crm-modal-xlarge" style="display:flex;flex-direction:column;max-height:92vh;">
-        <div class="crm-modal-header">
-          <div>
-            <h2>${escapeHtml(name)}</h2>
-            <div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">
-              ${c.email ? escapeHtml(c.email) : ''}${c.email && c.phone ? ' &middot; ' : ''}${c.phone ? escapeHtml(c.phone) : ''}${(c.city || c.state) ? ` &middot; ${escapeHtml([c.city, c.state].filter(Boolean).join(', '))}` : ''}
-            </div>
-          </div>
-          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
-        </div>
-        <div class="crm-modal-body" style="padding:20px;overflow-y:auto;">
-          ${renderSessionsRemainingBlock(remainingByService)}
-          ${renderHospitalityBlock(c)}
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-            <section>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Packages</h3>
-                <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-package" data-client-id="${c.id}">+ New</button>
-              </div>
-              ${renderPackageList(pkgs)}
-            </section>
-            <section>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Retreat Stays</h3>
-                <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-stay" data-client-id="${c.id}">+ New</button>
-              </div>
-              ${renderStayList(clientStays)}
-            </section>
-          </div>
-          ${renderLegacyNoteBlock(c)}
-          <section id="integration-notes-section" data-lead-id="${c.id}">
-            <div style="color:var(--text-muted,#888);font-size:13px;padding:8px 0;">Loading integration notes\u2026</div>
-          </section>
+        ${renderClientDrawerHeader(c)}
+        ${renderClientTabNav(activeClientTab)}
+        <div class="crm-modal-body" id="client-tab-panel" style="padding:20px;overflow-y:auto;flex:1;">
+          ${renderClientTabContent(c, 'overview')}
         </div>
       </div>
     </div>
@@ -818,25 +800,184 @@ function openClientDetail(leadId) {
   document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'clients-modal-overlay') closeModal();
   });
-  bootstrapIntegrationNotesSection(leadId);
 
-  const hospSaveBtn = document.getElementById('btn-save-hospitality');
-  if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
+  // Background loads — when each finishes, re-render the active tab if it
+  // needs that data (Overview cares about bookings + notes; Sessions needs
+  // bookings; Billing/Documents need proposals).
+  loadClientBookings(leadId);
+  loadClientProposals(leadId);
+  loadClientIntegrationNotes(leadId);
+}
 
-  const bindCollapsible = (toggleId, panelId, chevronId) => {
-    const toggle = document.getElementById(toggleId);
-    const panel = document.getElementById(panelId);
-    const chevron = document.getElementById(chevronId);
-    if (!toggle || !panel) return;
-    toggle.addEventListener('click', () => {
-      const open = panel.style.display !== 'none';
-      panel.style.display = open ? 'none' : 'grid';
-      toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
-      if (chevron) chevron.style.transform = open ? '' : 'rotate(90deg)';
-    });
-  };
-  bindCollapsible('hosp-diet-toggle', 'hosp-diet-panel', 'hosp-diet-chevron');
-  bindCollapsible('hosp-arr-toggle',  'hosp-arr-panel',  'hosp-arr-chevron');
+function renderClientDrawerHeader(c) {
+  const pkgs = getClientPackages(c.id);
+  const remainingByService = computeRemainingByService(pkgs);
+  const name = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+  const contactBits = [
+    c.email ? escapeHtml(c.email) : '',
+    c.phone ? escapeHtml(c.phone) : '',
+    (c.city || c.state) ? escapeHtml([c.city, c.state].filter(Boolean).join(', ')) : '',
+  ].filter(Boolean).join(' \u00b7 ');
+
+  const chips = [];
+  chips.push(renderOnboardingChip('Waiver', c.waiver_signed));
+  chips.push(renderOnboardingChip('Intake', c.intake_completed));
+
+  const pills = [];
+  for (const [serviceId, count] of remainingByService) {
+    pills.push(`
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#fff8ec;border:1px solid #f0d9ae;border-radius:999px;font-size:12px;">
+        <strong style="color:#b4691f;">${count}\u00d7</strong>
+        <span style="color:var(--text,#2a1f23);">${escapeHtml(getServiceName(serviceId))}</span>
+      </span>
+    `);
+  }
+
+  return `
+    <div class="crm-modal-header" style="flex-direction:column;align-items:stretch;padding:16px 20px 12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <h2 style="margin:0;">${escapeHtml(name)}</h2>
+          ${contactBits ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${contactBits}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;position:relative;">
+          <button class="crm-btn crm-btn-sm" id="client-more-btn" data-action="client-more-toggle">More \u25be</button>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+          ${renderClientMoreMenu(c.id)}
+        </div>
+      </div>
+      ${(chips.length || pills.length) ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center;">
+          ${chips.join('')}
+          ${pills.length ? `<span style="width:1px;height:18px;background:var(--border-color,#e5e5e5);margin:0 4px;"></span>` : ''}
+          ${pills.join('')}
+        </div>` : ''}
+    </div>
+  `;
+}
+
+function renderOnboardingChip(label, ok) {
+  const bg = ok ? '#dcfce7' : '#fee2e2';
+  const fg = ok ? '#15803d' : '#b91c1c';
+  const mark = ok ? '\u2713' : '\u2717';
+  return `
+    <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:${bg};color:${fg};border-radius:999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">
+      <span>${mark}</span>${escapeHtml(label)}
+    </span>
+  `;
+}
+
+function renderClientMoreMenu(leadId) {
+  const items = [
+    { action: 'add-package',         label: 'Add package' },
+    { action: 'add-stay',             label: 'Add retreat stay' },
+    { sep: true },
+    { action: 'send-invoice',         label: 'Send invoice\u2026' },
+    { action: 'send-welcome-letter',  label: 'Send welcome letter\u2026' },
+    { action: 'send-intake-link',     label: 'Send intake / waiver link' },
+    { action: 'send-reminder',        label: 'Send schedule reminder' },
+    { sep: true },
+    { action: 'open-in-crm',          label: 'Open in CRM \u2197' },
+  ];
+  const rendered = items.map(it => {
+    if (it.sep) return `<div style="height:1px;background:var(--border-color,#eee);margin:4px 0;"></div>`;
+    return `
+      <button data-action="client-more-item" data-item="${it.action}" data-lead-id="${leadId}" style="
+        display:block;width:100%;padding:8px 14px;background:none;border:none;text-align:left;font-size:13px;color:var(--text,#2a1f23);cursor:pointer;white-space:nowrap;
+      " onmouseover="this.style.background='#faf8f5'" onmouseout="this.style.background='none'">${escapeHtml(it.label)}</button>
+    `;
+  }).join('');
+  return `
+    <div id="client-more-menu" style="display:none;position:absolute;top:36px;right:40px;background:#fff;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:4px 0;min-width:220px;z-index:10;">
+      ${rendered}
+    </div>
+  `;
+}
+
+function renderClientTabNav(active) {
+  const tabs = [
+    { key: 'overview',    label: 'Overview' },
+    { key: 'sessions',    label: 'Sessions' },
+    { key: 'notes',       label: 'Notes' },
+    { key: 'hospitality', label: 'Hospitality' },
+    { key: 'billing',     label: 'Billing' },
+    { key: 'documents',   label: 'Documents' },
+  ];
+  return `
+    <div id="client-tab-nav" style="display:flex;gap:0;border-bottom:1px solid var(--border-color,#eee);padding:0 12px;overflow-x:auto;">
+      ${tabs.map(t => {
+        const isActive = t.key === active;
+        return `
+          <button class="client-tab-btn" data-action="client-select-tab" data-tab="${t.key}" style="
+            padding:10px 14px;background:none;border:none;
+            border-bottom:2px solid ${isActive ? '#c9943e' : 'transparent'};
+            color:${isActive ? 'var(--text,#2a1f23)' : 'var(--text-muted,#888)'};
+            font-weight:${isActive ? '600' : '500'};font-size:13px;cursor:pointer;white-space:nowrap;
+          ">${escapeHtml(t.label)}</button>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function selectClientTab(tab) {
+  if (!currentDrawerLeadId) return;
+  activeClientTab = tab;
+  const c = clients.find(x => x.id === currentDrawerLeadId);
+  if (!c) return;
+
+  document.querySelectorAll('.client-tab-btn').forEach(btn => {
+    const isActive = btn.dataset.tab === tab;
+    btn.style.borderBottom = `2px solid ${isActive ? '#c9943e' : 'transparent'}`;
+    btn.style.color = isActive ? 'var(--text,#2a1f23)' : 'var(--text-muted,#888)';
+    btn.style.fontWeight = isActive ? '600' : '500';
+  });
+
+  const panel = document.getElementById('client-tab-panel');
+  if (!panel) return;
+  panel.innerHTML = renderClientTabContent(c, tab);
+  panel.scrollTop = 0;
+  bindTabPanelHandlers(c.id, tab);
+}
+
+function renderClientTabContent(c, tab) {
+  switch (tab) {
+    case 'overview':    return renderOverviewTab(c);
+    case 'sessions':    return renderSessionsTab(c);
+    case 'notes':       return renderNotesTab(c);
+    case 'hospitality': return renderHospitalityBlock(c);
+    case 'billing':     return renderBillingTab(c);
+    case 'documents':   return renderDocumentsTab(c);
+  }
+  return '';
+}
+
+function bindTabPanelHandlers(leadId, tab) {
+  if (tab === 'notes') {
+    // Notes tab renders an empty section that gets filled by the async loader
+    // or by an immediate render if notes are already cached.
+    renderIntegrationNotesSection(leadId);
+    return;
+  }
+  if (tab === 'hospitality') {
+    const hospSaveBtn = document.getElementById('btn-save-hospitality');
+    if (hospSaveBtn) hospSaveBtn.addEventListener('click', () => saveHospitalityFields(leadId));
+    const bindCollapsible = (toggleId, panelId, chevronId) => {
+      const toggle = document.getElementById(toggleId);
+      const panel = document.getElementById(panelId);
+      const chevron = document.getElementById(chevronId);
+      if (!toggle || !panel) return;
+      toggle.addEventListener('click', () => {
+        const open = panel.style.display !== 'none';
+        panel.style.display = open ? 'none' : 'grid';
+        toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+        if (chevron) chevron.style.transform = open ? '' : 'rotate(90deg)';
+      });
+    };
+    bindCollapsible('hosp-diet-toggle', 'hosp-diet-panel', 'hosp-diet-chevron');
+    bindCollapsible('hosp-arr-toggle',  'hosp-arr-panel',  'hosp-arr-chevron');
+    return;
+  }
 }
 
 // Editable hospitality / logistics block for the client drawer.
@@ -976,32 +1117,6 @@ async function saveHospitalityFields(leadId) {
   }
 }
 
-function renderSessionsRemainingBlock(remainingByService) {
-  if (!remainingByService.size) {
-    return `
-      <section style="margin-bottom:20px;padding:14px 16px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
-        <h3 style="margin:0 0 6px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Sessions Remaining</h3>
-        <div style="font-size:13px;color:var(--text-muted,#999);">No unused sessions on active packages.</div>
-      </section>
-    `;
-  }
-  const pills = [];
-  for (const [serviceId, count] of remainingByService) {
-    pills.push(`
-      <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#fff8ec;border:1px solid #f0d9ae;border-radius:999px;">
-        <span style="font-weight:700;font-size:14px;color:#b4691f;">${count}\u00d7</span>
-        <span style="font-size:13px;color:var(--text,#2a1f23);">${escapeHtml(getServiceName(serviceId))}</span>
-      </div>
-    `);
-  }
-  return `
-    <section style="margin-bottom:20px;padding:14px 16px;border:1px solid #f0d9ae;border-radius:10px;background:#fffdf6;">
-      <h3 style="margin:0 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#b4691f;">Sessions Remaining</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">${pills.join('')}</div>
-    </section>
-  `;
-}
-
 function renderPackageList(pkgs) {
   if (!pkgs.length) {
     return `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No packages yet.</div>`;
@@ -1109,7 +1224,7 @@ function renderLegacyNoteBlock(c) {
   `;
 }
 
-async function bootstrapIntegrationNotesSection(leadId) {
+async function loadClientIntegrationNotes(leadId) {
   try {
     const { data, error } = await supabase
       .from('client_integration_notes')
@@ -1123,7 +1238,21 @@ async function bootstrapIntegrationNotesSection(leadId) {
     integrationNotesByLead.set(leadId, []);
     showToast('Failed to load integration notes', 'error');
   }
-  renderIntegrationNotesSection(leadId);
+  // Re-render the active tab if it cares about this data.
+  if (currentDrawerLeadId === leadId && (activeClientTab === 'notes' || activeClientTab === 'overview')) {
+    if (activeClientTab === 'notes') renderIntegrationNotesSection(leadId);
+    else rerenderActiveTabPanel();
+  }
+}
+
+function rerenderActiveTabPanel() {
+  if (!currentDrawerLeadId) return;
+  const c = clients.find(x => x.id === currentDrawerLeadId);
+  if (!c) return;
+  const panel = document.getElementById('client-tab-panel');
+  if (!panel) return;
+  panel.innerHTML = renderClientTabContent(c, activeClientTab);
+  bindTabPanelHandlers(c.id, activeClientTab);
 }
 
 function renderIntegrationNotesSection(leadId) {
@@ -1251,6 +1380,385 @@ async function saveIntegrationNoteEdit(leadId, noteId) {
   if (idx !== -1) list[idx] = data;
   renderIntegrationNotesSection(leadId);
   showToast('Note updated', 'success');
+}
+
+// ========== Client drawer tabs ==========
+
+async function loadClientBookings(leadId) {
+  try {
+    const { data, error } = await supabase
+      .from('scheduling_bookings')
+      .select('id, start_datetime, end_datetime, staff_user_id, facilitator_id, service_id, space_id, status, notes, package_session_id')
+      .eq('lead_id', leadId)
+      .order('start_datetime', { ascending: false });
+    if (error) throw error;
+    bookingsByLead.set(leadId, data || []);
+  } catch (e) {
+    console.error('load client bookings error:', e);
+    bookingsByLead.set(leadId, []);
+  }
+  if (currentDrawerLeadId === leadId && (activeClientTab === 'overview' || activeClientTab === 'sessions')) {
+    rerenderActiveTabPanel();
+  }
+}
+
+async function loadClientProposals(leadId) {
+  try {
+    const { data, error } = await supabase
+      .from('crm_proposals')
+      .select('id, proposal_number, title, status, total, paid_at, created_at, signwell_document_id, contract_signed_at, event_date')
+      .eq('lead_id', leadId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    proposalsByLead.set(leadId, data || []);
+  } catch (e) {
+    console.error('load client proposals error:', e);
+    proposalsByLead.set(leadId, []);
+  }
+  if (currentDrawerLeadId === leadId && (activeClientTab === 'billing' || activeClientTab === 'documents')) {
+    rerenderActiveTabPanel();
+  }
+}
+
+function getFacilitatorName(id) {
+  const f = facilitators.find(x => x.id === id);
+  if (!f) return 'Unknown';
+  return `${f.first_name || ''} ${f.last_name || ''}`.trim() || 'Unknown';
+}
+
+function getSpaceName(id) {
+  if (!id) return '';
+  const s = [...lodgingSpaces, ...sessionSpaces].find(x => x.id === id);
+  return s?.name || '';
+}
+
+function getUpcomingBookings(leadId) {
+  const all = bookingsByLead.get(leadId) || [];
+  const now = new Date();
+  return all
+    .filter(b => new Date(b.start_datetime) >= now && b.status !== 'cancelled')
+    .sort((a, b) => new Date(a.start_datetime) - new Date(b.start_datetime));
+}
+
+function getPastBookings(leadId) {
+  const all = bookingsByLead.get(leadId) || [];
+  const now = new Date();
+  return all
+    .filter(b => new Date(b.start_datetime) < now)
+    .sort((a, b) => new Date(b.start_datetime) - new Date(a.start_datetime));
+}
+
+function renderBookingRow(b) {
+  const service = escapeHtml(getServiceName(b.service_id));
+  const when = formatDateTimeShort(b.start_datetime);
+  const assignee = b.staff_user_id
+    ? escapeHtml(getStaffDisplayName(b.staff_user_id))
+    : (b.facilitator_id ? escapeHtml(getFacilitatorName(b.facilitator_id)) : 'Unassigned');
+  const space = getSpaceName(b.space_id);
+  const statusColor = {
+    confirmed: '#15803d', pending: '#4338ca', cancelled: '#b91c1c', completed: '#64748b',
+  }[b.status] || '#64748b';
+  return `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:10px 12px;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;background:#fff;margin-bottom:6px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;">${service}</div>
+        <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
+          ${when} \u00b7 ${assignee}${space ? ` \u00b7 ${escapeHtml(space)}` : ''}
+        </div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${escapeHtml(b.status || '')}</span>
+    </div>
+  `;
+}
+
+// ---------- Overview tab ----------
+
+function renderOverviewTab(c) {
+  const upcoming = getUpcomingBookings(c.id);
+  const nextBooking = upcoming[0] || null;
+  const notes = integrationNotesByLead.get(c.id);
+  const latestNote = (notes && notes[0]) || null;
+  const bookingsLoaded = bookingsByLead.has(c.id);
+  const notesLoaded = !!notes;
+
+  const gaps = [];
+  if (!c.waiver_signed) gaps.push('Waiver not signed');
+  if (!c.intake_completed) gaps.push('Intake not completed');
+
+  const emergencyHas = c.emergency_contact_name || c.emergency_contact_phone;
+
+  return `
+    ${gaps.length ? `
+      <div style="margin-bottom:16px;padding:10px 14px;background:#fff4e6;border:1px solid #f0c98a;border-radius:8px;color:#7c4f12;font-size:13px;">
+        <strong>Onboarding gaps:</strong> ${gaps.map(escapeHtml).join(' \u00b7 ')}
+      </div>
+    ` : ''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <section style="padding:14px 16px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
+        <h3 style="margin:0 0 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Identity</h3>
+        <div style="font-size:13px;line-height:1.7;">
+          <div><span style="color:var(--text-muted,#888);">Preferred name:</span> ${c.preferred_name ? escapeHtml(c.preferred_name) : '<span style="color:#bbb;">\u2014</span>'}</div>
+          <div><span style="color:var(--text-muted,#888);">Pronouns:</span> ${c.pronouns ? escapeHtml(c.pronouns) : '<span style="color:#bbb;">\u2014</span>'}</div>
+          <div><span style="color:var(--text-muted,#888);">Phone:</span> ${c.phone ? escapeHtml(c.phone) : '<span style="color:#bbb;">\u2014</span>'}</div>
+          <div><span style="color:var(--text-muted,#888);">Location:</span> ${(c.city || c.state) ? escapeHtml([c.city, c.state].filter(Boolean).join(', ')) : '<span style="color:#bbb;">\u2014</span>'}</div>
+        </div>
+      </section>
+
+      <section style="padding:14px 16px;border:1px solid ${emergencyHas ? 'var(--border-color,#eee)' : '#f0c98a'};border-radius:10px;background:${emergencyHas ? '#fff' : '#fffaf0'};">
+        <h3 style="margin:0 0 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:${emergencyHas ? 'var(--text-muted,#888)' : '#b4691f'};">Emergency Contact</h3>
+        ${emergencyHas ? `
+          <div style="font-size:13px;line-height:1.7;">
+            <div style="font-weight:600;">${escapeHtml(c.emergency_contact_name || '')}</div>
+            ${c.emergency_contact_relationship ? `<div style="color:var(--text-muted,#666);font-size:12px;">${escapeHtml(c.emergency_contact_relationship)}</div>` : ''}
+            ${c.emergency_contact_phone ? `<div style="margin-top:4px;"><a href="tel:${escapeHtml(c.emergency_contact_phone)}" style="color:#4338ca;text-decoration:none;">${escapeHtml(c.emergency_contact_phone)}</a></div>` : ''}
+          </div>
+        ` : `
+          <div style="font-size:13px;color:#b4691f;">Not on file. Add via Hospitality tab.</div>
+        `}
+      </section>
+    </div>
+
+    <section style="padding:14px 16px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Next session</h3>
+        ${upcoming.length > 1 ? `<button class="crm-btn crm-btn-sm" data-action="client-select-tab" data-tab="sessions" style="font-size:11px;">+${upcoming.length - 1} more \u2192</button>` : ''}
+      </div>
+      ${!bookingsLoaded
+        ? `<div style="font-size:13px;color:var(--text-muted,#888);">Loading\u2026</div>`
+        : nextBooking
+          ? renderBookingRow(nextBooking)
+          : `<div style="font-size:13px;color:var(--text-muted,#888);">No upcoming sessions scheduled.</div>`}
+    </section>
+
+    <section style="padding:14px 16px;border:1px solid var(--border-color,#eee);border-radius:10px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Latest integration note</h3>
+        <button class="crm-btn crm-btn-sm" data-action="client-select-tab" data-tab="notes" style="font-size:11px;">All notes \u2192</button>
+      </div>
+      ${!notesLoaded
+        ? `<div style="font-size:13px;color:var(--text-muted,#888);">Loading\u2026</div>`
+        : latestNote
+          ? `
+            <div style="font-size:12px;color:var(--text-muted,#666);margin-bottom:6px;">
+              <strong style="color:var(--text,#2a1f23);">${escapeHtml(getStaffDisplayName(latestNote.author_app_user_id))}</strong> \u00b7 ${formatDateTimeShort(latestNote.created_at)}
+            </div>
+            <div style="font-size:13px;white-space:pre-wrap;color:var(--text,#2a1f23);">${escapeHtml(latestNote.content)}</div>
+          `
+          : `<div style="font-size:13px;color:var(--text-muted,#888);">No integration notes yet. Add one from the Notes tab.</div>`}
+    </section>
+  `;
+}
+
+// ---------- Sessions tab ----------
+
+function renderSessionsTab(c) {
+  const pkgs = getClientPackages(c.id);
+  const clientStays = getClientStays(c.id);
+  const bookingsLoaded = bookingsByLead.has(c.id);
+  const upcoming = getUpcomingBookings(c.id);
+  const past = getPastBookings(c.id).slice(0, 20);
+
+  return `
+    <section style="margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Upcoming</h3>
+      ${!bookingsLoaded
+        ? `<div style="padding:12px;color:var(--text-muted,#888);font-size:13px;">Loading\u2026</div>`
+        : upcoming.length
+          ? upcoming.map(renderBookingRow).join('')
+          : `<div style="padding:12px;color:var(--text-muted,#888);font-size:13px;background:var(--bg,#faf9f6);border-radius:8px;">No upcoming sessions. Click an unscheduled session pill below to book.</div>`}
+    </section>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Packages</h3>
+          <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-package" data-client-id="${c.id}">+ New</button>
+        </div>
+        ${renderPackageList(pkgs)}
+      </section>
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Retreat Stays</h3>
+          <button class="crm-btn crm-btn-sm crm-btn-primary" data-action="new-stay" data-client-id="${c.id}">+ New</button>
+        </div>
+        ${renderStayList(clientStays)}
+      </section>
+    </div>
+
+    <section>
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Past sessions</h3>
+      ${!bookingsLoaded
+        ? `<div style="padding:12px;color:var(--text-muted,#888);font-size:13px;">Loading\u2026</div>`
+        : past.length
+          ? past.map(renderBookingRow).join('')
+          : `<div style="padding:12px;color:var(--text-muted,#888);font-size:13px;background:var(--bg,#faf9f6);border-radius:8px;">No past sessions yet.</div>`}
+    </section>
+  `;
+}
+
+// ---------- Notes tab ----------
+
+function renderNotesTab(c) {
+  return `
+    ${renderLegacyNoteBlock(c)}
+    <section id="integration-notes-section" data-lead-id="${c.id}">
+      <div style="color:var(--text-muted,#888);font-size:13px;padding:8px 0;">Loading integration notes\u2026</div>
+    </section>
+  `;
+}
+
+// ---------- Billing tab ----------
+
+function renderBillingTab(c) {
+  const proposals = proposalsByLead.get(c.id);
+  if (proposals === undefined) {
+    return `<div style="padding:20px;color:var(--text-muted,#888);font-size:13px;">Loading proposals\u2026</div>`;
+  }
+  const totalBilled = proposals.reduce((sum, p) => sum + (Number(p.total) || 0), 0);
+  const totalPaid = proposals.filter(p => p.paid_at).reduce((sum, p) => sum + (Number(p.total) || 0), 0);
+  const outstanding = totalBilled - totalPaid;
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;margin-bottom:20px;">
+      ${billingStatTile('Total billed', totalBilled)}
+      ${billingStatTile('Paid', totalPaid, '#15803d')}
+      ${billingStatTile('Outstanding', outstanding, outstanding > 0 ? '#b4691f' : '#64748b')}
+    </div>
+
+    <section>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Proposals &amp; Invoices</h3>
+        <a href="crm.html" target="_blank" style="font-size:12px;color:#4338ca;text-decoration:none;">Open CRM \u2197</a>
+      </div>
+      ${proposals.length
+        ? proposals.map(renderProposalRow).join('')
+        : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No proposals yet. Create one in the CRM.</div>`}
+    </section>
+  `;
+}
+
+function billingStatTile(label, amount, color = 'var(--text,#2a1f23)') {
+  const amt = isFinite(amount) ? `$${(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '\u2014';
+  return `
+    <div style="padding:12px 14px;border:1px solid var(--border-color,#eee);border-radius:8px;background:#fff;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">${escapeHtml(label)}</div>
+      <div style="font-size:18px;font-weight:600;color:${color};margin-top:4px;">${amt}</div>
+    </div>
+  `;
+}
+
+function renderProposalRow(p) {
+  const statusColor = {
+    draft: '#64748b', sent: '#4338ca', accepted: '#15803d', paid: '#15803d', declined: '#b91c1c',
+  }[p.status] || '#64748b';
+  const amt = `$${Number(p.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;background:#fff;margin-bottom:6px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;">${escapeHtml(p.proposal_number || '')} \u00b7 ${escapeHtml(p.title || '(untitled)')}</div>
+        <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
+          ${formatDate(p.created_at)}${p.paid_at ? ` \u00b7 paid ${formatDate(p.paid_at)}` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:600;font-size:14px;">${amt}</div>
+        <span style="font-size:10px;font-weight:600;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${escapeHtml(p.status || '')}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- Documents tab ----------
+
+function renderDocumentsTab(c) {
+  const proposals = proposalsByLead.get(c.id);
+  const loading = proposals === undefined;
+  const contracts = (proposals || []).filter(p => p.signwell_document_id);
+
+  return `
+    <section style="margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Waiver &amp; Intake</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        ${documentStatusTile('Waiver', c.waiver_signed)}
+        ${documentStatusTile('Intake', c.intake_completed)}
+      </div>
+    </section>
+
+    <section>
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Signed Contracts</h3>
+      ${loading
+        ? `<div style="padding:16px;color:var(--text-muted,#888);font-size:13px;">Loading\u2026</div>`
+        : contracts.length
+          ? contracts.map(renderContractRow).join('')
+          : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No signed contracts on file.</div>`}
+    </section>
+  `;
+}
+
+function documentStatusTile(label, ok) {
+  const bg = ok ? '#f0fdf4' : '#fff4e6';
+  const border = ok ? '#bbf7d0' : '#f0c98a';
+  const fg = ok ? '#15803d' : '#b4691f';
+  const mark = ok ? '\u2713 Signed / complete' : '\u2717 Not yet';
+  return `
+    <div style="padding:14px;border:1px solid ${border};border-radius:8px;background:${bg};">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">${escapeHtml(label)}</div>
+      <div style="font-size:14px;font-weight:600;color:${fg};margin-top:4px;">${mark}</div>
+    </div>
+  `;
+}
+
+function renderContractRow(p) {
+  const signed = !!p.contract_signed_at;
+  return `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;background:#fff;margin-bottom:6px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;">${escapeHtml(p.proposal_number || '')} \u00b7 ${escapeHtml(p.title || '(untitled)')}</div>
+        <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
+          ${signed ? `Signed ${formatDate(p.contract_signed_at)}` : 'Sent, awaiting signature'}
+        </div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${signed ? '#15803d' : '#b4691f'};text-transform:uppercase;letter-spacing:.5px;">${signed ? 'Signed' : 'Pending'}</span>
+    </div>
+  `;
+}
+
+// ---------- More menu ----------
+
+function toggleClientMoreMenu() {
+  const menu = document.getElementById('client-more-menu');
+  if (!menu) return;
+  moreMenuOpen = !moreMenuOpen;
+  menu.style.display = moreMenuOpen ? 'block' : 'none';
+}
+
+function closeClientMoreMenu() {
+  const menu = document.getElementById('client-more-menu');
+  if (!menu) return;
+  moreMenuOpen = false;
+  menu.style.display = 'none';
+}
+
+function handleClientMoreItem(leadId, item) {
+  closeClientMoreMenu();
+  switch (item) {
+    case 'add-package':
+      openPackageModal(leadId);
+      return;
+    case 'add-stay':
+      openStayModal(leadId);
+      return;
+    case 'open-in-crm':
+      window.open('crm.html', '_blank');
+      return;
+    case 'send-invoice':
+    case 'send-welcome-letter':
+    case 'send-intake-link':
+    case 'send-reminder':
+      showToast('Coming soon \u2014 use the CRM to send for now.', 'info');
+      return;
+  }
 }
 
 // ---------- New Package modal ----------
@@ -3404,6 +3912,9 @@ function closeModal() {
     modal.innerHTML = '';
     modal.style.display = 'none';
   }
+  currentDrawerLeadId = null;
+  activeClientTab = 'overview';
+  moreMenuOpen = false;
 }
 
 // =============================================
@@ -3510,15 +4021,32 @@ function handlePanelClicks(e) {
 
   const actionBtn = target.closest('[data-action]');
   if (actionBtn) {
+    const action = actionBtn.dataset.action;
     e.stopPropagation();
-    if (actionBtn.dataset.action === 'schedule-session') {
+    if (action === 'schedule-session') {
       openScheduleSessionModal(actionBtn.dataset.sessionId);
       return;
     }
+    if (action === 'client-select-tab') {
+      selectClientTab(actionBtn.dataset.tab);
+      return;
+    }
+    if (action === 'client-more-toggle') {
+      toggleClientMoreMenu();
+      return;
+    }
+    if (action === 'client-more-item') {
+      handleClientMoreItem(actionBtn.dataset.leadId, actionBtn.dataset.item);
+      return;
+    }
     const leadId = actionBtn.dataset.clientId;
-    if (actionBtn.dataset.action === 'new-package') openPackageModal(leadId);
-    if (actionBtn.dataset.action === 'new-stay')    openStayModal(leadId);
+    if (action === 'new-package') openPackageModal(leadId);
+    if (action === 'new-stay')    openStayModal(leadId);
     return;
+  }
+  // Click outside the More menu closes it.
+  if (moreMenuOpen && !target.closest('#client-more-menu') && !target.closest('#client-more-btn')) {
+    closeClientMoreMenu();
   }
   const clientRow = target.closest('.clients-client-row');
   if (clientRow) {
