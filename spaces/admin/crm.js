@@ -3,7 +3,7 @@
 
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage, showToast, setupLightbox } from '../../shared/admin-shell.js';
-import { sendProposalEmail, sendAgreementEmail } from './crm-actions.js';
+import { sendProposalEmail, sendAgreementEmail, previewAgreementPdf } from './crm-actions.js';
 
 // =============================================
 // STATE
@@ -1705,6 +1705,7 @@ function openAgreementReviewForm(lead, leadProposals) {
       <div class="crm-form-actions" style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
         <button class="crm-btn" id="btn-cancel-agreement-review">Cancel</button>
         <button class="crm-btn" id="btn-edit-proposal-from-review">Edit Proposal</button>
+        <button class="crm-btn" id="btn-preview-agreement-pdf" style="border-color:#6366f1;color:#6366f1;">Preview PDF</button>
         <button class="crm-btn crm-btn-success" id="btn-confirm-send-agreement">Send for Signature</button>
       </div>
     `;
@@ -1717,6 +1718,23 @@ function openAgreementReviewForm(lead, leadProposals) {
     document.getElementById('btn-edit-proposal-from-review').addEventListener('click', () => {
       closeModal();
       openProposalModal(prop, lead);
+    });
+
+    document.getElementById('btn-preview-agreement-pdf').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-preview-agreement-pdf');
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Building PDF…';
+      try {
+        const { pdf_base64, filename } = await previewAgreementPdf(prop.id);
+        showPdfPreviewModal({ pdfBase64: pdf_base64, filename });
+      } catch (err) {
+        console.error('Preview agreement error:', err);
+        showToast('Preview failed: ' + (err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
     });
 
     document.getElementById('btn-confirm-send-agreement').addEventListener('click', async () => {
@@ -3248,6 +3266,43 @@ function showProposalPreviewModal({ subject, html, from, to }) {
 
   const close = () => wrap.remove();
   wrap.querySelector('#crm-preview-close').addEventListener('click', close);
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+}
+
+// Show a PDF in a centered modal with a download button. Used to preview the
+// rental agreement before the SignWell doc is created.
+function showPdfPreviewModal({ pdfBase64, filename }) {
+  const existing = document.getElementById('crm-pdf-preview-modal');
+  if (existing) existing.remove();
+
+  const byteChars = atob(pdfBase64);
+  const bytes = new Uint8Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  const wrap = document.createElement('div');
+  wrap.id = 'crm-pdf-preview-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:#fff;width:100%;max-width:900px;height:92vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;background:#f8fafc;">
+        <div style="flex:1;min-width:0;font-size:12px;color:#475569;line-height:1.5;">
+          <div><strong style="color:#1e293b;">Rental Agreement Preview</strong> — exactly what the client will see when they open the SignWell link. Not yet sent.</div>
+        </div>
+        <a href="${blobUrl}" download="${escapeHtml(filename)}" class="crm-btn" style="text-decoration:none;">Download</a>
+        <button type="button" id="crm-pdf-preview-close" class="crm-btn">Close</button>
+      </div>
+      <iframe id="crm-pdf-preview-iframe" src="${blobUrl}" style="flex:1;width:100%;border:0;background:#525659;"></iframe>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const close = () => {
+    URL.revokeObjectURL(blobUrl);
+    wrap.remove();
+  };
+  wrap.querySelector('#crm-pdf-preview-close').addEventListener('click', close);
   wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
 }
 

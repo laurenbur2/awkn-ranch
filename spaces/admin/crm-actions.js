@@ -256,3 +256,27 @@ export async function sendAgreementEmail(proposalId, { authState = null } = {}) 
 
   return { proposal, lead, signing_url: signingUrl };
 }
+
+// Fetch the rental-agreement PDF for preview — builds the same doc that would
+// be uploaded to SignWell, but returns the bytes to the caller without
+// touching SignWell or the proposal row. AWKN Ranch only.
+export async function previewAgreementPdf(proposalId) {
+  const token = await getFreshToken();
+  const resp = await fetch(SUPABASE_URL + '/functions/v1/create-proposal-contract', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+      'apikey': ANON_KEY,
+    },
+    body: JSON.stringify({ proposal_id: proposalId, preview: true }),
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    const stringify = (v) => typeof v === 'string' ? v : (v != null ? JSON.stringify(v) : '');
+    const msg = [data.error, stringify(data.detail), data.message, data.code].filter(Boolean).join(' — ') || resp.status;
+    throw new Error(`Preview failed: ${msg}`);
+  }
+  if (!data.pdf_base64) throw new Error('Preview returned no PDF');
+  return { pdf_base64: data.pdf_base64, filename: data.filename || 'rental-agreement.pdf' };
+}

@@ -21,6 +21,10 @@ const corsHeaders = {
 
 interface Req {
   proposal_id: string;
+  // When true, build and return the PDF bytes only — don't touch SignWell and
+  // don't mutate the proposal row. Used for the "Preview" button in the
+  // rental-agreement review panel.
+  preview?: boolean;
 }
 
 function fmtMoney(n: number | null | undefined): string {
@@ -110,8 +114,10 @@ serve(async (req) => {
       });
     }
 
+    const isPreview = body.preview === true;
+
     const signwellKey = Deno.env.get("SIGNWELL_API_KEY");
-    if (!signwellKey) {
+    if (!signwellKey && !isPreview) {
       return new Response(JSON.stringify({ error: "SignWell is not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
@@ -125,11 +131,12 @@ serve(async (req) => {
     // Idempotency: if a SignWell document already exists for this proposal, reuse it
     // instead of creating a new one. Prevents duplicate docs (and burning SignWell
     // quota) when "Send" is clicked twice or the proposal is re-sent.
+    // Skip entirely in preview mode — we only want the PDF bytes.
     //
     // Only reuse a doc that has a real signer recipient + signing_url. Earlier buggy
     // code created docs where the person ended up in `copied_contacts` (no signer,
     // no signing_url). Reusing those would email a dead button to the client.
-    if (proposal.signwell_document_id) {
+    if (!isPreview && proposal.signwell_document_id) {
       const existing = await fetch(
         `https://www.signwell.com/api/v1/documents/${proposal.signwell_document_id}/`,
         { headers: { "X-Api-Key": signwellKey } }
@@ -403,6 +410,19 @@ serve(async (req) => {
 
     const pdfBytes = await pdf.save();
     const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+
+    // Preview mode: caller just wants to see the PDF before committing to a
+    // SignWell doc. Return the bytes and exit — no upload, no DB mutation.
+    if (isPreview) {
+      return new Response(JSON.stringify({
+        preview: true,
+        pdf_base64: pdfBase64,
+        filename: `${proposal.proposal_number}-rental-agreement.pdf`,
+        deposit_amount: depositAmt,
+        balance_due: balanceDue,
+        deposit_percent: depositPct,
+      }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // --- Upload to SignWell ---
     // `embedded_signing: false` + `send_email: false` → SignWell returns a shareable
