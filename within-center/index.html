@@ -408,45 +408,51 @@
     .menu-sub-back { display: none; }
     body.menu-open { overflow: hidden; }
 
-    /* ── HERO ─────────────────────────────────────────── */
+    /* ── HERO (sticky, scroll-driven cross-fade) ─────── */
     .awknhero {
       position: relative;
-      min-height: 110vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      height: 220vh;
       background-color: var(--dark);
+    }
+    .awknhero-stage {
+      position: sticky;
+      top: 0;
+      height: 100vh;
       overflow: hidden;
     }
     .awknhero-bg {
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
       transform: scale(1.08);
-      animation: kenburns 24s ease-out forwards;
+      animation: kenburns 28s ease-out forwards;
       will-change: transform;
     }
     @keyframes kenburns {
       0%   { transform: scale(1.08) translateY(0); }
       100% { transform: scale(1.18) translateY(-1.5%); }
     }
-    .awknhero::before {
+    .awknhero-stage::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.55) 50%, rgba(28,22,24,0.88) 100%);
+      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.5) 50%, rgba(28,22,24,0.78) 100%);
       z-index: 1;
     }
-    .awknhero-content {
-      position: relative; z-index: 2;
-      max-width: 900px;
+    .awknhero-frame {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       padding: 7rem 2rem 4rem;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeup 1.8s 0.4s ease-out forwards;
+      color: #fff;
+      z-index: 2;
+      will-change: opacity, transform;
+      transition: opacity 0.05s linear, transform 0.05s linear;
     }
-    @keyframes fadeup {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .awknhero-frame-1 { opacity: 1; }
+    .awknhero-frame-2 { opacity: 0; }
     .awknhero-place {
       display: block;
       font-size: 0.62rem;
@@ -456,7 +462,7 @@
       margin-bottom: 3rem;
       font-weight: 400;
     }
-    .awknhero h1 {
+    .awknhero-frame-1 h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(3.4rem, 9vw, 7rem);
       color: #fff;
@@ -466,25 +472,39 @@
       margin: 0;
       font-style: normal;
     }
-    .awknhero h1 em {
-      font-style: normal;
-      font-weight: 300;
-    }
-    .awknhero-scroll {
-      display: inline-block;
-      margin-top: 4.5rem;
+    .awknhero-frame-1 h1 em { font-style: normal; font-weight: 300; }
+    .awknhero-frame-eyebrow {
+      display: block;
       font-size: 0.6rem;
-      letter-spacing: 0.32em;
+      letter-spacing: 0.42em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-      transition: color 0.3s, border-color 0.3s, letter-spacing 0.3s;
-    }
-    .awknhero-scroll:hover {
       color: var(--gold);
-      border-color: var(--gold);
-      letter-spacing: 0.38em;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    .awknhero-frame-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+      color: #fff;
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+      margin: 0 0 1.8rem;
+      max-width: 14ch;
+    }
+    .awknhero-frame-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+      color: rgba(255,255,255,0.85);
+      line-height: 1.7;
+      max-width: 540px;
+      font-weight: 300;
+      margin: 0;
+    }
+    @media (max-width: 720px) {
+      .awknhero { height: 200vh; }
+      .awknhero-frame { padding: 5rem 1.5rem 3rem; }
     }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
@@ -518,33 +538,6 @@
     }
     .s-desc.centered { margin-left: auto; margin-right: auto; text-align: center; }
 
-    /* ── PHILOSOPHY ────────────────────────── */
-    .philosophy {
-      text-align: center;
-      padding: 6rem 2rem;
-    }
-    .philosophy-inner {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    .philosophy-body {
-      font-size: 0.95rem;
-      color: var(--grey);
-      line-height: 1.9;
-      margin: 1.5rem 0 2rem;
-    }
-    .philosophy-quote {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-size: 1.2rem;
-      color: var(--brown);
-      line-height: 1.7;
-      max-width: 540px;
-      margin: 0 auto;
-      padding: 1.5rem 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
 
     /* ── PHOTO STRIP ─────────────────────────────────── */
     .photo-strip {
@@ -991,25 +984,21 @@
     </ul>
   </aside>
 
-  <!-- ══ HERO ═══════════════════════════════════════════ -->
-  <header class="awknhero">
-    <div class="awknhero-bg"></div>
-    <div class="awknhero-content">
-      <span class="awknhero-place">Austin, Texas</span>
-      <h1>Go <em>within.</em></h1>
-      <a href="#welcome" class="awknhero-scroll">Enter</a>
+  <!-- ══ HERO (sticky cross-fade) ═══════════════════════════════════════ -->
+  <header class="awknhero" id="hero">
+    <div class="awknhero-stage">
+      <div class="awknhero-bg"></div>
+      <div class="awknhero-frame awknhero-frame-1">
+        <span class="awknhero-place">Austin, Texas</span>
+        <h1>Go <em>within.</em></h1>
+      </div>
+      <div class="awknhero-frame awknhero-frame-2">
+        <span class="awknhero-frame-eyebrow">Welcome</span>
+        <h2 class="awknhero-frame-title">Healing Requires Space</h2>
+        <p class="awknhero-frame-quote">Within a sacred container of support and integration, insight becomes embodied &mdash; and transformation becomes lasting.</p>
+      </div>
     </div>
   </header>
-
-  <!-- ══ PHILOSOPHY ═══════════════════════════════════ -->
-  <section class="philosophy" id="welcome">
-    <div class="philosophy-inner">
-      <div class="s-eyebrow">Welcome</div>
-      <div class="s-title">Healing Requires Space</div>
-      <p class="philosophy-body">We approach healing as a sacred process &mdash; guided by intention, presence, and care. The ceremonial container creates a safe and supportive space where the nervous system can soften, insight can emerge, and deeper healing can begin.</p>
-      <div class="philosophy-quote">Within a sacred container of support and integration, insight becomes embodied and transformation becomes lasting.</div>
-    </div>
-  </section>
 
   <!-- ══ IMMERSIVE RETREAT (two cards) ════════════════ -->
   <section class="bg-white" id="retreats">
@@ -1148,6 +1137,34 @@
         else nav.classList.remove('scrolled');
       }
       window.addEventListener('scroll', update);
+      update();
+    })();
+
+    // Hero scroll-driven cross-fade between frames
+    (function () {
+      var hero = document.getElementById('hero');
+      var f1 = document.querySelector('.awknhero-frame-1');
+      var f2 = document.querySelector('.awknhero-frame-2');
+      if (!hero || !f1 || !f2) return;
+      function lerp(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
+      function update() {
+        var rect = hero.getBoundingClientRect();
+        var travel = hero.offsetHeight - window.innerHeight;
+        if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
+        var p = Math.max(0, Math.min(1, -rect.top / travel));
+        var f1o = 1 - lerp(p, 0.0, 0.32);
+        var f1y = -lerp(p, 0.0, 0.32) * 28;
+        var f2In = lerp(p, 0.28, 0.52);
+        var f2Out = lerp(p, 0.82, 1.0);
+        var f2o = f2In * (1 - f2Out);
+        var f2y = (1 - f2In) * 36 - f2Out * 28;
+        f1.style.opacity = f1o;
+        f1.style.transform = 'translateY(' + f1y + 'px)';
+        f2.style.opacity = f2o;
+        f2.style.transform = 'translateY(' + f2y + 'px)';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
       update();
     })();
 
