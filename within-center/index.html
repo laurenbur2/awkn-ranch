@@ -411,7 +411,7 @@
     /* ── HERO (sticky, scroll-driven cross-fade) ─────── */
     .awknhero {
       position: relative;
-      height: 220vh;
+      height: 200vh;
       background-color: var(--dark);
     }
     .awknhero-stage {
@@ -423,13 +423,8 @@
     .awknhero-bg {
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
-      transform: scale(1.08);
-      animation: kenburns 28s ease-out forwards;
-      will-change: transform;
-    }
-    @keyframes kenburns {
-      0%   { transform: scale(1.08) translateY(0); }
-      100% { transform: scale(1.18) translateY(-1.5%); }
+      transform: scale(1.05);
+      will-change: transform, opacity;
     }
     .awknhero-stage::before {
       content: '';
@@ -1140,9 +1135,10 @@
       update();
     })();
 
-    // Hero scroll-driven cross-fade between frames
+    // Hero scroll-driven cross-fade + bg parallax/fade
     (function () {
       var hero = document.getElementById('hero');
+      var bg = document.querySelector('.awknhero-bg');
       var f1 = document.querySelector('.awknhero-frame-1');
       var f2 = document.querySelector('.awknhero-frame-2');
       if (!hero || !f1 || !f2) return;
@@ -1152,12 +1148,25 @@
         var travel = hero.offsetHeight - window.innerHeight;
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
+
+        // bg: parallax up + slow zoom + fade at the end
+        if (bg) {
+          var bgY = -p * 90;
+          var bgScale = 1.05 + p * 0.1;
+          var bgOpacity = 1 - lerp(p, 0.78, 1.0);
+          bg.style.transform = 'translateY(' + bgY + 'px) scale(' + bgScale + ')';
+          bg.style.opacity = bgOpacity;
+        }
+
+        // frame 1: fade out near the top of scroll
         var f1o = 1 - lerp(p, 0.0, 0.32);
         var f1y = -lerp(p, 0.0, 0.32) * 28;
+        // frame 2: fade in mid-scroll, fade out near the end
         var f2In = lerp(p, 0.28, 0.52);
-        var f2Out = lerp(p, 0.82, 1.0);
+        var f2Out = lerp(p, 0.78, 1.0);
         var f2o = f2In * (1 - f2Out);
         var f2y = (1 - f2In) * 36 - f2Out * 28;
+
         f1.style.opacity = f1o;
         f1.style.transform = 'translateY(' + f1y + 'px)';
         f2.style.opacity = f2o;
