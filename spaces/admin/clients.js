@@ -4,6 +4,7 @@
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage, showToast } from '../../shared/admin-shell.js';
 import { sendProposalEmail } from './crm-actions.js';
+import { openClientStayModal } from '../../shared/client-stay-modal.js';
 
 // =============================================
 // STATE
@@ -901,6 +902,7 @@ function renderClientTabNav(active) {
     { key: 'sessions',    label: 'Sessions' },
     { key: 'notes',       label: 'Notes' },
     { key: 'hospitality', label: 'Hospitality' },
+    { key: 'lodging',     label: 'Lodging' },
     { key: 'billing',     label: 'Billing' },
     { key: 'documents',   label: 'Documents' },
   ];
@@ -947,6 +949,7 @@ function renderClientTabContent(c, tab) {
     case 'sessions':    return renderSessionsTab(c);
     case 'notes':       return renderNotesTab(c);
     case 'hospitality': return renderHospitalityBlock(c);
+    case 'lodging':     return renderLodgingTab(c);
     case 'billing':     return renderBillingTab(c);
     case 'documents':   return renderDocumentsTab(c);
   }
@@ -979,6 +982,108 @@ function bindTabPanelHandlers(leadId, tab) {
     bindCollapsible('hosp-arr-toggle',  'hosp-arr-panel',  'hosp-arr-chevron');
     return;
   }
+  if (tab === 'lodging') {
+    loadAndRenderLodgingStays(leadId);
+    document.getElementById('btn-add-lodging-stay')?.addEventListener('click', async () => {
+      const result = await openClientStayModal({ leadId });
+      if (result?.saved) loadAndRenderLodgingStays(leadId);
+    });
+    return;
+  }
+}
+
+// =============================================
+// Lodging tab — current/upcoming/past Retreat House stays for this client
+// =============================================
+function renderLodgingTab(c) {
+  return `
+    <div style="padding:14px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">
+          Retreat House Stays
+        </div>
+        <button id="btn-add-lodging-stay" class="crm-btn" style="padding:6px 12px;background:#d4883a;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">
+          + Assign to Bed
+        </button>
+      </div>
+      <div id="lodging-stays-list" style="font-size:13px;color:var(--text-muted,#666);">
+        Loading…
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#4b5563;line-height:1.45;">
+        Tip: linking a stay to an active immersive package keeps the package and the lodging assignment in sync. The stay also shows up automatically on the Retreat House calendar.
+      </div>
+    </div>
+  `;
+}
+
+async function loadAndRenderLodgingStays(leadId) {
+  const list = document.getElementById('lodging-stays-list');
+  if (!list) return;
+
+  const { data, error } = await supabase
+    .from('client_stays')
+    .select('id, bed_id, package_id, check_in_at, check_out_at, status, notes, bed:beds(label, bed_type, space:spaces(name, floor)), package:client_packages(name)')
+    .eq('lead_id', leadId)
+    .order('check_in_at', { ascending: false });
+
+  if (error) {
+    list.innerHTML = `<div style="color:#991b1b;">Failed to load stays: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+  const stays = data || [];
+  if (stays.length === 0) {
+    list.innerHTML = `<div style="font-style:italic;color:#9ca3af;">No retreat house stays on file. Click + Assign to Bed to add one.</div>`;
+    return;
+  }
+
+  const now = Date.now();
+  const upcoming = [];
+  const active = [];
+  const past = [];
+  for (const s of stays) {
+    if (s.status === 'cancelled') { past.push({ ...s, _cancelled: true }); continue; }
+    const ci = new Date(s.check_in_at).getTime();
+    const co = new Date(s.check_out_at).getTime();
+    if (co < now) past.push(s);
+    else if (ci > now) upcoming.push(s);
+    else active.push(s);
+  }
+
+  const fmtDate = iso => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  const renderRow = (s) => {
+    const bed = s.bed?.label || '?';
+    const room = s.bed?.space?.name || '?';
+    const floor = s.bed?.space?.floor || '';
+    const pkg = s.package?.name ? ` · pkg: ${escapeHtml(s.package.name)}` : '';
+    const cancelled = s._cancelled || s.status === 'cancelled';
+    return `
+      <button class="lodging-stay-row" data-stay-id="${s.id}"
+              style="display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;font-family:inherit;${cancelled ? 'opacity:0.5;' : ''}">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;">
+          <span style="font-weight:600;color:#111827;">${escapeHtml(room)} · ${escapeHtml(bed)}</span>
+          <span style="font-size:11px;color:#6b7280;">${fmtDate(s.check_in_at)} → ${fmtDate(s.check_out_at)}</span>
+        </div>
+        <div style="font-size:11px;color:#6b7280;margin-top:2px;">${escapeHtml(floor)}${pkg}${cancelled ? ' · cancelled' : ''}</div>
+      </button>
+    `;
+  };
+
+  const section = (label, items) => items.length === 0 ? '' : `
+    <div style="margin-bottom:10px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af;margin-bottom:4px;">${escapeHtml(label)}</div>
+      ${items.map(renderRow).join('')}
+    </div>
+  `;
+
+  list.innerHTML = section('Currently in-house', active) + section('Upcoming', upcoming) + section('Past', past);
+
+  list.querySelectorAll('.lodging-stay-row').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const stayId = btn.dataset.stayId;
+      const result = await openClientStayModal({ stayId });
+      if (result?.saved) loadAndRenderLodgingStays(leadId);
+    });
+  });
 }
 
 // Editable hospitality / logistics block for the client drawer.

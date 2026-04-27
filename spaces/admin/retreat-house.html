@@ -17,83 +17,102 @@
   <link rel="stylesheet" href="../../styles/site.css">
   <link rel="stylesheet" href="../../styles/tailwind.out.css">
   <style>
-    .rh-wrap { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .rh-wrap { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
     .rh-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
-    .rh-head p { margin: 0 0 1.5rem; color: var(--text-muted, #6b7280); font-size: 0.9rem; }
+    .rh-head p { margin: 0 0 1.25rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
 
-    .rh-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
-    .rh-stat { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.875rem 1rem; }
-    .rh-stat-value { font-size: 1.4rem; font-weight: 700; color: #111827; }
-    .rh-stat-label { font-size: 0.72rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+    .rh-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+    .rh-stat { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .rh-stat-value { font-size: 1.3rem; font-weight: 700; color: #111827; }
+    .rh-stat-label { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
 
-    .rh-floor-head {
-      font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      color: #6b7280; margin: 1.5rem 0 0.75rem;
-    }
-
-    .rh-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1rem;
-    }
-
-    .rh-card {
+    /* Calendar toolbar */
+    .rh-cal-bar {
+      display: flex; align-items: center; gap: 0.5rem;
       background: #fff; border: 1px solid var(--border, #e5e7eb);
-      border-radius: 12px; padding: 1.1rem 1.15rem;
-      display: flex; flex-direction: column; gap: 0.7rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      border-radius: 10px 10px 0 0; padding: 0.55rem 0.75rem;
+      border-bottom: none;
     }
-    .rh-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
-    .rh-card-name { font-size: 1.05rem; font-weight: 700; color: #111827; }
-    .rh-card-type-pill {
-      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-      padding: 0.18rem 0.5rem; border-radius: 999px;
+    .rh-cal-btn {
+      padding: 0.4rem 0.75rem; border-radius: 7px; border: 1px solid #e5e7eb;
+      background: #fff; font-family: inherit; font-size: 0.82rem; font-weight: 600; color: #374151;
+      cursor: pointer;
     }
-    .rh-card-type-pill.private { background: #f0f9ff; color: #0c5a85; }
-    .rh-card-type-pill.shared  { background: #fef3c7; color: #92400e; }
+    .rh-cal-btn:hover { background: #f9fafb; }
+    .rh-cal-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; margin-left: auto; }
+    .rh-cal-btn-primary:hover { background: #b87625; }
+    .rh-cal-range {
+      font-size: 0.88rem; font-weight: 600; color: #111827;
+      padding: 0 0.5rem;
+    }
 
-    .rh-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; font-size: 0.74rem; color: var(--text-muted, #6b7280); }
-    .rh-meta-tag {
-      background: #f3f4f6; padding: 0.15rem 0.5rem; border-radius: 6px;
-      font-weight: 500; color: #4b5563;
+    /* Calendar grid */
+    .rh-cal-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 0 0 10px 10px;
+      overflow-x: auto; padding: 0.4rem;
     }
-    .rh-meta-tag.feature { background: #dbeafe; color: #1e3a8a; }
+    .rh-cal-grid {
+      display: grid;
+      grid-template-columns: 200px repeat(var(--rh-days, 14), minmax(70px, 1fr));
+      min-width: max-content;
+    }
+    .rh-cal-headcell {
+      padding: 0.45rem 0.4rem; font-size: 0.7rem; font-weight: 700;
+      color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid #f3f4f6;
+      text-align: center;
+    }
+    .rh-cal-headcell.today { color: #d4883a; background: #fef3e6; border-radius: 6px 6px 0 0; }
+    .rh-cal-headcell.label-corner { text-align: left; padding-left: 0.6rem; }
+    .rh-cal-floor-row {
+      grid-column: 1 / -1;
+      padding: 0.55rem 0.6rem 0.3rem;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280;
+    }
+    .rh-cal-bed-label {
+      padding: 0.55rem 0.6rem; font-size: 0.83rem;
+      border-bottom: 1px solid #f9fafb;
+      display: flex; flex-direction: column; gap: 0.1rem; justify-content: center;
+      background: #fafafa;
+    }
+    .rh-cal-bed-name { font-weight: 600; color: #111827; }
+    .rh-cal-bed-meta { font-size: 0.7rem; color: var(--text-muted, #6b7280); }
+    .rh-cal-cell {
+      border-bottom: 1px solid #f9fafb;
+      border-left: 1px solid #f9fafb;
+      min-height: 40px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.12s ease;
+    }
+    .rh-cal-cell:hover { background: #fef9f3; }
+    .rh-cal-cell.weekend { background: #fafafa; }
+    .rh-cal-cell.today { background: #fff7ec; }
+    .rh-cal-stay {
+      grid-row: auto;
+      margin: 3px 1px;
+      padding: 0.3rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.74rem; font-weight: 600;
+      cursor: pointer;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .rh-cal-stay.source-within { background: #dcfce7; color: #14532d; border-left: 3px solid #16a34a; }
+    .rh-cal-stay.source-ranch  { background: #fef3c7; color: #78350f; border-left: 3px solid #d97706; }
+    .rh-cal-stay.source-other  { background: #e0e7ff; color: #1e3a8a; border-left: 3px solid #4f46e5; }
+    .rh-cal-stay-source-pill {
+      font-size: 0.58rem; padding: 0.05rem 0.3rem; border-radius: 3px;
+      background: rgba(255,255,255,0.7); flex-shrink: 0;
+    }
 
-    .rh-beds { display: flex; flex-direction: column; gap: 0.35rem; }
-    .rh-beds-label {
-      font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      color: #6b7280; margin-bottom: 0.15rem;
-    }
-    .rh-bed-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0.35rem 0.5rem; border-radius: 6px;
-      background: var(--bg, #f6f5f0); font-size: 0.84rem;
-    }
-    .rh-bed-name { font-weight: 500; color: #111827; }
-    .rh-bed-rate { font-weight: 600; color: var(--accent, #d4883a); }
-
-    .rh-stays {
-      border-top: 1px solid #f3f4f6; margin-top: 0.4rem; padding-top: 0.55rem;
-    }
-    .rh-stays-label {
-      font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      color: #6b7280; margin-bottom: 0.4rem;
-    }
-    .rh-stay-row {
-      display: flex; justify-content: space-between; gap: 0.5rem;
-      padding: 0.3rem 0; font-size: 0.78rem; border-top: 1px solid #f9fafb;
-    }
-    .rh-stay-row:first-of-type { border-top: none; }
-    .rh-stay-guest { font-weight: 500; color: #111827; }
-    .rh-stay-dates { color: var(--text-muted, #6b7280); white-space: nowrap; }
-    .rh-stay-source {
-      font-size: 0.62rem; padding: 0.08rem 0.35rem; border-radius: 4px;
-      font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
-      background: #ecfdf5; color: #065f46;
-    }
-    .rh-stays-empty { font-size: 0.76rem; color: #9ca3af; font-style: italic; }
+    /* Below-grid footer summary */
+    .rh-summary { margin-top: 1.25rem; }
+    .rh-summary h2 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem; color: #374151; }
     .rh-empty-state {
-      grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center;
-      color: var(--text-muted, #6b7280); font-size: 0.9rem; font-style: italic;
+      padding: 1.5rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.85rem; font-style: italic;
     }
   </style>
 </head>
@@ -119,17 +138,26 @@
     <div class="rh-wrap">
       <div class="rh-head">
         <h1>Retreat House</h1>
-        <p>Seven rooms, eleven beds. Bookings here include Within client immersive stays plus public/venue-renter stays.</p>
+        <p>Click any empty cell to assign a guest to that bed and date. Click an existing stay to edit or cancel it. Within client immersive bookings appear here automatically once linked.</p>
       </div>
 
       <div class="rh-stats">
         <div class="rh-stat"><div class="rh-stat-value" id="rhStatRooms">—</div><div class="rh-stat-label">Rooms</div></div>
         <div class="rh-stat"><div class="rh-stat-value" id="rhStatBeds">—</div><div class="rh-stat-label">Bookable Beds</div></div>
-        <div class="rh-stat"><div class="rh-stat-value" id="rhStatUpcoming">—</div><div class="rh-stat-label">Upcoming Stays (30d)</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatUpcoming">—</div><div class="rh-stat-label">Upcoming Stays</div></div>
         <div class="rh-stat"><div class="rh-stat-value" id="rhStatActive">—</div><div class="rh-stat-label">Currently In-House</div></div>
       </div>
 
-      <div id="rhFloors"></div>
+      <div class="rh-cal-bar">
+        <button class="rh-cal-btn" id="rhPrev" aria-label="Previous week">←</button>
+        <button class="rh-cal-btn" id="rhToday">Today</button>
+        <button class="rh-cal-btn" id="rhNext" aria-label="Next week">→</button>
+        <span class="rh-cal-range" id="rhRange">—</span>
+        <button class="rh-cal-btn rh-cal-btn-primary" id="rhNewStay">+ New Stay</button>
+      </div>
+      <div class="rh-cal-wrap">
+        <div class="rh-cal-grid" id="rhCalGrid"></div>
+      </div>
     </div>
   </main>
 

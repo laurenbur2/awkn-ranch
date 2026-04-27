@@ -1,21 +1,21 @@
-// Retreat House admin landing — read-only inventory view.
-// Shows the seven crystal rooms grouped by floor with their beds, attributes,
-// nightly rates, and any upcoming `client_stays` (Within immersive bookings + others).
-//
-// Data sources:
-//   - spaces (filtered to space_type='lodging', is_archived=false)
-//   - beds (joined to spaces by space_id)
-//   - client_stays (joined to crm_leads for guest name, status='upcoming'|'active', next 30 days)
+// Retreat House admin — calendar grid + stay creation/editing.
+// Rows = beds (grouped by floor + room). Columns = dates (configurable window,
+// default 14 days). Click an empty cell to create a new client_stays row;
+// click an existing stay block to edit or cancel it. The booking modal is
+// shared with the Lodging tab in clients.js.
 
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage } from '../../shared/admin-shell.js';
+import { openClientStayModal } from '../../shared/client-stay-modal.js';
 
 const FLOOR_ORDER = ['downstairs', 'upstairs'];
 const FLOOR_LABELS = { downstairs: 'Downstairs', upstairs: 'Upstairs' };
+const DAYS_VISIBLE = 14;
 
 let rooms = [];          // spaces with space_type='lodging'
-let bedsByRoom = {};     // { space_id: [bed, ...] }
-let staysByBed = {};     // { bed_id: [stay, ...] }
+let beds = [];           // ordered list of beds with space attached
+let stays = [];          // raw client_stays with crm_leads + bed metadata
+let viewStart = startOfDay(new Date());
 
 (async function () {
   await initAdminPage({
@@ -23,21 +23,26 @@ let staysByBed = {};     // { bed_id: [stay, ...] }
     section: 'staff',
     requiredPermission: 'view_rentals',
     onReady: async () => {
-      await loadData();
+      bindToolbar();
+      await loadAll();
       render();
     },
   });
 })();
 
-async function loadData() {
-  const today = new Date();
-  const horizon = new Date();
-  horizon.setDate(horizon.getDate() + 30);
+// ============================================================================
+// Data load
+// ============================================================================
+
+async function loadAll() {
+  // Date window for stay query: pull anything that overlaps the visible 14 days.
+  const winStart = new Date(viewStart);
+  const winEnd = addDays(viewStart, DAYS_VISIBLE);
 
   const [roomsRes, bedsRes, staysRes] = await Promise.all([
     supabase
       .from('spaces')
-      .select('id, name, slug, floor, has_private_bath, features, booking_category')
+      .select('id, name, slug, floor, has_private_bath, features')
       .eq('space_type', 'lodging')
       .eq('is_archived', false)
       .order('floor')
@@ -49,38 +54,48 @@ async function loadData() {
       .order('sort_order'),
     supabase
       .from('client_stays')
-      .select('id, lead_id, bed_id, package_id, check_in_at, check_out_at, status, lead:crm_leads(first_name, last_name, business_line)')
+      .select('id, lead_id, bed_id, package_id, check_in_at, check_out_at, status, notes, lead:crm_leads(first_name, last_name, business_line)')
       .in('status', ['upcoming', 'active'])
-      .lte('check_in_at', horizon.toISOString())
-      .gte('check_out_at', today.toISOString())
+      .lt('check_in_at', winEnd.toISOString())
+      .gt('check_out_at', winStart.toISOString())
       .order('check_in_at'),
   ]);
 
-  if (roomsRes.error) console.warn('Failed to load rooms:', roomsRes.error);
-  if (bedsRes.error) console.warn('Failed to load beds:', bedsRes.error);
-  if (staysRes.error) console.warn('Failed to load stays:', staysRes.error);
+  if (roomsRes.error) console.warn('rooms:', roomsRes.error);
+  if (bedsRes.error)  console.warn('beds:', bedsRes.error);
+  if (staysRes.error) console.warn('stays:', staysRes.error);
 
   rooms = roomsRes.data || [];
-  bedsByRoom = {};
-  for (const bed of bedsRes.data || []) {
-    (bedsByRoom[bed.space_id] = bedsByRoom[bed.space_id] || []).push(bed);
-  }
-  staysByBed = {};
-  for (const stay of staysRes.data || []) {
-    (staysByBed[stay.bed_id] = staysByBed[stay.bed_id] || []).push(stay);
-  }
+
+  // Attach the room object to each bed so we can group/sort.
+  const roomById = Object.fromEntries(rooms.map(r => [r.id, r]));
+  beds = (bedsRes.data || [])
+    .map(b => ({ ...b, room: roomById[b.space_id] }))
+    .filter(b => !!b.room)
+    .sort((a, b) => {
+      const fa = FLOOR_ORDER.indexOf(a.room.floor || '') ?? 99;
+      const fb = FLOOR_ORDER.indexOf(b.room.floor || '') ?? 99;
+      return fa - fb || a.room.name.localeCompare(b.room.name) || (a.sort_order - b.sort_order);
+    });
+
+  stays = staysRes.data || [];
 }
+
+// ============================================================================
+// Rendering
+// ============================================================================
 
 function render() {
   renderStats();
-  renderFloors();
+  renderRange();
+  renderGrid();
 }
 
 function renderStats() {
-  const totalBeds = Object.values(bedsByRoom).reduce((n, arr) => n + arr.length, 0);
-  const allStays = Object.values(staysByBed).flat();
+  const totalBeds = beds.length;
+  const upcoming = stays.filter(s => s.status === 'upcoming').length;
   const now = Date.now();
-  const activeNow = allStays.filter(s => {
+  const activeNow = stays.filter(s => {
     const ci = new Date(s.check_in_at).getTime();
     const co = new Date(s.check_out_at).getTime();
     return ci <= now && co > now;
@@ -88,110 +103,199 @@ function renderStats() {
 
   setText('rhStatRooms', String(rooms.length));
   setText('rhStatBeds', String(totalBeds));
-  setText('rhStatUpcoming', String(allStays.length));
+  setText('rhStatUpcoming', String(upcoming + activeNow));
   setText('rhStatActive', String(activeNow));
 }
 
-function renderFloors() {
-  const container = document.getElementById('rhFloors');
-  if (!container) return;
+function renderRange() {
+  const end = addDays(viewStart, DAYS_VISIBLE - 1);
+  const fmt = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  setText('rhRange', `${fmt(viewStart)} – ${fmt(end)}`);
+}
 
-  if (rooms.length === 0) {
-    container.innerHTML = '<div class="rh-empty-state">No retreat house rooms found. Run the latest Supabase migrations to seed the inventory.</div>';
+function renderGrid() {
+  const grid = document.getElementById('rhCalGrid');
+  if (!grid) return;
+  grid.style.setProperty('--rh-days', String(DAYS_VISIBLE));
+
+  if (beds.length === 0) {
+    grid.innerHTML = '<div class="rh-empty-state" style="grid-column:1/-1;">No retreat house beds configured.</div>';
     return;
   }
 
-  // Group rooms by floor, then render in our preferred order.
-  const byFloor = {};
-  for (const room of rooms) {
-    const f = room.floor || 'downstairs';
-    (byFloor[f] = byFloor[f] || []).push(room);
+  const days = [];
+  for (let i = 0; i < DAYS_VISIBLE; i++) days.push(addDays(viewStart, i));
+  const todayKey = ymd(new Date());
+
+  // Group stays by bed for fast lookup.
+  const staysByBed = {};
+  for (const s of stays) (staysByBed[s.bed_id] = staysByBed[s.bed_id] || []).push(s);
+
+  // Build cells: header row, then floor headers + bed rows.
+  const cells = [];
+
+  // Top-left corner label
+  cells.push(`<div class="rh-cal-headcell label-corner">Bed</div>`);
+  // Date header cells
+  for (const d of days) {
+    const isToday = ymd(d) === todayKey;
+    const dow = d.toLocaleDateString(undefined, { weekday: 'short' });
+    const md  = d.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
+    cells.push(`<div class="rh-cal-headcell ${isToday ? 'today' : ''}">${dow}<br>${md}</div>`);
   }
 
-  const html = FLOOR_ORDER
-    .filter(f => (byFloor[f] || []).length > 0)
-    .map(f => `
-      <div class="rh-floor-head">${FLOOR_LABELS[f]}</div>
-      <div class="rh-grid">
-        ${byFloor[f].map(renderRoomCard).join('')}
+  // Walk floors in order, then beds.
+  let lastFloor = null;
+  for (const bed of beds) {
+    const floor = bed.room.floor || 'downstairs';
+    if (floor !== lastFloor) {
+      cells.push(`<div class="rh-cal-floor-row">${esc(FLOOR_LABELS[floor] || floor)}</div>`);
+      lastFloor = floor;
+    }
+
+    // Bed label cell
+    const rate = (bed.nightly_rate_cents || 0) / 100;
+    const rateLabel = rate > 0 ? `$${rate.toFixed(0)}/night` : '';
+    cells.push(`
+      <div class="rh-cal-bed-label">
+        <span class="rh-cal-bed-name">${esc(bed.room.name)} · ${esc(bed.label)}</span>
+        <span class="rh-cal-bed-meta">${esc(bed.bed_type.replace('_',' '))} · ${esc(rateLabel)}</span>
       </div>
-    `).join('');
+    `);
 
-  container.innerHTML = html;
-}
+    // For each day, decide what goes there: stay block (if it starts here),
+    // a continuation we've already painted (skip), or a clickable empty cell.
+    const bedStays = (staysByBed[bed.id] || [])
+      .map(s => ({ ...s, _ci: ymd(new Date(s.check_in_at)), _co: ymd(new Date(s.check_out_at)) }))
+      .sort((a, b) => a._ci.localeCompare(b._ci));
 
-function renderRoomCard(room) {
-  const beds = bedsByRoom[room.id] || [];
-  const isShared = beds.length > 1;
-  const typeLabel = isShared ? 'Shared' : 'Private';
-  const bathLabel = room.has_private_bath ? 'Private bath' : 'Shared bath';
+    let i = 0;
+    while (i < days.length) {
+      const dayKey = ymd(days[i]);
+      const dayObj = days[i];
 
-  const features = room.features || {};
-  const featureTags = [];
-  if (features.pool_access) featureTags.push('Pool access');
+      // Is there a stay starting on this day (or overlapping the start of the window)?
+      const stayStartingHere = bedStays.find(s => {
+        if (i === 0) return s._ci <= dayKey && s._co > dayKey;
+        return s._ci === dayKey;
+      });
 
-  const stays = beds.flatMap(b => (staysByBed[b.id] || []).map(s => ({ ...s, _bed: b })));
+      if (stayStartingHere) {
+        // How many of the visible days does this stay cover from index i forward?
+        let span = 0;
+        for (let j = i; j < days.length; j++) {
+          const k = ymd(days[j]);
+          if (k >= stayStartingHere._ci && k < stayStartingHere._co) span++;
+          else break;
+        }
+        if (span === 0) span = 1;
 
-  return `
-    <div class="rh-card">
-      <div class="rh-card-head">
-        <div class="rh-card-name">${escapeHtml(room.name)}</div>
-        <span class="rh-card-type-pill ${isShared ? 'shared' : 'private'}">${typeLabel}</span>
-      </div>
-      <div class="rh-card-meta">
-        <span class="rh-meta-tag">${bathLabel}</span>
-        ${featureTags.map(f => `<span class="rh-meta-tag feature">${escapeHtml(f)}</span>`).join('')}
-      </div>
-
-      <div class="rh-beds">
-        <div class="rh-beds-label">${beds.length} bed${beds.length === 1 ? '' : 's'}</div>
-        ${beds.map(renderBedRow).join('') || '<div class="rh-stays-empty">No beds configured.</div>'}
-      </div>
-
-      <div class="rh-stays">
-        <div class="rh-stays-label">Upcoming stays (next 30 days)</div>
-        ${stays.length === 0
-          ? '<div class="rh-stays-empty">No stays booked.</div>'
-          : stays.map(renderStayRow).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function renderBedRow(bed) {
-  const rate = (bed.nightly_rate_cents || 0) / 100;
-  const rateLabel = rate > 0 ? `$${rate.toFixed(0)}/night` : 'Rate not set';
-  return `
-    <div class="rh-bed-row">
-      <span class="rh-bed-name">${escapeHtml(bed.label)} <span style="color:#9ca3af;font-weight:400;">· ${escapeHtml(bed.bed_type.replace('_', ' '))}</span></span>
-      <span class="rh-bed-rate">${rateLabel}</span>
-    </div>
-  `;
-}
-
-function renderStayRow(stay) {
-  const lead = stay.lead || {};
-  const guestName = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Guest';
-  const ci = formatShortDate(stay.check_in_at);
-  const co = formatShortDate(stay.check_out_at);
-  const isWithin = lead.business_line === 'within';
-  const sourceLabel = isWithin ? 'Within' : (lead.business_line === 'awkn_ranch' ? 'Venue' : 'Stay');
-  return `
-    <div class="rh-stay-row">
-      <span class="rh-stay-guest">${escapeHtml(guestName)} <span class="rh-stay-source">${sourceLabel}</span></span>
-      <span class="rh-stay-dates">${ci} → ${co}</span>
-    </div>
-  `;
-}
-
-function formatShortDate(iso) {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  } catch (e) {
-    return iso;
+        const guest = ((stayStartingHere.lead?.first_name || '') + ' ' + (stayStartingHere.lead?.last_name || '')).trim() || 'Guest';
+        const sourceClass = (stayStartingHere.lead?.business_line === 'within') ? 'source-within'
+                          : (stayStartingHere.lead?.business_line === 'awkn_ranch') ? 'source-ranch'
+                          : 'source-other';
+        const sourceLabel = (stayStartingHere.lead?.business_line === 'within') ? 'Within'
+                          : (stayStartingHere.lead?.business_line === 'awkn_ranch') ? 'Venue'
+                          : 'Stay';
+        cells.push(`
+          <div class="rh-cal-stay ${sourceClass}" style="grid-column: span ${span};"
+               data-stay-id="${stayStartingHere.id}">
+            <span class="rh-cal-stay-source-pill">${sourceLabel}</span>
+            <span>${esc(guest)}</span>
+          </div>
+        `);
+        i += span;
+      } else {
+        const isWeekend = dayObj.getDay() === 0 || dayObj.getDay() === 6;
+        const isToday = ymd(dayObj) === todayKey;
+        cells.push(`
+          <div class="rh-cal-cell ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}"
+               data-bed-id="${bed.id}" data-date="${dayKey}"></div>
+        `);
+        i++;
+      }
+    }
   }
+
+  grid.innerHTML = cells.join('');
+  bindGridHandlers(grid);
+}
+
+function bindGridHandlers(grid) {
+  // Single delegated listener: dispatch to either an empty cell (create) or a stay block (edit).
+  grid.addEventListener('click', async (e) => {
+    const stayBlock = e.target.closest('.rh-cal-stay');
+    if (stayBlock) {
+      const stayId = stayBlock.dataset.stayId;
+      const result = await openClientStayModal({ stayId });
+      if (result?.saved) await reloadAndRender();
+      return;
+    }
+    const cell = e.target.closest('.rh-cal-cell');
+    if (cell && !cell.classList.contains('rh-stay-cell')) {
+      const bedId = cell.dataset.bedId;
+      const date  = cell.dataset.date;
+      if (!bedId || !date) return;
+      const checkIn = new Date(date + 'T00:00:00');
+      const result = await openClientStayModal({
+        bedId,
+        checkIn,
+        checkOut: addDays(checkIn, 1),
+      });
+      if (result?.saved) await reloadAndRender();
+    }
+  });
+}
+
+async function reloadAndRender() {
+  await loadAll();
+  render();
+}
+
+// ============================================================================
+// Toolbar
+// ============================================================================
+
+function bindToolbar() {
+  document.getElementById('rhPrev')?.addEventListener('click', async () => {
+    viewStart = addDays(viewStart, -7);
+    await reloadAndRender();
+  });
+  document.getElementById('rhNext')?.addEventListener('click', async () => {
+    viewStart = addDays(viewStart, 7);
+    await reloadAndRender();
+  });
+  document.getElementById('rhToday')?.addEventListener('click', async () => {
+    viewStart = startOfDay(new Date());
+    await reloadAndRender();
+  });
+  document.getElementById('rhNewStay')?.addEventListener('click', async () => {
+    const result = await openClientStayModal({});
+    if (result?.saved) await reloadAndRender();
+  });
+}
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const da = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${da}`;
 }
 
 function setText(id, text) {
@@ -199,7 +303,7 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
-function escapeHtml(s) {
+function esc(s) {
   if (s == null) return '';
   const d = document.createElement('div');
   d.textContent = String(s);
