@@ -407,6 +407,46 @@
       color: rgba(28,22,24,0.55);
       font-weight: 600;
     }
+
+    /* ── OPTIONAL ENHANCEMENTS ──────────────────────── */
+    .enhancements-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 980px;
+      margin: 3rem auto 0;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      border-left: 1px solid rgba(28,22,24,0.08);
+      background: #fff;
+    }
+    @media (max-width: 860px) { .enhancements-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .enhancements-grid { grid-template-columns: 1fr; } }
+    .enhancement-item {
+      padding: 1.6rem 1.2rem;
+      border-bottom: 1px solid rgba(28,22,24,0.08);
+      border-right: 1px solid rgba(28,22,24,0.08);
+      text-align: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--dark);
+      letter-spacing: 0.01em;
+      line-height: 1.35;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+    .enhancement-item:hover {
+      color: var(--gold);
+      background: rgba(201,148,62,0.05);
+    }
+    .enhancements-note {
+      max-width: 540px;
+      margin: 2.4rem auto 0;
+      text-align: center;
+      font-size: 0.88rem;
+      color: rgba(28,22,24,0.6);
+      font-style: italic;
+      line-height: 1.7;
+    }
+    .enhancements-note strong { color: var(--gold); font-style: normal; font-weight: 600; letter-spacing: 0.02em; }
   </style>
 </head>
 <body>
@@ -586,6 +626,31 @@
       </div>
       <div style="text-align:center; margin-top:2rem;">
         <button type="button" class="schedule-btn" onclick="document.getElementById('sampleScheduleModal').classList.add('open')">Sample Schedule</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── OPTIONAL ENHANCEMENTS ──────────────────────── -->
+  <section class="pkg-section bg-white" id="enhancements">
+    <div class="container">
+      <div style="text-align:center; max-width:620px; margin:0 auto;">
+        <div class="section-eyebrow">Curate Your Experience</div>
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(2rem,4vw,2.6rem); margin:0 0 1rem;">Optional Enhancements</h2>
+        <p style="color:rgba(28,22,24,0.65); font-size:0.95rem; line-height:1.75;">A curated collection of offerings to deepen your time at the ranch. Add any of these to your stay before you arrive, or in the moment.</p>
+      </div>
+      <div class="enhancements-grid">
+        <div class="enhancement-item">60-Minute Massage</div>
+        <div class="enhancement-item">Additional Integration Coaching</div>
+        <div class="enhancement-item">Human Design Reading</div>
+        <div class="enhancement-item">Licensed Therapy Session</div>
+        <div class="enhancement-item">Astrology Session</div>
+        <div class="enhancement-item">Hap&eacute; Ceremony</div>
+        <div class="enhancement-item">Internal Family Systems Session</div>
+        <div class="enhancement-item">Private Sound Journey</div>
+        <div class="enhancement-item">Pickleball Lesson</div>
+      </div>
+      <div class="enhancements-note">
+        <strong>Inquire with our concierge</strong> to weave any of these offerings into your stay.
       </div>
     </div>
   </section>
