@@ -423,14 +423,23 @@
     .awknhero-bg {
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
-      transform: scale(1.12);
+      transform: scale(1.16);
       will-change: transform, opacity;
     }
     .awknhero-stage::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.5) 50%, rgba(28,22,24,0.78) 100%);
+      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.55) 55%, rgba(28,22,24,0.92) 100%);
       z-index: 1;
+      pointer-events: none;
+    }
+    .awknhero-darken {
+      position: absolute; inset: 0;
+      background: var(--dark);
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+      will-change: opacity;
     }
     .awknhero-frame {
       position: absolute;
@@ -983,6 +992,7 @@
   <header class="awknhero" id="hero">
     <div class="awknhero-stage">
       <div class="awknhero-bg"></div>
+      <div class="awknhero-darken"></div>
       <div class="awknhero-frame awknhero-frame-1">
         <span class="awknhero-place">Austin, Texas</span>
         <h1>Go <em>within.</em></h1>
@@ -1139,6 +1149,7 @@
     (function () {
       var hero = document.getElementById('hero');
       var bg = document.querySelector('.awknhero-bg');
+      var darken = document.querySelector('.awknhero-darken');
       var f1 = document.querySelector('.awknhero-frame-1');
       var f2 = document.querySelector('.awknhero-frame-2');
       if (!hero || !f1 || !f2) return;
@@ -1149,12 +1160,16 @@
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-        // bg: drifts upward and fades out as the section ends
+        // bg: drifts strongly upward and fades into black
         if (bg) {
-          var bgY = -p * 80;
-          var bgOpacity = 1 - lerp(p, 0.55, 1.0);
-          bg.style.transform = 'translateY(' + bgY + 'px) scale(1.12)';
+          var bgY = -p * 220;
+          var bgOpacity = 1 - lerp(p, 0.45, 0.92);
+          bg.style.transform = 'translateY(' + bgY + 'px) scale(1.16)';
           bg.style.opacity = bgOpacity;
+        }
+        // dark overlay strengthens as the section ends
+        if (darken) {
+          darken.style.opacity = lerp(p, 0.35, 0.95) * 0.9;
         }
 
         // frame 1: fade out near the top of scroll
