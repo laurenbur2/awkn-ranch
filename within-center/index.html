@@ -1215,10 +1215,10 @@
       function visible(s, eA, eB, xA, xB) {
         return easeInOut(lerp(s, eA, eB)) * (1 - easeInOut(lerp(s, xA, xB)));
       }
-      function apply(el, v, maxOpacity) {
+      function apply(el, v, maxOpacity, travel) {
         if (!el) return;
         el.style.opacity = v * (maxOpacity || 1);
-        el.style.transform = 'translateY(' + ((1 - v) * 44) + 'px)';
+        el.style.transform = 'translateY(' + ((1 - v) * (travel || 44)) + 'px)';
       }
       function update() {
         var rect = block.getBoundingClientRect();
@@ -1227,10 +1227,10 @@
         if (H <= 0) return;
         // s: 0 when block top hits viewport bottom; 1 when block bottom hits viewport top
         var s = (vh - rect.top) / (vh + H);
-        apply(eyebrow, visible(s, 0.06, 0.20, 0.82, 0.96), 1);
-        apply(title,   visible(s, 0.14, 0.30, 0.72, 0.86), 1);
-        apply(divider, visible(s, 0.22, 0.38, 0.62, 0.78), 0.75);
-        apply(quote,   visible(s, 0.30, 0.46, 0.54, 0.70), 1);
+        apply(eyebrow, visible(s, 0.04, 0.18, 0.84, 0.98), 1, 36);
+        apply(title,   visible(s, 0.16, 0.36, 0.68, 0.86), 1, 60);
+        apply(divider, visible(s, 0.30, 0.44, 0.58, 0.72), 0.75, 40);
+        apply(quote,   visible(s, 0.38, 0.54, 0.50, 0.66), 1, 44);
       }
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
