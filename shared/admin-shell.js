@@ -126,7 +126,7 @@ const PILLAR_LABELS = {
   master:      'Master Calendar',
   memberships: 'Memberships',
   within:      'Within',
-  ranch:       'AWKN Ranch',
+  ranch:       'Venue Rental',
   retreat:     'Retreat House',
 };
 const PILLAR_STORAGE_KEY = 'awkn.activePillar';
