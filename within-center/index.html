@@ -506,9 +506,52 @@
       font-weight: 300;
       margin: 0;
     }
+    .awknhero-frame-divider {
+      display: block;
+      width: 48px;
+      height: 1px;
+      background: rgba(201,148,62,0.55);
+      margin: 0 auto 1.8rem;
+    }
+    .awknhero-scroll-cue {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin-top: 3.5rem;
+      color: rgba(255,255,255,0.75);
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.3s, border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+    .awknhero-scroll-cue:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(201,148,62,0.08);
+      transform: translateY(2px);
+    }
+    .awknhero-scroll-cue svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: scrollPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { transform: translateY(-2px); opacity: 0.75; }
+      50%      { transform: translateY(3px);  opacity: 1; }
+    }
     @media (max-width: 720px) {
       .awknhero { height: 200vh; }
       .awknhero-frame { padding: 5rem 1.5rem 3rem; }
+      .awknhero-scroll-cue { margin-top: 2.5rem; }
     }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
@@ -996,10 +1039,14 @@
       <div class="awknhero-frame awknhero-frame-1">
         <span class="awknhero-place">Austin, Texas</span>
         <h1>Go <em>within.</em></h1>
+        <button type="button" class="awknhero-scroll-cue" onclick="window.scrollTo({top: window.innerHeight * 0.7, behavior: 'smooth'})" aria-label="Scroll down">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+        </button>
       </div>
       <div class="awknhero-frame awknhero-frame-2">
         <span class="awknhero-frame-eyebrow">Welcome</span>
         <h2 class="awknhero-frame-title">Healing Requires Space</h2>
+        <span class="awknhero-frame-divider"></span>
         <p class="awknhero-frame-quote">Within a sacred container of support and integration, insight becomes embodied &mdash; and transformation becomes lasting.</p>
       </div>
     </div>
@@ -1173,11 +1220,11 @@
         }
 
         // frame 1: fade out near the top of scroll
-        var f1o = 1 - lerp(p, 0.0, 0.32);
-        var f1y = -lerp(p, 0.0, 0.32) * 28;
-        // frame 2: fade in mid-scroll, fade out near the end
-        var f2In = lerp(p, 0.28, 0.52);
-        var f2Out = lerp(p, 0.78, 1.0);
+        var f1o = 1 - lerp(p, 0.0, 0.28);
+        var f1y = -lerp(p, 0.0, 0.28) * 28;
+        // frame 2: brief gap, then fade in, hold, then fade out
+        var f2In = lerp(p, 0.34, 0.55);
+        var f2Out = lerp(p, 0.78, 0.95);
         var f2o = f2In * (1 - f2Out);
         var f2y = (1 - f2In) * 36 - f2Out * 28;
 
