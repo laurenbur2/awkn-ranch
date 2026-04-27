@@ -80,7 +80,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
   { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master', 'within', 'ranch', 'retreat'] },
-  { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['within'] },
+  { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
@@ -120,13 +120,14 @@ export const ALL_ADMIN_TABS = [
 // Within the staff section, tabs are filtered by the active pillar.
 // Pillar buttons appear in this display order. Admin / DevControl are
 // rendered separately at the end (they're sections, not pillars).
-const PILLAR_ORDER = ['shared', 'master', 'within', 'ranch', 'retreat'];
+const PILLAR_ORDER = ['shared', 'master', 'memberships', 'within', 'ranch', 'retreat'];
 const PILLAR_LABELS = {
-  shared:  'Today',
-  master:  'Master Calendar',
-  within:  'Within',
-  ranch:   'AWKN Ranch',
-  retreat: 'Retreat House',
+  shared:      'Today',
+  master:      'Master Calendar',
+  memberships: 'Memberships',
+  within:      'Within',
+  ranch:       'AWKN Ranch',
+  retreat:     'Retreat House',
 };
 const PILLAR_STORAGE_KEY = 'awkn.activePillar';
 const DEFAULT_PILLAR = 'shared';
