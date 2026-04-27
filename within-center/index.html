@@ -412,7 +412,7 @@
     .awknhero {
       position: relative;
       height: 175vh;
-      background-color: var(--white);
+      background-color: var(--dark);
     }
     .awknhero-stage {
       position: sticky;
@@ -424,16 +424,22 @@
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
       transform: scale(1.16);
-      will-change: transform;
-      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0) 100%);
-      mask-image: linear-gradient(180deg, #000 0%, #000 62%, rgba(0,0,0,0.6) 80%, rgba(0,0,0,0) 100%);
+      will-change: transform, opacity;
     }
     .awknhero-stage::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.45) 0%, rgba(28,22,24,0.4) 40%, rgba(28,22,24,0.15) 75%, rgba(28,22,24,0) 100%);
+      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.55) 55%, rgba(28,22,24,0.92) 100%);
       z-index: 1;
       pointer-events: none;
+    }
+    .awknhero-darken {
+      position: absolute; inset: 0;
+      background: var(--dark);
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+      will-change: opacity;
     }
     .awknhero-frame {
       position: absolute;
@@ -443,7 +449,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 6vh 2rem 30vh;
+      padding: 7rem 2rem 4rem;
       color: #fff;
       z-index: 2;
       will-change: opacity, transform;
@@ -544,7 +550,7 @@
     }
     @media (max-width: 720px) {
       .awknhero { height: 165vh; }
-      .awknhero-frame { padding: 5vh 1.5rem 28vh; }
+      .awknhero-frame { padding: 5rem 1.5rem 3rem; }
       .awknhero-scroll-cue { margin-top: 2.5rem; }
     }
 
@@ -1029,6 +1035,7 @@
   <header class="awknhero" id="hero">
     <div class="awknhero-stage">
       <div class="awknhero-bg"></div>
+      <div class="awknhero-darken"></div>
       <div class="awknhero-frame awknhero-frame-1">
         <span class="awknhero-place">Austin, Texas</span>
         <h1>Go <em>within.</em></h1>
@@ -1189,6 +1196,7 @@
     (function () {
       var hero = document.getElementById('hero');
       var bg = document.querySelector('.awknhero-bg');
+      var darken = document.querySelector('.awknhero-darken');
       var f1 = document.querySelector('.awknhero-frame-1');
       var f2 = document.querySelector('.awknhero-frame-2');
       if (!hero || !f1 || !f2) return;
@@ -1199,10 +1207,15 @@
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-        // bg: drifts upward; bottom mask handles the fade into white
+        // bg: drifts upward; stays visible until the section releases
         if (bg) {
           var bgY = -p * 180;
           bg.style.transform = 'translateY(' + bgY + 'px) scale(1.16)';
+          bg.style.opacity = 1;
+        }
+        // dark overlay: gentle build, never goes opaque
+        if (darken) {
+          darken.style.opacity = lerp(p, 0.4, 1.0) * 0.45;
         }
 
         // frame 1: fade out near the top of scroll
