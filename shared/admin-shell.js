@@ -76,6 +76,9 @@ const TAB_ICONS = {
 // A tab can list multiple pillars if it surfaces in more than one.
 // Tabs with no `pillars` are pillar-agnostic (visible in any staff pillar) — used for hidden direct-URL tabs.
 export const ALL_ADMIN_TABS = [
+  // Pillar-exclusive landing tabs (listed first so they win as the pillar's first-available
+  // tab in renderContextSwitcher's firstTabForPillar lookup).
+  { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat'] },
   // Staff section — primary admin tabs (Mindbody-style)
   { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },

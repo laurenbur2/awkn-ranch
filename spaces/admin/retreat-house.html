@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Retreat House - AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .rh-wrap { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .rh-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .rh-head p { margin: 0 0 1.5rem; color: var(--text-muted, #6b7280); font-size: 0.9rem; }
+
+    .rh-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .rh-stat { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.875rem 1rem; }
+    .rh-stat-value { font-size: 1.4rem; font-weight: 700; color: #111827; }
+    .rh-stat-label { font-size: 0.72rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+
+    .rh-floor-head {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280; margin: 1.5rem 0 0.75rem;
+    }
+
+    .rh-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+
+    .rh-card {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; padding: 1.1rem 1.15rem;
+      display: flex; flex-direction: column; gap: 0.7rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .rh-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+    .rh-card-name { font-size: 1.05rem; font-weight: 700; color: #111827; }
+    .rh-card-type-pill {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.18rem 0.5rem; border-radius: 999px;
+    }
+    .rh-card-type-pill.private { background: #f0f9ff; color: #0c5a85; }
+    .rh-card-type-pill.shared  { background: #fef3c7; color: #92400e; }
+
+    .rh-card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; font-size: 0.74rem; color: var(--text-muted, #6b7280); }
+    .rh-meta-tag {
+      background: #f3f4f6; padding: 0.15rem 0.5rem; border-radius: 6px;
+      font-weight: 500; color: #4b5563;
+    }
+    .rh-meta-tag.feature { background: #dbeafe; color: #1e3a8a; }
+
+    .rh-beds { display: flex; flex-direction: column; gap: 0.35rem; }
+    .rh-beds-label {
+      font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280; margin-bottom: 0.15rem;
+    }
+    .rh-bed-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.35rem 0.5rem; border-radius: 6px;
+      background: var(--bg, #f6f5f0); font-size: 0.84rem;
+    }
+    .rh-bed-name { font-weight: 500; color: #111827; }
+    .rh-bed-rate { font-weight: 600; color: var(--accent, #d4883a); }
+
+    .rh-stays {
+      border-top: 1px solid #f3f4f6; margin-top: 0.4rem; padding-top: 0.55rem;
+    }
+    .rh-stays-label {
+      font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280; margin-bottom: 0.4rem;
+    }
+    .rh-stay-row {
+      display: flex; justify-content: space-between; gap: 0.5rem;
+      padding: 0.3rem 0; font-size: 0.78rem; border-top: 1px solid #f9fafb;
+    }
+    .rh-stay-row:first-of-type { border-top: none; }
+    .rh-stay-guest { font-weight: 500; color: #111827; }
+    .rh-stay-dates { color: var(--text-muted, #6b7280); white-space: nowrap; }
+    .rh-stay-source {
+      font-size: 0.62rem; padding: 0.08rem 0.35rem; border-radius: 4px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+      background: #ecfdf5; color: #065f46;
+    }
+    .rh-stays-empty { font-size: 0.76rem; color: #9ca3af; font-style: italic; }
+    .rh-empty-state {
+      grid-column: 1 / -1; padding: 2.5rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.9rem; font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="rh-wrap">
+      <div class="rh-head">
+        <h1>Retreat House</h1>
+        <p>Seven rooms, eleven beds. Bookings here include Within client immersive stays plus public/venue-renter stays.</p>
+      </div>
+
+      <div class="rh-stats">
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatRooms">—</div><div class="rh-stat-label">Rooms</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatBeds">—</div><div class="rh-stat-label">Bookable Beds</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatUpcoming">—</div><div class="rh-stat-label">Upcoming Stays (30d)</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatActive">—</div><div class="rh-stat-label">Currently In-House</div></div>
+      </div>
+
+      <div id="rhFloors"></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="retreat-house.js"></script>
+</body>
+</html>
