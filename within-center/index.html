@@ -423,7 +423,7 @@
     .awknhero-bg {
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
-      transform: scale(1.05);
+      transform: scale(1.12);
       will-change: transform, opacity;
     }
     .awknhero-stage::before {
@@ -1149,12 +1149,11 @@
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-        // bg: parallax up + slow zoom + fade at the end
+        // bg: drifts downward and fades out as the section ends
         if (bg) {
-          var bgY = -p * 90;
-          var bgScale = 1.05 + p * 0.1;
-          var bgOpacity = 1 - lerp(p, 0.78, 1.0);
-          bg.style.transform = 'translateY(' + bgY + 'px) scale(' + bgScale + ')';
+          var bgY = p * 80;
+          var bgOpacity = 1 - lerp(p, 0.55, 1.0);
+          bg.style.transform = 'translateY(' + bgY + 'px) scale(1.12)';
           bg.style.opacity = bgOpacity;
         }
 
