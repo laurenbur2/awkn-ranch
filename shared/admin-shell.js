@@ -120,7 +120,7 @@ export const ALL_ADMIN_TABS = [
 // Within the staff section, tabs are filtered by the active pillar.
 // Pillar buttons appear in this display order. Admin / DevControl are
 // rendered separately at the end (they're sections, not pillars).
-const PILLAR_ORDER = ['shared', 'master', 'memberships', 'within', 'ranch', 'retreat'];
+const PILLAR_ORDER = ['shared', 'master', 'within', 'ranch', 'retreat', 'memberships'];
 const PILLAR_LABELS = {
   shared:      'Today',
   master:      'Master Calendar',
