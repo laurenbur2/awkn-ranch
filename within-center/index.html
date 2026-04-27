@@ -703,54 +703,7 @@
       .package-grid { grid-template-columns: 1fr; }
     }
 
-    /* ── RETREAT SPLIT ────────────────────────────────── */
-    .retreat-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 460px;
-    }
-    .retreat-split-img {
-      position: relative;
-      overflow: hidden;
-    }
-    .retreat-split-img img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .retreat-split-content {
-      background: var(--white);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 4rem 3.5rem;
-    }
-    .retreat-hero-eyebrow {
-      font-size: 0.55rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 600;
-      margin-bottom: 1.25rem;
-    }
-    .retreat-hero-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
-      font-weight: 400;
-      color: var(--dark);
-      line-height: 1.25;
-      margin-bottom: 1.25rem;
-    }
-    .retreat-hero-title em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .retreat-hero-desc {
-      font-size: 0.88rem;
-      color: var(--grey);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
+    /* ── RETREAT CARDS ────────────────────────────────── */
     .retreat-hero-btn {
       display: inline-block;
       padding: 0.85rem 2.2rem;
@@ -769,11 +722,115 @@
       background: var(--brown);
       transform: translateY(-2px);
     }
-    @media (max-width: 900px) {
-      .retreat-split { grid-template-columns: 1fr; }
-      .retreat-split-img { height: 360px; }
-      .retreat-split-content { padding: 3rem 2rem; }
+    .retreat-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 820px;
+      margin: 3rem auto 0;
     }
+    @media (max-width: 720px) { .retreat-cards { grid-template-columns: 1fr; max-width: 480px; } }
+    .retreat-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.07);
+      border-radius: 14px;
+      padding: 2.4rem 2rem 2rem;
+      box-shadow: 0 1px 2px rgba(28,22,24,0.04);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .retreat-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.55;
+    }
+    .retreat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,148,62,0.4);
+      box-shadow: 0 18px 40px rgba(28,22,24,0.07);
+    }
+    .retreat-card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.1rem;
+      color: var(--gold);
+    }
+    .retreat-card-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .retreat-card-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.45rem;
+      color: var(--dark);
+      margin: 0 0 1.1rem;
+      padding-bottom: 0.85rem;
+      position: relative;
+      line-height: 1.2;
+    }
+    .retreat-card-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 28px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .retreat-card-meta {
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .retreat-card ul { list-style: none; padding: 0; margin: 0 0 1.5rem; }
+    .retreat-card li {
+      padding: 0.6rem 0 0.6rem 1.7rem;
+      position: relative;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: rgba(28,22,24,0.82);
+      border-bottom: 1px dashed rgba(28,22,24,0.06);
+    }
+    .retreat-card li:last-child { border-bottom: none; }
+    .retreat-card li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold);
+      background: rgba(201,148,62,0.15);
+    }
+    .retreat-card-cta {
+      margin-top: auto;
+      align-self: flex-start;
+      font-size: 0.65rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(201,148,62,0.4);
+      padding-bottom: 0.2rem;
+      transition: border-color 0.25s;
+    }
+    .retreat-card:hover .retreat-card-cta { border-bottom-color: var(--gold); }
 
     /* ── CTA BANNER ──────────────────────────────────── */
     .cta-section {
@@ -954,21 +1011,42 @@
     </div>
   </section>
 
-  <!-- ══ IMMERSIVE RETREAT (split hero) ════════════════ -->
-  <div class="retreat-split">
-    <div class="retreat-split-img">
-      <img src="../pricing/images/dome-exterior.jpeg" alt="Honeycomb ceremony dome at AWKN Ranch">
-    </div>
-    <div class="retreat-split-content">
-      <div class="retreat-hero-eyebrow">Our Signature Experience</div>
-      <div class="retreat-hero-title">Immerse in Your <em>Healing</em></div>
-      <p class="retreat-hero-desc">Step away from everything. AWKN Ranch becomes your container &mdash; twelve private acres, guided ceremonies, daily wellness rituals, and a live-in team devoted to your healing. This is how the deepest work gets done.</p>
-      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <a href="immersive-retreat/" class="retreat-hero-btn">6-Day Retreat</a>
-        <a href="immersive-retreat/3-day/" class="retreat-hero-btn" style="background:transparent; border:1px solid var(--dark); color:var(--dark);">3-Day Retreat</a>
+  <!-- ══ IMMERSIVE RETREAT (two cards) ════════════════ -->
+  <section class="bg-white" id="retreats">
+    <div class="container-wide">
+      <div style="text-align:center; margin-bottom: 1rem;">
+        <div class="s-eyebrow">Our Signature Experience</div>
+        <div class="s-title">Immerse in Your <em style="font-style:italic; color:var(--gold); font-weight:400;">Healing</em></div>
+        <p class="s-desc centered">Step away from everything. AWKN Ranch becomes your container &mdash; twelve private acres, guided ceremonies, daily wellness rituals, and a live-in team devoted to your healing.</p>
+      </div>
+      <div class="retreat-cards">
+        <a href="immersive-retreat/" class="retreat-card">
+          <div class="retreat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3c-2 3-2 5 0 7s2 4 0 7"/><path d="M8 6c-1.5 2-1.5 3.5 0 5.5"/><path d="M16 6c1.5 2 1.5 3.5 0 5.5"/><path d="M5 21h14"/></svg></div>
+          <div class="retreat-card-meta">6 Days &middot; 5 Nights</div>
+          <h3 class="retreat-card-title">Full Immersion Retreat</h3>
+          <ul>
+            <li>Two guided ceremonies</li>
+            <li>Two integration sessions</li>
+            <li>Daily wellness &amp; movement</li>
+            <li>Live-in concierge &amp; meals</li>
+          </ul>
+          <span class="retreat-card-cta">Explore &rarr;</span>
+        </a>
+        <a href="immersive-retreat/3-day/" class="retreat-card">
+          <div class="retreat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="retreat-card-meta">3 Days &middot; 2 Nights</div>
+          <h3 class="retreat-card-title">Residential Reset</h3>
+          <ul>
+            <li>One guided ceremony</li>
+            <li>Integration coaching</li>
+            <li>Wellness rituals on the ranch</li>
+            <li>Onsite lodging &amp; meals</li>
+          </ul>
+          <span class="retreat-card-cta">Explore &rarr;</span>
+        </a>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- ══ CEREMONIAL KETAMINE (split) ══════════════════ -->
   <div class="split-block reverse" id="ceremony">
