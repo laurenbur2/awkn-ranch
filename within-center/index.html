@@ -1149,9 +1149,9 @@
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-        // bg: drifts downward and fades out as the section ends
+        // bg: drifts upward and fades out as the section ends
         if (bg) {
-          var bgY = p * 80;
+          var bgY = -p * 80;
           var bgOpacity = 1 - lerp(p, 0.55, 1.0);
           bg.style.transform = 'translateY(' + bgY + 'px) scale(1.12)';
           bg.style.opacity = bgOpacity;
