@@ -424,8 +424,8 @@
       background: url('images/hero.jpg') center/cover no-repeat;
       transform: scale(1.06);
       animation: kenburns 26s ease-out forwards;
-      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
-      mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, rgba(0,0,0,0.5) 88%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(180deg, #000 0%, #000 72%, rgba(0,0,0,0.5) 88%, rgba(0,0,0,0) 100%);
       will-change: transform;
     }
     @keyframes kenburns {
@@ -441,7 +441,7 @@
     .awknhero-content {
       position: relative; z-index: 2;
       max-width: 900px;
-      padding: 7rem 2rem 8rem;
+      padding: 5rem 2rem 5rem;
       color: #fff;
       opacity: 0;
       transform: translateY(20px);
@@ -474,7 +474,7 @@
       background: var(--dark);
       color: #fff;
       text-align: center;
-      padding: 0.5rem 2rem 9rem;
+      padding: 0.5rem 2rem 14rem;
     }
     .philosophy-block-inner {
       max-width: 680px;
@@ -524,19 +524,23 @@
       font-weight: 300;
     }
     .awknhero-scroll-cue {
+      position: absolute;
+      bottom: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
       display: inline-flex;
       align-items: flex-start;
       justify-content: center;
-      margin-top: 4rem;
       color: rgba(255,255,255,0.75);
       background: transparent;
       border: none;
       cursor: pointer;
       padding: 0;
       text-decoration: none;
-      transition: color 0.35s ease, transform 0.4s ease;
+      transition: color 0.35s ease;
     }
-    .awknhero-scroll-cue:hover { color: var(--gold); transform: translateY(4px); }
+    .awknhero-scroll-cue:hover { color: var(--gold); }
     .awknhero-scroll-cue svg {
       width: 14px;
       height: 78px;
@@ -555,7 +559,7 @@
       .awknhero { min-height: 100vh; }
       .awknhero-content { padding: 5rem 1.5rem 6rem; }
       .awknhero-scroll-cue { margin-top: 2.5rem; }
-      .philosophy-block { padding: 0.5rem 1.5rem 6rem; }
+      .philosophy-block { padding: 0.5rem 1.5rem 9rem; }
     }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
@@ -1041,13 +1045,13 @@
     <div class="awknhero-content">
       <span class="awknhero-place">Austin, Texas</span>
       <h1>Go <em>within.</em></h1>
-      <a href="#welcome" class="awknhero-scroll-cue" aria-label="Scroll down">
-        <svg viewBox="0 0 14 78" aria-hidden="true">
-          <line x1="7" y1="0" x2="7" y2="62"/>
-          <path d="M2 56l5 8 5-8"/>
-        </svg>
-      </a>
     </div>
+    <a href="#welcome" class="awknhero-scroll-cue" aria-label="Scroll down">
+      <svg viewBox="0 0 14 78" aria-hidden="true">
+        <line x1="7" y1="0" x2="7" y2="62"/>
+        <path d="M2 56l5 8 5-8"/>
+      </svg>
+    </a>
   </header>
 
   <!-- ══ PHILOSOPHY BLOCK ═══════════════════════════════ -->
