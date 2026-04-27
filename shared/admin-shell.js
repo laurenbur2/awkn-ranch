@@ -69,19 +69,25 @@ const TAB_ICONS = {
 // Tabs without a `feature` key are always shown (core admin tabs).
 // When property_config.features exists, tabs whose feature is disabled are hidden.
 // When property_config.features is NOT set, all tabs show (backward compatible).
+//
+// `pillars` (staff-section tabs only): which business pillar(s) this tab belongs to.
+// Values: 'shared' (cross-business / Today), 'master' (Master Calendar),
+// 'within' (Within Center), 'ranch' (AWKN Ranch venue), 'retreat' (AWKN Retreat House).
+// A tab can list multiple pillars if it surfaces in more than one.
+// Tabs with no `pillars` are pillar-agnostic (visible in any staff pillar) — used for hidden direct-URL tabs.
 export const ALL_ADMIN_TABS = [
   // Staff section — primary admin tabs (Mindbody-style)
-  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff' },
-  { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff' },
-  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
-  { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals' },
-  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff' },
-  { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff' },
-  { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff' },
-  { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events' },
-  { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff' },
-  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff' },
-  // Hidden but still accessible via direct URL
+  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
+  { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
+  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master', 'within', 'ranch', 'retreat'] },
+  { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['within'] },
+  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
+  { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
+  { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
+  { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events', pillars: ['ranch'] },
+  { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
+  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
+  // Hidden but still accessible via direct URL — no pillar filtering
   { id: 'spaces', label: 'Spaces', href: 'spaces.html', permission: 'view_spaces', section: 'staff', feature: '_hidden' },
   { id: 'media', label: 'Media', href: 'media.html', permission: 'view_media', section: 'staff', feature: '_hidden' },
   { id: 'sms', label: 'SMS', href: 'sms-messages.html', permission: 'view_sms', section: 'staff', feature: 'sms' },
@@ -107,6 +113,51 @@ export const ALL_ADMIN_TABS = [
   // DevControl is a top-level nav item (in context switcher), not an admin sub-tab — but listed here for permission sync
   { id: 'devcontrol', label: 'DevControl', href: '/spaces/admin/devcontrol/', permission: 'view_devcontrol', section: 'admin' },
 ];
+
+// =============================================
+// PILLARS — top-level business groupings in the context switcher
+// =============================================
+// Within the staff section, tabs are filtered by the active pillar.
+// Pillar buttons appear in this display order. Admin / DevControl are
+// rendered separately at the end (they're sections, not pillars).
+const PILLAR_ORDER = ['shared', 'master', 'within', 'ranch', 'retreat'];
+const PILLAR_LABELS = {
+  shared:  'Today',
+  master:  'Master Calendar',
+  within:  'Within',
+  ranch:   'AWKN Ranch',
+  retreat: 'Retreat House',
+};
+const PILLAR_STORAGE_KEY = 'awkn.activePillar';
+const DEFAULT_PILLAR = 'shared';
+
+/**
+ * Resolve the active pillar from the URL (?pillar=) or localStorage.
+ * Side effect: when a valid pillar is in the URL, it's persisted to localStorage
+ * so subsequent navigations without the param remember the user's last context.
+ */
+export function getActivePillar() {
+  try {
+    const url = new URL(window.location.href);
+    const fromUrl = url.searchParams.get('pillar');
+    if (fromUrl && PILLAR_ORDER.includes(fromUrl)) {
+      try { localStorage.setItem(PILLAR_STORAGE_KEY, fromUrl); } catch (e) { /* ignore */ }
+      return fromUrl;
+    }
+  } catch (e) { /* ignore */ }
+  try {
+    const stored = localStorage.getItem(PILLAR_STORAGE_KEY);
+    if (stored && PILLAR_ORDER.includes(stored)) return stored;
+  } catch (e) { /* ignore */ }
+  return DEFAULT_PILLAR;
+}
+
+/** Append ?pillar=X to a tab href so navigation preserves pillar context. */
+function appendPillarParam(href, pillar) {
+  if (!pillar) return href;
+  const sep = href.includes('?') ? '&' : '?';
+  return `${href}${sep}pillar=${encodeURIComponent(pillar)}`;
+}
 
 // =============================================
 // TOAST NOTIFICATIONS
@@ -190,7 +241,7 @@ async function syncTabPermissions() {
 // =============================================
 // TAB NAVIGATION
 // =============================================
-export async function renderTabNav(activeTab, authState, section = 'staff') {
+export async function renderTabNav(activeTab, authState, section = 'staff', pillar = null) {
   const tabsContainer = document.querySelector('.manage-tabs');
   if (!tabsContainer) return;
 
@@ -212,6 +263,11 @@ export async function renderTabNav(activeTab, authState, section = 'staff') {
     .filter(tab => tab.section === section)
     .filter(tab => !tab.feature || enabledFeatures[tab.feature])
     .filter(tab => {
+      // Pillar filter (staff section only). Tabs without a `pillars` array are
+      // pillar-agnostic — they only surface via direct URL, never in the tab bar.
+      if (section === 'staff' && pillar) {
+        if (!tab.pillars || !tab.pillars.includes(pillar)) return false;
+      }
       // If permissions haven't loaded yet but user has admin role, show all tabs
       if (!permissionsLoaded && isAdminRole) return true;
       return authState.hasPermission?.(tab.permission);
@@ -222,7 +278,9 @@ export async function renderTabNav(activeTab, authState, section = 'staff') {
     tabsContainer.innerHTML = tabs.map(tab => {
       const isActive = tab.id === activeTab;
       const icon = TAB_ICONS[tab.id] || '';
-      return `<a href="${tab.href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
+      // Preserve pillar context when navigating between staff tabs
+      const href = (section === 'staff' && pillar) ? appendPillarParam(tab.href, pillar) : tab.href;
+      return `<a href="${href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
     }).join('');
   }
 
@@ -286,7 +344,7 @@ function escapeHtml(s) {
 // =============================================
 // CONTEXT SWITCHER (Devices / Resident / Associate / Staff / Admin)
 // =============================================
-async function renderContextSwitcher(userRole, activeSection = 'staff') {
+async function renderContextSwitcher(userRole, activeSection = 'staff', activePillar = null) {
   const switcher = document.getElementById('contextSwitcher');
   if (!switcher) return;
 
@@ -298,24 +356,46 @@ async function renderContextSwitcher(userRole, activeSection = 'staff') {
     return;
   }
 
-  // Resolve Staff/Admin hrefs to the first page the user actually has permission for
   // Feature filtering uses the cached result from getEnabledFeatures (already loaded by renderTabNav)
   const enabledFeatures = await getEnabledFeatures();
-  const firstStaffTab = ALL_ADMIN_TABS.find(t => t.section === 'staff' && (!t.feature || enabledFeatures[t.feature]) && hasAnyPermission(t.permission));
-  const firstAdminTab = ALL_ADMIN_TABS.find(t => t.section === 'admin' && (!t.feature || enabledFeatures[t.feature]) && hasAnyPermission(t.permission));
-  const staffHref = firstStaffTab ? (firstStaffTab.href.startsWith('/') ? firstStaffTab.href : `/spaces/admin/${firstStaffTab.href}`) : '/spaces/admin/';
-  const adminHref = firstAdminTab ? (firstAdminTab.href.startsWith('/') ? firstAdminTab.href : `/spaces/admin/${firstAdminTab.href}`) : '/spaces/admin/users.html';
 
-  // Template-era tabs (Devices / Residents / Associates) removed for AWKN Ranch.
-  // New business-specific top-level sections can be pushed into `tabs` below as
-  // they come online. Keeping the hasDevicePerms / hasAssociatePerms checks
-  // around in case old records still carry those permissions — they just don't
-  // surface a tab right now.
+  // For each business pillar, find the first tab the user has access to.
+  // The pillar button deep-links there (with ?pillar= so the page knows its context).
+  function firstTabForPillar(pillar) {
+    return ALL_ADMIN_TABS.find(t =>
+      t.section === 'staff' &&
+      t.pillars?.includes(pillar) &&
+      (!t.feature || enabledFeatures[t.feature]) &&
+      hasAnyPermission(t.permission)
+    );
+  }
+  function buildPillarHref(tab, pillar) {
+    if (!tab) return appendPillarParam('/awkn-ranch/spaces/admin/dashboard.html', pillar);
+    const base = tab.href.startsWith('/') ? tab.href : `/awkn-ranch/spaces/admin/${tab.href}`;
+    return appendPillarParam(base, pillar);
+  }
 
   const tabs = [];
-  if (hasStaffPerms) tabs.push({ id: 'staff', label: 'Staff', href: staffHref });
-  if (hasAdminPerms) tabs.push({ id: 'admin', label: 'Admin', href: adminHref });
-  if (hasAdminPerms) tabs.push({ id: 'devcontrol', label: 'DevControl', href: '/spaces/admin/devcontrol.html' });
+  if (hasStaffPerms) {
+    for (const pillar of PILLAR_ORDER) {
+      const firstTab = firstTabForPillar(pillar);
+      if (!firstTab) continue;
+      tabs.push({
+        id: pillar,
+        label: PILLAR_LABELS[pillar],
+        href: buildPillarHref(firstTab, pillar),
+        kind: 'pillar',
+      });
+    }
+  }
+  if (hasAdminPerms) {
+    const firstAdminTab = ALL_ADMIN_TABS.find(t => t.section === 'admin' && (!t.feature || enabledFeatures[t.feature]) && hasAnyPermission(t.permission));
+    const adminHref = firstAdminTab
+      ? (firstAdminTab.href.startsWith('/') ? firstAdminTab.href : `/awkn-ranch/spaces/admin/${firstAdminTab.href}`)
+      : '/awkn-ranch/spaces/admin/users.html';
+    tabs.push({ id: 'admin', label: 'Admin', href: adminHref, kind: 'section' });
+    tabs.push({ id: 'devcontrol', label: 'DevControl', href: '/awkn-ranch/spaces/admin/devcontrol.html', kind: 'section' });
+  }
 
   // Hide if only one tab (nothing to switch between)
   if (tabs.length <= 1) {
@@ -323,11 +403,15 @@ async function renderContextSwitcher(userRole, activeSection = 'staff') {
     return;
   }
 
-  const safeSection = activeSection === 'devcontrol' ? 'devcontrol' : (hasAdminPerms && activeSection === 'admin' ? 'admin' : 'staff');
+  // Resolve which button is active. Section-level (admin/devcontrol) wins;
+  // otherwise highlight the active pillar inside the staff section.
+  const activeId = activeSection === 'devcontrol' ? 'devcontrol'
+                 : (activeSection === 'admin' && hasAdminPerms) ? 'admin'
+                 : (activePillar || DEFAULT_PILLAR);
+
   switcher.innerHTML = tabs.map(tab => {
-    const isActive = tab.id === safeSection || (tab.id === 'resident' && safeSection === 'resident');
-    const activeClass = isActive ? ' active' : '';
-    return `<a href="${tab.href}" class="context-switcher-btn${activeClass}">${tab.label}</a>`;
+    const activeClass = tab.id === activeId ? ' active' : '';
+    return `<a href="${tab.href}" class="context-switcher-btn${activeClass}" data-pillar="${tab.id}">${tab.label}</a>`;
   }).join('');
 }
 
@@ -614,6 +698,9 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
       const userIsAdmin = ['admin', 'oracle'].includes(state.appUser.role);
       const isDemo = state.appUser.role === 'demo';
       const resolvedSection = section === 'devcontrol' && userIsAdmin ? 'devcontrol' : (section === 'admin' && userIsAdmin ? 'admin' : 'staff');
+      // For staff section: resolve active pillar from URL/localStorage. Admin/DevControl
+      // sections aren't pillar-scoped (they show the full admin tab list).
+      const resolvedPillar = resolvedSection === 'staff' ? getActivePillar() : null;
 
       // Sync tab permissions to DB — if new perms were created, refresh user's permission set
       const synced = await syncTabPermissions();
@@ -626,8 +713,8 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
         }
       }
 
-      await renderTabNav(activeTab, state, resolvedSection);
-      await renderContextSwitcher(state.appUser?.role, resolvedSection);
+      await renderTabNav(activeTab, state, resolvedSection, resolvedPillar);
+      await renderContextSwitcher(state.appUser?.role, resolvedSection, resolvedPillar);
 
       let demoBanner = document.getElementById('demoModeBanner');
       if (isDemo && document.getElementById('appContent')) {

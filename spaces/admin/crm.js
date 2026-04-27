@@ -10,7 +10,20 @@ import { sendProposalEmail, sendAgreementEmail, previewAgreementPdf } from './cr
 // =============================================
 
 let authState = null;
-let currentBizLine = localStorage.getItem('crm-biz-line') || 'within';
+// Pillar (?pillar=) overrides the persisted biz-line so the CRM aligns with
+// whichever business pillar the user navigated from in the top-level switcher.
+// Pillars without a dedicated biz_line value (shared/master/retreat) fall back
+// to "all" — retreat will get its own biz_line once the data layer supports it.
+function _resolveInitialBizLine() {
+  try {
+    const pillar = new URL(window.location.href).searchParams.get('pillar');
+    if (pillar === 'within') return 'within';
+    if (pillar === 'ranch') return 'awkn_ranch';
+    if (pillar === 'shared' || pillar === 'master' || pillar === 'retreat') return 'all';
+  } catch (e) { /* ignore */ }
+  return localStorage.getItem('crm-biz-line') || 'within';
+}
+let currentBizLine = _resolveInitialBizLine();
 let currentSubtab = 'pipeline';
 let currentPeriod = 'month';
 
