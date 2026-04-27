@@ -486,21 +486,7 @@
     .philosophy-block-quote {
       opacity: 0;
       transform: translateY(44px);
-      transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .philosophy-block.in-view .philosophy-block-eyebrow {
-      opacity: 1; transform: translateY(0); transition-delay: 0s;
-    }
-    .philosophy-block.in-view .philosophy-block-title {
-      opacity: 1; transform: translateY(0); transition-delay: 0.2s;
-    }
-    .philosophy-block.in-view .philosophy-block-divider {
-      opacity: 0.75; transform: translateY(0); transition-delay: 0.42s;
-      transition-duration: 1.3s;
-    }
-    .philosophy-block.in-view .philosophy-block-quote {
-      opacity: 1; transform: translateY(0); transition-delay: 0.58s;
+      will-change: opacity, transform;
     }
     .philosophy-block-eyebrow {
       display: block;
@@ -1214,23 +1200,36 @@
       update();
     })();
 
-    // Philosophy block: staggered fade-in on scroll into view
+    // Philosophy block: scroll-driven staggered fade-in (reverses on scroll up)
     (function () {
       var block = document.querySelector('.philosophy-block');
       if (!block) return;
-      var triggered = false;
-      function check() {
-        if (triggered) return;
-        var rect = block.getBoundingClientRect();
-        if (rect.top < window.innerHeight - 140) {
-          triggered = true;
-          block.classList.add('in-view');
-          window.removeEventListener('scroll', check);
-        }
+      var eyebrow = block.querySelector('.philosophy-block-eyebrow');
+      var title = block.querySelector('.philosophy-block-title');
+      var divider = block.querySelector('.philosophy-block-divider');
+      var quote = block.querySelector('.philosophy-block-quote');
+      function lerp(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function apply(el, p, start, end, maxOpacity) {
+        if (!el) return;
+        var t = easeOut(lerp(p, start, end));
+        el.style.opacity = t * (maxOpacity || 1);
+        el.style.transform = 'translateY(' + ((1 - t) * 44) + 'px)';
       }
-      window.addEventListener('scroll', check, { passive: true });
-      window.addEventListener('resize', check);
-      check();
+      function update() {
+        var rect = block.getBoundingClientRect();
+        var vh = window.innerHeight;
+        // p ramps from 0 (block top at viewport bottom) to 1 (block top ~25% from viewport top)
+        var travel = vh * 0.75;
+        var p = Math.max(0, Math.min(1, (vh - rect.top) / travel));
+        apply(eyebrow, p, 0.00, 0.22, 1);
+        apply(title,   p, 0.15, 0.42, 1);
+        apply(divider, p, 0.35, 0.58, 0.75);
+        apply(quote,   p, 0.52, 0.78, 1);
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
     })();
 
 
