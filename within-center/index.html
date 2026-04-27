@@ -411,7 +411,7 @@
     /* ── HERO (sticky, scroll-driven cross-fade) ─────── */
     .awknhero {
       position: relative;
-      height: 200vh;
+      height: 175vh;
       background-color: var(--dark);
     }
     .awknhero-stage {
@@ -549,7 +549,7 @@
       50%      { transform: translateY(3px);  opacity: 1; }
     }
     @media (max-width: 720px) {
-      .awknhero { height: 200vh; }
+      .awknhero { height: 165vh; }
       .awknhero-frame { padding: 5rem 1.5rem 3rem; }
       .awknhero-scroll-cue { margin-top: 2.5rem; }
     }
@@ -1207,26 +1207,24 @@
         if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
         var p = Math.max(0, Math.min(1, -rect.top / travel));
 
-        // bg: drifts strongly upward and fades into black
+        // bg: drifts upward; stays visible until the section releases
         if (bg) {
-          var bgY = -p * 220;
-          var bgOpacity = 1 - lerp(p, 0.45, 0.92);
+          var bgY = -p * 180;
           bg.style.transform = 'translateY(' + bgY + 'px) scale(1.16)';
-          bg.style.opacity = bgOpacity;
+          bg.style.opacity = 1;
         }
-        // dark overlay strengthens as the section ends
+        // dark overlay: gentle build, never goes opaque
         if (darken) {
-          darken.style.opacity = lerp(p, 0.35, 0.95) * 0.9;
+          darken.style.opacity = lerp(p, 0.4, 1.0) * 0.45;
         }
 
         // frame 1: fade out near the top of scroll
         var f1o = 1 - lerp(p, 0.0, 0.28);
         var f1y = -lerp(p, 0.0, 0.28) * 28;
-        // frame 2: brief gap, then fade in, hold, then fade out
+        // frame 2: fade in mid-scroll, hold all the way to release
         var f2In = lerp(p, 0.34, 0.55);
-        var f2Out = lerp(p, 0.78, 0.95);
-        var f2o = f2In * (1 - f2Out);
-        var f2y = (1 - f2In) * 36 - f2Out * 28;
+        var f2o = f2In;
+        var f2y = (1 - f2In) * 36;
 
         f1.style.opacity = f1o;
         f1.style.transform = 'translateY(' + f1y + 'px)';
