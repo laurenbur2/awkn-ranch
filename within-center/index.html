@@ -408,55 +408,46 @@
     .menu-sub-back { display: none; }
     body.menu-open { overflow: hidden; }
 
-    /* ── HERO (sticky, scroll-driven cross-fade) ─────── */
+    /* ── HERO (image fades to dark at bottom) ─────────── */
     .awknhero {
       position: relative;
-      height: 175vh;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
       background-color: var(--dark);
-    }
-    .awknhero-stage {
-      position: sticky;
-      top: 0;
-      height: 100vh;
       overflow: hidden;
     }
     .awknhero-bg {
       position: absolute; inset: 0;
       background: url('images/hero.jpg') center/cover no-repeat;
-      transform: scale(1.16);
-      will-change: transform, opacity;
+      transform: scale(1.06);
+      animation: kenburns 26s ease-out forwards;
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+      mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+      will-change: transform;
     }
-    .awknhero-stage::before {
+    @keyframes kenburns {
+      0%   { transform: scale(1.06) translateY(0); }
+      100% { transform: scale(1.14) translateY(-1.5%); }
+    }
+    .awknhero::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.55) 55%, rgba(28,22,24,0.92) 100%);
+      background: linear-gradient(180deg, rgba(28,22,24,0.35) 0%, rgba(28,22,24,0.5) 55%, rgba(28,22,24,0.95) 100%);
       z-index: 1;
-      pointer-events: none;
     }
-    .awknhero-darken {
-      position: absolute; inset: 0;
-      background: var(--dark);
-      opacity: 0;
-      z-index: 1;
-      pointer-events: none;
-      will-change: opacity;
-    }
-    .awknhero-frame {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 7rem 2rem 4rem;
+    .awknhero-content {
+      position: relative; z-index: 2;
+      max-width: 900px;
+      padding: 7rem 2rem 8rem;
       color: #fff;
-      z-index: 2;
-      will-change: opacity, transform;
-      transition: opacity 0.05s linear, transform 0.05s linear;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeup 1.6s 0.3s ease-out forwards;
     }
-    .awknhero-frame-1 { opacity: 1; }
-    .awknhero-frame-2 { opacity: 0; }
+    @keyframes fadeup { to { opacity: 1; transform: translateY(0); } }
     .awknhero-place {
       display: block;
       font-size: 0.62rem;
@@ -466,7 +457,7 @@
       margin-bottom: 3rem;
       font-weight: 400;
     }
-    .awknhero-frame-1 h1 {
+    .awknhero h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(3.4rem, 9vw, 7rem);
       color: #fff;
@@ -474,44 +465,56 @@
       letter-spacing: 0.02em;
       line-height: 1.05;
       margin: 0;
-      font-style: normal;
     }
-    .awknhero-frame-1 h1 em { font-style: normal; font-weight: 300; }
-    .awknhero-frame-eyebrow {
+    .awknhero h1 em { font-style: normal; font-weight: 300; }
+
+    /* ── PHILOSOPHY BLOCK (dark, follows hero seamlessly) ── */
+    .philosophy-block {
+      position: relative;
+      background: var(--dark);
+      color: #fff;
+      text-align: center;
+      padding: 5rem 2rem 7rem;
+    }
+    .philosophy-block-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .philosophy-block-eyebrow {
       display: block;
       font-size: 0.6rem;
       letter-spacing: 0.42em;
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 600;
-      margin-bottom: 2rem;
+      margin-bottom: 1.6rem;
     }
-    .awknhero-frame-title {
+    .philosophy-block-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
       color: #fff;
       font-weight: 300;
-      line-height: 1.1;
+      line-height: 1.15;
       letter-spacing: 0.01em;
-      margin: 0 0 1.8rem;
-      max-width: 14ch;
+      margin: 0 0 1.6rem;
     }
-    .awknhero-frame-quote {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-      color: rgba(255,255,255,0.85);
-      line-height: 1.7;
-      max-width: 540px;
-      font-weight: 300;
-      margin: 0;
-    }
-    .awknhero-frame-divider {
+    .philosophy-block-divider {
       display: block;
       width: 48px;
       height: 1px;
-      background: rgba(201,148,62,0.55);
+      background: var(--gold);
       margin: 0 auto 1.8rem;
+      opacity: 0.7;
+    }
+    .philosophy-block-quote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+      color: rgba(255,255,255,0.8);
+      line-height: 1.75;
+      max-width: 560px;
+      margin: 0 auto;
+      font-weight: 300;
     }
     .awknhero-scroll-cue {
       display: inline-flex;
@@ -549,9 +552,10 @@
       50%      { transform: translateY(3px);  opacity: 1; }
     }
     @media (max-width: 720px) {
-      .awknhero { height: 165vh; }
-      .awknhero-frame { padding: 5rem 1.5rem 3rem; }
+      .awknhero { min-height: 100vh; }
+      .awknhero-content { padding: 5rem 1.5rem 6rem; }
       .awknhero-scroll-cue { margin-top: 2.5rem; }
+      .philosophy-block { padding: 4rem 1.5rem 5rem; }
     }
 
     /* ── LAYOUT ─────────────────────────────────────────── */
@@ -1031,26 +1035,27 @@
     </ul>
   </aside>
 
-  <!-- ══ HERO (sticky cross-fade) ═══════════════════════════════════════ -->
+  <!-- ══ HERO ═══════════════════════════════════════════ -->
   <header class="awknhero" id="hero">
-    <div class="awknhero-stage">
-      <div class="awknhero-bg"></div>
-      <div class="awknhero-darken"></div>
-      <div class="awknhero-frame awknhero-frame-1">
-        <span class="awknhero-place">Austin, Texas</span>
-        <h1>Go <em>within.</em></h1>
-        <button type="button" class="awknhero-scroll-cue" onclick="window.scrollTo({top: window.innerHeight * 0.7, behavior: 'smooth'})" aria-label="Scroll down">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
-        </button>
-      </div>
-      <div class="awknhero-frame awknhero-frame-2">
-        <span class="awknhero-frame-eyebrow">Welcome</span>
-        <h2 class="awknhero-frame-title">Healing Requires Space</h2>
-        <span class="awknhero-frame-divider"></span>
-        <p class="awknhero-frame-quote">Within a sacred container of support and integration, insight becomes embodied &mdash; and transformation becomes lasting.</p>
-      </div>
+    <div class="awknhero-bg"></div>
+    <div class="awknhero-content">
+      <span class="awknhero-place">Austin, Texas</span>
+      <h1>Go <em>within.</em></h1>
+      <a href="#welcome" class="awknhero-scroll-cue" aria-label="Scroll down">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+      </a>
     </div>
   </header>
+
+  <!-- ══ PHILOSOPHY BLOCK ═══════════════════════════════ -->
+  <section class="philosophy-block" id="welcome">
+    <div class="philosophy-block-inner">
+      <span class="philosophy-block-eyebrow">Welcome</span>
+      <h2 class="philosophy-block-title">Healing Requires Space</h2>
+      <span class="philosophy-block-divider"></span>
+      <p class="philosophy-block-quote">Within a sacred container of support and integration, insight becomes embodied &mdash; and transformation becomes lasting.</p>
+    </div>
+  </section>
 
   <!-- ══ IMMERSIVE RETREAT (two cards) ════════════════ -->
   <section class="bg-white" id="retreats">
@@ -1192,49 +1197,6 @@
       update();
     })();
 
-    // Hero scroll-driven cross-fade + bg parallax/fade
-    (function () {
-      var hero = document.getElementById('hero');
-      var bg = document.querySelector('.awknhero-bg');
-      var darken = document.querySelector('.awknhero-darken');
-      var f1 = document.querySelector('.awknhero-frame-1');
-      var f2 = document.querySelector('.awknhero-frame-2');
-      if (!hero || !f1 || !f2) return;
-      function lerp(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
-      function update() {
-        var rect = hero.getBoundingClientRect();
-        var travel = hero.offsetHeight - window.innerHeight;
-        if (travel <= 0) { f1.style.opacity = 1; f2.style.opacity = 0; return; }
-        var p = Math.max(0, Math.min(1, -rect.top / travel));
-
-        // bg: drifts upward; stays visible until the section releases
-        if (bg) {
-          var bgY = -p * 180;
-          bg.style.transform = 'translateY(' + bgY + 'px) scale(1.16)';
-          bg.style.opacity = 1;
-        }
-        // dark overlay: gentle build, never goes opaque
-        if (darken) {
-          darken.style.opacity = lerp(p, 0.4, 1.0) * 0.45;
-        }
-
-        // frame 1: fade out near the top of scroll
-        var f1o = 1 - lerp(p, 0.0, 0.28);
-        var f1y = -lerp(p, 0.0, 0.28) * 28;
-        // frame 2: fade in mid-scroll, hold all the way to release
-        var f2In = lerp(p, 0.34, 0.55);
-        var f2o = f2In;
-        var f2y = (1 - f2In) * 36;
-
-        f1.style.opacity = f1o;
-        f1.style.transform = 'translateY(' + f1y + 'px)';
-        f2.style.opacity = f2o;
-        f2.style.transform = 'translateY(' + f2y + 'px)';
-      }
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      update();
-    })();
 
     // Menu: multi-submenu panel + blurred backdrop
     (function () {
