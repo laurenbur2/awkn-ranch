@@ -1200,32 +1200,37 @@
       update();
     })();
 
-    // Philosophy block: scroll-driven staggered fade-in (reverses on scroll up)
+    // Philosophy block: bidirectional scroll-bound stagger
+    // Elements fade in as block enters from below (eyebrow → quote)
+    // and fade out in reverse order as it exits at top (quote → eyebrow)
     (function () {
       var block = document.querySelector('.philosophy-block');
       if (!block) return;
       var eyebrow = block.querySelector('.philosophy-block-eyebrow');
-      var title = block.querySelector('.philosophy-block-title');
+      var title   = block.querySelector('.philosophy-block-title');
       var divider = block.querySelector('.philosophy-block-divider');
-      var quote = block.querySelector('.philosophy-block-quote');
-      function lerp(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
-      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-      function apply(el, p, start, end, maxOpacity) {
+      var quote   = block.querySelector('.philosophy-block-quote');
+      function lerp(s, a, b) { return Math.max(0, Math.min(1, (s - a) / (b - a))); }
+      function easeInOut(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2; }
+      function visible(s, eA, eB, xA, xB) {
+        return easeInOut(lerp(s, eA, eB)) * (1 - easeInOut(lerp(s, xA, xB)));
+      }
+      function apply(el, v, maxOpacity) {
         if (!el) return;
-        var t = easeOut(lerp(p, start, end));
-        el.style.opacity = t * (maxOpacity || 1);
-        el.style.transform = 'translateY(' + ((1 - t) * 44) + 'px)';
+        el.style.opacity = v * (maxOpacity || 1);
+        el.style.transform = 'translateY(' + ((1 - v) * 44) + 'px)';
       }
       function update() {
         var rect = block.getBoundingClientRect();
         var vh = window.innerHeight;
-        // p ramps from 0 (block top at viewport bottom) to 1 (block top ~25% from viewport top)
-        var travel = vh * 0.75;
-        var p = Math.max(0, Math.min(1, (vh - rect.top) / travel));
-        apply(eyebrow, p, 0.00, 0.22, 1);
-        apply(title,   p, 0.15, 0.42, 1);
-        apply(divider, p, 0.35, 0.58, 0.75);
-        apply(quote,   p, 0.52, 0.78, 1);
+        var H = rect.height;
+        if (H <= 0) return;
+        // s: 0 when block top hits viewport bottom; 1 when block bottom hits viewport top
+        var s = (vh - rect.top) / (vh + H);
+        apply(eyebrow, visible(s, 0.06, 0.20, 0.82, 0.96), 1);
+        apply(title,   visible(s, 0.14, 0.30, 0.72, 0.86), 1);
+        apply(divider, visible(s, 0.22, 0.38, 0.62, 0.78), 0.75);
+        apply(quote,   visible(s, 0.30, 0.46, 0.54, 0.70), 1);
       }
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
