@@ -62,31 +62,48 @@
     }
 
     .org-down { width: 2px; height: 28px; background: #d1d5db; margin: 0 auto; }
+
+    /* Horizontal row of sibling subtrees — used when parent has layout:'row'.
+       Children are placed side-by-side with a horizontal connecting bar. */
     .org-row {
-      display: flex; gap: 1.25rem; justify-content: center;
-      flex-wrap: wrap; position: relative;
-      padding-top: 18px;
+      display: flex; gap: 1.5rem; justify-content: center;
+      flex-wrap: nowrap; position: relative;
+      padding-top: 20px; align-items: flex-start;
     }
     .org-row.has-bar::before {
       content: ""; position: absolute; top: 0;
       left: 50%; transform: translateX(-50%);
-      width: var(--bar-w, calc(100% - 200px)); height: 2px; background: #d1d5db;
+      width: calc(100% - 220px); height: 2px; background: #d1d5db;
     }
     .org-row > .org-child::before {
-      content: ""; display: block; width: 2px; height: 18px; background: #d1d5db;
-      margin: -18px auto 0;
+      content: ""; display: block; width: 2px; height: 20px; background: #d1d5db;
+      margin: -20px auto 0;
     }
-    .org-child { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .org-child { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 0 0 auto; }
     .org-single { display: flex; flex-direction: column; align-items: center; }
+
+    /* Vertical stack of children — used when parent has layout:'stack' (default).
+       Children stacked one below the other with a vertical connector between them. */
+    .org-stack { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .org-stack-item { display: flex; flex-direction: column; align-items: center; }
+    .org-stack-item + .org-stack-item { margin-top: 12px; position: relative; }
+    .org-stack-item + .org-stack-item::before {
+      content: ""; position: absolute; left: 50%; top: -12px;
+      width: 2px; height: 12px; background: #d1d5db;
+    }
 
     .org-foot {
       margin-top: 3rem; text-align: center; font-size: 0.78rem; color: #9ca3af;
     }
 
+    @media (max-width: 1100px) {
+      .org-row { flex-wrap: wrap; gap: 1.25rem; }
+    }
     @media (max-width: 760px) {
       .org-row { flex-direction: column; align-items: center; gap: 0.6rem; }
       .org-row.has-bar::before { display: none; }
       .org-row > .org-child::before { display: none; }
+      .org-stack-item + .org-stack-item { margin-top: 8px; }
       .org-down { height: 18px; }
       .org-page { padding: 1.5rem 1rem 3rem; }
     }
@@ -110,12 +127,16 @@
   </div>
 
   <script>
+    // `layout` controls how a node's children are arranged:
+    //   'row'   — children placed side-by-side under a horizontal bar
+    //   'stack' — children stacked vertically (default)
     const ORG = {
       kind: 'parent', name: 'Heart Space Health', tag: 'Parent Company',
       children: [{
         kind: 'person', name: 'William Naylor', role: 'Owner / Founder',
         children: [{
           kind: 'person', name: 'Justin DeLaCruz', role: 'Executive Director',
+          layout: 'row',
           children: [
             {
               kind: 'business', name: 'AWKN Venue Rental',
@@ -137,7 +158,7 @@
             {
               kind: 'business', name: 'Within Center',
               children: [{
-                kind: 'role', name: 'Medical Director',
+                kind: 'role', name: 'Medical Director', layout: 'row',
                 children: [
                   { kind: 'role', name: 'Psych NP' },
                   { kind: 'role', name: 'RN / IV Nurse' },
@@ -172,9 +193,16 @@
       if (kids.length === 1) {
         return `<div class="org-single">${box}<div class="org-down"></div>${renderNode(kids[0])}</div>`;
       }
+      // Multiple children: row vs stack based on the `layout` flag.
+      if (n.layout === 'row') {
+        return `<div class="org-single">${box}<div class="org-down"></div>
+          <div class="org-row has-bar">
+            ${kids.map(c => `<div class="org-child">${renderNode(c)}</div>`).join('')}
+          </div></div>`;
+      }
       return `<div class="org-single">${box}<div class="org-down"></div>
-        <div class="org-row has-bar">
-          ${kids.map(c => `<div class="org-child">${renderNode(c)}</div>`).join('')}
+        <div class="org-stack">
+          ${kids.map(c => `<div class="org-stack-item">${renderNode(c)}</div>`).join('')}
         </div></div>`;
     }
     document.getElementById('orgTree').innerHTML = renderNode(ORG);
