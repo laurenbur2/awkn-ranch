@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medication Management | Within Center Austin</title>
+  <meta name="description" content="Psychiatric medication management at Within Center in Austin, TX. Board-certified care for depression, anxiety, PTSD, ADHD, and complex mental health conditions.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <meta property="og:title" content="Medication Management | Within Center">
+  <meta property="og:description" content="Board-certified psychiatric medication management in Austin, Texas.">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalProcedure",
+    "name": "Psychiatric Medication Management",
+    "procedureType": "https://schema.org/TherapeuticProcedure",
+    "provider": {
+      "@type": "MedicalBusiness",
+      "name": "Within Center",
+      "url": "https://within.center",
+      "telephone": "+1-512-969-2399",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "7600 Stillridge Dr",
+        "addressLocality": "Austin",
+        "addressRegion": "TX",
+        "postalCode": "78736",
+        "addressCountry": "US"
+      }
+    }
+  }
+  </script>
+  <style>
+    .med-list {
+      max-width: 720px;
+      margin: 2.5rem auto 0;
+      list-style: none;
+      padding: 0;
+    }
+    .med-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      color: var(--dark);
+      line-height: 1.7;
+    }
+    .med-list li:last-child { border-bottom: none; }
+    .med-list li::before {
+      content: '◦';
+      color: var(--gold);
+      font-size: 1.6rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: -0.1rem;
+    }
+    .med-list li strong { font-weight: 600; margin-right: 0.25rem; }
+
+    .step-grid {
+      max-width: 1000px;
+      margin: 3rem auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    .step {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem 1.75rem;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .step-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.4rem;
+      color: var(--gold);
+      opacity: 0.45;
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .step h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .step p {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+    @media (max-width: 768px) { .step-grid { grid-template-columns: 1fr; } }
+
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.9s, transform 0.9s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li><a href="../facility/" data-menu-link>Our Facility</a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.</div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="../our-team/" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="./" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="../resources/" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ── HERO ── -->
+  <header class="page-hero" style="background-color:var(--dark);">
+    <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/lounge.jpeg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">Medication Management</span>
+      <h1>Thoughtful psychiatric care, when you need it.</h1>
+      <p class="lead">Board-certified psychiatry &mdash; for depression, anxiety, PTSD, ADHD, and complex mental health conditions. Available as a stand-alone service or alongside ceremonial ketamine work.</p>
+    </div>
+  </header>
+
+  <!-- ── INTRO ── -->
+  <section class="bg-cream" style="padding:5rem 2rem;">
+    <div class="prose reveal">
+      <p>Medication can be a meaningful part of recovery &mdash; but only when it is prescribed by someone who is actually paying attention. At Within Center, our psychiatric care is unhurried, personalized, and focused on helping you feel steady enough to do the deeper work of healing.</p>
+      <p>We see medication as one tool among many. Our role is to help you understand your options, weigh the trade-offs, and find a regimen that supports the life you actually want to live.</p>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT IS ── -->
+  <section class="bg-white" style="padding:5rem 2rem;">
+    <div class="container" style="text-align:center;">
+      <div class="s-eyebrow">What We Treat</div>
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.4vw,2.3rem); color:var(--dark); font-weight:700; margin-bottom:0.5rem;">Conditions We Support</h2>
+      <p class="s-desc centered">Our psychiatrists are experienced with a broad range of mental health concerns, including:</p>
+      <ul class="med-list" style="text-align:left;">
+        <li><strong>Depression</strong> &mdash; including treatment-resistant depression that has not responded to standard antidepressants.</li>
+        <li><strong>Anxiety disorders</strong> &mdash; generalized anxiety, panic, social anxiety, and OCD.</li>
+        <li><strong>PTSD &amp; complex trauma</strong> &mdash; including symptoms following military service, medical trauma, or childhood adversity.</li>
+        <li><strong>ADHD</strong> &mdash; in adults, with diagnostic clarification when needed.</li>
+        <li><strong>Bipolar spectrum &amp; mood disorders</strong> &mdash; with careful, conservative prescribing.</li>
+        <li><strong>Sleep, irritability, and burnout</strong> &mdash; the chronic states that often hide under bigger labels.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="bg-cream" style="padding:5rem 2rem;">
+    <div class="container-wide" style="text-align:center;">
+      <div class="s-eyebrow">How It Works</div>
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.4vw,2.3rem); color:var(--dark); font-weight:700;">A Simple Path to Care</h2>
+      <div class="step-grid">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Initial Consultation</h3>
+          <p>A 60-minute intake with one of our psychiatrists to understand your history, current symptoms, and goals.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Personalized Plan</h3>
+          <p>If medication is appropriate, we build a plan together &mdash; with full transparency about benefits, side effects, and alternatives.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Ongoing Support</h3>
+          <p>Regular follow-up visits to monitor response, adjust as needed, and stay connected over time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ALONGSIDE CEREMONY ── -->
+  <section class="bg-white" style="padding:5rem 2rem;">
+    <div class="container reveal">
+      <div class="s-eyebrow" style="text-align:center;">Together with Ceremony</div>
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.4vw,2.3rem); color:var(--dark); font-weight:700; text-align:center; margin-bottom:1.5rem;">Integrated With Our Ceremonial Work</h2>
+      <p style="font-size:0.98rem; color:var(--grey); line-height:1.95; text-align:center; max-width:680px; margin:0 auto;">Many clients move between medication management and ceremonial ketamine therapy depending on what life requires of them. Because both services live under one roof, your psychiatrist and ceremonial team can coordinate directly &mdash; so the work in one space supports the work in the other.</p>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section style="position:relative; text-align:center; padding:6rem 2rem; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:url('/awkn-ranch/pricing/images/hammock-garden.jpg'); background-size:cover; background-position:center; filter:brightness(0.35);"></div>
+    <div style="position:relative; z-index:1;">
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.2vw,2.2rem); font-weight:700; color:#fff; margin-bottom:0.75rem;">Schedule a Consultation</h2>
+      <p style="font-size:0.95rem; color:rgba(255,255,255,0.7); max-width:480px; margin:0 auto 2rem; line-height:1.75;">A free 15-minute call to discuss whether medication management is right for you.</p>
+      <a href="../book-a-call/" class="awknhero-cta">Book a Call</a>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="contact-row">
+      <div class="contact-item"><span class="label">Phone</span><a href="tel:5129692399">512-969-2399</a></div>
+      <div class="contact-item"><span class="label">Email</span><a href="mailto:intake@within.center">intake@within.center</a></div>
+      <div class="contact-item"><span class="label">Visit</span>7600 Stillridge Dr<br>Austin, TX 78736</div>
+      <div class="contact-item"><span class="label">Web</span><a href="https://within.center">within.center</a></div>
+    </div>
+  </section>
+
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){
+      var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');
+      var allSubs=document.querySelectorAll('.menu-sub');
+      function isOpen(){return panel.classList.contains('open');}
+      function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}
+      function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}
+      function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}
+      toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});
+      backdrop.addEventListener('click',closeMenu);
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
+    })();
+    (function(){var els=document.querySelectorAll('.reveal');if(!els.length)return;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.15,rootMargin:'0px 0px -40px 0px'});els.forEach(function(el){io.observe(el);});})();
+  </script>
+</body>
+</html>

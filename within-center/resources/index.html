@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources | Within Center — Articles &amp; Guides</title>
+  <meta name="description" content="Articles, guides, and resources from Within Center on ceremonial ketamine therapy, mental health retreats, integration, and the science of psychedelic medicine.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <meta property="og:title" content="Resources | Within Center">
+  <meta property="og:description" content="Articles, guides, and resources from Within Center.">
+  <meta property="og:type" content="website">
+  <style>
+    .res-section { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem; }
+
+    .res-cat-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 3.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+    .res-cat-tab {
+      padding: 0.85rem 1.4rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--grey);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.25s, border-color 0.25s;
+      margin-bottom: -1px;
+    }
+    .res-cat-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .res-cat-tab:hover { color: var(--gold); }
+
+    .res-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.25rem;
+    }
+    .res-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .res-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(201,148,62,0.3);
+    }
+    .res-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      background: #ece6da;
+    }
+    .res-body {
+      padding: 1.6rem 1.5rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .res-cat {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    .res-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+      margin-bottom: 0.65rem;
+    }
+    .res-excerpt {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 1.25rem;
+    }
+    .res-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--grey);
+    }
+    .res-meta .arrow {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      transition: transform 0.25s;
+    }
+    .res-card:hover .arrow { transform: translateX(4px); }
+
+    .res-featured {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 4rem;
+      border: 1px solid var(--border);
+    }
+    .res-featured-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      min-height: 360px;
+      display: block;
+    }
+    .res-featured-content {
+      padding: 3rem 2.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .res-featured-content .res-cat { margin-bottom: 0.75rem; }
+    .res-featured-content h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 2.8vw, 2rem);
+      color: var(--dark);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+    .res-featured-content p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+    .res-featured-content .read-link {
+      align-self: flex-start;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .res-featured-content .read-link::after {
+      content: ' ›';
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      line-height: 0.8;
+    }
+
+    .res-empty-note {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem;
+      text-align: center;
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.85;
+      background: var(--cream);
+      border-radius: var(--radius);
+    }
+
+    @media (max-width: 1000px) {
+      .res-grid { grid-template-columns: repeat(2, 1fr); }
+      .res-featured { grid-template-columns: 1fr; }
+      .res-featured-img { min-height: 280px; }
+    }
+    @media (max-width: 600px) {
+      .res-grid { grid-template-columns: 1fr; }
+      .res-featured-content { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li><a href="../facility/" data-menu-link>Our Facility</a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.</div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="../our-team/" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="../medication-management/" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="./" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ── HERO ── -->
+  <header class="page-hero" style="background-color:var(--dark); min-height: 60vh;">
+    <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/lodge-interior.jpg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">Resources</span>
+      <h1>Articles, guides, and stories.</h1>
+      <p class="lead">A library of writing on ceremonial ketamine, integration, mental health, and the lived experience of inner work.</p>
+    </div>
+  </header>
+
+  <!-- ── RESOURCES ── -->
+  <section class="res-section">
+
+    <!-- Tabs (visual only — content below is shown for all tabs as the library grows) -->
+    <div class="res-cat-tabs" role="tablist">
+      <button class="res-cat-tab active">All</button>
+      <button class="res-cat-tab">The Medicine</button>
+      <button class="res-cat-tab">Integration</button>
+      <button class="res-cat-tab">Mental Health</button>
+      <button class="res-cat-tab">Retreats</button>
+      <button class="res-cat-tab">Stories</button>
+    </div>
+
+    <!-- FEATURED -->
+    <a href="#" class="res-featured" style="text-decoration:none;">
+      <img src="/awkn-ranch/pricing/images/ceremony-circle.jpg" alt="Ceremony circle" class="res-featured-img">
+      <div class="res-featured-content">
+        <div class="res-cat">Featured &middot; The Medicine</div>
+        <h2>What Ceremonial Ketamine Actually Does to the Brain</h2>
+        <p>A grounded look at the neuroscience of ketamine-assisted therapy &mdash; what we know, what we don&rsquo;t, and why the ceremonial container matters as much as the molecule.</p>
+        <span class="read-link">Read Article</span>
+      </div>
+    </a>
+
+    <!-- GRID -->
+    <div class="res-grid">
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/ketamine-therapy-3.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">The Medicine</div>
+          <div class="res-title">Ceremonial Ketamine vs. Psychedelic Therapy: What&rsquo;s the Difference?</div>
+          <div class="res-excerpt">Many people searching for psilocybin, MDMA, or DMT therapy find ceremonial ketamine. Here is how they compare and why ketamine is the only legal option in the U.S. today.</div>
+          <div class="res-meta"><span>10 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/client-integration.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Integration</div>
+          <div class="res-title">The Days After: A Practical Guide to Integration</div>
+          <div class="res-excerpt">Insight without integration fades. Here is how to turn what arose during ceremony into changes that stay with you in daily life.</div>
+          <div class="res-meta"><span>8 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/client-meditation.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Mental Health</div>
+          <div class="res-title">When Therapy Isn&rsquo;t Enough: Treatment-Resistant Depression</div>
+          <div class="res-excerpt">For people who&rsquo;ve tried multiple medications and many years of therapy, ceremonial ketamine can offer something fundamentally different.</div>
+          <div class="res-meta"><span>12 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/dome-exterior.jpeg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Retreats</div>
+          <div class="res-title">What to Expect at a Mental Health Retreat</div>
+          <div class="res-excerpt">A day-by-day walk-through of an immersive retreat at AWKN Ranch &mdash; what mornings look like, what ceremony feels like, and what happens after you leave.</div>
+          <div class="res-meta"><span>9 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/client-hug.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Stories</div>
+          <div class="res-title">Beyond the Battlefield: Retreats for Veterans</div>
+          <div class="res-excerpt">Why so many veterans struggling with PTSD are turning to ceremonial ketamine &mdash; and what the work has looked like for the ones who&rsquo;ve done it with us.</div>
+          <div class="res-meta"><span>11 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/ketamine-couples.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Stories</div>
+          <div class="res-title">A Couples Reset: When Two People Heal Together</div>
+          <div class="res-excerpt">Most couples therapy works in words. Sometimes a shared ceremonial experience does what twenty hours of conversation can&rsquo;t.</div>
+          <div class="res-meta"><span>7 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/ceremonial-drum.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">The Medicine</div>
+          <div class="res-title">Why We Call It &ldquo;Ceremonial&rdquo;</div>
+          <div class="res-excerpt">A look at what changes when ketamine is offered as a ceremony rather than a procedure &mdash; and why the container matters as much as the medicine.</div>
+          <div class="res-meta"><span>6 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/client-yoga.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Mental Health</div>
+          <div class="res-title">Burnout: A Modern Diagnosis That Needs an Old Solution</div>
+          <div class="res-excerpt">Why the high-functioning, capable, &ldquo;fine&rdquo; people are often the ones whose nervous systems need this work most.</div>
+          <div class="res-meta"><span>9 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+      <a href="#" class="res-card" style="text-decoration:none;">
+        <img src="/awkn-ranch/pricing/images/grounds.jpg" alt="" class="res-img">
+        <div class="res-body">
+          <div class="res-cat">Retreats</div>
+          <div class="res-title">Texas Wellness Retreats: Your Guide</div>
+          <div class="res-excerpt">An honest look at the wellness retreat landscape in Texas &mdash; from yoga and meditation to ceremonial medicine work, and how to choose what fits.</div>
+          <div class="res-meta"><span>14 min read</span><span class="arrow">›</span></div>
+        </div>
+      </a>
+
+    </div>
+
+  </section>
+
+  <!-- ── CTA ── -->
+  <section style="position:relative; text-align:center; padding:6rem 2rem; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:url('/awkn-ranch/pricing/images/hammock-garden.jpg'); background-size:cover; background-position:center; filter:brightness(0.35);"></div>
+    <div style="position:relative; z-index:1;">
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.2vw,2.2rem); font-weight:700; color:#fff; margin-bottom:0.75rem;">Ready to Begin?</h2>
+      <p style="font-size:0.95rem; color:rgba(255,255,255,0.7); max-width:480px; margin:0 auto 2rem; line-height:1.75;">Reading only goes so far. A free 15-minute call is the best way to figure out if this work is right for you.</p>
+      <a href="../book-a-call/" class="awknhero-cta">Book a Call</a>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="contact-row">
+      <div class="contact-item"><span class="label">Phone</span><a href="tel:5129692399">512-969-2399</a></div>
+      <div class="contact-item"><span class="label">Email</span><a href="mailto:intake@within.center">intake@within.center</a></div>
+      <div class="contact-item"><span class="label">Visit</span>7600 Stillridge Dr<br>Austin, TX 78736</div>
+      <div class="contact-item"><span class="label">Web</span><a href="https://within.center">within.center</a></div>
+    </div>
+  </section>
+
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){
+      var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');
+      var allSubs=document.querySelectorAll('.menu-sub');
+      function isOpen(){return panel.classList.contains('open');}
+      function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}
+      function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}
+      function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}
+      toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});
+      backdrop.addEventListener('click',closeMenu);
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
+      // Tab toggle (visual only — no filtering yet, content is universal until categories are populated)
+      document.querySelectorAll('.res-cat-tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.res-cat-tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');});});
+    })();
+  </script>
+</body>
+</html>
