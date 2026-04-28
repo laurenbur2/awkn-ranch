@@ -37,7 +37,10 @@ let activityBookings = [];
 // Calendar state
 let currentDate = getAustinToday();
 let currentView = 'day'; // day | week | month
-let currentTab = 'house';
+// House Stays is now mirrored from the Retreat House Rooms page (clicking the
+// House Stays subtab redirects there). Default active subtab is Rental Spaces
+// so the master Schedule page doesn't try to render its own house calendar.
+let currentTab = 'rentals';
 let selectedStaffId = 'all'; // 'all' or specific staff UUID
 let editingBooking = null; // { type, data } when editing
 
@@ -1456,6 +1459,16 @@ function setupEventListeners() {
   document.getElementById('resSubtabs').addEventListener('click', (e) => {
     const btn = e.target.closest('.res-subtab');
     if (!btn) return;
+
+    // House Stays mirrors the Retreat House Rooms tab — that view already has
+    // per-bed rendering with Within client stays, venue-renter stays, and
+    // public stays color-coded by source. Redirecting there keeps a single
+    // source of truth for house occupancy instead of a parallel calendar.
+    if (btn.dataset.tab === 'house') {
+      const pillarParam = new URL(window.location.href).searchParams.get('pillar') || 'master';
+      window.location.href = `retreat-house.html?pillar=${encodeURIComponent(pillarParam)}`;
+      return;
+    }
 
     document.querySelectorAll('.res-subtab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
