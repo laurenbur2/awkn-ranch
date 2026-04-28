@@ -1455,20 +1455,14 @@ async function handleDelete() {
 // =============================================
 
 function setupEventListeners() {
-  // Sub-tab switching
+  // Sub-tab switching — all 4 subtabs render in place. House Stays previously
+  // redirected to the Retreat House Rooms page, but that broke the ability
+  // to navigate between subtabs once you'd left. There's now a "View per-bed
+  // calendar →" link inside panelHouse pointing at the Rooms page for users
+  // who want the richer view.
   document.getElementById('resSubtabs').addEventListener('click', (e) => {
     const btn = e.target.closest('.res-subtab');
     if (!btn) return;
-
-    // House Stays mirrors the Retreat House Rooms tab — that view already has
-    // per-bed rendering with Within client stays, venue-renter stays, and
-    // public stays color-coded by source. Redirecting there keeps a single
-    // source of truth for house occupancy instead of a parallel calendar.
-    if (btn.dataset.tab === 'house') {
-      const pillarParam = new URL(window.location.href).searchParams.get('pillar') || 'master';
-      window.location.href = `retreat-house.html?pillar=${encodeURIComponent(pillarParam)}`;
-      return;
-    }
 
     document.querySelectorAll('.res-subtab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
