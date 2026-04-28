@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Org Chart — Heart Space Health</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'DM Sans', system-ui, sans-serif;
+      background: #f6f5f0; color: #2a1f23;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .org-page { max-width: 1400px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    .org-head { text-align: center; margin-bottom: 2.25rem; }
+    .org-head h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
+    .org-head p  { margin: 0; color: #6b7280; font-size: 0.92rem; }
+
+    .org-tree { display: flex; flex-direction: column; align-items: center; }
+
+    .org-node {
+      background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 12px; padding: 0.75rem 1rem;
+      min-width: 200px; max-width: 260px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      text-align: center;
+      display: inline-flex; flex-direction: column; gap: 0.15rem;
+      align-items: center;
+    }
+    .org-node-name { font-size: 0.95rem; font-weight: 700; color: #111827; line-height: 1.2; }
+    .org-node-role { font-size: 0.76rem; color: #6b7280; }
+    .org-node-tag {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.18rem 0.55rem; border-radius: 999px;
+      margin-top: 0.3rem;
+    }
+
+    .org-node.is-parent     { background: #fef3e6; border-color: #d4883a; }
+    .org-node.is-parent     .org-node-tag { background: #d4883a; color: #fff; }
+    .org-node.is-person     { background: #fff; }
+    .org-node.is-person     .org-node-tag { background: #ecfdf5; color: #14532d; }
+    .org-node.is-business   { background: #f0f9ff; border-color: #0c5a85; }
+    .org-node.is-business   .org-node-tag { background: #0c5a85; color: #fff; }
+    .org-node.is-role       { background: #fafafa; border-style: dashed; min-width: 180px; }
+    .org-node.is-role       .org-node-name { font-weight: 600; color: #374151; font-size: 0.88rem; }
+
+    .org-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #f3e6d3; color: #d4883a;
+      font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .org-down { width: 2px; height: 28px; background: #d1d5db; margin: 0 auto; }
+    .org-row {
+      display: flex; gap: 1.25rem; justify-content: center;
+      flex-wrap: wrap; position: relative;
+      padding-top: 18px;
+    }
+    .org-row.has-bar::before {
+      content: ""; position: absolute; top: 0;
+      left: 50%; transform: translateX(-50%);
+      width: var(--bar-w, calc(100% - 200px)); height: 2px; background: #d1d5db;
+    }
+    .org-row > .org-child::before {
+      content: ""; display: block; width: 2px; height: 18px; background: #d1d5db;
+      margin: -18px auto 0;
+    }
+    .org-child { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .org-single { display: flex; flex-direction: column; align-items: center; }
+
+    .org-foot {
+      margin-top: 3rem; text-align: center; font-size: 0.78rem; color: #9ca3af;
+    }
+
+    @media (max-width: 760px) {
+      .org-row { flex-direction: column; align-items: center; gap: 0.6rem; }
+      .org-row.has-bar::before { display: none; }
+      .org-row > .org-child::before { display: none; }
+      .org-down { height: 18px; }
+      .org-page { padding: 1.5rem 1rem 3rem; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .org-foot { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="org-page">
+    <div class="org-head">
+      <h1>Heart Space Health</h1>
+      <p>Org chart across operating businesses.</p>
+    </div>
+
+    <div class="org-tree" id="orgTree"></div>
+
+    <div class="org-foot">Last updated 2026-04-27</div>
+  </div>
+
+  <script>
+    const ORG = {
+      kind: 'parent', name: 'Heart Space Health', tag: 'Parent Company',
+      children: [{
+        kind: 'person', name: 'William Naylor', role: 'Owner / Founder',
+        children: [{
+          kind: 'person', name: 'Justin DeLaCruz', role: 'Executive Director',
+          children: [
+            {
+              kind: 'business', name: 'AWKN Venue Rental',
+              children: [
+                { kind: 'role', name: 'Sales / Event Coordinator' },
+                { kind: 'role', name: 'Marketing' },
+                { kind: 'role', name: 'Cleaning Crew' },
+              ],
+            },
+            {
+              kind: 'business', name: 'AWKN Retreat House',
+              children: [
+                { kind: 'role', name: 'Sales Team' },
+                { kind: 'role', name: 'Guest Experience' },
+                { kind: 'role', name: 'Guides / Coaches' },
+                { kind: 'role', name: 'Maintenance / Housekeeping' },
+              ],
+            },
+            {
+              kind: 'business', name: 'Within Center',
+              children: [{
+                kind: 'role', name: 'Medical Director',
+                children: [
+                  { kind: 'role', name: 'Psych NP' },
+                  { kind: 'role', name: 'RN / IV Nurse' },
+                ],
+              }],
+            },
+          ],
+        }],
+      }],
+    };
+
+    function esc(s) {
+      if (s == null) return '';
+      const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML;
+    }
+    function initials(name) {
+      if (!name) return '?';
+      const p = String(name).trim().split(/\s+/);
+      return p.length >= 2 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : name[0].toUpperCase();
+    }
+    function renderBox(n) {
+      const kind = n.kind || 'role';
+      const tag  = n.tag  ? `<span class="org-node-tag">${esc(n.tag)}</span>` : '';
+      const role = n.role ? `<span class="org-node-role">${esc(n.role)}</span>` : '';
+      const av   = (kind === 'person' && n.name) ? `<span class="org-avatar">${initials(n.name)}</span>` : '';
+      return `<div class="org-node is-${kind}">${av}<span class="org-node-name">${esc(n.name)}</span>${role}${tag}</div>`;
+    }
+    function renderNode(n) {
+      const box = renderBox(n);
+      const kids = n.children || [];
+      if (kids.length === 0) return box;
+      if (kids.length === 1) {
+        return `<div class="org-single">${box}<div class="org-down"></div>${renderNode(kids[0])}</div>`;
+      }
+      return `<div class="org-single">${box}<div class="org-down"></div>
+        <div class="org-row has-bar">
+          ${kids.map(c => `<div class="org-child">${renderNode(c)}</div>`).join('')}
+        </div></div>`;
+    }
+    document.getElementById('orgTree').innerHTML = renderNode(ORG);
+  </script>
+</body>
+</html>
