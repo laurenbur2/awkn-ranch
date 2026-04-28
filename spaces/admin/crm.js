@@ -131,9 +131,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       await loadAllData();
       renderAll();
       setupEventListeners();
+      // Deep-link support: ?lead=<uuid>&action=<create-proposal|send-agreement|create-invoice>
+      // arrives from the venue-clients/venue-events pages so the CRM jumps
+      // straight into the lead drawer (and the requested action when present).
+      handleDeepLinkAfterRender();
     },
   });
 });
+
+async function handleDeepLinkAfterRender() {
+  try {
+    const url = new URL(window.location.href);
+    const leadId = url.searchParams.get('lead');
+    const action = url.searchParams.get('action');
+    if (!leadId) return;
+
+    // openLeadDetail handles the heavy lifting (tab switch, drawer render).
+    await openLeadDetail(leadId);
+
+    if (!action) return;
+    // Click the right action button after a tick so the drawer's
+    // bindLeadDetailHandlers has wired everything up. The button IDs are
+    // defined in renderLeadDrawer() — see crm.js search for
+    // 'btn-create-proposal-from-lead', etc.
+    setTimeout(() => {
+      const map = {
+        'create-proposal':  'btn-create-proposal-from-lead',
+        'send-agreement':   'btn-send-agreement-from-lead',
+        'create-invoice':   'btn-create-invoice-from-lead',
+      };
+      const btnId = map[action];
+      if (!btnId) return;
+      const btn = document.getElementById(btnId);
+      if (btn) btn.click();
+      else console.warn(`[crm.js] deep-link action "${action}" — button #${btnId} not found on this lead`);
+    }, 250);
+  } catch (e) {
+    console.warn('[crm.js] deep-link handling failed:', e);
+  }
+}
 
 // =============================================
 // DATA LOADING

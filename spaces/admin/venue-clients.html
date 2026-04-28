@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Venue Clients — AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .vc-wrap { max-width: 1300px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+    .vc-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .vc-head p  { margin: 0 0 1.25rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+
+    .vc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+    .vc-stat  { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .vc-stat-value { font-size: 1.3rem; font-weight: 700; color: #111827; }
+    .vc-stat-label { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
+
+    .vc-controls {
+      display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 12px;
+      padding: 0.7rem 0.85rem; margin-bottom: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .vc-search { flex: 1 1 240px; position: relative; }
+    .vc-search input {
+      width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+      border: 1px solid #d1d5db; border-radius: 8px; font: inherit; font-size: 0.92rem;
+    }
+    .vc-search input:focus { outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a; }
+    .vc-search svg {
+      position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: #9ca3af; pointer-events: none;
+    }
+    .vc-control-group { display: flex; align-items: center; gap: 0.4rem; }
+    .vc-control-group label { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; }
+    .vc-control-group select {
+      padding: 0.5rem 0.6rem; border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.88rem; background: #fff; cursor: pointer;
+    }
+
+    .vc-table-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .vc-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vc-table thead th {
+      text-align: left; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;
+      padding: 0.65rem 0.8rem; border-bottom: 1px solid #e5e7eb; background: #fafafa;
+    }
+    .vc-table tbody tr { border-top: 1px solid #f3f4f6; transition: background 0.1s ease; cursor: pointer; }
+    .vc-table tbody tr:first-child { border-top: none; }
+    .vc-table tbody tr:hover { background: #fffaf3; }
+    .vc-table td { padding: 0.7rem 0.8rem; vertical-align: top; }
+    .vc-cell-name { font-weight: 600; color: #111827; }
+    .vc-cell-name .vc-meta { font-size: 0.74rem; color: #6b7280; font-weight: 400; display: block; margin-top: 0.1rem; }
+    .vc-cell-count { font-weight: 600; color: #111827; }
+    .vc-cell-revenue { font-weight: 600; color: #111827; text-align: right; min-width: 100px; }
+    .vc-cell-date { font-size: 0.82rem; color: #4b5563; min-width: 110px; }
+    .vc-cell-date .vc-rel { font-size: 0.7rem; color: #6b7280; display: block; }
+
+    .vc-empty { padding: 3rem 1rem; text-align: center; color: var(--text-muted, #6b7280); font-size: 0.92rem; }
+    .vc-empty strong { color: #2a1f23; display: block; margin-bottom: 0.4rem; }
+
+    /* Modal — client detail with all their events */
+    .vc-modal-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(20, 20, 20, 0.45); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .vc-modal-overlay.hidden { display: none; }
+    .vc-modal {
+      background: #fff; border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      width: 100%; max-width: 640px; max-height: calc(100vh - 2rem);
+      display: flex; flex-direction: column;
+    }
+    .vc-modal-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; gap: 0.75rem; }
+    .vc-modal-titles { display: flex; flex-direction: column; gap: 0.15rem; }
+    .vc-modal-title { font-size: 1.1rem; font-weight: 700; color: #111827; }
+    .vc-modal-sub   { font-size: 0.82rem; color: #6b7280; }
+    .vc-modal-x { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; flex-shrink: 0; }
+    .vc-modal-summary {
+      display: flex; gap: 1rem; padding: 0.85rem 1.25rem; background: #fafafa;
+      border-bottom: 1px solid #f3f4f6; flex-wrap: wrap;
+    }
+    .vc-summary-item { font-size: 0.78rem; color: #4b5563; }
+    .vc-summary-item strong { color: #111827; font-size: 0.95rem; font-weight: 700; display: block; }
+    .vc-modal-body { padding: 0.5rem 1.25rem 1rem; overflow-y: auto; }
+    .vc-section-title {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #6b7280; padding: 0.85rem 0 0.4rem;
+    }
+    .vc-event {
+      padding: 0.7rem 0.85rem;
+      background: #fafafa; border: 1px solid #e5e7eb; border-radius: 10px;
+      margin-bottom: 0.5rem;
+      display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .vc-event.is-past { opacity: 0.85; }
+    .vc-event-head { display: flex; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+    .vc-event-date { font-weight: 700; color: #111827; font-size: 0.92rem; }
+    .vc-event-amount { font-weight: 700; color: #d4883a; font-size: 0.92rem; }
+    .vc-event-meta { font-size: 0.78rem; color: #4b5563; }
+    .vc-event-meta strong { color: #111827; font-weight: 600; }
+    .vc-event-stage {
+      font-size: 0.6rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      background: #f3f4f6; color: #4b5563;
+      display: inline-block; align-self: flex-start;
+    }
+    .vc-event-stage.confirmed { background: #ecfdf5; color: #065f46; }
+    .vc-event-stage.deposit   { background: #fef3c7; color: #78350f; }
+    .vc-event-stage.signed    { background: #dbeafe; color: #1e3a8a; }
+    .vc-event-stage.lost      { background: #fef2f2; color: #991b1b; }
+    .vc-event-actions {
+      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem;
+      padding-top: 0.4rem; border-top: 1px solid #e5e7eb;
+    }
+    .vc-action {
+      padding: 0.35rem 0.7rem; border-radius: 6px; border: 1px solid #d1d5db;
+      background: #fff; font: inherit; font-size: 0.74rem; font-weight: 600; color: #374151;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;
+    }
+    .vc-action:hover { background: #f9fafb; border-color: #9ca3af; }
+    .vc-action.primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .vc-action.primary:hover { background: #b87625; border-color: #b87625; }
+
+    .vc-modal-foot {
+      padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6;
+      display: flex; gap: 0.5rem; justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="vc-wrap">
+      <div class="vc-head">
+        <h1>Venue Clients</h1>
+        <p>Anyone who has booked a venue event. Click a client to see their full rental history and quick-access actions for each booking.</p>
+      </div>
+
+      <div class="vc-stats">
+        <div class="vc-stat"><div class="vc-stat-value" id="statClients">—</div><div class="vc-stat-label">Total Clients</div></div>
+        <div class="vc-stat"><div class="vc-stat-value" id="statRepeat">—</div><div class="vc-stat-label">Repeat Clients</div></div>
+        <div class="vc-stat"><div class="vc-stat-value" id="statRevenue">—</div><div class="vc-stat-label">Lifetime Revenue</div></div>
+        <div class="vc-stat"><div class="vc-stat-value" id="statUpcoming">—</div><div class="vc-stat-label">With Upcoming Events</div></div>
+      </div>
+
+      <div class="vc-controls">
+        <div class="vc-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" placeholder="Search by name, email, phone, or event type…" autocomplete="off">
+        </div>
+        <div class="vc-control-group">
+          <label for="filterType">Show</label>
+          <select id="filterType">
+            <option value="all">All clients</option>
+            <option value="upcoming">Has upcoming event</option>
+            <option value="past">Past events only</option>
+            <option value="repeat">2+ events</option>
+          </select>
+        </div>
+        <div class="vc-control-group">
+          <label for="sortBy">Sort by</label>
+          <select id="sortBy">
+            <option value="recent">Most recent activity</option>
+            <option value="upcoming">Next event soonest</option>
+            <option value="revenue">Lifetime revenue (high → low)</option>
+            <option value="events">Event count (high → low)</option>
+            <option value="name">Name (A → Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="vc-table-wrap">
+        <table class="vc-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Events</th>
+              <th>Last event</th>
+              <th>Next event</th>
+              <th style="text-align:right;">Lifetime revenue</th>
+            </tr>
+          </thead>
+          <tbody id="clientsBody">
+            <tr><td colspan="5" class="vc-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Client detail modal -->
+  <div class="vc-modal-overlay hidden" id="vcModal">
+    <div class="vc-modal">
+      <div class="vc-modal-head">
+        <div class="vc-modal-titles">
+          <span class="vc-modal-title" id="vcTitle">Client</span>
+          <span class="vc-modal-sub" id="vcSub"></span>
+        </div>
+        <button class="vc-modal-x" id="vcClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="vc-modal-summary" id="vcSummary"></div>
+      <div class="vc-modal-body" id="vcBody"></div>
+      <div class="vc-modal-foot" id="vcFoot"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="venue-clients.js"></script>
+</body>
+</html>
