@@ -79,10 +79,11 @@ export const ALL_ADMIN_TABS = [
   // Pillar-exclusive landing tabs (listed first so they win as the pillar's first-available
   // tab in renderContextSwitcher's firstTabForPillar lookup).
   { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat'] },
+  { id: 'venue-events', label: 'Events', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   // Staff section — primary admin tabs (Mindbody-style)
   { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared'] },
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
-  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master', 'ranch', 'retreat'] },
+  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master', 'retreat'] },
   { id: 'within-schedule', label: 'Schedule', href: 'within-schedule.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
@@ -92,7 +93,6 @@ export const ALL_ADMIN_TABS = [
   // nav — it's been superseded by the unified Events page (venue-events.html)
   // which handles both list and calendar views off crm_leads.
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: '_hidden' },
-  { id: 'venue-events', label: 'Events', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
   // Hidden but still accessible via direct URL — no pillar filtering
