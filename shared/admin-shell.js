@@ -88,6 +88,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events', pillars: ['ranch'] },
+  { id: 'venue-events', label: 'Events List', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
   // Hidden but still accessible via direct URL — no pillar filtering

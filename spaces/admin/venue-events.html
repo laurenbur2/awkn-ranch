@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Venue Events — AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .ve-wrap { max-width: 1300px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+    .ve-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .ve-head p  { margin: 0 0 1.25rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+
+    .ve-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+    .ve-stat  { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .ve-stat-value { font-size: 1.3rem; font-weight: 700; color: #111827; }
+    .ve-stat-label { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
+
+    .ve-controls {
+      display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 12px;
+      padding: 0.7rem 0.85rem; margin-bottom: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .ve-search {
+      flex: 1 1 240px;
+      position: relative;
+    }
+    .ve-search input {
+      width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+      border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.92rem;
+    }
+    .ve-search input:focus { outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a; }
+    .ve-search svg {
+      position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: #9ca3af; pointer-events: none;
+    }
+    .ve-control-group {
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .ve-control-group label {
+      font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+      color: #6b7280;
+    }
+    .ve-control-group select {
+      padding: 0.5rem 0.6rem; border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.88rem; background: #fff; cursor: pointer;
+    }
+    .ve-control-group select:focus { outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a; }
+
+    .ve-table-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .ve-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .ve-table thead th {
+      text-align: left; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;
+      padding: 0.65rem 0.8rem; border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+    .ve-table tbody tr {
+      border-top: 1px solid #f3f4f6; transition: background 0.1s ease; cursor: pointer;
+    }
+    .ve-table tbody tr:first-child { border-top: none; }
+    .ve-table tbody tr:hover { background: #fffaf3; }
+    .ve-table td { padding: 0.7rem 0.8rem; vertical-align: top; }
+    .ve-cell-date {
+      font-weight: 600; color: #111827; min-width: 110px;
+    }
+    .ve-cell-date .ve-relative { font-size: 0.7rem; color: #6b7280; font-weight: 500; margin-top: 0.1rem; display:block; }
+    .ve-cell-time { color: #4b5563; font-size: 0.82rem; }
+    .ve-cell-client { font-weight: 600; color: #111827; }
+    .ve-cell-client .ve-email { font-size: 0.74rem; color: #6b7280; font-weight: 400; display: block; margin-top: 0.1rem; }
+    .ve-cell-space { color: #4b5563; font-size: 0.84rem; }
+    .ve-pill {
+      display: inline-block; font-size: 0.66rem; font-weight: 700;
+      padding: 0.18rem 0.5rem; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .ve-pill.type     { background: #f3e8ff; color: #5b21b6; }
+    .ve-pill.stage    { background: #f3f4f6; color: #4b5563; }
+    .ve-pill.stage.confirmed { background: #ecfdf5; color: #065f46; }
+    .ve-pill.stage.deposit   { background: #fef3c7; color: #78350f; }
+    .ve-pill.stage.signed    { background: #dbeafe; color: #1e3a8a; }
+    .ve-pill.stage.lost      { background: #fef2f2; color: #991b1b; }
+    .ve-cell-amount { font-weight: 600; color: #111827; text-align: right; min-width: 90px; }
+
+    .ve-empty {
+      padding: 3rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.92rem;
+    }
+    .ve-empty strong { color: #2a1f23; display: block; margin-bottom: 0.4rem; }
+
+    @media (max-width: 720px) {
+      .ve-table .col-amount, .ve-table .col-type { display: none; }
+    }
+    @media (max-width: 540px) {
+      .ve-table .col-time { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="ve-wrap">
+      <div class="ve-head">
+        <h1>Venue Events</h1>
+        <p>Upcoming and recent venue rentals across all spaces. Click any row to open the event in the CRM.</p>
+      </div>
+
+      <div class="ve-stats">
+        <div class="ve-stat"><div class="ve-stat-value" id="statUpcoming">—</div><div class="ve-stat-label">Upcoming Events</div></div>
+        <div class="ve-stat"><div class="ve-stat-value" id="statThisMonth">—</div><div class="ve-stat-label">This Month</div></div>
+        <div class="ve-stat"><div class="ve-stat-value" id="statRevenue">—</div><div class="ve-stat-label">Booked Revenue (Upcoming)</div></div>
+        <div class="ve-stat"><div class="ve-stat-value" id="statPipeline">—</div><div class="ve-stat-label">Pipeline (Quoted, Not Yet Booked)</div></div>
+      </div>
+
+      <div class="ve-controls">
+        <div class="ve-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" placeholder="Search by client name, email, space, or notes…" autocomplete="off">
+        </div>
+        <div class="ve-control-group">
+          <label for="monthFilter">Month</label>
+          <select id="monthFilter">
+            <option value="all">All upcoming</option>
+            <option value="past">Past 30 days</option>
+          </select>
+        </div>
+        <div class="ve-control-group">
+          <label for="stageFilter">Stage</label>
+          <select id="stageFilter">
+            <option value="all">All stages</option>
+          </select>
+        </div>
+        <div class="ve-control-group">
+          <label for="spaceFilter">Space</label>
+          <select id="spaceFilter">
+            <option value="all">All spaces</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="ve-table-wrap">
+        <table class="ve-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th class="col-time">Time</th>
+              <th>Client</th>
+              <th>Space</th>
+              <th class="col-type">Event Type</th>
+              <th>Stage</th>
+              <th class="col-amount" style="text-align:right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="eventsBody">
+            <tr><td colspan="7" class="ve-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="venue-events.js"></script>
+</body>
+</html>
