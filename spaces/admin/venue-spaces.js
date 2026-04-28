@@ -86,8 +86,22 @@ async function loadAll() {
   if (stagesRes.error) console.warn('stages load error:', stagesRes.error);
 
   allSpaces   = spacesRes.data || [];
-  allBookings = leadsRes.data  || [];
+  // Spaces calendar only shows CONFIRMED bookings — stages from invoice_paid
+  // forward (invoice_paid / event_scheduled / event_complete /
+  // feedback_form_sent). Earlier-stage leads stay in the CRM pipeline but
+  // don't clutter the resource calendar with maybes.
+  allBookings = (leadsRes.data || []).filter(isConfirmedBooking);
   allStages   = stagesRes.data || [];
+}
+
+const CONFIRMED_STAGE_SLUGS = new Set([
+  'invoice_paid',
+  'event_scheduled',
+  'event_complete',
+  'feedback_form_sent',
+]);
+function isConfirmedBooking(lead) {
+  return CONFIRMED_STAGE_SLUGS.has((lead?.stage?.slug || '').toLowerCase());
 }
 
 // ============================================================================

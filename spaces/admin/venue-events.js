@@ -250,6 +250,20 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// A booking is "confirmed" once it reaches the invoice_paid stage or any
+// later stage (event_scheduled, event_complete, feedback_form_sent). The
+// admin can also drop a lead straight into one of these stages to mark it
+// confirmed manually without having gone through the proposal flow.
+const CONFIRMED_STAGE_SLUGS = new Set([
+  'invoice_paid',
+  'event_scheduled',
+  'event_complete',
+  'feedback_form_sent',
+]);
+function isConfirmedBooking(lead) {
+  return CONFIRMED_STAGE_SLUGS.has((lead?.stage?.slug || '').toLowerCase());
+}
+
 function render() {
   const filtered = applyFilters(allEvents);
   renderStats();
@@ -278,8 +292,13 @@ function renderCalendar() {
   // Bucket events for the visible window by date for fast lookup.
   // Use the search/stage/space filters here too — calendar respects them —
   // but ignore the month-filter dropdown since calendar nav controls month.
+  // Calendar only shows CONFIRMED bookings — stages from invoice_paid forward
+  // — so the visualization stays clean and only commits show up. Earlier-
+  // stage leads (inquiry, contacted, tour_call, proposal_sent) still show
+  // in the list view so you can track the pipeline.
   const visibleEvents = allEvents.filter(e => {
     if (!e.event_date) return false;
+    if (!isConfirmedBooking(e)) return false;
     if (filterState.stage !== 'all' && e.stage?.slug !== filterState.stage) return false;
     if (filterState.space !== 'all' && e.space_id !== filterState.space) return false;
     if (filterState.search) {
