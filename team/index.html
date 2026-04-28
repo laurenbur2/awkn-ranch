@@ -277,11 +277,12 @@
 
     <div class="org-toolbar">
       <button class="tb-btn tb-btn-primary" id="btnAddRoot">+ Add Top-Level Position</button>
+      <button class="tb-btn" id="btnUndo" disabled title="Nothing to undo">↶ Undo</button>
       <button class="tb-btn" id="btnExport">Export JSON</button>
       <button class="tb-btn" id="btnImport">Import JSON</button>
       <button class="tb-btn tb-btn-danger" id="btnReset">Reset to Default</button>
       <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
-      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag onto a box (center = make child, edges = insert as sibling at that level)</div>
+      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag onto a box (center = make child, edges = insert as sibling) · ⌘Z / Ctrl-Z to undo</div>
     </div>
     <div id="dropHint" class="drop-hint" aria-live="polite"></div>
 
@@ -404,6 +405,8 @@
   let authedEmail = null;
   let saveTimer = null;     // debounce timer
   let lastSavedHash = null; // skip realtime echoes of our own writes
+  let undoStack = [];       // JSON snapshots of ORG before each local mutation
+  const UNDO_MAX = 80;
 
   // -- Supabase persistence --------------------------------------------------
   async function loadFromDb() {
@@ -473,6 +476,38 @@
   function save() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => { pushToDb(); }, 250);
+  }
+
+  // Push current state onto the undo stack BEFORE applying a mutation.
+  // Realtime updates from other users do NOT push (that would let me
+  // undo their changes). Also drops the oldest entries past UNDO_MAX.
+  function pushUndo() {
+    undoStack.push(JSON.stringify(ORG));
+    if (undoStack.length > UNDO_MAX) undoStack.shift();
+    refreshUndoButton();
+  }
+  function undo() {
+    if (!isAuthed) { alert('Sign in to edit.'); return; }
+    if (undoStack.length === 0) return;
+    const prev = undoStack.pop();
+    try {
+      const parsed = JSON.parse(prev);
+      ORG = parsed;
+      ensureIds(ORG);
+      save();
+      render();
+      refreshUndoButton();
+    } catch (e) {
+      console.warn('[org-chart] undo parse failed:', e);
+    }
+  }
+  function refreshUndoButton() {
+    const btn = document.getElementById('btnUndo');
+    if (!btn) return;
+    btn.disabled = undoStack.length === 0;
+    btn.title = undoStack.length === 0
+      ? 'Nothing to undo'
+      : `Undo last change (${undoStack.length} step${undoStack.length === 1 ? '' : 's'} available)`;
   }
 
   function setStatus(kind, msg) {
@@ -589,11 +624,10 @@
   }
 
   // Insert dragged node as a sibling of target (same level) at position
-  // before/after target. Optional `orientation` ('row' | 'stack') updates
-  // the parent's layout so siblings end up arranged the way the user
-  // dropped — drop left/right of any target → parent becomes a row;
-  // drop top/bottom → parent becomes a stack.
-  function moveAsSibling(draggedId, targetId, before, orientation) {
+  // before/after target. The parent's layout stays unchanged — only the one
+  // dragged node moves. Layout (row vs stack) is controlled separately via
+  // the parent's edit modal.
+  function moveAsSibling(draggedId, targetId, before) {
     if (draggedId === targetId) return false;
     if (isDescendant(draggedId, targetId)) return false;
     if (draggedId === ORG.id) return false;
@@ -617,9 +651,6 @@
       return false;
     }
     targetParent.children.splice(before ? targetIdx : targetIdx + 1, 0, removed);
-
-    if (orientation === 'row') targetParent.layout = 'row';
-    else if (orientation === 'stack') delete targetParent.layout;
     return true;
   }
 
@@ -715,39 +746,37 @@
     `;
   }
 
-  // Determine which drop zone the cursor is in. Five options:
-  //   'child'        — cursor is in the box's center → become target's child
-  //   'before-row'   — left edge   → insert as sibling and set parent's layout to row
-  //   'after-row'    — right edge  → insert as sibling and set parent's layout to row
-  //   'before-stack' — top edge    → insert as sibling and set parent's layout to stack
-  //   'after-stack'  — bottom edge → insert as sibling and set parent's layout to stack
-  // Drop zones are AVAILABLE on every box (regardless of current layout) as
-  // long as the box is not the root — dropping on a perpendicular edge swaps
-  // the parent's layout to whichever the user requested.
+  // Determine which drop zone the cursor is in. Three meaningful options:
+  //   'child'        — center → become target's child
+  //   'before-*'     — appropriate edge → insert as sibling before target
+  //   'after-*'      — appropriate edge → insert as sibling after target
+  //
+  // The relevant edge depends on the target's parent layout:
+  //   - row siblings → left edge = before, right edge = after
+  //   - stack siblings → top edge = before, bottom edge = after
+  // Drops on the perpendicular edge fall through to "child" so the user
+  // doesn't accidentally trigger a sibling-insert at a 90° angle from the
+  // actual layout.
   function getDropZone(e, box) {
     // Root has no siblings — only "child" is meaningful.
     if (box.dataset.id === ORG.id) return 'child';
+
+    const parent = findParent(box.dataset.id);
+    if (!parent) return 'child';
+    const isRow = parent.layout === 'row';
 
     const rect = box.getBoundingClientRect();
     const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-    // Distance to each edge (0 = on edge, 0.5 = dead center).
-    const distLeft   = xPct;
-    const distRight  = 1 - xPct;
-    const distTop    = yPct;
-    const distBottom = 1 - yPct;
-    const minDist = Math.min(distLeft, distRight, distTop, distBottom);
-
-    // Inner ~56% × 56% (~31% of box area) → "child" zone; the outer 22% on
-    // each side becomes an edge zone. This gives the center plenty of room
-    // so dropping a sibling onto another sibling reliably nests it as a
-    // child rather than triggering a sibling-insert.
-    if (minDist > 0.22) return 'child';
-    if (minDist === distLeft)   return 'before-row';
-    if (minDist === distRight)  return 'after-row';
-    if (minDist === distTop)    return 'before-stack';
-    return 'after-stack';
+    if (isRow) {
+      if (xPct < 0.28) return 'before-row';
+      if (xPct > 0.72) return 'after-row';
+    } else {
+      if (yPct < 0.28) return 'before-stack';
+      if (yPct > 0.72) return 'after-stack';
+    }
+    return 'child';
   }
 
   function clearDropClasses() {
@@ -776,16 +805,16 @@
       html = `Insert <strong>${dragName}</strong> after <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
     } else if (kind === 'before-row') {
-      html = `Place <strong>${dragName}</strong> <span class="hint-arrow">←</span> to the left of <strong>${tgtName}</strong>`;
+      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">←</span> to the left of <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
     } else if (kind === 'after-row') {
-      html = `Place <strong>${dragName}</strong> to the right of <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
+      html = `Insert <strong>${dragName}</strong> to the right of <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
       el.style.background = '#2a1f23';
     } else if (kind === 'before-stack') {
-      html = `Place <strong>${dragName}</strong> <span class="hint-arrow">↑</span> above <strong>${tgtName}</strong>`;
+      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">↑</span> above <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
     } else if (kind === 'after-stack') {
-      html = `Place <strong>${dragName}</strong> below <strong>${tgtName}</strong> <span class="hint-arrow">↓</span>`;
+      html = `Insert <strong>${dragName}</strong> below <strong>${tgtName}</strong> <span class="hint-arrow">↓</span>`;
       el.style.background = '#2a1f23';
     }
     el.innerHTML = html;
@@ -872,11 +901,17 @@
         if (!valid) return;
 
         let ok = false;
-        if (zone === 'before-row')        ok = moveAsSibling(dragId, targetId, true,  'row');
-        else if (zone === 'after-row')    ok = moveAsSibling(dragId, targetId, false, 'row');
-        else if (zone === 'before-stack') ok = moveAsSibling(dragId, targetId, true,  'stack');
-        else if (zone === 'after-stack')  ok = moveAsSibling(dragId, targetId, false, 'stack');
-        else                              ok = moveNode(dragId, targetId);
+        if (zone === 'before-row' || zone === 'before-stack') {
+          pushUndo();
+          ok = moveAsSibling(dragId, targetId, true);
+        } else if (zone === 'after-row' || zone === 'after-stack') {
+          pushUndo();
+          ok = moveAsSibling(dragId, targetId, false);
+        } else {
+          pushUndo();
+          ok = moveNode(dragId, targetId);
+        }
+        if (!ok) undoStack.pop();    // mutation didn't actually change anything
         if (ok) {
           save();
           render();
@@ -889,12 +924,15 @@
   // ACTIONS
   // =========================================================================
   function addChildAction(parentId) {
+    pushUndo();
     const child = { id: newId(), kind: 'role', name: 'New Position' };
     if (addChild(parentId, child)) {
       save();
       render();
       // Open the edit modal for the new child immediately so it can be named.
       openEditModal(child.id);
+    } else {
+      undoStack.pop();
     }
   }
 
@@ -906,6 +944,7 @@
       ? `Remove "${node.name}" and ${subtreeCount} position${subtreeCount === 1 ? '' : 's'} reporting under it?`
       : `Remove "${node.name}"?`;
     if (!confirm(msg)) return;
+    pushUndo();
     removeNode(id);
     save();
     render();
@@ -972,6 +1011,7 @@
     const personVal = fieldPerson.value.trim();
     if (!titleVal) { alert('Position name is required.'); return; }
 
+    pushUndo();
     n.kind = newKind;
     n.tag = fieldTag.value.trim() || undefined;
     n.layout = fieldLayout.value === 'row' ? 'row' : undefined;
@@ -1002,10 +1042,23 @@
   document.getElementById('btnReset').addEventListener('click', () => {
     if (!isAuthed) { alert('Sign in to edit.'); return; }
     if (!confirm('Reset to the default org chart? This is shared — everyone will see the reset.')) return;
+    pushUndo();
     ORG = JSON.parse(JSON.stringify(DEFAULT_ORG));
     ensureIds(ORG);
     save();
     render();
+  });
+
+  document.getElementById('btnUndo').addEventListener('click', undo);
+
+  // Keyboard shortcut: ⌘Z (mac) or Ctrl+Z elsewhere. Skip when typing in an input/textarea.
+  document.addEventListener('keydown', (e) => {
+    const isUndoKey = (e.key === 'z' || e.key === 'Z') && (e.metaKey || e.ctrlKey) && !e.shiftKey;
+    if (!isUndoKey) return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    e.preventDefault();
+    undo();
   });
 
   document.getElementById('btnExport').addEventListener('click', () => {
@@ -1031,6 +1084,7 @@
       try {
         const parsed = JSON.parse(reader.result);
         if (!parsed || typeof parsed !== 'object' || !parsed.name) throw new Error('Not a valid org chart JSON.');
+        pushUndo();
         ensureIds(parsed);
         ORG = parsed;
         save();
