@@ -40,8 +40,19 @@
     .tb-btn-danger  { color: #991b1b; border-color: #fecaca; }
     .tb-btn-danger:hover { background: #fef2f2; }
 
-    /* Tree */
-    .org-tree { display: flex; flex-direction: column; align-items: center; }
+    /* Canvas — gives the tree horizontal-scroll fallback when it's too wide
+       even after auto-fit zoom. Also clips the half-tint backgrounds when
+       boxes near the edges. */
+    .org-canvas {
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 0.5rem 1rem 1rem;
+      margin: 0 -1rem;
+    }
+
+    /* Tree — `zoom` is set dynamically after every render so the entire tree
+       fits within the canvas without horizontal scrolling whenever possible. */
+    .org-tree { display: flex; flex-direction: column; align-items: center; min-width: max-content; }
     .org-down { width: 2px; height: 28px; background: #d1d5db; margin: 0 auto; flex-shrink: 0; }
 
     .org-row {
@@ -274,7 +285,9 @@
     </div>
     <div id="dropHint" class="drop-hint" aria-live="polite"></div>
 
-    <div class="org-tree" id="orgTree"></div>
+    <div class="org-canvas" id="orgCanvas">
+      <div class="org-tree" id="orgTree"></div>
+    </div>
 
     <div class="org-foot">
       <span id="lastSaved">Loading…</span><span id="saveStatus" class="save-status" style="display:none;"></span>
@@ -617,7 +630,37 @@
     const root = document.getElementById('orgTree');
     root.innerHTML = renderNode(ORG);
     bindNodeEvents();
+    autoFitChart();
   }
+
+  // After every render, if the natural tree width exceeds the canvas width,
+  // apply a CSS `zoom` so the whole chart fits horizontally. Stays at 1 for
+  // small charts; clamps at 0.45 so very wide charts stay readable but the
+  // user can horizontally scroll the canvas if they want to see more.
+  function autoFitChart() {
+    const tree = document.getElementById('orgTree');
+    const canvas = document.getElementById('orgCanvas');
+    if (!tree || !canvas) return;
+    tree.style.zoom = '1'; // reset to measure natural size
+    // Force layout to make sure scrollWidth is accurate after the reset
+    void tree.offsetWidth;
+    const natural = tree.scrollWidth;
+    const available = canvas.clientWidth;
+    if (!natural || !available) return;
+    if (natural <= available) {
+      tree.style.zoom = '1';
+      return;
+    }
+    const scale = Math.max(0.45, available / natural);
+    tree.style.zoom = scale.toFixed(3);
+  }
+
+  // Recalculate the fit when the window resizes (debounced).
+  let _resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(autoFitChart, 120);
+  });
 
   function renderNode(n) {
     const box = renderBox(n);
