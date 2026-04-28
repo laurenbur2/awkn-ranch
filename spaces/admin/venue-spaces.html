@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Venue Spaces — AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    :root { --vs-day-w: 60px; --vs-info-w: 220px; --vs-row-h: 90px; }
+
+    .vs-wrap { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+    .vs-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .vs-head p  { margin: 0 0 1.25rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+
+    .vs-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+    .vs-stat  { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .vs-stat-value { font-size: 1.3rem; font-weight: 700; color: #111827; }
+    .vs-stat-label { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
+
+    /* Toolbar (date nav) */
+    .vs-bar {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px 12px 0 0; padding: 0.55rem 0.75rem;
+      border-bottom: none;
+    }
+    .vs-tb-btn {
+      padding: 0.4rem 0.75rem; border-radius: 7px; border: 1px solid #e5e7eb;
+      background: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; color: #374151; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .vs-tb-btn:hover { background: #f9fafb; }
+    .vs-tb-range { font-size: 0.92rem; font-weight: 600; color: #111827; padding: 0 0.5rem; flex: 1; text-align: center; }
+
+    /* Resource grid */
+    .vs-grid-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 0 0 12px 12px; overflow-x: auto;
+    }
+    .vs-grid {
+      display: flex; flex-direction: column;
+      min-width: calc(var(--vs-info-w) + var(--vs-day-w) * 14);
+    }
+
+    .vs-header-row {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+      position: sticky; top: 0; z-index: 3;
+    }
+    .vs-corner {
+      width: var(--vs-info-w); flex-shrink: 0;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+      color: #6b7280;
+      border-right: 1px solid #f3f4f6;
+      background: #fafafa;
+      position: sticky; left: 0; z-index: 4;
+      display: flex; align-items: center;
+    }
+    .vs-day-headers {
+      display: flex; flex: 1;
+    }
+    .vs-day-head {
+      flex: 1 1 0; min-width: var(--vs-day-w);
+      padding: 0.4rem 0.3rem 0.45rem;
+      text-align: center;
+      border-right: 1px solid #f3f4f6;
+      background: #fafafa;
+    }
+    .vs-day-head.is-today { background: #fef3e6; }
+    .vs-day-head.weekend  { background: #f4f3ee; }
+    .vs-day-dow  { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .vs-day-date { font-size: 0.85rem; font-weight: 700; color: #111827; margin-top: 0.05rem; }
+    .vs-day-head.is-today .vs-day-date { color: #d4883a; }
+
+    .vs-space-row {
+      display: flex; min-height: var(--vs-row-h);
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .vs-space-info {
+      width: var(--vs-info-w); flex-shrink: 0;
+      padding: 0.65rem 0.75rem;
+      border-right: 1px solid #f3f4f6;
+      background: #fff;
+      position: sticky; left: 0; z-index: 2;
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .vs-space-name { font-size: 0.95rem; font-weight: 700; color: #111827; }
+    .vs-space-cap  { font-size: 0.7rem; color: #6b7280; }
+    .vs-space-rates { font-size: 0.72rem; color: #4b5563; margin-top: 0.15rem; line-height: 1.35; }
+    .vs-rate-line  { display: block; }
+
+    .vs-timeline {
+      flex: 1; position: relative;
+      background-image: repeating-linear-gradient(
+        to right,
+        #fff 0,
+        #fff calc(100% / 14 - 1px),
+        #f3f4f6 calc(100% / 14 - 1px),
+        #f3f4f6 calc(100% / 14)
+      );
+      min-width: calc(var(--vs-day-w) * 14);
+    }
+    /* Subtle shading for today's column inside the timeline */
+    .vs-today-overlay {
+      position: absolute; top: 0; bottom: 0;
+      background: rgba(212, 136, 58, 0.05);
+      pointer-events: none;
+    }
+
+    .vs-empty-cell {
+      position: absolute;
+      top: 0; bottom: 0;
+      cursor: pointer;
+    }
+    .vs-empty-cell:hover { background: rgba(212, 136, 58, 0.08); }
+
+    .vs-booking {
+      position: absolute;
+      top: 8px; bottom: 8px;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.74rem; line-height: 1.2;
+      background: #f0f9ff; color: #0c5a85; border-left: 3px solid #0c5a85;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      transition: transform 0.08s ease, box-shadow 0.12s ease;
+      z-index: 1;
+    }
+    .vs-booking:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); z-index: 2; }
+    .vs-booking-name  { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vs-booking-sub   { font-size: 0.65rem; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.1rem; }
+
+    .vs-booking.stage-confirmed { background: #ecfdf5; color: #065f46; border-left-color: #16a34a; }
+    .vs-booking.stage-deposit   { background: #fef3c7; color: #78350f; border-left-color: #d97706; }
+    .vs-booking.stage-signed    { background: #dbeafe; color: #1e3a8a; border-left-color: #2563eb; }
+    .vs-booking.stage-lost      { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; opacity: 0.55; }
+
+    .vs-empty-state {
+      padding: 3rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.92rem;
+    }
+
+    /* Modal — same patterns as venue-events */
+    .vs-modal-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(20, 20, 20, 0.45); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .vs-modal-overlay.hidden { display: none; }
+    .vs-modal { background: #fff; border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); width: 100%; max-width: 460px; max-height: calc(100vh - 2rem); display: flex; flex-direction: column; }
+    .vs-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; }
+    .vs-modal-title { font-size: 1.05rem; font-weight: 700; color: #111827; }
+    .vs-modal-x { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; }
+    .vs-modal-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.7rem; overflow-y: auto; }
+    .vs-modal-foot { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6; }
+    .vs-modal-row { display: flex; flex-direction: column; gap: 0.15rem; }
+    .vs-modal-label { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .vs-modal-value { font-size: 0.9rem; color: #111827; }
+    .vs-btn { padding: 0.55rem 0.95rem; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; font: inherit; font-size: 0.85rem; font-weight: 600; color: #374151; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .vs-btn:hover { background: #f9fafb; }
+    .vs-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .vs-btn-primary:hover { background: #b87625; }
+
+    @media (max-width: 720px) {
+      .vs-day-head { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
+      :root { --vs-info-w: 160px; --vs-day-w: 50px; --vs-row-h: 75px; }
+      .vs-space-name { font-size: 0.85rem; }
+      .vs-space-rates { font-size: 0.66rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="vs-wrap">
+      <div class="vs-head">
+        <h1>Venue Spaces</h1>
+        <p>Each rentable space and its booking timeline. Click a booking to see details, or click an empty day to add a new event for that space.</p>
+      </div>
+
+      <div class="vs-stats">
+        <div class="vs-stat"><div class="vs-stat-value" id="vsStatSpaces">—</div><div class="vs-stat-label">Rentable Spaces</div></div>
+        <div class="vs-stat"><div class="vs-stat-value" id="vsStatBookings">—</div><div class="vs-stat-label">Bookings in Window</div></div>
+        <div class="vs-stat"><div class="vs-stat-value" id="vsStatOccupancy">—</div><div class="vs-stat-label">Days Booked / Available</div></div>
+        <div class="vs-stat"><div class="vs-stat-value" id="vsStatRevenue">—</div><div class="vs-stat-label">Revenue in Window</div></div>
+      </div>
+
+      <div class="vs-bar">
+        <button class="vs-tb-btn" id="vsPrev" aria-label="Previous">←</button>
+        <button class="vs-tb-btn" id="vsToday">Today</button>
+        <button class="vs-tb-btn" id="vsNext" aria-label="Next">→</button>
+        <span class="vs-tb-range" id="vsRange">—</span>
+      </div>
+
+      <div class="vs-grid-wrap">
+        <div class="vs-grid" id="vsGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Booking details modal -->
+  <div class="vs-modal-overlay hidden" id="vsModal">
+    <div class="vs-modal">
+      <div class="vs-modal-head">
+        <span class="vs-modal-title" id="vsModalTitle">Booking</span>
+        <button class="vs-modal-x" id="vsModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="vs-modal-body" id="vsModalBody"></div>
+      <div class="vs-modal-foot" id="vsModalFoot"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="venue-spaces.js"></script>
+</body>
+</html>
