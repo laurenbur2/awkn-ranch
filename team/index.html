@@ -420,6 +420,7 @@
   let lastSavedHash = null; // skip realtime echoes of our own writes
   let undoStack = [];       // JSON snapshots of ORG before each local mutation
   const UNDO_MAX = 80;
+  let savedZoomDuringDrag = '1'; // restored on dragend so auto-fit can resume
 
   // -- Supabase persistence --------------------------------------------------
   async function loadFromDb() {
@@ -782,21 +783,17 @@
     const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-    // Stack siblings: only the TOP edge inserts as a peer (sibling above).
-    // Dropping anywhere else — center or below — makes the dragged
-    // position a CHILD of the target (= reporting to it). This matches
-    // the org-chart mental model: a box drawn below another is a report.
-    //
-    // Row siblings: left/right edges in the TOP half are sibling-insert.
-    // The whole bottom half (y > 0.55) is "drop below" → make child.
-    // That way you can drop near the right side as long as you're aimed
-    // at the lower half and it correctly registers as "report to."
+    // Sibling-insert is only triggered when the cursor is solidly in a
+    // CORNER of the target (top 25% × outer 25%). Everything else — center,
+    // any of the bottom, the middle-side bands — is "child" (= report).
+    // This makes "drop below to make report" the overwhelmingly dominant
+    // gesture, with sibling-insert as a deliberate corner-targeting move.
+    const inTop = yPct < 0.25;
     if (isRow) {
-      if (yPct > 0.55) return 'child';
-      if (xPct < 0.20) return 'before-row';
-      if (xPct > 0.80) return 'after-row';
+      if (inTop && xPct < 0.20) return 'before-row';
+      if (inTop && xPct > 0.80) return 'after-row';
     } else {
-      if (yPct < 0.22) return 'before-stack';
+      if (inTop) return 'before-stack';
     }
     return 'child';
   }
@@ -878,12 +875,22 @@
         dragId = box.dataset.id;
         box.classList.add('dragging');
         document.body.classList.add('is-dragging');
+        // Reset auto-fit zoom for the duration of the drag so getBoundingClientRect
+        // and the cursor's clientX/Y agree on the same coordinate system. CSS
+        // `zoom` can desync these in Safari and route the drop to the wrong zone.
+        const tree = document.getElementById('orgTree');
+        if (tree) {
+          savedZoomDuringDrag = tree.style.zoom || '1';
+          tree.style.zoom = '1';
+        }
         e.dataTransfer.effectAllowed = 'move';
         try { e.dataTransfer.setData('text/plain', dragId); } catch (e) {}
       });
       box.addEventListener('dragend', () => {
         box.classList.remove('dragging');
         document.body.classList.remove('is-dragging');
+        // Re-apply auto-fit so the chart re-shrinks to fit the viewport.
+        autoFitChart();
         clearDropClasses();
         hideDropHint();
         dragId = null;
