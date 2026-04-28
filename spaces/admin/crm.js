@@ -2866,6 +2866,13 @@ async function openProposalModal(proposal = null, lead = null) {
               </select>
             </div>
             <div class="crm-form-field">
+              <label>Venue Space</label>
+              <select class="crm-select" id="prop-space-id">
+                <option value="">— Select space —</option>
+                ${rentalSpaces.map(s => `<option value="${s.id}" ${(lead?.space_id) === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
+              </select>
+            </div>
+            <div class="crm-form-field">
               <label>Event Date</label>
               <input type="date" class="crm-input" id="prop-event-date" value="${proposal?.event_date || leadDefaults.event_date || ''}">
             </div>
@@ -3157,6 +3164,31 @@ async function saveProposal(existingProposal, status) {
       const itemsPayload = lineItems.map(li => ({ ...li, proposal_id: proposalId }));
       const { error: liError } = await supabase.from('crm_proposal_items').insert(itemsPayload);
       if (liError) throw liError;
+    }
+
+    // Sync the selected venue space + event timing back to the lead. This is
+    // what the Venue Rental → Spaces calendar reads from (lead.space_id +
+    // lead.event_date), so without this update a confirmed proposal wouldn't
+    // visually block the time on the resource calendar.
+    if (leadId) {
+      const selectedSpaceId = document.getElementById('prop-space-id')?.value || null;
+      const leadUpdate = {
+        space_id:         selectedSpaceId,
+        event_date:       payload.event_date,
+        event_start_time: payload.event_start,
+        event_end_time:   payload.event_end,
+        event_type:       payload.event_type,
+      };
+      // Only include guest_count if a value was provided (don't blow away
+      // the lead's existing count with null).
+      if (payload.guest_count != null) leadUpdate.guest_count = payload.guest_count;
+      // Strip nulls so we don't overwrite lead fields that were already set
+      // and the proposal didn't bother to capture.
+      Object.keys(leadUpdate).forEach(k => { if (leadUpdate[k] == null) delete leadUpdate[k]; });
+      if (Object.keys(leadUpdate).length > 0) {
+        const { error: leadErr } = await supabase.from('crm_leads').update(leadUpdate).eq('id', leadId);
+        if (leadErr) console.warn('Failed to sync proposal to lead:', leadErr);
+      }
     }
 
     if (status === 'sent') {
