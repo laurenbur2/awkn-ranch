@@ -285,7 +285,7 @@
       <button class="tb-btn" id="btnImport">Import JSON</button>
       <button class="tb-btn tb-btn-danger" id="btnReset">Reset to Default</button>
       <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
-      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag onto a box (center = make child, edges = insert as sibling) · ⌘Z / Ctrl-Z to undo</div>
+      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag a position onto another to make it report there · Drop on the very top edge to insert as a peer · ⌘Z / Ctrl-Z to undo</div>
     </div>
     <div id="dropHint" class="drop-hint" aria-live="polite"></div>
 
@@ -772,15 +772,18 @@
     const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-    // Outer 15% on the matching axis is the sibling-insert zone; the inner
-    // 70% is "child" — reliably the easiest target so dropping "under"
-    // another position (= make child) just works.
+    // Stack siblings: only the TOP edge inserts as a peer (sibling above).
+    // Dropping anywhere else — center or below — makes the dragged
+    // position a CHILD of the target (= reporting to it). This matches
+    // the org-chart mental model: a box drawn below another is a report.
+    //
+    // Row siblings: left edge = sibling before, right edge = sibling
+    // after, center = child.
     if (isRow) {
-      if (xPct < 0.15) return 'before-row';
-      if (xPct > 0.85) return 'after-row';
+      if (xPct < 0.20) return 'before-row';
+      if (xPct > 0.80) return 'after-row';
     } else {
-      if (yPct < 0.15) return 'before-stack';
-      if (yPct > 0.85) return 'after-stack';
+      if (yPct < 0.22) return 'before-stack';
     }
     return 'child';
   }
@@ -802,7 +805,7 @@
       html = `Can't drop <strong>${dragName}</strong> into its own subtree`;
       el.style.background = '#7f1d1d';
     } else if (kind === 'child') {
-      html = `Make <strong>${dragName}</strong> a child of <strong>${tgtName}</strong>`;
+      html = `<strong>${dragName}</strong> reports to <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
     } else if (kind === 'before') {       // legacy compat (unused after this commit)
       html = `Insert <strong>${dragName}</strong> before <strong>${tgtName}</strong>`;
