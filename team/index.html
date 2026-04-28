@@ -739,8 +739,11 @@
     const distBottom = 1 - yPct;
     const minDist = Math.min(distLeft, distRight, distTop, distBottom);
 
-    // Inner ~30% → "child" zone; otherwise the closest edge wins.
-    if (minDist > 0.30) return 'child';
+    // Inner ~56% × 56% (~31% of box area) → "child" zone; the outer 22% on
+    // each side becomes an edge zone. This gives the center plenty of room
+    // so dropping a sibling onto another sibling reliably nests it as a
+    // child rather than triggering a sibling-insert.
+    if (minDist > 0.22) return 'child';
     if (minDist === distLeft)   return 'before-row';
     if (minDist === distRight)  return 'after-row';
     if (minDist === distTop)    return 'before-stack';
