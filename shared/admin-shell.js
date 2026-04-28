@@ -80,7 +80,7 @@ export const ALL_ADMIN_TABS = [
   // tab in renderContextSwitcher's firstTabForPillar lookup).
   { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat'] },
   // Staff section — primary admin tabs (Mindbody-style)
-  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
+  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared'] },
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
   { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master', 'within', 'ranch', 'retreat'] },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
