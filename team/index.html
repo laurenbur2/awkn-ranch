@@ -576,8 +576,11 @@
   }
 
   // Insert dragged node as a sibling of target (same level) at position
-  // before/after target. Same cycle/root guards as moveNode.
-  function moveAsSibling(draggedId, targetId, before) {
+  // before/after target. Optional `orientation` ('row' | 'stack') updates
+  // the parent's layout so siblings end up arranged the way the user
+  // dropped — drop left/right of any target → parent becomes a row;
+  // drop top/bottom → parent becomes a stack.
+  function moveAsSibling(draggedId, targetId, before, orientation) {
     if (draggedId === targetId) return false;
     if (isDescendant(draggedId, targetId)) return false;
     if (draggedId === ORG.id) return false;
@@ -601,6 +604,9 @@
       return false;
     }
     targetParent.children.splice(before ? targetIdx : targetIdx + 1, 0, removed);
+
+    if (orientation === 'row') targetParent.layout = 'row';
+    else if (orientation === 'stack') delete targetParent.layout;
     return true;
   }
 
@@ -666,38 +672,36 @@
     `;
   }
 
-  // Determine which drop zone the cursor is in. Three options:
+  // Determine which drop zone the cursor is in. Five options:
   //   'child'        — cursor is in the box's center → become target's child
-  //   'before-row'   — cursor near the LEFT edge of a target inside a row
-  //   'after-row'    — cursor near the RIGHT edge of a target inside a row
-  //   'before-stack' — cursor near the TOP edge of a target inside a stack
-  //   'after-stack'  — cursor near the BOTTOM edge of a target inside a stack
-  // Sibling zones are only available when the target actually has siblings —
-  // i.e. it lives inside a .org-row or .org-stack ancestor.
+  //   'before-row'   — left edge   → insert as sibling and set parent's layout to row
+  //   'after-row'    — right edge  → insert as sibling and set parent's layout to row
+  //   'before-stack' — top edge    → insert as sibling and set parent's layout to stack
+  //   'after-stack'  — bottom edge → insert as sibling and set parent's layout to stack
+  // Drop zones are AVAILABLE on every box (regardless of current layout) as
+  // long as the box is not the root — dropping on a perpendicular edge swaps
+  // the parent's layout to whichever the user requested.
   function getDropZone(e, box) {
-    // Walk up to find whether this box is inside a row, stack, or singleton.
-    // We look at the box's wrapper (.org-child or .org-stack-item).
-    const stackItem = box.closest('.org-stack-item');
-    const rowChild  = box.closest('.org-child');
-    const rect = box.getBoundingClientRect();
+    // Root has no siblings — only "child" is meaningful.
+    if (box.dataset.id === ORG.id) return 'child';
 
-    // Inside a horizontal row of siblings — outer 38% on each side triggers
-    // sibling-insert; inner 24% becomes "child of this box".
-    if (rowChild && rowChild.parentElement?.classList.contains('org-row')) {
-      const xPct = (e.clientX - rect.left) / rect.width;
-      if (xPct < 0.38) return 'before-row';
-      if (xPct > 0.62) return 'after-row';
-      return 'child';
-    }
-    // Inside a vertical stack of siblings
-    if (stackItem && stackItem.parentElement?.classList.contains('org-stack')) {
-      const yPct = (e.clientY - rect.top) / rect.height;
-      if (yPct < 0.38) return 'before-stack';
-      if (yPct > 0.62) return 'after-stack';
-      return 'child';
-    }
-    // Singleton (only-child or root subtree) — no siblings to insert beside
-    return 'child';
+    const rect = box.getBoundingClientRect();
+    const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+
+    // Distance to each edge (0 = on edge, 0.5 = dead center).
+    const distLeft   = xPct;
+    const distRight  = 1 - xPct;
+    const distTop    = yPct;
+    const distBottom = 1 - yPct;
+    const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+
+    // Inner ~30% → "child" zone; otherwise the closest edge wins.
+    if (minDist > 0.30) return 'child';
+    if (minDist === distLeft)   return 'before-row';
+    if (minDist === distRight)  return 'after-row';
+    if (minDist === distTop)    return 'before-stack';
+    return 'after-stack';
   }
 
   function clearDropClasses() {
@@ -719,11 +723,23 @@
     } else if (kind === 'child') {
       html = `Make <strong>${dragName}</strong> a child of <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
-    } else if (kind === 'before') {
-      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">←</span> before <strong>${tgtName}</strong>`;
+    } else if (kind === 'before') {       // legacy compat (unused after this commit)
+      html = `Insert <strong>${dragName}</strong> before <strong>${tgtName}</strong>`;
       el.style.background = '#2a1f23';
-    } else if (kind === 'after') {
-      html = `Insert <strong>${dragName}</strong> after <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
+    } else if (kind === 'after') {        // legacy compat (unused after this commit)
+      html = `Insert <strong>${dragName}</strong> after <strong>${tgtName}</strong>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'before-row') {
+      html = `Place <strong>${dragName}</strong> <span class="hint-arrow">←</span> to the left of <strong>${tgtName}</strong>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'after-row') {
+      html = `Place <strong>${dragName}</strong> to the right of <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'before-stack') {
+      html = `Place <strong>${dragName}</strong> <span class="hint-arrow">↑</span> above <strong>${tgtName}</strong>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'after-stack') {
+      html = `Place <strong>${dragName}</strong> below <strong>${tgtName}</strong> <span class="hint-arrow">↓</span>`;
       el.style.background = '#2a1f23';
     }
     el.innerHTML = html;
@@ -786,19 +802,15 @@
           return;
         }
         const target = findNode(box.dataset.id);
-        if (zone === 'child') {
-          box.classList.add('drop-child');
-          updateDropHint('child', target);
-        } else if (zone === 'before-row' || zone === 'before-stack') {
-          box.classList.add(zone === 'before-row' ? 'drop-before-row' : 'drop-before-stack');
-          updateDropHint('before', target);
-        } else if (zone === 'after-row' || zone === 'after-stack') {
-          box.classList.add(zone === 'after-row' ? 'drop-after-row' : 'drop-after-stack');
-          updateDropHint('after', target);
-        } else {
-          box.classList.add('drop-child');
-          updateDropHint('child', target);
-        }
+        const cls = {
+          'child':        'drop-child',
+          'before-row':   'drop-before-row',
+          'after-row':    'drop-after-row',
+          'before-stack': 'drop-before-stack',
+          'after-stack':  'drop-after-stack',
+        }[zone] || 'drop-child';
+        box.classList.add(cls);
+        updateDropHint(zone, target);
       });
       box.addEventListener('dragleave', () => {
         // Don't clear here — dragover on adjacent boxes will refresh classes.
@@ -814,13 +826,11 @@
         if (!valid) return;
 
         let ok = false;
-        if (zone === 'before-row' || zone === 'before-stack') {
-          ok = moveAsSibling(dragId, targetId, true);
-        } else if (zone === 'after-row' || zone === 'after-stack') {
-          ok = moveAsSibling(dragId, targetId, false);
-        } else {
-          ok = moveNode(dragId, targetId);
-        }
+        if (zone === 'before-row')        ok = moveAsSibling(dragId, targetId, true,  'row');
+        else if (zone === 'after-row')    ok = moveAsSibling(dragId, targetId, false, 'row');
+        else if (zone === 'before-stack') ok = moveAsSibling(dragId, targetId, true,  'stack');
+        else if (zone === 'after-stack')  ok = moveAsSibling(dragId, targetId, false, 'stack');
+        else                              ok = moveNode(dragId, targetId);
         if (ok) {
           save();
           render();
