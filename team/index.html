@@ -875,22 +875,12 @@
         dragId = box.dataset.id;
         box.classList.add('dragging');
         document.body.classList.add('is-dragging');
-        // Reset auto-fit zoom for the duration of the drag so getBoundingClientRect
-        // and the cursor's clientX/Y agree on the same coordinate system. CSS
-        // `zoom` can desync these in Safari and route the drop to the wrong zone.
-        const tree = document.getElementById('orgTree');
-        if (tree) {
-          savedZoomDuringDrag = tree.style.zoom || '1';
-          tree.style.zoom = '1';
-        }
         e.dataTransfer.effectAllowed = 'move';
         try { e.dataTransfer.setData('text/plain', dragId); } catch (e) {}
       });
       box.addEventListener('dragend', () => {
         box.classList.remove('dragging');
         document.body.classList.remove('is-dragging');
-        // Re-apply auto-fit so the chart re-shrinks to fit the viewport.
-        autoFitChart();
         clearDropClasses();
         hideDropHint();
         dragId = null;
