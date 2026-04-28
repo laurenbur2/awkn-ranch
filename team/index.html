@@ -295,7 +295,7 @@
       <button class="tb-btn" id="btnImport">Import JSON</button>
       <button class="tb-btn tb-btn-danger" id="btnReset">Reset to Default</button>
       <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
-      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag a position onto another to make it report there · Drop on the very top edge to insert as a peer · ⌘Z / Ctrl-Z to undo</div>
+      <div class="org-toolbar-msg">Hover any box for actions · Drag a position onto another · Drop in the middle/bottom = report · Top edge = peer above · Left/right edge = peer beside · ⌘Z / Ctrl-Z to undo</div>
     </div>
     <div id="dropHint" class="drop-hint" aria-live="polite"></div>
 
@@ -637,10 +637,12 @@
   }
 
   // Insert dragged node as a sibling of target (same level) at position
-  // before/after target. The parent's layout stays unchanged — only the one
-  // dragged node moves. Layout (row vs stack) is controlled separately via
-  // the parent's edit modal.
-  function moveAsSibling(draggedId, targetId, before) {
+  // before/after target. Optional `orientation` ('row' | 'stack') updates
+  // the target's parent layout so the resulting arrangement actually
+  // displays the way the user dropped — drop on left/right edges sets
+  // parent.layout = 'row' (siblings go side-by-side); top edge sets it
+  // back to stack. Without an orientation, layout stays as-is.
+  function moveAsSibling(draggedId, targetId, before, orientation) {
     if (draggedId === targetId) return false;
     if (isDescendant(draggedId, targetId)) return false;
     if (draggedId === ORG.id) return false;
@@ -664,6 +666,9 @@
       return false;
     }
     targetParent.children.splice(before ? targetIdx : targetIdx + 1, 0, removed);
+
+    if (orientation === 'row') targetParent.layout = 'row';
+    else if (orientation === 'stack') delete targetParent.layout;
     return true;
   }
 
@@ -742,41 +747,41 @@
     `;
   }
 
-  // Determine which drop zone the cursor is in. Three meaningful options:
-  //   'child'        — center → become target's child
-  //   'before-*'     — appropriate edge → insert as sibling before target
-  //   'after-*'      — appropriate edge → insert as sibling after target
-  //
-  // The relevant edge depends on the target's parent layout:
-  //   - row siblings → left edge = before, right edge = after
-  //   - stack siblings → top edge = before, bottom edge = after
-  // Drops on the perpendicular edge fall through to "child" so the user
-  // doesn't accidentally trigger a sibling-insert at a 90° angle from the
-  // actual layout.
+  // Determine which drop zone the cursor is in. Five outcomes:
+  //   'child'        — drop below or in the center → become target's report
+  //   'before-stack' — top of target → place above as a peer (stack layout)
+  //   'before-row'   — left of target → place beside as a peer (row layout)
+  //   'after-row'    — right of target → place beside as a peer (row layout)
+  // Row drops set parent.layout = 'row' so the new arrangement actually
+  // renders side-by-side; stack drops set parent.layout = stack.
   function getDropZone(e, box) {
     // Root has no siblings — only "child" is meaningful.
     if (box.dataset.id === ORG.id) return 'child';
 
     const parent = findParent(box.dataset.id);
     if (!parent) return 'child';
-    const isRow = parent.layout === 'row';
 
     const rect = box.getBoundingClientRect();
     const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-    // Sibling-insert is only triggered when the cursor is solidly in a
-    // CORNER of the target (top 25% × outer 25%). Everything else — center,
-    // any of the bottom, the middle-side bands — is "child" (= report).
-    // This makes "drop below to make report" the overwhelmingly dominant
-    // gesture, with sibling-insert as a deliberate corner-targeting move.
-    const inTop = yPct < 0.25;
-    if (isRow) {
-      if (inTop && xPct < 0.20) return 'before-row';
-      if (inTop && xPct > 0.80) return 'after-row';
-    } else {
-      if (inTop) return 'before-stack';
-    }
+    // Four regions per box, regardless of the parent's current layout —
+    // each maps to a clear, predictable result:
+    //
+    //   ┌─────────────────┐
+    //   │       TOP       │  → place above (peer)
+    //   │ LEFT  ·  RIGHT  │  → place beside (peer)   ← parent flips to row
+    //   │      BOTTOM     │  → place below (child)
+    //   └─────────────────┘
+    //
+    // "Beside" requires the parent to be a row, so dropping on left/right
+    // sets parent.layout = 'row'. Use the layout toggle button on the
+    // parent to flip back to a stack if needed.
+    if (yPct < 0.20) return 'before-stack';
+    if (yPct > 0.65) return 'child';
+    // Middle vertical band — left/right edges are peer-beside, center is child.
+    if (xPct < 0.28) return 'before-row';
+    if (xPct > 0.72) return 'after-row';
     return 'child';
   }
 
@@ -909,12 +914,18 @@
         if (!valid) return;
 
         let ok = false;
-        if (zone === 'before-row' || zone === 'before-stack') {
+        if (zone === 'before-row') {
           pushUndo();
-          ok = moveAsSibling(dragId, targetId, true);
-        } else if (zone === 'after-row' || zone === 'after-stack') {
+          ok = moveAsSibling(dragId, targetId, true, 'row');
+        } else if (zone === 'after-row') {
           pushUndo();
-          ok = moveAsSibling(dragId, targetId, false);
+          ok = moveAsSibling(dragId, targetId, false, 'row');
+        } else if (zone === 'before-stack') {
+          pushUndo();
+          ok = moveAsSibling(dragId, targetId, true, 'stack');
+        } else if (zone === 'after-stack') {
+          pushUndo();
+          ok = moveAsSibling(dragId, targetId, false, 'stack');
         } else {
           pushUndo();
           ok = moveNode(dragId, targetId);
