@@ -87,26 +87,41 @@
     .org-node.drop-child  { border-color: #d4883a; box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.20); transform: translateY(-1px); }
     .org-node.drop-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important; cursor: not-allowed; }
 
-    /* Sibling-insert indicators — orange bar on the appropriate edge of the
-       target box. Row-context = vertical bars on left/right; stack-context =
-       horizontal bars on top/bottom. */
+    /* Sibling-insert indicators — bright orange bar on the appropriate edge
+       of the target box. Row-context = vertical bars on left/right;
+       stack-context = horizontal bars on top/bottom. The bar pulses to draw
+       attention while a drag is in progress. */
+    @keyframes dropPulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.65; }
+    }
     .org-node.drop-before-row::before,
     .org-node.drop-after-row::after {
-      content: ""; position: absolute; top: -6px; bottom: -6px; width: 4px;
-      background: #d4883a; border-radius: 2px;
-      box-shadow: 0 0 0 2px rgba(212, 136, 58, 0.22);
+      content: ""; position: absolute; top: -10px; bottom: -10px; width: 7px;
+      background: #d4883a; border-radius: 4px;
+      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
+      animation: dropPulse 0.9s ease-in-out infinite;
+      z-index: 5;
     }
-    .org-node.drop-before-row::before { left: -12px; }
-    .org-node.drop-after-row::after  { right: -12px; }
+    .org-node.drop-before-row::before { left: -14px; }
+    .org-node.drop-after-row::after  { right: -14px; }
 
     .org-node.drop-before-stack::before,
     .org-node.drop-after-stack::after {
-      content: ""; position: absolute; left: -6px; right: -6px; height: 4px;
-      background: #d4883a; border-radius: 2px;
-      box-shadow: 0 0 0 2px rgba(212, 136, 58, 0.22);
+      content: ""; position: absolute; left: -10px; right: -10px; height: 7px;
+      background: #d4883a; border-radius: 4px;
+      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
+      animation: dropPulse 0.9s ease-in-out infinite;
+      z-index: 5;
     }
-    .org-node.drop-before-stack::before { top: -10px; }
-    .org-node.drop-after-stack::after  { bottom: -10px; }
+    .org-node.drop-before-stack::before { top: -12px; }
+    .org-node.drop-after-stack::after  { bottom: -12px; }
+
+    /* Faint half-tint on the box itself so it's obvious which side wins. */
+    .org-node.drop-before-row  { background-image: linear-gradient(to right,  rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
+    .org-node.drop-after-row   { background-image: linear-gradient(to left,   rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
+    .org-node.drop-before-stack{ background-image: linear-gradient(to bottom, rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
+    .org-node.drop-after-stack { background-image: linear-gradient(to top,    rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
 
     .org-node-name { font-size: 0.95rem; font-weight: 700; color: #111827; line-height: 1.2; }
     .org-node-person { font-size: 0.78rem; color: #4b5563; font-weight: 500; }
@@ -155,6 +170,18 @@
       margin-top: 3rem; text-align: center; font-size: 0.78rem; color: #9ca3af;
     }
     .org-foot small { display: block; margin-top: 0.4rem; opacity: 0.7; }
+
+    /* Floating hint shown during a drag */
+    .drop-hint {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: #2a1f23; color: #fff; padding: 0.55rem 1rem; border-radius: 999px;
+      font-size: 0.84rem; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
+      z-index: 100;
+    }
+    .drop-hint.show { opacity: 1; }
+    .drop-hint .hint-arrow { color: #fbbf24; margin: 0 0.35rem; }
 
     /* Auth banner */
     .auth-banner {
@@ -243,8 +270,9 @@
       <button class="tb-btn" id="btnImport">Import JSON</button>
       <button class="tb-btn tb-btn-danger" id="btnReset">Reset to Default</button>
       <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
-      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag to reparent</div>
+      <div class="org-toolbar-msg">Hover any box for actions · Click to edit · Drag onto a box (center = make child, edges = insert as sibling at that level)</div>
     </div>
+    <div id="dropHint" class="drop-hint" aria-live="polite"></div>
 
     <div class="org-tree" id="orgTree"></div>
 
@@ -653,18 +681,19 @@
     const rowChild  = box.closest('.org-child');
     const rect = box.getBoundingClientRect();
 
-    // Inside a horizontal row of siblings
+    // Inside a horizontal row of siblings — outer 38% on each side triggers
+    // sibling-insert; inner 24% becomes "child of this box".
     if (rowChild && rowChild.parentElement?.classList.contains('org-row')) {
       const xPct = (e.clientX - rect.left) / rect.width;
-      if (xPct < 0.28) return 'before-row';
-      if (xPct > 0.72) return 'after-row';
+      if (xPct < 0.38) return 'before-row';
+      if (xPct > 0.62) return 'after-row';
       return 'child';
     }
     // Inside a vertical stack of siblings
     if (stackItem && stackItem.parentElement?.classList.contains('org-stack')) {
       const yPct = (e.clientY - rect.top) / rect.height;
-      if (yPct < 0.28) return 'before-stack';
-      if (yPct > 0.72) return 'after-stack';
+      if (yPct < 0.38) return 'before-stack';
+      if (yPct > 0.62) return 'after-stack';
       return 'child';
     }
     // Singleton (only-child or root subtree) — no siblings to insert beside
@@ -675,6 +704,34 @@
     document.querySelectorAll('.org-node').forEach(n => {
       n.classList.remove('drop-child', 'drop-invalid', 'drop-before-row', 'drop-after-row', 'drop-before-stack', 'drop-after-stack');
     });
+  }
+
+  function updateDropHint(kind, target) {
+    const el = document.getElementById('dropHint');
+    if (!el) return;
+    const dragged = findNode(dragId);
+    const dragName = dragged ? esc(dragged.name) : 'this';
+    const tgtName  = target ? esc(target.name) : '?';
+    let html = '';
+    if (kind === 'invalid') {
+      html = `Can't drop <strong>${dragName}</strong> into its own subtree`;
+      el.style.background = '#7f1d1d';
+    } else if (kind === 'child') {
+      html = `Make <strong>${dragName}</strong> a child of <strong>${tgtName}</strong>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'before') {
+      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">←</span> before <strong>${tgtName}</strong>`;
+      el.style.background = '#2a1f23';
+    } else if (kind === 'after') {
+      html = `Insert <strong>${dragName}</strong> after <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
+      el.style.background = '#2a1f23';
+    }
+    el.innerHTML = html;
+    el.classList.add('show');
+  }
+  function hideDropHint() {
+    const el = document.getElementById('dropHint');
+    if (el) el.classList.remove('show');
   }
 
   // SVG icons (kept inline so the file stays standalone)
@@ -713,6 +770,7 @@
       box.addEventListener('dragend', () => {
         box.classList.remove('dragging');
         clearDropClasses();
+        hideDropHint();
         dragId = null;
       });
       box.addEventListener('dragover', (e) => {
@@ -724,20 +782,22 @@
         clearDropClasses();
         if (!valid) {
           box.classList.add('drop-invalid');
+          updateDropHint('invalid', findNode(box.dataset.id));
           return;
         }
+        const target = findNode(box.dataset.id);
         if (zone === 'child') {
           box.classList.add('drop-child');
-        } else if (zone === 'before-row') {
-          box.classList.add('drop-before-row');
-        } else if (zone === 'after-row') {
-          box.classList.add('drop-after-row');
-        } else if (zone === 'before-stack') {
-          box.classList.add('drop-before-stack');
-        } else if (zone === 'after-stack') {
-          box.classList.add('drop-after-stack');
+          updateDropHint('child', target);
+        } else if (zone === 'before-row' || zone === 'before-stack') {
+          box.classList.add(zone === 'before-row' ? 'drop-before-row' : 'drop-before-stack');
+          updateDropHint('before', target);
+        } else if (zone === 'after-row' || zone === 'after-stack') {
+          box.classList.add(zone === 'after-row' ? 'drop-after-row' : 'drop-after-stack');
+          updateDropHint('after', target);
         } else {
-          box.classList.add('drop-child'); // fallback
+          box.classList.add('drop-child');
+          updateDropHint('child', target);
         }
       });
       box.addEventListener('dragleave', () => {
