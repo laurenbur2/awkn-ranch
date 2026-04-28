@@ -93,8 +93,8 @@ export const ALL_ADMIN_TABS = [
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
   { id: 'within-schedule', label: 'Schedule', href: 'within-schedule.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
-  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
+  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
   // Old events.html still exists at its URL but is no longer in the pillar
   // nav — it's been superseded by the unified Events page (venue-events.html)
