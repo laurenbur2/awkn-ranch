@@ -81,12 +81,12 @@ const TAB_ICONS = {
 export const ALL_ADMIN_TABS = [
   // Pillar-exclusive landing tabs (listed first so they win as the pillar's first-available
   // tab in renderContextSwitcher's firstTabForPillar lookup).
-  { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat'] },
+  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master'] },
+  { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat', 'master'] },
   { id: 'venue-events', label: 'Events', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   // Staff section — primary admin tabs (Mindbody-style)
   { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared'] },
   { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
-  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master'] },
   { id: 'within-schedule', label: 'Schedule', href: 'within-schedule.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
