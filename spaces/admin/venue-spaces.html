@@ -17,7 +17,8 @@
   <link rel="stylesheet" href="../../styles/site.css">
   <link rel="stylesheet" href="../../styles/tailwind.out.css">
   <style>
-    :root { --vs-day-w: 60px; --vs-info-w: 220px; --vs-row-h: 90px; }
+    :root { --vs-day-w: 60px; --vs-info-w: 220px; --vs-row-h: 90px; --vs-day-count: 7; }
+    body.vs-mode-month { --vs-day-w: 38px; --vs-row-h: 70px; }
 
     .vs-wrap { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
     .vs-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
@@ -43,6 +44,17 @@
     .vs-tb-btn:hover { background: #f9fafb; }
     .vs-tb-range { font-size: 0.92rem; font-weight: 600; color: #111827; padding: 0 0.5rem; flex: 1; text-align: center; }
 
+    .vs-view-toggle {
+      display: inline-flex; background: #f3f4f6; border-radius: 8px; padding: 3px; gap: 2px;
+    }
+    .vs-view-btn {
+      padding: 0.42rem 0.85rem; border: none; background: transparent;
+      font: inherit; font-size: 0.82rem; font-weight: 600; color: #6b7280;
+      border-radius: 6px; cursor: pointer;
+    }
+    .vs-view-btn:hover:not(.active) { color: #111827; }
+    .vs-view-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
     /* Resource grid */
     .vs-grid-wrap {
       background: #fff; border: 1px solid var(--border, #e5e7eb);
@@ -50,7 +62,7 @@
     }
     .vs-grid {
       display: flex; flex-direction: column;
-      min-width: calc(var(--vs-info-w) + var(--vs-day-w) * 7);
+      min-width: calc(var(--vs-info-w) + var(--vs-day-w) * var(--vs-day-count));
     }
 
     .vs-header-row {
@@ -107,12 +119,17 @@
       background-image: repeating-linear-gradient(
         to right,
         #fff 0,
-        #fff calc(100% / 7 - 1px),
-        #f3f4f6 calc(100% / 7 - 1px),
-        #f3f4f6 calc(100% / 7)
+        #fff calc(100% / var(--vs-day-count) - 1px),
+        #f3f4f6 calc(100% / var(--vs-day-count) - 1px),
+        #f3f4f6 calc(100% / var(--vs-day-count))
       );
-      min-width: calc(var(--vs-day-w) * 7);
+      min-width: calc(var(--vs-day-w) * var(--vs-day-count));
     }
+    body.vs-mode-month .vs-day-dow { font-size: 0.5rem; }
+    body.vs-mode-month .vs-day-date { font-size: 0.7rem; }
+    body.vs-mode-month .vs-booking-name  { font-size: 0.62rem; }
+    body.vs-mode-month .vs-booking-sub   { display: none; }
+    body.vs-mode-month .vs-booking { padding: 0.18rem 0.3rem; top: 5px; bottom: 5px; }
     /* Subtle shading for today's column inside the timeline */
     .vs-today-overlay {
       position: absolute; top: 0; bottom: 0;
@@ -216,6 +233,10 @@
         <button class="vs-tb-btn" id="vsToday">Today</button>
         <button class="vs-tb-btn" id="vsNext" aria-label="Next">→</button>
         <span class="vs-tb-range" id="vsRange">—</span>
+        <div class="vs-view-toggle">
+          <button class="vs-view-btn active" data-mode="week">Week</button>
+          <button class="vs-view-btn" data-mode="month">Month</button>
+        </div>
       </div>
 
       <div class="vs-grid-wrap">

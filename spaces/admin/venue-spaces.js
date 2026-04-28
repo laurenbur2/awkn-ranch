@@ -8,12 +8,22 @@
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage } from '../../shared/admin-shell.js';
 
-const DAYS_VISIBLE = 7;
-
 // ============================================================================
 // State
 // ============================================================================
-let viewStart = startOfWeek(new Date()); // Sunday at 00:00 of the current week
+// View mode: 'week' (7 days, Sun → Sat) or 'month' (the full calendar month).
+// Persisted to localStorage so the user's last preference sticks.
+let viewMode = (() => {
+  try { return localStorage.getItem('awkn.venueSpaces.viewMode') === 'month' ? 'month' : 'week'; }
+  catch (e) { return 'week'; }
+})();
+let viewStart = viewMode === 'month' ? startOfMonth(new Date()) : startOfWeek(new Date());
+
+// Number of days currently visible in the resource calendar.
+function daysVisible() {
+  if (viewMode === 'month') return daysInMonth(viewStart);
+  return 7;
+}
 let allSpaces = [];        // rentable spaces + their derived rate info
 let allBookings = [];      // crm_leads bookings overlapping the window
 let allStages = [];        // pipeline stages (for status pill class)
@@ -40,7 +50,7 @@ let allStages = [];        // pipeline stages (for status pill class)
 // ============================================================================
 async function loadAll() {
   const winStart = new Date(viewStart);
-  const winEnd = addDays(viewStart, DAYS_VISIBLE);
+  const winEnd = addDays(viewStart, daysVisible());
 
   const [spacesRes, leadsRes, stagesRes] = await Promise.all([
     supabase
@@ -84,15 +94,35 @@ async function loadAll() {
 // Render
 // ============================================================================
 function render() {
+  // Sync DOM-level state (CSS class + custom property) so the gridlines and
+  // min-width math respect the current mode.
+  document.body.classList.toggle('vs-mode-month', viewMode === 'month');
+  document.querySelector('.vs-grid')?.style?.setProperty('--vs-day-count', String(daysVisible()));
+  document.querySelectorAll('.vs-view-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === viewMode));
   renderRange();
   renderStats();
   renderGrid();
+  // After the grid is in the DOM, set the custom property on it directly
+  // (the renderGrid call replaces the .vs-grid contents).
+  document.querySelector('.vs-grid')?.style?.setProperty('--vs-day-count', String(daysVisible()));
 }
 
 function renderRange() {
-  const end = addDays(viewStart, DAYS_VISIBLE - 1);
+  const end = addDays(viewStart, daysVisible() - 1);
   const fmt = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  // Compare to "this week" so the label reads "This week", "Next week", etc.
+
+  if (viewMode === 'month') {
+    const monthLabel = viewStart.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    const today = new Date();
+    let prefix = '';
+    if (isSameMonth(viewStart, today)) prefix = 'This month · ';
+    else if (isSameMonth(viewStart, new Date(today.getFullYear(), today.getMonth() + 1, 1))) prefix = 'Next month · ';
+    else if (isSameMonth(viewStart, new Date(today.getFullYear(), today.getMonth() - 1, 1))) prefix = 'Last month · ';
+    setText('vsRange', `${prefix}${monthLabel}`);
+    return;
+  }
+
+  // Week mode
   const thisWeekStart = startOfWeek(new Date());
   const weekDelta = Math.round((viewStart - thisWeekStart) / (7 * 86400000));
   let prefix = '';
@@ -108,9 +138,9 @@ function renderStats() {
   setText('vsStatBookings', String(allBookings.length));
 
   // Days booked = (# bookings) since each booking is single-day in the
-  // current data model. Days available = spaces × DAYS_VISIBLE.
+  // current data model. Days available = spaces × daysVisible().
   const daysBooked = allBookings.length;
-  const totalDays  = allSpaces.length * DAYS_VISIBLE;
+  const totalDays  = allSpaces.length * daysVisible();
   setText('vsStatOccupancy', totalDays > 0 ? `${daysBooked} / ${totalDays}` : '—');
 
   const revenue = allBookings.reduce((sum, b) => sum + Number(b.actual_revenue || b.estimated_value || 0), 0);
@@ -128,7 +158,7 @@ function renderGrid() {
 
   // Build day list for header
   const days = [];
-  for (let i = 0; i < DAYS_VISIBLE; i++) days.push(addDays(viewStart, i));
+  for (let i = 0; i < daysVisible(); i++) days.push(addDays(viewStart, i));
   const todayKey = ymd(new Date());
 
   // Header
@@ -169,15 +199,15 @@ function renderGrid() {
     // Per-day empty cells (clickable for new event)
     const emptyCells = days.map((d, idx) => {
       const dateKey = ymd(d);
-      const left = (idx / DAYS_VISIBLE) * 100;
-      const width = (1 / DAYS_VISIBLE) * 100;
+      const left = (idx / daysVisible()) * 100;
+      const width = (1 / daysVisible()) * 100;
       return `<div class="vs-empty-cell" data-space-id="${esc(space.id)}" data-date="${dateKey}" style="left:${left}%; width:${width}%;"></div>`;
     }).join('');
 
     // Today's column tint inside this row
     const todayIdx = days.findIndex(d => ymd(d) === todayKey);
     const todayOverlay = todayIdx >= 0
-      ? `<div class="vs-today-overlay" style="left:${(todayIdx / DAYS_VISIBLE) * 100}%; width:${(1 / DAYS_VISIBLE) * 100}%;"></div>`
+      ? `<div class="vs-today-overlay" style="left:${(todayIdx / daysVisible()) * 100}%; width:${(1 / daysVisible()) * 100}%;"></div>`
       : '';
 
     // Booking blocks
@@ -225,8 +255,8 @@ function renderBookingBlock(b, days) {
   const idx = days.findIndex(d => ymd(d) === b.event_date);
   if (idx < 0) return '';
   // Single-day blocks for now (the schema treats event_date as a single day).
-  const left  = (idx / DAYS_VISIBLE) * 100;
-  const width = (1 / DAYS_VISIBLE) * 100;
+  const left  = (idx / daysVisible()) * 100;
+  const width = (1 / daysVisible()) * 100;
   const guest = ((b.first_name || '') + ' ' + (b.last_name || '')).trim() || '(unnamed)';
   const slug  = (b.stage?.slug || '').toLowerCase();
   let cls = '';
@@ -303,20 +333,45 @@ function closeBookingModal() {
 // Toolbar
 // ============================================================================
 function bindToolbar() {
-  document.getElementById('vsPrev')?.addEventListener('click', async () => {
-    viewStart = addDays(viewStart, -7);
+  const goPrev = async () => {
+    if (viewMode === 'month') {
+      viewStart = new Date(viewStart.getFullYear(), viewStart.getMonth() - 1, 1);
+    } else {
+      viewStart = addDays(viewStart, -7);
+    }
     await loadAll();
     render();
-  });
-  document.getElementById('vsNext')?.addEventListener('click', async () => {
-    viewStart = addDays(viewStart, 7);
+  };
+  const goNext = async () => {
+    if (viewMode === 'month') {
+      viewStart = new Date(viewStart.getFullYear(), viewStart.getMonth() + 1, 1);
+    } else {
+      viewStart = addDays(viewStart, 7);
+    }
     await loadAll();
     render();
-  });
-  document.getElementById('vsToday')?.addEventListener('click', async () => {
-    viewStart = startOfWeek(new Date());
+  };
+  const goToday = async () => {
+    viewStart = viewMode === 'month' ? startOfMonth(new Date()) : startOfWeek(new Date());
     await loadAll();
     render();
+  };
+  document.getElementById('vsPrev')?.addEventListener('click', goPrev);
+  document.getElementById('vsNext')?.addEventListener('click', goNext);
+  document.getElementById('vsToday')?.addEventListener('click', goToday);
+
+  // View toggle (Week / Month) — switching modes resets viewStart to the
+  // current week or month so the user lands on something sensible.
+  document.querySelectorAll('.vs-view-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const mode = btn.dataset.mode;
+      if (mode === viewMode) return;
+      viewMode = mode;
+      try { localStorage.setItem('awkn.venueSpaces.viewMode', mode); } catch (e) { /* ignore */ }
+      viewStart = viewMode === 'month' ? startOfMonth(viewStart) : startOfWeek(viewStart);
+      await loadAll();
+      render();
+    });
   });
 }
 
@@ -353,6 +408,15 @@ function startOfWeek(d) {
   const x = startOfDay(d);
   x.setDate(x.getDate() - x.getDay());
   return x;
+}
+function startOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+function daysInMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+}
+function isSameMonth(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 }
 function addDays(d, n) {
   const x = new Date(d);
