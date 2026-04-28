@@ -32,6 +32,21 @@
       padding: 0.7rem 0.85rem; margin-bottom: 0.75rem;
       box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
+
+    .ve-view-toggle {
+      display: inline-flex; background: #f3f4f6; border-radius: 8px; padding: 3px; gap: 2px;
+    }
+    .ve-view-btn {
+      padding: 0.42rem 0.85rem; border: none; background: transparent;
+      font: inherit; font-size: 0.84rem; font-weight: 600; color: #6b7280;
+      border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .ve-view-btn:hover:not(.active) { color: #111827; }
+    .ve-view-btn.active {
+      background: #fff; color: #111827;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .ve-view-btn svg { width: 14px; height: 14px; }
     .ve-search {
       flex: 1 1 240px;
       position: relative;
@@ -104,11 +119,80 @@
     }
     .ve-empty strong { color: #2a1f23; display: block; margin-bottom: 0.4rem; }
 
+    /* Calendar view */
+    .ve-cal-wrap { display: none; }
+    body.ve-mode-calendar .ve-cal-wrap { display: block; }
+    body.ve-mode-calendar .ve-table-wrap { display: none; }
+
+    .ve-cal-toolbar {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px 12px 0 0; padding: 0.65rem 0.85rem;
+      border-bottom: none;
+    }
+    .ve-cal-nav {
+      width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e5e7eb;
+      background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #4b5563;
+    }
+    .ve-cal-nav:hover { background: #f9fafb; color: #111827; }
+    .ve-cal-month { font-size: 1rem; font-weight: 700; color: #111827; padding: 0 0.6rem; flex: 1; }
+    .ve-cal-today {
+      padding: 0.4rem 0.85rem; border-radius: 6px; border: 1px solid #e5e7eb;
+      background: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; color: #374151; cursor: pointer;
+    }
+    .ve-cal-today:hover { background: #f9fafb; }
+
+    .ve-cal-grid {
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-top: none;
+      border-radius: 0 0 12px 12px; overflow: hidden;
+      display: grid; grid-template-columns: repeat(7, 1fr);
+    }
+    .ve-cal-dow {
+      padding: 0.5rem 0.6rem; font-size: 0.66rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: #6b7280; border-bottom: 1px solid #f3f4f6;
+      background: #fafafa;
+    }
+    .ve-cal-day {
+      min-height: 96px;
+      border-right: 1px solid #f3f4f6;
+      border-bottom: 1px solid #f3f4f6;
+      padding: 0.35rem 0.45rem 0.4rem;
+      display: flex; flex-direction: column; gap: 0.2rem;
+      position: relative;
+    }
+    .ve-cal-day:nth-child(7n+1) { /* first of week — no */ }
+    .ve-cal-day.other-month { background: #fafafa; }
+    .ve-cal-day.other-month .ve-cal-daynum { color: #d1d5db; }
+    .ve-cal-day.is-today { background: #fef9f3; }
+    .ve-cal-day.is-today .ve-cal-daynum { color: #d4883a; font-weight: 700; }
+    .ve-cal-daynum { font-size: 0.78rem; font-weight: 600; color: #4b5563; }
+
+    .ve-cal-event {
+      font-size: 0.72rem; font-weight: 600; line-height: 1.2;
+      padding: 0.22rem 0.4rem; border-radius: 4px;
+      cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      background: #f0f9ff; color: #0c5a85; border-left: 3px solid #0c5a85;
+    }
+    .ve-cal-event:hover { filter: brightness(0.96); }
+    .ve-cal-event.stage-confirmed { background: #ecfdf5; color: #065f46; border-left-color: #16a34a; }
+    .ve-cal-event.stage-deposit   { background: #fef3c7; color: #78350f; border-left-color: #d97706; }
+    .ve-cal-event.stage-signed    { background: #dbeafe; color: #1e3a8a; border-left-color: #2563eb; }
+    .ve-cal-event.stage-lost      { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; opacity: 0.55; }
+    .ve-cal-more {
+      font-size: 0.66rem; color: #6b7280; padding: 0.05rem 0.4rem; cursor: default;
+    }
+
     @media (max-width: 720px) {
       .ve-table .col-amount, .ve-table .col-type { display: none; }
+      .ve-cal-day { min-height: 60px; }
+      .ve-cal-event { font-size: 0.66rem; padding: 0.18rem 0.3rem; }
     }
     @media (max-width: 540px) {
       .ve-table .col-time { display: none; }
+      .ve-cal-day { min-height: 48px; padding: 0.2rem 0.3rem; }
+      .ve-cal-dow { font-size: 0.6rem; padding: 0.4rem 0.3rem; }
     }
   </style>
 </head>
@@ -145,6 +229,16 @@
       </div>
 
       <div class="ve-controls">
+        <div class="ve-view-toggle">
+          <button class="ve-view-btn active" data-mode="list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            List
+          </button>
+          <button class="ve-view-btn" data-mode="calendar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Calendar
+          </button>
+        </div>
         <div class="ve-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="search" id="searchInput" placeholder="Search by client name, email, space, or notes…" autocomplete="off">
@@ -168,6 +262,20 @@
             <option value="all">All spaces</option>
           </select>
         </div>
+      </div>
+
+      <div class="ve-cal-wrap">
+        <div class="ve-cal-toolbar">
+          <button class="ve-cal-nav" id="calPrev" aria-label="Previous month">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="ve-cal-nav" id="calNext" aria-label="Next month">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <span class="ve-cal-month" id="calMonth">—</span>
+          <button class="ve-cal-today" id="calToday">Today</button>
+        </div>
+        <div class="ve-cal-grid" id="calGrid"></div>
       </div>
 
       <div class="ve-table-wrap">

@@ -19,6 +19,12 @@ let filterState = {
   stage:  'all',
   space:  'all',
 };
+// View mode: 'list' (default — table of events) or 'calendar' (month grid).
+// Persisted to localStorage so the user's last preference sticks.
+let viewMode = 'list';
+// Month being displayed in calendar mode (anchored at the 1st of the month
+// in local time). Independent of the filterState.month dropdown.
+let calMonthAnchor = startOfMonth(new Date());
 
 (async function () {
   await initAdminPage({
@@ -26,6 +32,13 @@ let filterState = {
     section: 'staff',
     requiredPermission: 'view_crm',
     onReady: async () => {
+      // Restore last view-mode preference
+      try {
+        const saved = localStorage.getItem('awkn.venueEvents.viewMode');
+        if (saved === 'calendar' || saved === 'list') viewMode = saved;
+      } catch (e) { /* ignore */ }
+      applyViewMode();
+
       await loadAll();
       bindControls();
       render();
@@ -152,6 +165,44 @@ function bindControls() {
     filterState.space = e.target.value;
     render();
   });
+
+  // View toggle (List / Calendar)
+  document.querySelectorAll('.ve-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      if (mode === viewMode) return;
+      viewMode = mode;
+      try { localStorage.setItem('awkn.venueEvents.viewMode', mode); } catch (e) { /* ignore */ }
+      applyViewMode();
+      render();
+    });
+  });
+
+  // Calendar month nav
+  document.getElementById('calPrev')?.addEventListener('click', () => {
+    calMonthAnchor = new Date(calMonthAnchor.getFullYear(), calMonthAnchor.getMonth() - 1, 1);
+    if (viewMode === 'calendar') renderCalendar();
+  });
+  document.getElementById('calNext')?.addEventListener('click', () => {
+    calMonthAnchor = new Date(calMonthAnchor.getFullYear(), calMonthAnchor.getMonth() + 1, 1);
+    if (viewMode === 'calendar') renderCalendar();
+  });
+  document.getElementById('calToday')?.addEventListener('click', () => {
+    calMonthAnchor = startOfMonth(new Date());
+    if (viewMode === 'calendar') renderCalendar();
+  });
+}
+
+function applyViewMode() {
+  document.body.classList.toggle('ve-mode-calendar', viewMode === 'calendar');
+  document.querySelectorAll('.ve-view-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === viewMode);
+  });
+  // The month-filter dropdown only really makes sense in list mode — it's
+  // redundant with the calendar's own prev/next nav. Hide its label group
+  // on calendar mode so the controls bar isn't confusing.
+  const monthGroup = document.getElementById('monthFilter')?.closest('.ve-control-group');
+  if (monthGroup) monthGroup.style.display = viewMode === 'calendar' ? 'none' : '';
 }
 
 // ============================================================================
@@ -202,6 +253,123 @@ function render() {
   const filtered = applyFilters(allEvents);
   renderStats();
   renderTable(filtered);
+  if (viewMode === 'calendar') renderCalendar();
+}
+
+// ============================================================================
+// Calendar (month grid)
+// ============================================================================
+function startOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+function renderCalendar() {
+  const month = calMonthAnchor.getMonth();
+  const year  = calMonthAnchor.getFullYear();
+  const monthLabel = calMonthAnchor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  setText('calMonth', monthLabel);
+
+  // 6-week grid starting on Sunday so it's stable across months.
+  const firstOfMonth = new Date(year, month, 1);
+  const gridStart = new Date(firstOfMonth);
+  gridStart.setDate(gridStart.getDate() - gridStart.getDay()); // back up to Sunday
+
+  // Bucket events for the visible window by date for fast lookup.
+  // Use the search/stage/space filters here too — calendar respects them —
+  // but ignore the month-filter dropdown since calendar nav controls month.
+  const visibleEvents = allEvents.filter(e => {
+    if (!e.event_date) return false;
+    if (filterState.stage !== 'all' && e.stage?.slug !== filterState.stage) return false;
+    if (filterState.space !== 'all' && e.space_id !== filterState.space) return false;
+    if (filterState.search) {
+      const hay = [
+        e.first_name, e.last_name, e.email, e.phone,
+        e.space?.name, e.event_type, e.notes, e.internal_staff_notes,
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(filterState.search)) return false;
+    }
+    return true;
+  });
+
+  const eventsByDate = new Map();
+  for (const ev of visibleEvents) {
+    const arr = eventsByDate.get(ev.event_date) || [];
+    arr.push(ev);
+    eventsByDate.set(ev.event_date, arr);
+  }
+  // Sort each day's events by start time.
+  for (const arr of eventsByDate.values()) {
+    arr.sort((a, b) => (a.event_start_time || '').localeCompare(b.event_start_time || ''));
+  }
+
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  const todayKey_ = todayKey();
+
+  // Day-of-week headers
+  const dows = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const headers = dows.map(d => `<div class="ve-cal-dow">${d}</div>`).join('');
+
+  // 6 rows × 7 cols = 42 cells
+  const cells = [];
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(gridStart);
+    date.setDate(gridStart.getDate() + i);
+    const dateKey = ymd(date);
+    const isOther = date.getMonth() !== month;
+    const isToday = dateKey === todayKey_;
+    const dayNum = date.getDate();
+    const dayEvents = eventsByDate.get(dateKey) || [];
+    const visible = dayEvents.slice(0, 3);
+    const overflow = dayEvents.length - visible.length;
+    cells.push(`
+      <div class="ve-cal-day ${isOther ? 'other-month' : ''} ${isToday ? 'is-today' : ''}" data-date="${dateKey}">
+        <div class="ve-cal-daynum">${dayNum}</div>
+        ${visible.map(renderCalendarEvent).join('')}
+        ${overflow > 0 ? `<div class="ve-cal-more">+${overflow} more</div>` : ''}
+      </div>
+    `);
+  }
+  grid.innerHTML = headers + cells.join('');
+
+  grid.querySelectorAll('.ve-cal-event').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = el.dataset.leadId;
+      if (id) window.location.href = `crm.html?pillar=ranch&lead=${encodeURIComponent(id)}`;
+    });
+  });
+}
+
+function renderCalendarEvent(ev) {
+  const slug = (ev.stage?.slug || '').toLowerCase();
+  let cls = '';
+  if (/lost/.test(slug)) cls = 'stage-lost';
+  else if (/signed/.test(slug)) cls = 'stage-signed';
+  else if (/deposit/.test(slug)) cls = 'stage-deposit';
+  else if (/book|confirmed|scheduled/.test(slug)) cls = 'stage-confirmed';
+
+  const guest = ((ev.first_name || '') + ' ' + (ev.last_name || '')).trim() || '(unnamed)';
+  const space = ev.space?.name ? ` · ${ev.space.name}` : '';
+  const time  = ev.event_start_time ? `${formatHourMinShort(ev.event_start_time)} ` : '';
+  return `<div class="ve-cal-event ${cls}" data-lead-id="${esc(ev.id)}" title="${esc(`${guest}${space}${ev.event_type ? ` (${ev.event_type})` : ''}`)}">${esc(time)}${esc(guest)}</div>`;
+}
+
+function formatHourMinShort(t) {
+  if (!t) return '';
+  if (!/^\d{1,2}:\d{2}/.test(t)) return t;
+  const [h, m] = t.split(':');
+  const hh = Number(h);
+  const ampm = hh >= 12 ? 'p' : 'a';
+  const h12 = ((hh + 11) % 12) + 1;
+  return m === '00' ? `${h12}${ampm}` : `${h12}:${m}${ampm}`;
+}
+
+function ymd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const da = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${da}`;
 }
 
 function renderStats() {

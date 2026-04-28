@@ -87,8 +87,11 @@ export const ALL_ADMIN_TABS = [
   { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
-  { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: 'events', pillars: ['ranch'] },
-  { id: 'venue-events', label: 'Events List', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
+  // Old events.html still exists at its URL but is no longer in the pillar
+  // nav — it's been superseded by the unified Events page (venue-events.html)
+  // which handles both list and calendar views off crm_leads.
+  { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: '_hidden' },
+  { id: 'venue-events', label: 'Events', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
   // Hidden but still accessible via direct URL — no pillar filtering
