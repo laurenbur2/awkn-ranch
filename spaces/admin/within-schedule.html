@@ -36,43 +36,76 @@
     .ws-tb-btn:hover { background: #f9fafb; }
     .ws-tb-range { font-size: 0.92rem; font-weight: 600; color: #111827; padding: 0 0.5rem; flex: 1; text-align: center; }
 
-    /* Grid layout: 1 time column + 7 day columns */
+    /* Layout: separate header row from body. Body has a time column on the
+       left and 7 equal-width day columns. Each day column is its own
+       positioned context for absolutely-placed events.
+
+       Why not CSS Grid with one big multi-row item? Grid auto-row sizing
+       interacts unpredictably with overlay items spanning many rows — events
+       were drifting to the top of the day. A pure flex layout where each
+       day column owns its own height makes the math one-to-one. */
+    :root { --hour-h: 70px; --header-h: 56px; --time-col-w: 60px; }
+
     .ws-grid-wrap {
       background: #fff; border: 1px solid var(--border, #e5e7eb);
       border-radius: 0 0 12px 12px; overflow: auto;
     }
-    .ws-grid {
-      display: grid;
-      grid-template-columns: 60px repeat(7, minmax(140px, 1fr));
-      min-width: 980px;
-      position: relative;
+
+    .ws-header {
+      display: flex; min-width: 980px;
+      position: sticky; top: 0; z-index: 4;
+      background: #fafafa; border-bottom: 1px solid #e5e7eb;
     }
-    .ws-corner { background: #fafafa; border-right: 1px solid #f3f4f6; border-bottom: 1px solid #e5e7eb; position: sticky; left: 0; z-index: 3; }
+    .ws-corner {
+      flex: 0 0 var(--time-col-w);
+      height: var(--header-h);
+      background: #fafafa; border-right: 1px solid #f3f4f6;
+    }
     .ws-day-head {
-      padding: 0.55rem 0.6rem; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #f3f4f6;
+      flex: 1 1 0; min-width: 140px;
+      height: var(--header-h);
+      padding: 0.55rem 0.6rem;
+      border-right: 1px solid #f3f4f6;
       background: #fafafa; text-align: center;
+      display: flex; flex-direction: column; justify-content: center;
     }
     .ws-day-head.is-today { background: #fef3e6; }
     .ws-day-dow { font-size: 0.7rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
     .ws-day-date { font-size: 1rem; font-weight: 700; color: #111827; margin-top: 0.1rem; }
     .ws-day-head.is-today .ws-day-date { color: #d4883a; }
 
-    /* Hour rows. Each row is one hour tall (--hour-h px). */
-    :root { --hour-h: 70px; }
+    .ws-body {
+      display: flex; min-width: 980px;
+      position: relative;
+    }
+
+    /* Time-of-day labels column on the left. Stacked hour rows. */
+    .ws-time-col {
+      flex: 0 0 var(--time-col-w);
+      background: #fafafa; border-right: 1px solid #f3f4f6;
+      position: sticky; left: 0; z-index: 3;
+    }
     .ws-time-cell {
       height: var(--hour-h);
-      border-right: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6;
-      font-size: 0.7rem; color: #6b7280; padding: 0.2rem 0.4rem 0; text-align: right;
-      background: #fafafa; position: sticky; left: 0; z-index: 2;
+      font-size: 0.7rem; color: #6b7280;
+      padding: 0.2rem 0.4rem 0; text-align: right;
+      border-bottom: 1px solid #f3f4f6;
+      box-sizing: border-box;
     }
-    .ws-day-cell {
-      height: var(--hour-h);
-      border-right: 1px solid #f3f4f6; border-bottom: 1px solid #f3f4f6;
-      position: relative;
-    }
+
+    /* Day column: positioned context for absolutely-placed events. Hour
+       gridlines drawn as a repeating background so they always line up
+       with the time labels on the left. */
     .ws-day-col {
+      flex: 1 1 0; min-width: 140px;
       position: relative;
+      border-right: 1px solid #f3f4f6;
+      background-image:
+        linear-gradient(to bottom, transparent calc(var(--hour-h) - 1px), #f3f4f6 calc(var(--hour-h) - 1px), #f3f4f6 var(--hour-h));
+      background-size: 100% var(--hour-h);
+      background-repeat: repeat-y;
     }
+    .ws-day-col.is-today { background-color: #fef9f3; }
 
     /* Events absolutely positioned within their day column. The day-col itself
        is the positioning context; all events use top/height/left/width % */
@@ -108,13 +141,14 @@
     }
     .ws-event.meal .ws-event-title { font-weight: 600; }
 
-    /* Now-line: subtle horizontal indicator for current time */
+    /* Now-line: subtle horizontal indicator for current time. Lives inside
+       today's day column, positioned absolutely. */
     .ws-now-line {
       position: absolute;
-      left: 60px; right: 0;
+      left: 0; right: 0;
       height: 2px;
       background: #ef4444;
-      z-index: 4;
+      z-index: 5;
       pointer-events: none;
     }
     .ws-now-line::before {
@@ -183,7 +217,8 @@
         <span class="ws-tb-range" id="tbRange">—</span>
       </div>
       <div class="ws-grid-wrap">
-        <div class="ws-grid" id="wsGrid"></div>
+        <div class="ws-header" id="wsHeader"></div>
+        <div class="ws-body" id="wsBody"></div>
       </div>
     </div>
   </main>

@@ -105,12 +105,15 @@ function renderToolbar() {
 }
 
 function renderGrid() {
-  const grid = document.getElementById('wsGrid');
-  if (!grid) return;
+  const header = document.getElementById('wsHeader');
+  const body   = document.getElementById('wsBody');
+  if (!header || !body) return;
 
   const todayStr = ymd(new Date());
+  const totalHours = DAY_END_HOUR - DAY_START_HOUR;
+  const totalHeight = totalHours * HOUR_PX;
 
-  // Header row: blank corner + 7 day heads.
+  // ── Header row: blank corner + 7 day-of-week heads ─────────────────────
   const headerHtml = [`<div class="ws-corner"></div>`];
   for (let i = 0; i < 7; i++) {
     const d = new Date(weekAnchor);
@@ -123,61 +126,51 @@ function renderGrid() {
       </div>
     `);
   }
+  header.innerHTML = headerHtml.join('');
 
-  // Body: for each hour, one time-cell + 7 day-cells (which act as gridlines).
-  // Events are rendered separately, absolutely positioned inside .ws-day-col
-  // overlays we lay over the cell stack.
-  const bodyHtml = [];
+  // ── Body row: time labels column + 7 day columns ───────────────────────
+  // The time column has 14 stacked hour cells, each 70px tall.
+  // Each day column is a fixed-height (980px) container with gridline
+  // background and absolutely-positioned events on top.
+  const timeCol = ['<div class="ws-time-col" style="height:' + totalHeight + 'px;">'];
   for (let hr = DAY_START_HOUR; hr < DAY_END_HOUR; hr++) {
-    bodyHtml.push(`<div class="ws-time-cell">${formatHourLabel(hr)}</div>`);
-    for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
-      bodyHtml.push(`<div class="ws-day-cell" data-day-idx="${dayIdx}" data-hour="${hr}"></div>`);
-    }
+    timeCol.push(`<div class="ws-time-cell">${formatHourLabel(hr)}</div>`);
   }
+  timeCol.push('</div>');
 
-  // Day-column overlays: one per day, absolutely positioned over the cell
-  // stack. Each holds that day's events (meals + sessions).
-  const totalHours = DAY_END_HOUR - DAY_START_HOUR;
-  const totalHeight = totalHours * HOUR_PX;
-  // The header row reserves 1 row (~52px). We'll position day-col absolutely
-  // relative to the .ws-grid-wrap so it sits over the body cells.
-  const overlayHtml = [];
+  const dayCols = [];
+  const now = new Date();
   for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
     const d = new Date(weekAnchor);
     d.setDate(d.getDate() + dayIdx);
+    const isToday = ymd(d) === todayStr;
     const events = collectDayEvents(d);
     assignColumns(events);
-    // Position day-col by grid-column. Inside it, events are absolutely placed.
-    overlayHtml.push(`
-      <div class="ws-day-col" style="grid-column: ${dayIdx + 2}; grid-row: 2 / span ${totalHours}; height: ${totalHeight}px;">
+
+    // Now-line on today's column (only if current time is in the visible window)
+    let nowLine = '';
+    if (isToday) {
+      const minutesFromStart = (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes();
+      if (minutesFromStart >= 0 && minutesFromStart <= totalHours * 60) {
+        const top = (minutesFromStart / 60) * HOUR_PX;
+        nowLine = `<div class="ws-now-line" style="top:${top}px;"></div>`;
+      }
+    }
+
+    dayCols.push(`
+      <div class="ws-day-col ${isToday ? 'is-today' : ''}" style="height:${totalHeight}px;">
         ${events.map(renderEvent).join('')}
+        ${nowLine}
       </div>
     `);
   }
 
-  // Now line (only for today, only if within visible hour range)
-  const now = new Date();
-  let nowLineHtml = '';
-  if (isInWeek(now, weekAnchor)) {
-    const minutesFromStart = (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes();
-    if (minutesFromStart >= 0 && minutesFromStart <= totalHours * 60) {
-      const dayIdx = (now.getDay() - weekAnchor.getDay() + 7) % 7;
-      // Now line spans only the current day's column.
-      const top = (minutesFromStart / 60) * HOUR_PX;
-      nowLineHtml = `
-        <div class="ws-now-line" style="grid-column: ${dayIdx + 2}; grid-row: 2 / span ${totalHours}; top: ${top}px; left: 0; right: 0;"></div>
-      `;
-    }
-  }
+  body.innerHTML = timeCol.join('') + dayCols.join('');
 
-  grid.innerHTML = headerHtml.join('') + bodyHtml.join('') + overlayHtml.join('') + nowLineHtml;
-
-  // Click handler delegated on the grid
-  grid.addEventListener('click', onGridClick, { once: false });
-  // Make sure we don't double-bind; use a flag.
-  if (!grid.dataset.bound) {
-    grid.addEventListener('click', onGridClick);
-    grid.dataset.bound = '1';
+  // Click delegation on the body for session detail open
+  if (!body.dataset.bound) {
+    body.addEventListener('click', onGridClick);
+    body.dataset.bound = '1';
   }
 }
 
