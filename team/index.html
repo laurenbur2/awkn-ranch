@@ -98,6 +98,16 @@
     .org-node.drop-child  { border-color: #d4883a; box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.20); transform: translateY(-1px); }
     .org-node.drop-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important; cursor: not-allowed; }
 
+    /* "Drop below to make child" indicator — pulsing orange bar centered
+       under the target box, mirroring the left/right sibling-insert bars. */
+    .org-node.drop-child::after {
+      content: ""; position: absolute; left: 12%; right: 12%; bottom: -12px; height: 7px;
+      background: #d4883a; border-radius: 4px;
+      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
+      animation: dropPulse 0.9s ease-in-out infinite;
+      z-index: 5;
+    }
+
     /* Sibling-insert indicators — bright orange bar on the appropriate edge
        of the target box. Row-context = vertical bars on left/right;
        stack-context = horizontal bars on top/bottom. The bar pulses to draw
