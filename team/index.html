@@ -787,9 +787,12 @@
     // position a CHILD of the target (= reporting to it). This matches
     // the org-chart mental model: a box drawn below another is a report.
     //
-    // Row siblings: left edge = sibling before, right edge = sibling
-    // after, center = child.
+    // Row siblings: left/right edges in the TOP half are sibling-insert.
+    // The whole bottom half (y > 0.55) is "drop below" → make child.
+    // That way you can drop near the right side as long as you're aimed
+    // at the lower half and it correctly registers as "report to."
     if (isRow) {
+      if (yPct > 0.55) return 'child';
       if (xPct < 0.20) return 'before-row';
       if (xPct > 0.80) return 'after-row';
     } else {
