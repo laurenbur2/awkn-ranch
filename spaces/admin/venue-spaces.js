@@ -8,12 +8,12 @@
 import { supabase } from '../../shared/supabase.js';
 import { initAdminPage } from '../../shared/admin-shell.js';
 
-const DAYS_VISIBLE = 14;
+const DAYS_VISIBLE = 7;
 
 // ============================================================================
 // State
 // ============================================================================
-let viewStart = startOfDay(new Date());
+let viewStart = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let allSpaces = [];        // rentable spaces + their derived rate info
 let allBookings = [];      // crm_leads bookings overlapping the window
 let allStages = [];        // pipeline stages (for status pill class)
@@ -92,10 +92,14 @@ function render() {
 function renderRange() {
   const end = addDays(viewStart, DAYS_VISIBLE - 1);
   const fmt = d => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  const sameMonth = viewStart.getMonth() === end.getMonth();
-  const label = sameMonth
-    ? `${fmt(viewStart)} – ${fmt(end)}, ${end.getFullYear()}`
-    : `${fmt(viewStart)} – ${fmt(end)}, ${end.getFullYear()}`;
+  // Compare to "this week" so the label reads "This week", "Next week", etc.
+  const thisWeekStart = startOfWeek(new Date());
+  const weekDelta = Math.round((viewStart - thisWeekStart) / (7 * 86400000));
+  let prefix = '';
+  if (weekDelta === 0) prefix = 'This week · ';
+  else if (weekDelta === 1) prefix = 'Next week · ';
+  else if (weekDelta === -1) prefix = 'Last week · ';
+  const label = `${prefix}${fmt(viewStart)} – ${fmt(end)}, ${end.getFullYear()}`;
   setText('vsRange', label);
 }
 
@@ -310,7 +314,7 @@ function bindToolbar() {
     render();
   });
   document.getElementById('vsToday')?.addEventListener('click', async () => {
-    viewStart = startOfDay(new Date());
+    viewStart = startOfWeek(new Date());
     await loadAll();
     render();
   });
@@ -341,6 +345,13 @@ function formatBedSummary(space) {
 function startOfDay(d) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
+  return x;
+}
+// Snap to Sunday (0) at the start of the week so the calendar always
+// reads as Sun → Sat across the columns.
+function startOfWeek(d) {
+  const x = startOfDay(d);
+  x.setDate(x.getDate() - x.getDay());
   return x;
 }
 function addDays(d, n) {

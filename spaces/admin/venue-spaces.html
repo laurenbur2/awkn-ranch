@@ -50,7 +50,7 @@
     }
     .vs-grid {
       display: flex; flex-direction: column;
-      min-width: calc(var(--vs-info-w) + var(--vs-day-w) * 14);
+      min-width: calc(var(--vs-info-w) + var(--vs-day-w) * 7);
     }
 
     .vs-header-row {
@@ -107,11 +107,11 @@
       background-image: repeating-linear-gradient(
         to right,
         #fff 0,
-        #fff calc(100% / 14 - 1px),
-        #f3f4f6 calc(100% / 14 - 1px),
-        #f3f4f6 calc(100% / 14)
+        #fff calc(100% / 7 - 1px),
+        #f3f4f6 calc(100% / 7 - 1px),
+        #f3f4f6 calc(100% / 7)
       );
-      min-width: calc(var(--vs-day-w) * 14);
+      min-width: calc(var(--vs-day-w) * 7);
     }
     /* Subtle shading for today's column inside the timeline */
     .vs-today-overlay {
@@ -201,7 +201,7 @@
     <div class="vs-wrap">
       <div class="vs-head">
         <h1>Venue Spaces</h1>
-        <p>Each rentable space and its booking timeline. Click a booking to see details, or click an empty day to add a new event for that space.</p>
+        <p>Each rentable space across this week. Click any booked day for the event details; click an open day to add a new event for that space.</p>
       </div>
 
       <div class="vs-stats">
