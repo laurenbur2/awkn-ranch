@@ -84,8 +84,29 @@
     .org-node:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); transform: translateY(-1px); }
     .org-node:active { cursor: grabbing; }
     .org-node.dragging { opacity: 0.45; }
-    .org-node.drop-target { border-color: #d4883a; box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.18); transform: translateY(-1px); }
+    .org-node.drop-child  { border-color: #d4883a; box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.20); transform: translateY(-1px); }
     .org-node.drop-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important; cursor: not-allowed; }
+
+    /* Sibling-insert indicators — orange bar on the appropriate edge of the
+       target box. Row-context = vertical bars on left/right; stack-context =
+       horizontal bars on top/bottom. */
+    .org-node.drop-before-row::before,
+    .org-node.drop-after-row::after {
+      content: ""; position: absolute; top: -6px; bottom: -6px; width: 4px;
+      background: #d4883a; border-radius: 2px;
+      box-shadow: 0 0 0 2px rgba(212, 136, 58, 0.22);
+    }
+    .org-node.drop-before-row::before { left: -12px; }
+    .org-node.drop-after-row::after  { right: -12px; }
+
+    .org-node.drop-before-stack::before,
+    .org-node.drop-after-stack::after {
+      content: ""; position: absolute; left: -6px; right: -6px; height: 4px;
+      background: #d4883a; border-radius: 2px;
+      box-shadow: 0 0 0 2px rgba(212, 136, 58, 0.22);
+    }
+    .org-node.drop-before-stack::before { top: -10px; }
+    .org-node.drop-after-stack::after  { bottom: -10px; }
 
     .org-node-name { font-size: 0.95rem; font-weight: 700; color: #111827; line-height: 1.2; }
     .org-node-person { font-size: 0.78rem; color: #4b5563; font-weight: 500; }
@@ -526,6 +547,35 @@
     return addChild(newParentId, removed);
   }
 
+  // Insert dragged node as a sibling of target (same level) at position
+  // before/after target. Same cycle/root guards as moveNode.
+  function moveAsSibling(draggedId, targetId, before) {
+    if (draggedId === targetId) return false;
+    if (isDescendant(draggedId, targetId)) return false;
+    if (draggedId === ORG.id) return false;
+    if (targetId === ORG.id) return false; // root has no siblings
+
+    const targetParent = findParent(targetId);
+    if (!targetParent) return false;
+    const draggedParent = findParent(draggedId);
+    if (!draggedParent) return false;
+
+    const draggedIdx = draggedParent.children.findIndex(c => c.id === draggedId);
+    if (draggedIdx === -1) return false;
+    const removed = draggedParent.children.splice(draggedIdx, 1)[0];
+
+    // If we just removed from the same parent at a lower index than target,
+    // target's index shifted down by 1.
+    let targetIdx = targetParent.children.findIndex(c => c.id === targetId);
+    if (targetIdx === -1) {
+      // Shouldn't happen; restore for safety
+      draggedParent.children.splice(draggedIdx, 0, removed);
+      return false;
+    }
+    targetParent.children.splice(before ? targetIdx : targetIdx + 1, 0, removed);
+    return true;
+  }
+
   // =========================================================================
   // RENDER
   // =========================================================================
@@ -588,6 +638,45 @@
     `;
   }
 
+  // Determine which drop zone the cursor is in. Three options:
+  //   'child'        — cursor is in the box's center → become target's child
+  //   'before-row'   — cursor near the LEFT edge of a target inside a row
+  //   'after-row'    — cursor near the RIGHT edge of a target inside a row
+  //   'before-stack' — cursor near the TOP edge of a target inside a stack
+  //   'after-stack'  — cursor near the BOTTOM edge of a target inside a stack
+  // Sibling zones are only available when the target actually has siblings —
+  // i.e. it lives inside a .org-row or .org-stack ancestor.
+  function getDropZone(e, box) {
+    // Walk up to find whether this box is inside a row, stack, or singleton.
+    // We look at the box's wrapper (.org-child or .org-stack-item).
+    const stackItem = box.closest('.org-stack-item');
+    const rowChild  = box.closest('.org-child');
+    const rect = box.getBoundingClientRect();
+
+    // Inside a horizontal row of siblings
+    if (rowChild && rowChild.parentElement?.classList.contains('org-row')) {
+      const xPct = (e.clientX - rect.left) / rect.width;
+      if (xPct < 0.28) return 'before-row';
+      if (xPct > 0.72) return 'after-row';
+      return 'child';
+    }
+    // Inside a vertical stack of siblings
+    if (stackItem && stackItem.parentElement?.classList.contains('org-stack')) {
+      const yPct = (e.clientY - rect.top) / rect.height;
+      if (yPct < 0.28) return 'before-stack';
+      if (yPct > 0.72) return 'after-stack';
+      return 'child';
+    }
+    // Singleton (only-child or root subtree) — no siblings to insert beside
+    return 'child';
+  }
+
+  function clearDropClasses() {
+    document.querySelectorAll('.org-node').forEach(n => {
+      n.classList.remove('drop-child', 'drop-invalid', 'drop-before-row', 'drop-after-row', 'drop-before-stack', 'drop-after-stack');
+    });
+  }
+
   // SVG icons (kept inline so the file stays standalone)
   const ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4z"/></svg>';
   const ICON_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
@@ -623,26 +712,56 @@
       });
       box.addEventListener('dragend', () => {
         box.classList.remove('dragging');
-        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('drop-target', 'drop-invalid'));
+        clearDropClasses();
         dragId = null;
       });
       box.addEventListener('dragover', (e) => {
         if (!dragId || dragId === box.dataset.id) return;
         e.preventDefault();
         const valid = !isDescendant(dragId, box.dataset.id) && dragId !== box.dataset.id;
+        const zone = valid ? getDropZone(e, box) : null;
         e.dataTransfer.dropEffect = valid ? 'move' : 'none';
-        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('drop-target', 'drop-invalid'));
-        box.classList.add(valid ? 'drop-target' : 'drop-invalid');
+        clearDropClasses();
+        if (!valid) {
+          box.classList.add('drop-invalid');
+          return;
+        }
+        if (zone === 'child') {
+          box.classList.add('drop-child');
+        } else if (zone === 'before-row') {
+          box.classList.add('drop-before-row');
+        } else if (zone === 'after-row') {
+          box.classList.add('drop-after-row');
+        } else if (zone === 'before-stack') {
+          box.classList.add('drop-before-stack');
+        } else if (zone === 'after-stack') {
+          box.classList.add('drop-after-stack');
+        } else {
+          box.classList.add('drop-child'); // fallback
+        }
       });
       box.addEventListener('dragleave', () => {
-        box.classList.remove('drop-target', 'drop-invalid');
+        // Don't clear here — dragover on adjacent boxes will refresh classes.
+        // Only clear when the drag actually ends.
       });
       box.addEventListener('drop', (e) => {
         e.preventDefault();
         const targetId = box.dataset.id;
-        box.classList.remove('drop-target', 'drop-invalid');
+        const zone = getDropZone(e, box);
+        clearDropClasses();
         if (!dragId || dragId === targetId) return;
-        if (moveNode(dragId, targetId)) {
+        const valid = !isDescendant(dragId, targetId) && dragId !== targetId;
+        if (!valid) return;
+
+        let ok = false;
+        if (zone === 'before-row' || zone === 'before-stack') {
+          ok = moveAsSibling(dragId, targetId, true);
+        } else if (zone === 'after-row' || zone === 'after-stack') {
+          ok = moveAsSibling(dragId, targetId, false);
+        } else {
+          ok = moveNode(dragId, targetId);
+        }
+        if (ok) {
           save();
           render();
         }
