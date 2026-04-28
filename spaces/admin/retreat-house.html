@@ -6,7 +6,20 @@
   <title>Retreat House - AWKN Dashboard</title>
   <link rel="icon" type="image/png" href="../../favicon.png">
   <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
-  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <script>
+    try { var c = localStorage.getItem("awkn-ranch-cached-auth"); if (c && JSON.parse(c).appUser) document.documentElement.dataset.cachedAuth = "1"; } catch (e) {}
+    // Embed mode (?embed=1): the page is rendered inside an iframe — hide
+    // the outer admin chrome so just the per-bed rooms calendar shows.
+    try { if (new URL(location.href).searchParams.get('embed') === '1') document.documentElement.classList.add('rh-embed'); } catch (e) {}
+  </script>
+  <style>
+    .rh-embed #siteHeader,
+    .rh-embed #contextSwitcher,
+    .rh-embed .manage-tabs,
+    .rh-embed .rh-head { display: none !important; }
+    .rh-embed .rh-wrap { padding-top: 0.6rem; }
+    .rh-embed body, .rh-embed html { background: transparent; }
+  </style>
   <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
