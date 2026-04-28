@@ -184,10 +184,75 @@
       font-size: 0.66rem; color: #6b7280; padding: 0.05rem 0.4rem; cursor: default;
     }
 
+    /* Modals — used for both event details and new event creation */
+    .ve-modal-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(20, 20, 20, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .ve-modal-overlay.hidden { display: none; }
+    .ve-modal {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      width: 100%; max-width: 520px; max-height: calc(100vh - 2rem);
+      display: flex; flex-direction: column;
+    }
+    .ve-modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;
+    }
+    .ve-modal-title { font-size: 1.05rem; font-weight: 700; color: #111827; }
+    .ve-modal-x { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; }
+    .ve-modal-body { padding: 1rem 1.25rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .ve-modal-foot { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6; }
+
+    .ve-modal-row { display: flex; flex-direction: column; gap: 0.15rem; }
+    .ve-modal-row.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .ve-modal-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .ve-modal-value { font-size: 0.92rem; color: #111827; }
+    .ve-modal-row input,
+    .ve-modal-row select,
+    .ve-modal-row textarea {
+      width: 100%; padding: 0.55rem 0.7rem;
+      border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.9rem; background: #fff;
+      box-sizing: border-box;
+    }
+    .ve-modal-row input:focus,
+    .ve-modal-row select:focus,
+    .ve-modal-row textarea:focus {
+      outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a;
+    }
+    .ve-btn {
+      padding: 0.55rem 0.95rem; border-radius: 8px;
+      border: 1px solid #d1d5db; background: #fff;
+      font: inherit; font-size: 0.85rem; font-weight: 600; color: #374151; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .ve-btn:hover { background: #f9fafb; }
+    .ve-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .ve-btn-primary:hover { background: #b87625; }
+    .ve-btn-primary:disabled { background: #d1d5db; border-color: #d1d5db; cursor: not-allowed; }
+
+    .ve-modal-error {
+      background: #fef2f2; color: #991b1b; padding: 0.5rem 0.7rem;
+      border-radius: 6px; font-size: 0.82rem; border: 1px solid #fecaca;
+    }
+    .ve-modal-error.hidden { display: none; }
+
+    /* Empty-day hover hint in calendar mode */
+    body.ve-mode-calendar .ve-cal-day:not(.other-month):hover {
+      cursor: pointer;
+      box-shadow: inset 0 0 0 2px rgba(212, 136, 58, 0.35);
+    }
+    body.ve-mode-calendar .ve-cal-day.other-month { cursor: default; }
+
     @media (max-width: 720px) {
       .ve-table .col-amount, .ve-table .col-type { display: none; }
       .ve-cal-day { min-height: 60px; }
       .ve-cal-event { font-size: 0.66rem; padding: 0.18rem 0.3rem; }
+      .ve-modal-row.row-2 { grid-template-columns: 1fr; }
     }
     @media (max-width: 540px) {
       .ve-table .col-time { display: none; }
@@ -298,6 +363,101 @@
       </div>
     </div>
   </main>
+
+  <!-- Event details modal — shown when a calendar event is clicked -->
+  <div class="ve-modal-overlay hidden" id="edModal">
+    <div class="ve-modal">
+      <div class="ve-modal-head">
+        <span class="ve-modal-title" id="edTitle">Event</span>
+        <button class="ve-modal-x" id="edClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ve-modal-body" id="edBody"></div>
+      <div class="ve-modal-foot" id="edFoot"></div>
+    </div>
+  </div>
+
+  <!-- New event modal — shown when an empty day cell is clicked -->
+  <div class="ve-modal-overlay hidden" id="neModal">
+    <div class="ve-modal">
+      <div class="ve-modal-head">
+        <span class="ve-modal-title">New Event</span>
+        <button class="ve-modal-x" id="neClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ve-modal-body">
+        <div class="ve-modal-error hidden" id="neError"></div>
+        <div class="ve-modal-row row-2">
+          <div>
+            <label class="ve-modal-label" for="neFirstName">First name</label>
+            <input id="neFirstName" type="text" autocomplete="given-name" placeholder="Client's first name">
+          </div>
+          <div>
+            <label class="ve-modal-label" for="neLastName">Last name</label>
+            <input id="neLastName" type="text" autocomplete="family-name" placeholder="Client's last name">
+          </div>
+        </div>
+        <div class="ve-modal-row row-2">
+          <div>
+            <label class="ve-modal-label" for="neEmail">Email</label>
+            <input id="neEmail" type="email" autocomplete="email" placeholder="email@example.com">
+          </div>
+          <div>
+            <label class="ve-modal-label" for="nePhone">Phone</label>
+            <input id="nePhone" type="tel" autocomplete="tel" placeholder="(512) 555-0100">
+          </div>
+        </div>
+        <div class="ve-modal-row">
+          <label class="ve-modal-label" for="neEventType">Event type</label>
+          <select id="neEventType">
+            <option value="">— Select an event type —</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Retreat">Retreat</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Private Party">Private Party</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="ve-modal-row row-2">
+          <div>
+            <label class="ve-modal-label" for="neDate">Event date</label>
+            <input id="neDate" type="date" required>
+          </div>
+          <div>
+            <label class="ve-modal-label" for="neGuestCount">Guest count <span style="font-weight:500;color:#9ca3af;text-transform:none;">(optional)</span></label>
+            <input id="neGuestCount" type="number" min="0" step="1" placeholder="e.g. 25">
+          </div>
+        </div>
+        <div class="ve-modal-row row-2">
+          <div>
+            <label class="ve-modal-label" for="neStart">Start time</label>
+            <input id="neStart" type="time">
+          </div>
+          <div>
+            <label class="ve-modal-label" for="neEnd">End time</label>
+            <input id="neEnd" type="time">
+          </div>
+        </div>
+        <div class="ve-modal-row">
+          <label class="ve-modal-label" for="neSpace">Primary space</label>
+          <select id="neSpace">
+            <option value="">— Select a space —</option>
+          </select>
+        </div>
+        <div class="ve-modal-row">
+          <label class="ve-modal-label" for="neEstimatedValue">Estimated value <span style="font-weight:500;color:#9ca3af;text-transform:none;">(quote total)</span></label>
+          <input id="neEstimatedValue" type="number" min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="ve-modal-row">
+          <label class="ve-modal-label" for="neNotes">Notes</label>
+          <textarea id="neNotes" rows="2" placeholder="Anything important about this booking…"></textarea>
+        </div>
+      </div>
+      <div class="ve-modal-foot">
+        <button class="ve-btn" id="neCancel">Cancel</button>
+        <button class="ve-btn ve-btn-primary" id="neCreate">Create Event</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script type="module" src="venue-events.js"></script>

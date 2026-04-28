@@ -41,6 +41,7 @@ let calMonthAnchor = startOfMonth(new Date());
 
       await loadAll();
       bindControls();
+      bindModals();
       render();
     },
   });
@@ -332,12 +333,226 @@ function renderCalendar() {
   }
   grid.innerHTML = headers + cells.join('');
 
+  // Click an event block → open the details modal.
+  // Click an empty day cell → open the new-event modal pre-filled with that date.
   grid.querySelectorAll('.ve-cal-event').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = el.dataset.leadId;
-      if (id) window.location.href = `crm.html?pillar=ranch&lead=${encodeURIComponent(id)}`;
+      if (id) openEventDetails(id);
     });
+  });
+  grid.querySelectorAll('.ve-cal-day').forEach(el => {
+    el.addEventListener('click', (e) => {
+      // Ignore clicks on the events themselves; those are handled above.
+      if (e.target.closest('.ve-cal-event')) return;
+      // Don't allow new events on dim "other-month" cells — too easy to misclick.
+      if (el.classList.contains('other-month')) return;
+      const date = el.dataset.date;
+      if (date) openNewEventModal(date);
+    });
+  });
+}
+
+// ============================================================================
+// Event details modal — read-only quick look + jump-to-CRM
+// ============================================================================
+function openEventDetails(leadId) {
+  const ev = allEvents.find(x => x.id === leadId);
+  if (!ev) {
+    // Fallback: jump to CRM if we can't locate the event in the cached list.
+    window.location.href = `crm.html?pillar=ranch&lead=${encodeURIComponent(leadId)}`;
+    return;
+  }
+
+  const guest = ((ev.first_name || '') + ' ' + (ev.last_name || '')).trim() || '(unnamed)';
+  const dateStr = formatEventDate(ev.event_date);
+  const timeStr = formatTime(ev.event_start_time, ev.event_end_time);
+  const spaceStr = ev.space?.name || '—';
+  const stageName = ev.stage?.name || '—';
+  const eventType = ev.event_type || '—';
+  const guestCount = ev.guest_count != null ? String(ev.guest_count) : '—';
+  const amount = ev.actual_revenue || ev.estimated_value
+    ? formatMoney(Number(ev.actual_revenue || ev.estimated_value))
+    : '—';
+
+  setText('edTitle', guest);
+
+  const body = document.getElementById('edBody');
+  const rows = [];
+  const row = (label, value) => `
+    <div class="ve-modal-row">
+      <span class="ve-modal-label">${esc(label)}</span>
+      <span class="ve-modal-value">${value}</span>
+    </div>
+  `;
+  rows.push(row('When', `${esc(dateStr)} · ${esc(timeStr)}`));
+  rows.push(row('Space', esc(spaceStr)));
+  rows.push(row('Event type', esc(eventType)));
+  rows.push(row('Guest count', esc(guestCount)));
+  rows.push(row('Stage', esc(stageName)));
+  rows.push(row('Estimated value', esc(amount)));
+  if (ev.email)  rows.push(row('Email', esc(ev.email)));
+  if (ev.phone)  rows.push(row('Phone', esc(ev.phone)));
+  if (ev.notes)  rows.push(row('Notes', `<span style="white-space:pre-wrap;">${esc(ev.notes)}</span>`));
+  if (ev.internal_staff_notes) rows.push(row('Internal notes', `<span style="white-space:pre-wrap;color:#92400e;">${esc(ev.internal_staff_notes)}</span>`));
+  body.innerHTML = rows.join('');
+
+  const foot = document.getElementById('edFoot');
+  foot.innerHTML = `
+    <button class="ve-btn" id="edCloseBtn">Close</button>
+    <a class="ve-btn ve-btn-primary" href="crm.html?pillar=ranch&lead=${encodeURIComponent(leadId)}">Open in CRM</a>
+  `;
+  foot.querySelector('#edCloseBtn').addEventListener('click', closeEventDetails);
+
+  document.getElementById('edModal').classList.remove('hidden');
+}
+
+function closeEventDetails() {
+  document.getElementById('edModal').classList.add('hidden');
+}
+
+// ============================================================================
+// New event modal — creates a crm_leads row tagged business_line='awkn_ranch'
+// ============================================================================
+function openNewEventModal(dateYmd) {
+  // Reset fields
+  document.getElementById('neFirstName').value = '';
+  document.getElementById('neLastName').value = '';
+  document.getElementById('neEmail').value = '';
+  document.getElementById('nePhone').value = '';
+  document.getElementById('neEventType').value = '';
+  document.getElementById('neDate').value = dateYmd || '';
+  document.getElementById('neGuestCount').value = '';
+  document.getElementById('neStart').value = '';
+  document.getElementById('neEnd').value = '';
+  document.getElementById('neEstimatedValue').value = '';
+  document.getElementById('neNotes').value = '';
+  hideError();
+
+  // Populate space dropdown
+  const spaceSel = document.getElementById('neSpace');
+  spaceSel.innerHTML = '<option value="">— Select a space —</option>'
+    + allSpaces.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  spaceSel.value = '';
+
+  document.getElementById('neModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('neFirstName').focus(), 30);
+}
+function closeNewEventModal() {
+  document.getElementById('neModal').classList.add('hidden');
+}
+
+function showError(msg) {
+  const el = document.getElementById('neError');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+function hideError() {
+  document.getElementById('neError').classList.add('hidden');
+}
+
+async function createNewEvent() {
+  hideError();
+  const firstName = document.getElementById('neFirstName').value.trim();
+  const lastName  = document.getElementById('neLastName').value.trim();
+  const email     = document.getElementById('neEmail').value.trim();
+  const phone     = document.getElementById('nePhone').value.trim();
+  const eventType = document.getElementById('neEventType').value;
+  const dateVal   = document.getElementById('neDate').value;
+  const guestStr  = document.getElementById('neGuestCount').value;
+  const startTime = document.getElementById('neStart').value || null;
+  const endTime   = document.getElementById('neEnd').value || null;
+  const spaceId   = document.getElementById('neSpace').value || null;
+  const estVal    = document.getElementById('neEstimatedValue').value;
+  const notes     = document.getElementById('neNotes').value.trim() || null;
+
+  if (!firstName && !lastName && !email) {
+    showError('Add a client name or email.');
+    return;
+  }
+  if (!dateVal) {
+    showError('Event date is required.');
+    return;
+  }
+  if (startTime && endTime && endTime <= startTime) {
+    showError('End time must be after the start time.');
+    return;
+  }
+
+  // Default to the first stage in the AWKN Ranch pipeline.
+  const firstStage = allStages.length > 0 ? allStages[0] : null;
+
+  const payload = {
+    business_line: 'awkn_ranch',
+    first_name: firstName || null,
+    last_name:  lastName || null,
+    email:      email || null,
+    phone:      phone || null,
+    event_type: eventType || null,
+    event_date: dateVal,
+    event_start_time: startTime,
+    event_end_time:   endTime,
+    space_id:   spaceId,
+    guest_count: guestStr ? parseInt(guestStr, 10) : null,
+    estimated_value: estVal ? Number(estVal) : null,
+    notes,
+    stage_id:   firstStage?.id || null,
+  };
+
+  const btn = document.getElementById('neCreate');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
+  const { data, error } = await supabase
+    .from('crm_leads')
+    .insert([payload])
+    .select(`
+      id, first_name, last_name, email, phone,
+      event_date, event_start_time, event_end_time, event_type, guest_count,
+      space_id, stage_id, estimated_value, actual_revenue,
+      deposit_amount, deposit_paid_at, balance_amount, balance_paid_at,
+      notes, internal_staff_notes,
+      space:spaces(id, name, slug),
+      stage:crm_pipeline_stages(id, slug, name)
+    `)
+    .single();
+
+  btn.disabled = false;
+  btn.textContent = 'Create Event';
+
+  if (error) {
+    showError('Could not create event: ' + error.message);
+    return;
+  }
+
+  // Insert the new event into our local cache and re-render so it shows up
+  // immediately without a full reload.
+  allEvents.push(data);
+  closeNewEventModal();
+  render();
+}
+
+function bindModals() {
+  // Event details
+  document.getElementById('edClose').addEventListener('click', closeEventDetails);
+  document.getElementById('edModal').addEventListener('click', (e) => {
+    if (e.target.id === 'edModal') closeEventDetails();
+  });
+
+  // New event
+  document.getElementById('neClose').addEventListener('click', closeNewEventModal);
+  document.getElementById('neCancel').addEventListener('click', closeNewEventModal);
+  document.getElementById('neCreate').addEventListener('click', createNewEvent);
+  document.getElementById('neModal').addEventListener('click', (e) => {
+    if (e.target.id === 'neModal') closeNewEventModal();
+  });
+
+  // Esc closes whichever modal is open
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('edModal').classList.contains('hidden')) closeEventDetails();
+    else if (!document.getElementById('neModal').classList.contains('hidden')) closeNewEventModal();
   });
 }
 
