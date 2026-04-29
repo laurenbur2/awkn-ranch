@@ -1932,6 +1932,21 @@ const WELCOME_PACKAGES = {
 const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
 
+// Map a client_packages.name to one of the welcome-letter preset keys, so the
+// modal can auto-select the right preset for clients who already have a
+// package on file. Returns null when nothing matches (admin picks manually).
+function matchPackageNameToPresetKey(name) {
+  if (!name) return null;
+  const n = String(name).toLowerCase();
+  if (/(six[\s-]?day|6[\s-]?day|6d\s*\/\s*5n)/.test(n)) return 'immersive-6day';
+  if (/(three[\s-]?day|3[\s-]?day|3d\s*\/\s*2n)/.test(n)) return 'immersive-3day';
+  if (/\bheal\b/.test(n)) return 'heal';
+  if (/\bdiscover\b/.test(n)) return 'discover';
+  if (/(couples|twin[\s-]?flame)/.test(n)) return 'twin-flame';
+  if (/\bawkn\b/.test(n)) return 'awkn';
+  return null;
+}
+
 function openSendWelcomeLetterModal(leadId) {
   const c = clients.find(cl => cl.id === leadId);
   if (!c) { showToast('Client not found', 'error'); return; }
@@ -1939,15 +1954,26 @@ function openSendWelcomeLetterModal(leadId) {
 
   const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
 
-  const packageOptions = [
-    '<option value="heal" selected>HEAL \u2014 3 ceremonies + integration</option>',
-    '<option value="discover">DISCOVER \u2014 1 ceremony + integration</option>',
-    '<option value="awkn">AWKN \u2014 6 ceremonies (deepest offering)</option>',
-    '<option value="twin-flame">Couples Reset \u2014 shared journey for partners</option>',
-    '<option value="immersive-6day">Six-Day Immersive Retreat</option>',
-    '<option value="immersive-3day">Three-Day Immersive Retreat</option>',
-    '<option value="custom">Custom \u2014 build your own list</option>',
-  ].join('');
+  // Auto-detect the right preset from the client's most recent package. Falls
+  // back to 'heal' (the default outpatient program) when no package is on file
+  // or the name doesn't match any known preset.
+  const clientPkgs = getClientPackages(leadId);
+  const newestPkg = clientPkgs[0]; // already sorted desc by created_at
+  const detectedKey = newestPkg ? matchPackageNameToPresetKey(newestPkg.name) : null;
+  const initialKey = detectedKey || 'heal';
+
+  const packageOptionDefs = [
+    { key: 'heal',           label: 'HEAL \u2014 3 ceremonies + integration' },
+    { key: 'discover',       label: 'DISCOVER \u2014 1 ceremony + integration' },
+    { key: 'awkn',           label: 'AWKN \u2014 6 ceremonies (deepest offering)' },
+    { key: 'twin-flame',     label: 'Couples Reset \u2014 shared journey for partners' },
+    { key: 'immersive-6day', label: 'Six-Day Immersive Retreat' },
+    { key: 'immersive-3day', label: 'Three-Day Immersive Retreat' },
+    { key: 'custom',         label: 'Custom \u2014 build your own list' },
+  ];
+  const packageOptions = packageOptionDefs
+    .map(o => `<option value="${o.key}"${o.key === initialKey ? ' selected' : ''}>${o.label}</option>`)
+    .join('');
 
   const modal = document.getElementById('clients-modal');
   modal.innerHTML = `
@@ -2055,8 +2081,12 @@ function openSendWelcomeLetterModal(leadId) {
     }
   };
 
-  loadPackageItems('heal');
-  applyVariantLabels('heal');
+  loadPackageItems(initialKey);
+  applyVariantLabels(initialKey);
+
+  if (detectedKey && newestPkg) {
+    showToast(`Pre-filled from package on file: ${newestPkg.name}`, 'info');
+  }
 
   document.getElementById('welcome-package').addEventListener('change', (e) => {
     loadPackageItems(e.target.value);
