@@ -102,8 +102,10 @@ export const ALL_ADMIN_TABS = [
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: '_hidden' },
   { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
   { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
-  // Hidden but still accessible via direct URL — no pillar filtering
-  { id: 'spaces', label: 'Spaces', href: 'spaces.html', permission: 'view_spaces', section: 'staff', feature: '_hidden' },
+  // Hidden but still accessible via direct URL — no pillar filtering.
+  // (The old generic spaces admin page was retired — see spaces.html which
+  // now redirects to the dashboard. Venue Rental's "Spaces" tab is the
+  // current resource-calendar replacement.)
   { id: 'media', label: 'Media', href: 'media.html', permission: 'view_media', section: 'staff', feature: '_hidden' },
   { id: 'sms', label: 'SMS', href: 'sms-messages.html', permission: 'view_sms', section: 'staff', feature: 'sms' },
   { id: 'hours', label: 'Workstuff', href: 'worktracking.html', permission: 'view_hours', section: 'staff', feature: 'associates' },
