@@ -1912,7 +1912,7 @@ const WELCOME_PACKAGES = {
     items: [
       { description: 'Private guided ketamine ceremonies during the retreat', quantity: 2 },
       { description: 'Nights of residential stay at AWKN Ranch', quantity: 5 },
-      { description: 'Group integration circles and daily practices', quantity: 1 },
+      { description: 'Integration coaching sessions', quantity: 2 },
       { description: 'Full access to AWKN amenities \u2014 saunas, cold plunges, hot tub, temple space', quantity: 1 },
       { description: 'All meals and on-site care', quantity: 1 },
     ],
