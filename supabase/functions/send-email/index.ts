@@ -2673,7 +2673,7 @@ This is an automated weekly schedule report from AWKN Ranch.`
   <!-- What's included -->
   <div style="padding:0 40px 32px 40px;">
     <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
-      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Outpatient Program Includes</div>
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Package Includes</div>
       <ul style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.85;margin:0;padding-left:18px;">
         ${includedItems}
       </ul>

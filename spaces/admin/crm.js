@@ -1359,7 +1359,7 @@ The ${bizLabel} Team</textarea>
     const form = openInlineActionForm();
 
     // Package presets — each maps to a title + line items that render in the
-    // "Your Outpatient Program Includes" section. Edit here to change what
+    // "Your Package Includes" section. Edit here to change what
     // gets listed per package.
     const WELCOME_PACKAGES = {
       heal: {
@@ -1444,7 +1444,7 @@ The ${bizLabel} Team</textarea>
         <input type="text" class="crm-input" id="welcome-package-title" placeholder="e.g. HEAL Package">
       </div>
       <div class="crm-form-field">
-        <label>Your Outpatient Program Includes</label>
+        <label>Your Package Includes</label>
         <div id="welcome-items-wrap" style="display:flex;flex-direction:column;gap:6px;"></div>
         <button type="button" class="crm-btn crm-btn-sm" id="btn-welcome-add-item" style="margin-top:8px;">+ Add item</button>
         <div class="crm-muted" style="font-size:12px;margin-top:4px;">Quantity × description. Quantity of 1 hides the "1 ×" prefix in the email.</div>
