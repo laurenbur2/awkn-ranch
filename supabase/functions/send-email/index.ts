@@ -2808,7 +2808,7 @@ This is an automated weekly schedule report from AWKN Ranch.`
     <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Shannon Grossman</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Admissions</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding services to your experience.</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding services to your experience — call or text <a href="tel:7372262569" style="color:#c9943e;text-decoration:none;white-space:nowrap;">737-226-2569</a> or email <a href="mailto:shannon@within.center" style="color:#c9943e;text-decoration:none;">shannon@within.center</a>.</div>
     </div>
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
@@ -2889,7 +2889,7 @@ Trouble finding it or any questions day-of? Call or text Justin at 512-796-1886.
 
 YOUR CORE TEAM
 - Leslie Glace — Clinic Scheduler & Client Care · leslie@within.center
-- Shannon Grossman — Admissions
+- Shannon Grossman — Admissions · 737-226-2569 · shannon@within.center
 - Justin De La Cruz — Managing Director · 512-796-1886 · justin@within.center
 
 JOIN THE WHATSAPP COMMUNITY
@@ -3108,6 +3108,11 @@ function buildImmersiveWelcomeLetter({
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Schedule &amp; Client Care</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your retreat schedule and any pre-arrival changes. <a href="mailto:leslie@within.center" style="color:#c9943e;text-decoration:none;">leslie@within.center</a></div>
     </div>
+    <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Shannon Grossman</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Admissions</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Adding any add-on services to your retreat — extra coaching, licensed therapy, bodywork, extended stays. Call or text <a href="tel:7372262569" style="color:#c9943e;text-decoration:none;white-space:nowrap;">737-226-2569</a> or email <a href="mailto:shannon@within.center" style="color:#c9943e;text-decoration:none;">shannon@within.center</a>.</div>
+    </div>
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director · Day-of Contact</div>
@@ -3215,6 +3220,7 @@ BEFORE EACH CEREMONY (THE FASTING WINDOW)
 
 YOUR CORE TEAM
 - Leslie Glace — Schedule & Client Care · leslie@within.center
+- Shannon Grossman — Admissions, add-on services · 737-226-2569 · shannon@within.center
 - Justin De La Cruz — Managing Director, day-of contact · 512-796-1886 · justin@within.center
 
 DEPARTURE & WHAT COMES AFTER
