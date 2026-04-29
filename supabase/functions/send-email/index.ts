@@ -2817,8 +2817,8 @@ This is an automated weekly schedule report from AWKN Ranch.`
     </div>
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
-      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all, including directions or questions day-of — call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Executive Director</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Holds the long-view direction of Within Center and AWKN Ranch — leadership, partnerships, and the vision that ties everything together. The right person to reach for an escalation, a partnership, or anything you'd like to land directly at the leadership level. Call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
     </div>
     <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, retreat care, and operations — the whole team looks forward to meeting you.</p>
   </div>
@@ -2896,7 +2896,7 @@ YOUR CORE TEAM
 - Heather Hoover — Director of Client Experience · 512-738-3750 · heatherhoover@within.center
 - Leslie Glace — Clinic Scheduler & Client Care · leslie@within.center
 - Shannon Grossman — Admissions · 737-226-2569 · shannon@within.center
-- Justin De La Cruz — Managing Director · 512-796-1886 · justin@within.center
+- Justin De La Cruz — Executive Director · 512-796-1886 · justin@within.center
 
 JOIN THE WHATSAPP COMMUNITY
 https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt
@@ -3126,8 +3126,8 @@ function buildImmersiveWelcomeLetter({
     </div>
     <div style="padding-top:16px;">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
-      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director · Day-of Contact</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — directions, late arrivals, after-hours, questions on the road. Call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Executive Director</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Holds the long-view direction of Within Center and AWKN Ranch — leadership, partnerships, and the vision that ties everything together. The right person to reach for an escalation, a partnership, or anything you'd like to land directly at the leadership level. Call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
     </div>
     <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, kitchen, retreat care, and operations — the whole team looks forward to meeting you.</p>
   </div>
@@ -3233,7 +3233,7 @@ YOUR CORE TEAM
 - Heather Hoover — Director of Client Experience · 512-738-3750 · heatherhoover@within.center
 - Leslie Glace — Schedule & Client Care · leslie@within.center
 - Shannon Grossman — Admissions, add-on services · 737-226-2569 · shannon@within.center
-- Justin De La Cruz — Managing Director, day-of contact · 512-796-1886 · justin@within.center
+- Justin De La Cruz — Executive Director · 512-796-1886 · justin@within.center
 
 DEPARTURE & WHAT COMES AFTER
 Check-out by 11am on your final day, after a slow morning and breakfast. We'll reach out within a week to schedule your post-retreat integration call — and the door doesn't close there. Integration packages are available for anyone who wants continued support as they ease back into everyday life: extended coaching, additional sessions, and gentle check-ins to help what opened here keep unfolding at home. Reach out whenever you're ready — we'd love to walk the next stretch with you. Protect the days after — no big meetings, no hard conversations. Integration happens in rest.
