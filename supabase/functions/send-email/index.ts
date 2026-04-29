@@ -2967,7 +2967,7 @@ function buildImmersiveWelcomeLetter({
   <div style="padding:40px 40px 24px 40px;text-align:center;">
     <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Welcome · ${proposalTitle}</div>
     <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">We're honored to host you, ${firstName}.</h1>
-    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">For the next ${nights} nights, the ranch is yours. Our whole team — medical, integration, guides, kitchen, care, and operations — is here to hold you through this, mind, body, and spirit.</p>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">For ${nights} nights, the ranch is yours. Our whole team — medical, integration, guides, kitchen, care, and operations — is here to hold you through this, mind, body, and spirit.</p>
   </div>
 
   <!-- Your retreat at a glance -->
@@ -3165,7 +3165,7 @@ function buildImmersiveWelcomeLetter({
 
 Hi ${firstName},
 
-For the next ${nights} nights, the ranch is yours. We're honored to host you.
+For ${nights} nights, the ranch is yours. We're honored to host you.
 
 CHECK-IN
 ${checkInDate} · ${checkInWindow}
