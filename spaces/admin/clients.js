@@ -1856,10 +1856,347 @@ function handleClientMoreItem(leadId, item) {
       openSendInvoiceModal(leadId);
       return;
     case 'send-welcome-letter':
+      openSendWelcomeLetterModal(leadId);
+      return;
     case 'send-intake-link':
     case 'send-reminder':
       showToast('Coming soon \u2014 use the CRM to send for now.', 'info');
       return;
+  }
+}
+
+// ---------- Send Welcome Letter modal ----------
+
+// Mirrors the structure used in crm.js: same package presets, same Resend
+// `send-email` endpoint with type=welcome_letter, same crm_activities log on
+// success. Built as a modal here (instead of an inline form on the lead
+// detail) to match the rest of the clients-page action UX.
+const WELCOME_PACKAGES = {
+  heal: {
+    title: 'HEAL Package',
+    items: [
+      { description: 'Personalized guided ketamine sessions', quantity: 3 },
+      { description: 'Integration coaching sessions', quantity: 3 },
+      { description: '1-month AWKN membership \u2014 saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+      { description: 'Access to on-site wellness amenities and events as available', quantity: 1 },
+    ],
+  },
+  discover: {
+    title: 'DISCOVER Package',
+    items: [
+      { description: 'Private guided ketamine ceremony (fully held \u2014 prep, ceremony, integration)', quantity: 1 },
+      { description: 'Integration coaching session', quantity: 1 },
+      { description: '1-month AWKN membership \u2014 saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+    ],
+  },
+  awkn: {
+    title: 'AWKN Package',
+    items: [
+      { description: 'Personalized guided ketamine ceremonies over 3\u20136 months', quantity: 6 },
+      { description: 'Integration coaching sessions', quantity: 6 },
+      { description: '3-month AWKN membership \u2014 saunas, cold plunges, hot tub, co-working, temple space, pickleball, fire pits, community', quantity: 1 },
+      { description: 'Access to on-site wellness amenities and events as available', quantity: 1 },
+    ],
+  },
+  'twin-flame': {
+    title: 'Couples Reset',
+    items: [
+      { description: 'Shared guided ketamine ceremony for both partners', quantity: 1 },
+      { description: 'Joint integration coaching session', quantity: 1 },
+      { description: 'Private reflection session for each partner', quantity: 2 },
+      { description: '1-month AWKN membership', quantity: 1 },
+    ],
+  },
+  'immersive-6day': {
+    title: 'Six-Day Immersive Retreat',
+    items: [
+      { description: 'Private guided ketamine ceremonies during the retreat', quantity: 2 },
+      { description: 'Nights of residential stay at AWKN Ranch', quantity: 5 },
+      { description: 'Group integration circles and daily practices', quantity: 1 },
+      { description: 'Full access to AWKN amenities \u2014 saunas, cold plunges, hot tub, temple space', quantity: 1 },
+      { description: 'All meals and on-site care', quantity: 1 },
+    ],
+  },
+  'immersive-3day': {
+    title: 'Three-Day Immersive Retreat',
+    items: [
+      { description: 'Private guided ketamine ceremony during the retreat', quantity: 1 },
+      { description: 'Nights of residential stay at AWKN Ranch', quantity: 2 },
+      { description: 'Integration circle and daily practices', quantity: 1 },
+      { description: 'Full access to AWKN amenities \u2014 saunas, cold plunges, hot tub, temple space', quantity: 1 },
+      { description: 'All meals and on-site care', quantity: 1 },
+    ],
+  },
+};
+
+const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+function openSendWelcomeLetterModal(leadId) {
+  const c = clients.find(cl => cl.id === leadId);
+  if (!c) { showToast('Client not found', 'error'); return; }
+  if (!c.email) { showToast('This client has no email address on file.', 'error'); return; }
+
+  const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+
+  const packageOptions = [
+    '<option value="heal" selected>HEAL \u2014 3 ceremonies + integration</option>',
+    '<option value="discover">DISCOVER \u2014 1 ceremony + integration</option>',
+    '<option value="awkn">AWKN \u2014 6 ceremonies (deepest offering)</option>',
+    '<option value="twin-flame">Couples Reset \u2014 shared journey for partners</option>',
+    '<option value="immersive-6day">Six-Day Immersive Retreat</option>',
+    '<option value="immersive-3day">Three-Day Immersive Retreat</option>',
+    '<option value="custom">Custom \u2014 build your own list</option>',
+  ].join('');
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content" style="max-width:640px;">
+        <div class="crm-modal-header">
+          <h2>Send welcome letter to ${escapeHtml(fullName)}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body" style="padding:20px;">
+          <div class="crm-form-field">
+            <label>To</label>
+            <input type="email" class="crm-input" id="welcome-to" value="${escapeHtml(c.email)}" readonly style="background:#f3f4f6">
+          </div>
+          <div class="crm-form-field">
+            <label>Package</label>
+            <select class="crm-select" id="welcome-package">${packageOptions}</select>
+          </div>
+          <div class="crm-form-field">
+            <label>Package title (appears in the welcome header)</label>
+            <input type="text" class="crm-input" id="welcome-package-title" placeholder="e.g. HEAL Package">
+          </div>
+          <div class="crm-form-field">
+            <label>Your Outpatient Program Includes</label>
+            <div id="welcome-items-wrap" style="display:flex;flex-direction:column;gap:6px;"></div>
+            <button type="button" class="crm-btn crm-btn-sm" id="btn-welcome-add-item" style="margin-top:8px;">+ Add item</button>
+            <div class="crm-muted" style="font-size:12px;margin-top:4px;">Quantity \u00d7 description. Quantity of 1 hides the "1 \u00d7" prefix in the email.</div>
+          </div>
+          <div class="crm-form-row" style="display:flex;gap:12px;">
+            <div class="crm-form-field" style="flex:1;">
+              <label>First session date (optional)</label>
+              <input type="date" class="crm-input" id="welcome-session-date">
+            </div>
+            <div class="crm-form-field" style="flex:1;">
+              <label>Arrive by (optional)</label>
+              <input type="text" class="crm-input" id="welcome-arrival-time" placeholder="e.g. 9:30 AM">
+            </div>
+          </div>
+          <div class="crm-form-field" style="margin-top:6px;padding-top:12px;border-top:1px dashed rgba(0,0,0,0.1);">
+            <label>Send test copy to (any email)</label>
+            <div style="display:flex;gap:8px;">
+              <input type="email" class="crm-input" id="welcome-test-to" placeholder="you@within.center" style="flex:1;">
+              <button class="crm-btn crm-btn-sm" id="btn-send-welcome-test">Send Test</button>
+            </div>
+            <div class="crm-muted" style="font-size:12px;margin-top:4px;">Sends the actual email to the address above \u2014 useful for previewing in your own inbox before sending to the client.</div>
+          </div>
+        </div>
+        <div class="crm-modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-color,#eee);display:flex;gap:8px;justify-content:flex-end;">
+          <button class="crm-btn crm-btn-sm" id="btn-cancel-welcome">Cancel</button>
+          <button class="crm-btn crm-btn-sm" id="btn-preview-welcome">Preview Email</button>
+          <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-welcome">Send to ${escapeHtml(c.email)}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const itemsWrap = document.getElementById('welcome-items-wrap');
+  const renderItemRow = (item) => {
+    const row = document.createElement('div');
+    row.className = 'crm-welcome-item';
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+    row.innerHTML = `
+      <input type="number" class="crm-input crm-welcome-qty" value="${Number(item.quantity || 1)}" min="1" step="1" style="width:70px;">
+      <input type="text" class="crm-input crm-welcome-desc" value="${escapeHtml(item.description || '')}" placeholder="Description" style="flex:1;">
+      <button type="button" class="crm-btn crm-btn-xs crm-btn-danger crm-welcome-remove" title="Remove">&times;</button>
+    `;
+    row.querySelector('.crm-welcome-remove').addEventListener('click', () => row.remove());
+    return row;
+  };
+
+  const loadPackageItems = (packageKey) => {
+    itemsWrap.innerHTML = '';
+    const pkg = WELCOME_PACKAGES[packageKey];
+    if (pkg) {
+      document.getElementById('welcome-package-title').value = pkg.title;
+      pkg.items.forEach(item => itemsWrap.appendChild(renderItemRow(item)));
+    } else {
+      document.getElementById('welcome-package-title').value = '';
+      itemsWrap.appendChild(renderItemRow({ quantity: 1, description: '' }));
+    }
+  };
+
+  loadPackageItems('heal');
+
+  document.getElementById('welcome-package').addEventListener('change', (e) => {
+    loadPackageItems(e.target.value);
+  });
+
+  document.getElementById('btn-welcome-add-item').addEventListener('click', () => {
+    itemsWrap.appendChild(renderItemRow({ quantity: 1, description: '' }));
+  });
+
+  const collectItems = () =>
+    Array.from(itemsWrap.querySelectorAll('.crm-welcome-item'))
+      .map(row => ({
+        description: row.querySelector('.crm-welcome-desc').value.trim(),
+        quantity: Math.max(1, parseInt(row.querySelector('.crm-welcome-qty').value, 10) || 1),
+      }))
+      .filter(item => item.description);
+
+  const buildPayload = ({ preview, toOverride } = {}) => ({
+    type: 'welcome_letter',
+    to: toOverride || c.email,
+    preview: preview || undefined,
+    data: {
+      recipient_first_name: c.first_name || 'there',
+      business_line: c.business_line || 'within',
+      proposal_title: document.getElementById('welcome-package-title').value.trim() || 'Your Program',
+      session_date: document.getElementById('welcome-session-date')?.value || null,
+      arrival_time: document.getElementById('welcome-arrival-time')?.value.trim() || null,
+      line_items: collectItems(),
+    },
+  });
+
+  const callSendEmail = async (payload) => {
+    const resp = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(result.error || 'Request failed (HTTP ' + resp.status + ')');
+    return result;
+  };
+
+  document.getElementById('btn-preview-welcome').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-preview-welcome');
+    const prevLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Loading preview\u2026';
+    try {
+      const result = await callSendEmail(buildPayload({ preview: true }));
+      if (!result.html) throw new Error('Preview returned no HTML');
+      showWelcomePreviewModal({
+        subject: result.subject || 'Welcome Letter preview',
+        html: result.html,
+        from: result.from || '',
+        to: (result.to && result.to[0]) || c.email,
+      });
+    } catch (err) {
+      console.error('Welcome preview error:', err);
+      showToast('Preview failed: ' + (err.message || err), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+    }
+  });
+
+  document.getElementById('btn-send-welcome-test').addEventListener('click', async () => {
+    const testTo = document.getElementById('welcome-test-to').value.trim();
+    if (!testTo) { showToast('Enter an email address to send the test to', 'error'); return; }
+    const btn = document.getElementById('btn-send-welcome-test');
+    const prevLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+    try {
+      await callSendEmail(buildPayload({ toOverride: testTo }));
+      showToast(`Test copy sent to ${testTo}`, 'success');
+    } catch (err) {
+      console.error('Welcome test send error:', err);
+      showToast('Test send failed: ' + (err.message || err), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+    }
+  });
+
+  document.getElementById('btn-confirm-send-welcome').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-confirm-send-welcome');
+    const prevLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+    try {
+      await callSendEmail(buildPayload({}));
+      await logClientActivity(c.id, 'email', `Welcome letter sent to ${c.email}`);
+      showToast('Welcome letter sent', 'success');
+      openClientDetail(c.id);
+    } catch (err) {
+      console.error('Welcome send error:', err);
+      showToast('Send failed: ' + (err.message || err), 'error');
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+    }
+  });
+
+  const backToDrawer = () => openClientDetail(leadId);
+  document.getElementById('clients-modal-close-btn').addEventListener('click', backToDrawer);
+  document.getElementById('btn-cancel-welcome').addEventListener('click', backToDrawer);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') backToDrawer();
+  });
+}
+
+// Lightweight email-preview modal (mirrors crm.js's showProposalPreviewModal).
+// Renders the welcome-letter HTML inside an iframe so its inline styles can't
+// leak into the admin shell.
+function showWelcomePreviewModal({ subject, html, from, to }) {
+  const existing = document.getElementById('clients-preview-modal');
+  if (existing) existing.remove();
+
+  const wrap = document.createElement('div');
+  wrap.id = 'clients-preview-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:#fff;width:100%;max-width:760px;max-height:92vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;background:#f8fafc;">
+        <div style="flex:1;min-width:0;font-size:12px;color:#475569;line-height:1.5;">
+          <div><strong style="color:#1e293b;">Preview</strong> \u2014 exactly what the recipient will see. No email sent.</div>
+        </div>
+        <button type="button" id="clients-preview-close" class="crm-btn">Close</button>
+      </div>
+      <div style="padding:14px 20px;border-bottom:1px solid #e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#334155;">
+        <div style="font-size:17px;font-weight:600;color:#0f172a;margin-bottom:6px;line-height:1.3;">${escapeHtml(subject)}</div>
+        <div style="display:grid;grid-template-columns:60px 1fr;gap:2px 10px;">
+          <div style="color:#94a3b8;">From:</div><div>${escapeHtml(from)}</div>
+          <div style="color:#94a3b8;">To:</div><div>${escapeHtml(to)}</div>
+        </div>
+      </div>
+      <iframe id="clients-preview-iframe" style="flex:1;width:100%;border:0;min-height:520px;background:#ffffff;"></iframe>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const iframe = wrap.querySelector('#clients-preview-iframe');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`);
+  doc.close();
+
+  const close = () => wrap.remove();
+  wrap.querySelector('#clients-preview-close').addEventListener('click', close);
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+}
+
+async function logClientActivity(leadId, type, description) {
+  try {
+    const { error } = await supabase.from('crm_activities').insert({
+      lead_id: leadId,
+      activity_type: type,
+      description,
+      created_by: authState?.user?.id || null,
+    });
+    if (error) throw error;
+  } catch (err) {
+    console.error('Add activity error:', err);
   }
 }
 
