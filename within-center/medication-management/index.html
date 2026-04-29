@@ -36,30 +36,29 @@
   <style>
     .med-list {
       max-width: 720px;
-      margin: 2.5rem auto 0;
+      margin: 2.25rem auto 0;
       list-style: none;
       padding: 0;
     }
     .med-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1.1rem 0;
+      position: relative;
+      padding: 0.95rem 0 0.95rem 1.6rem;
       border-bottom: 1px solid var(--border);
       font-size: 0.95rem;
       color: var(--dark);
-      line-height: 1.7;
+      line-height: 1.6;
     }
     .med-list li:last-child { border-bottom: none; }
     .med-list li::before {
       content: '◦';
+      position: absolute;
+      left: 0;
+      top: 0.85rem;
       color: var(--gold);
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       line-height: 1;
-      flex-shrink: 0;
-      margin-top: -0.1rem;
     }
-    .med-list li strong { font-weight: 600; margin-right: 0.25rem; }
+    .med-list li strong { font-weight: 600; }
 
     .step-grid {
       max-width: 1000px;
