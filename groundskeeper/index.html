@@ -27,6 +27,29 @@
 
     .page { max-width: 560px; margin: 0 auto; padding: 1rem 1rem 7rem; }
 
+    .monday-banner {
+      display: none;
+      background: #dc2626;
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.005em;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.32);
+      align-items: center;
+      gap: 0.65rem;
+      line-height: 1.3;
+      animation: monday-pulse 1.6s ease-in-out infinite;
+    }
+    .monday-banner.show { display: flex; }
+    .monday-banner svg { flex-shrink: 0; width: 22px; height: 22px; }
+    @keyframes monday-pulse {
+      0%, 100% { box-shadow: 0 4px 14px rgba(220, 38, 38, 0.32); }
+      50%      { box-shadow: 0 4px 20px rgba(220, 38, 38, 0.55); }
+    }
+
     header { margin-bottom: 1.25rem; }
     h1 { font-size: 1.45rem; font-weight: 700; margin: 0 0 0.15rem; letter-spacing: -0.01em; }
     .today {
@@ -195,6 +218,14 @@
 </head>
 <body>
   <div class="page">
+    <div class="monday-banner" id="mondayBanner" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
+      <span>Take trash and recycle bins out to street</span>
+    </div>
+
     <header>
       <h1>Daily Grounds Checklist</h1>
       <div class="today" id="todayDate">Loading…</div>
@@ -344,6 +375,19 @@
         timeZone: 'America/Chicago',
       });
       document.getElementById('todayDate').textContent = dateStr;
+    }
+
+    function renderMondayBanner() {
+      // Determine weekday in America/Chicago so the banner aligns with the
+      // checklist's date (which is also Central). `?preview=monday` lets us
+      // verify the banner on any other day before pushing.
+      const params = new URLSearchParams(window.location.search);
+      const forceMonday = params.get('preview') === 'monday';
+      const weekday = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long', timeZone: 'America/Chicago',
+      }).format(new Date());
+      const isMonday = forceMonday || weekday === 'Monday';
+      document.getElementById('mondayBanner').classList.toggle('show', isMonday);
     }
 
     function renderChecklist() {
@@ -506,6 +550,7 @@
     // Init
     // ============================================================
     renderToday();
+    renderMondayBanner();
     document.getElementById('nameInput').value = state.name || '';
     document.getElementById('notesInput').value = state.notes || '';
     renderChecklist();
