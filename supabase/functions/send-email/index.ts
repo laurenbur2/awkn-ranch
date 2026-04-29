@@ -2801,6 +2801,11 @@ This is an automated weekly schedule report from AWKN Ranch.`
     <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Your Core Team</div>
     <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Who to reach, for what</h2>
     <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Heather Hoover</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Director of Client Experience</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your point of contact for anything about how this is going for you — feedback, concerns, or just needing to talk something through. Call or text <a href="tel:5127383750" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-738-3750</a> or email <a href="mailto:heatherhoover@within.center" style="color:#c9943e;text-decoration:none;">heatherhoover@within.center</a>.</div>
+    </div>
+    <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Leslie Glace</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Clinic Scheduler &amp; Client Care</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your schedule and any appointment changes. She'll follow up with your full schedule. <a href="mailto:leslie@within.center" style="color:#c9943e;text-decoration:none;">leslie@within.center</a></div>
@@ -2888,6 +2893,7 @@ Check-in at the Wellness Center. Once through the gate, turn left — the Wellne
 Trouble finding it or any questions day-of? Call or text Justin at 512-796-1886.
 
 YOUR CORE TEAM
+- Heather Hoover — Director of Client Experience · 512-738-3750 · heatherhoover@within.center
 - Leslie Glace — Clinic Scheduler & Client Care · leslie@within.center
 - Shannon Grossman — Admissions · 737-226-2569 · shannon@within.center
 - Justin De La Cruz — Managing Director · 512-796-1886 · justin@within.center
@@ -3104,6 +3110,11 @@ function buildImmersiveWelcomeLetter({
     <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Your Core Team</div>
     <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Who to reach, for what</h2>
     <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Heather Hoover</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Director of Client Experience</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your point of contact for anything about how the retreat is going for you — feedback, concerns, or just needing to talk something through. Call or text <a href="tel:5127383750" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-738-3750</a> or email <a href="mailto:heatherhoover@within.center" style="color:#c9943e;text-decoration:none;">heatherhoover@within.center</a>.</div>
+    </div>
+    <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.18);">
       <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Leslie Glace</div>
       <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Schedule &amp; Client Care</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your retreat schedule and any pre-arrival changes. <a href="mailto:leslie@within.center" style="color:#c9943e;text-decoration:none;">leslie@within.center</a></div>
@@ -3219,6 +3230,7 @@ BEFORE EACH CEREMONY (THE FASTING WINDOW)
 - Continue prescribed medications as normal unless told otherwise
 
 YOUR CORE TEAM
+- Heather Hoover — Director of Client Experience · 512-738-3750 · heatherhoover@within.center
 - Leslie Glace — Schedule & Client Care · leslie@within.center
 - Shannon Grossman — Admissions, add-on services · 737-226-2569 · shannon@within.center
 - Justin De La Cruz — Managing Director, day-of contact · 512-796-1886 · justin@within.center
