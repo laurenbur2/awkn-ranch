@@ -30,6 +30,9 @@ const DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 let weekAnchor = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let sessions = [];                         // raw rows for the visible window
 let services = [];                         // service catalog for display + classification
+let allSpaces = [];                        // every space the admin can put a session in
+let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
+let nsSearchDebounce  = null;
 
 // ============================================================================
 // Boot
@@ -42,13 +45,28 @@ let services = [];                         // service catalog for display + clas
     onReady: async () => {
       bindToolbar();
       bindModal();
+      bindNewSessionModal();
       await loadServices();
+      await loadSpaces();
       await loadAndRender();
       // Refresh every 60s so the now-line updates and any new bookings appear.
       setInterval(loadAndRender, 60_000);
     },
   });
 })();
+
+async function loadSpaces() {
+  // Pull anything the admin might host a session in: session-capable spaces
+  // (Wellness Rooms, Dome, Yurts, Temple) PLUS rentable spaces (since those
+  // can host private sessions for Within clients too).
+  const { data } = await supabase
+    .from('spaces')
+    .select('id, name, space_type, booking_category')
+    .eq('is_archived', false)
+    .or('space_type.eq.session,space_type.eq.both,booking_category.eq.rental_space')
+    .order('name');
+  allSpaces = data || [];
+}
 
 async function loadServices() {
   const { data } = await supabase.from('services').select('id, slug, name, duration_minutes');
@@ -357,6 +375,289 @@ function bindToolbar() {
     weekAnchor = startOfWeek(new Date());
     loadAndRender();
   });
+  document.getElementById('btnNewSession')?.addEventListener('click', openNewSessionModal);
+}
+
+// ============================================================================
+// New Session modal — create a scheduling_bookings row + check conflicts
+// ============================================================================
+function bindNewSessionModal() {
+  document.getElementById('nsClose')?.addEventListener('click', closeNewSessionModal);
+  document.getElementById('nsCancel')?.addEventListener('click', closeNewSessionModal);
+  document.getElementById('nsModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'nsModal') closeNewSessionModal();
+  });
+  document.getElementById('nsSave')?.addEventListener('click', saveNewSession);
+
+  // Service dropdown
+  const svcSel = document.getElementById('nsService');
+  svcSel.innerHTML = '<option value="">— Select service —</option>'
+    + services.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration_minutes} min)</option>`).join('');
+
+  // Space dropdown — list every session-capable + rentable space, plus an
+  // "Other" option that reveals a free-text location field.
+  const spcSel = document.getElementById('nsSpace');
+  spcSel.innerHTML = '<option value="">— Select a space —</option>'
+    + allSpaces.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')
+    + '<option value="__other__">Other (specify location)</option>';
+
+  // Show/hide the Other location text field based on selection
+  spcSel.addEventListener('change', () => {
+    document.getElementById('nsOtherWrap').style.display =
+      spcSel.value === '__other__' ? '' : 'none';
+    runConflictCheck();
+  });
+
+  // Re-run conflict check when date/time changes
+  ['nsDate', 'nsStart', 'nsEnd'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', runConflictCheck);
+  });
+
+  // Auto-fill end time when service is picked (start + duration)
+  svcSel.addEventListener('change', () => {
+    const startEl = document.getElementById('nsStart');
+    const endEl   = document.getElementById('nsEnd');
+    const svc = services.find(s => s.id === svcSel.value);
+    if (svc && startEl.value && !endEl.value) {
+      endEl.value = addMinutesToTime(startEl.value, svc.duration_minutes);
+      runConflictCheck();
+    }
+  });
+
+  // Client search
+  const searchEl  = document.getElementById('nsClientSearch');
+  const resultsEl = document.getElementById('nsClientResults');
+  searchEl?.addEventListener('input', () => {
+    clearTimeout(nsSearchDebounce);
+    const q = searchEl.value.trim();
+    if (q.length < 2) {
+      resultsEl.style.display = 'none';
+      resultsEl.innerHTML = '';
+      return;
+    }
+    nsSearchDebounce = setTimeout(async () => {
+      const { data } = await supabase
+        .from('crm_leads')
+        .select('id, first_name, last_name, email, phone')
+        .eq('business_line', 'within')
+        .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,email.ilike.%${q}%`)
+        .limit(8);
+      const rows = data || [];
+      if (rows.length === 0) {
+        resultsEl.innerHTML = '<div style="padding:0.55rem 0.7rem;color:#9ca3af;font-size:0.84rem;font-style:italic;">No Within clients match.</div>';
+      } else {
+        resultsEl.innerHTML = rows.map(r => {
+          const name = ((r.first_name || '') + ' ' + (r.last_name || '')).trim() || r.email || 'Client';
+          return `<button class="ns-client-row" data-id="${esc(r.id)}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
+            <span style="font-weight:600;color:#111827;font-size:0.88rem;">${esc(name)}</span>
+            ${r.email ? `<span style="font-size:0.74rem;color:#6b7280;">${esc(r.email)}</span>` : ''}
+          </button>`;
+        }).join('');
+      }
+      resultsEl.style.display = '';
+    }, 200);
+  });
+
+  resultsEl?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.ns-client-row');
+    if (!btn) return;
+    nsSelectedLeadId = btn.dataset.id;
+    const nameEl = btn.querySelector('span');
+    const selectedEl = document.getElementById('nsSelectedClient');
+    selectedEl.style.display = '';
+    selectedEl.innerHTML = `<strong>Selected:</strong> ${nameEl.innerHTML} <button id="nsClearClient" style="background:none;border:none;color:#d4883a;font-size:0.78rem;font-weight:600;cursor:pointer;margin-left:0.5rem;">change</button>`;
+    document.getElementById('nsClearClient').addEventListener('click', () => {
+      nsSelectedLeadId = null;
+      selectedEl.style.display = 'none';
+      selectedEl.innerHTML = '';
+      searchEl.value = '';
+      searchEl.focus();
+    });
+    searchEl.value = '';
+    resultsEl.style.display = 'none';
+    resultsEl.innerHTML = '';
+  });
+
+  // Esc closes the modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('nsModal').classList.contains('hidden')) {
+      closeNewSessionModal();
+    }
+  });
+}
+
+function openNewSessionModal() {
+  // Reset state
+  nsSelectedLeadId = null;
+  document.getElementById('nsClientSearch').value = '';
+  document.getElementById('nsSelectedClient').style.display = 'none';
+  document.getElementById('nsClientResults').style.display = 'none';
+  document.getElementById('nsService').value = '';
+  document.getElementById('nsDate').value = ymd(new Date());
+  document.getElementById('nsStart').value = '';
+  document.getElementById('nsEnd').value = '';
+  document.getElementById('nsSpace').value = '';
+  document.getElementById('nsOtherWrap').style.display = 'none';
+  document.getElementById('nsOtherLocation').value = '';
+  document.getElementById('nsNotes').value = '';
+  hideNsError();
+  hideNsConflict();
+
+  document.getElementById('nsModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('nsClientSearch').focus(), 30);
+}
+function closeNewSessionModal() {
+  document.getElementById('nsModal').classList.add('hidden');
+}
+function showNsError(msg) {
+  const el = document.getElementById('nsError');
+  el.textContent = msg; el.style.display = '';
+}
+function hideNsError() {
+  const el = document.getElementById('nsError');
+  el.style.display = 'none'; el.textContent = '';
+}
+function showNsConflict(msg) {
+  const el = document.getElementById('nsConflict');
+  el.innerHTML = msg; el.style.display = '';
+}
+function hideNsConflict() {
+  const el = document.getElementById('nsConflict');
+  el.style.display = 'none'; el.innerHTML = '';
+}
+
+// Combine date + HH:MM time into a Date in the local timezone.
+function combineDateTimeLocal(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [h, mn] = timeStr.split(':').map(Number);
+  return new Date(y, m - 1, d, h, mn, 0, 0);
+}
+function addMinutesToTime(timeStr, minutes) {
+  if (!timeStr) return '';
+  const [h, m] = timeStr.split(':').map(Number);
+  const total = h * 60 + m + minutes;
+  const hh = Math.floor(total / 60) % 24;
+  const mm = total % 60;
+  return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+}
+
+// Look up overlapping bookings on the chosen space + time window. Hits
+// scheduling_bookings (other Within sessions) and crm_leads (venue events
+// where business_line='awkn_ranch'). Shows a yellow warning banner if
+// anything overlaps. Doesn't block the create — just informs.
+async function runConflictCheck() {
+  hideNsConflict();
+  const spaceId = document.getElementById('nsSpace').value;
+  const date    = document.getElementById('nsDate').value;
+  const start   = document.getElementById('nsStart').value;
+  const end     = document.getElementById('nsEnd').value;
+
+  if (!spaceId || spaceId === '__other__' || !date || !start || !end) return;
+
+  const startDt = combineDateTimeLocal(date, start);
+  const endDt   = combineDateTimeLocal(date, end);
+  if (!startDt || !endDt || endDt <= startDt) return;
+
+  const startISO = startDt.toISOString();
+  const endISO   = endDt.toISOString();
+
+  const [sessRes, leadRes] = await Promise.all([
+    // Other Within sessions on the same space, overlapping window
+    supabase
+      .from('scheduling_bookings')
+      .select('id, start_datetime, end_datetime, status, lead:crm_leads(first_name, last_name)')
+      .eq('space_id', spaceId)
+      .neq('status', 'cancelled')
+      .lt('start_datetime', endISO)
+      .gt('end_datetime',   startISO),
+    // Venue events booked on this space — only the confirmed ones
+    supabase
+      .from('crm_leads')
+      .select('id, first_name, last_name, event_date, event_start_time, event_end_time, stage:crm_pipeline_stages(slug)')
+      .eq('business_line', 'awkn_ranch')
+      .eq('space_id', spaceId)
+      .eq('event_date', date),
+  ]);
+
+  const sessConflicts = sessRes.data || [];
+  const venueConflicts = (leadRes.data || []).filter(lead => {
+    const slug = (lead.stage?.slug || '').toLowerCase();
+    if (!['invoice_paid', 'event_scheduled', 'event_complete', 'feedback_form_sent'].includes(slug)) return false;
+    if (!lead.event_start_time || !lead.event_end_time) return true; // unknown times → assume conflict
+    return lead.event_start_time < end && lead.event_end_time > start;
+  });
+
+  if (sessConflicts.length === 0 && venueConflicts.length === 0) return;
+
+  const lines = [];
+  if (sessConflicts.length > 0) {
+    lines.push(`<strong>⚠️ ${sessConflicts.length} Within session${sessConflicts.length === 1 ? '' : 's'}</strong> already booked on this space at this time.`);
+  }
+  if (venueConflicts.length > 0) {
+    const names = venueConflicts.map(v => ((v.first_name || '') + ' ' + (v.last_name || '')).trim() || 'unnamed');
+    lines.push(`<strong>⚠️ Venue event${venueConflicts.length === 1 ? '' : 's'} confirmed</strong> on this space today: ${esc(names.join(', '))}.`);
+  }
+  showNsConflict(lines.join('<br>'));
+}
+
+async function saveNewSession() {
+  hideNsError();
+  if (!nsSelectedLeadId) { showNsError('Select a Within client.'); return; }
+  const serviceId = document.getElementById('nsService').value;
+  if (!serviceId) { showNsError('Select a service.'); return; }
+  const date  = document.getElementById('nsDate').value;
+  const start = document.getElementById('nsStart').value;
+  const end   = document.getElementById('nsEnd').value;
+  if (!date || !start || !end) { showNsError('Date, start, and end are required.'); return; }
+  if (end <= start) { showNsError('End time must be after start time.'); return; }
+  const spaceVal = document.getElementById('nsSpace').value;
+  if (!spaceVal) { showNsError('Select a space (or Other).'); return; }
+  const otherLocation = document.getElementById('nsOtherLocation').value.trim();
+  if (spaceVal === '__other__' && !otherLocation) {
+    showNsError('Type a location for "Other".');
+    return;
+  }
+
+  const startDt = combineDateTimeLocal(date, start);
+  const endDt   = combineDateTimeLocal(date, end);
+
+  // For Other, leave space_id null and stamp the location into notes so it
+  // shows up in the session detail modal.
+  const spaceId = spaceVal === '__other__' ? null : spaceVal;
+  const baseNotes = document.getElementById('nsNotes').value.trim();
+  const finalNotes = spaceId
+    ? (baseNotes || null)
+    : `Location: ${otherLocation}${baseNotes ? `\n\n${baseNotes}` : ''}`;
+
+  const payload = {
+    lead_id: nsSelectedLeadId,
+    service_id: serviceId,
+    space_id: spaceId,
+    start_datetime: startDt.toISOString(),
+    end_datetime:   endDt.toISOString(),
+    status: 'scheduled',
+    notes: finalNotes,
+  };
+
+  const btn = document.getElementById('nsSave');
+  btn.disabled = true; btn.textContent = 'Creating…';
+
+  const { data, error } = await supabase
+    .from('scheduling_bookings')
+    .insert([payload])
+    .select()
+    .single();
+
+  btn.disabled = false; btn.textContent = 'Create Session';
+
+  if (error) {
+    showNsError('Could not create: ' + error.message);
+    return;
+  }
+
+  closeNewSessionModal();
+  await loadAndRender();
 }
 
 // ============================================================================

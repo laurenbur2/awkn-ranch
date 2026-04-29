@@ -35,6 +35,8 @@
     }
     .ws-tb-btn:hover { background: #f9fafb; }
     .ws-tb-range { font-size: 0.92rem; font-weight: 600; color: #111827; padding: 0 0.5rem; flex: 1; text-align: center; }
+    .ws-tb-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .ws-tb-btn-primary:hover { background: #b87625; }
 
     /* Layout: separate header row from body. Body has a time column on the
        left and 7 equal-width day columns. Each day column is its own
@@ -215,6 +217,7 @@
         <button class="ws-tb-btn" id="btnToday">Today</button>
         <button class="ws-tb-btn" id="btnNext" aria-label="Next week">→</button>
         <span class="ws-tb-range" id="tbRange">—</span>
+        <button class="ws-tb-btn ws-tb-btn-primary" id="btnNewSession">+ New Session</button>
       </div>
       <div class="ws-grid-wrap">
         <div class="ws-header" id="wsHeader"></div>
@@ -222,6 +225,75 @@
       </div>
     </div>
   </main>
+
+  <!-- New session modal -->
+  <div class="ws-modal-overlay hidden" id="nsModal">
+    <div class="ws-modal" style="max-width: 520px;">
+      <div class="ws-modal-head">
+        <span class="ws-modal-title">New Session</span>
+        <button class="ws-modal-x" id="nsClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ws-modal-body">
+        <div id="nsError" style="background:#fef2f2;color:#991b1b;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fecaca;display:none;"></div>
+        <div id="nsConflict" style="background:#fef3c7;color:#78350f;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fde68a;display:none;"></div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Client</span>
+          <div style="position: relative;">
+            <input type="text" id="nsClientSearch" placeholder="Search Within client (name, email)…" autocomplete="off"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+            <div id="nsClientResults" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:5;display:none;box-shadow:0 8px 20px rgba(0,0,0,0.08);"></div>
+            <div id="nsSelectedClient" style="margin-top:0.4rem;display:none;background:#f9fafb;padding:0.45rem 0.6rem;border-radius:6px;border:1px solid #e5e7eb;font-size:0.84rem;"></div>
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Service</span>
+          <select id="nsService" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select service —</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Date</span>
+            <input type="date" id="nsDate" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Start</span>
+            <input type="time" id="nsStart" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">End</span>
+            <input type="time" id="nsEnd" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Space</span>
+          <select id="nsSpace" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select a space —</option>
+          </select>
+        </div>
+
+        <div class="ws-modal-row" id="nsOtherWrap" style="display:none;">
+          <span class="ws-modal-label">Location</span>
+          <input type="text" id="nsOtherLocation" placeholder="Type the location (e.g., Outside, Pool deck, Off-site)"
+                 style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Notes <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="nsNotes" rows="2" placeholder="Anything the team should know about this session…"
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="ws-modal-foot">
+        <button class="ws-tb-btn" id="nsCancel">Cancel</button>
+        <button class="ws-tb-btn ws-tb-btn-primary" id="nsSave">Create Session</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Session detail modal -->
   <div class="ws-modal-overlay hidden" id="wsModal">
