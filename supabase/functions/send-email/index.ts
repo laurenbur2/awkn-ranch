@@ -3136,7 +3136,7 @@ function buildImmersiveWelcomeLetter({
   <div style="padding:0 40px 32px 40px;">
     <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:8px;">Departure &amp; What Comes After</div>
-      <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.8;margin:0;">Check-out is by <strong>11am</strong> on your final day, after a slow morning and breakfast together. We'll reach out within a week to schedule your post-retreat integration call — and the door doesn't close there. <strong>Integration packages are available</strong> for anyone who wants continued support as they ease back into everyday life: extended coaching, additional sessions, and gentle check-ins to help what opened here keep unfolding at home. Reach out whenever you're ready — we'd love to walk the next stretch with you. Protect the days following: no big meetings, no hard conversations. Integration happens in rest.</p>
+      <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.8;margin:0;">Check-out is by <strong>11am</strong> on your final day, after a slow morning and breakfast together. <strong>Integration packages are available</strong> for anyone who wants continued support as they ease back into everyday life: extended coaching, additional sessions, and gentle check-ins to help what opened here keep unfolding at home. Reach out whenever you're ready — we'd love to walk the next stretch with you. Protect the days following: no big meetings, no hard conversations. Integration happens in rest.</p>
     </div>
   </div>
 
@@ -3236,7 +3236,7 @@ YOUR CORE TEAM
 - Justin De La Cruz — Executive Director · 512-796-1886 · justin@within.center
 
 DEPARTURE & WHAT COMES AFTER
-Check-out by 11am on your final day, after a slow morning and breakfast. We'll reach out within a week to schedule your post-retreat integration call — and the door doesn't close there. Integration packages are available for anyone who wants continued support as they ease back into everyday life: extended coaching, additional sessions, and gentle check-ins to help what opened here keep unfolding at home. Reach out whenever you're ready — we'd love to walk the next stretch with you. Protect the days after — no big meetings, no hard conversations. Integration happens in rest.
+Check-out by 11am on your final day, after a slow morning and breakfast. Integration packages are available for anyone who wants continued support as they ease back into everyday life: extended coaching, additional sessions, and gentle check-ins to help what opened here keep unfolding at home. Reach out whenever you're ready — we'd love to walk the next stretch with you. Protect the days after — no big meetings, no hard conversations. Integration happens in rest.
 
 JOIN THE WHATSAPP COMMUNITY
 https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt
