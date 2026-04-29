@@ -2638,6 +2638,21 @@ This is an automated weekly schedule report from AWKN Ranch.`
       const arrivalTime = String(data.arrival_time || "30 min early");
       const proposalTitle = String(data.proposal_title || "Your Program");
 
+      // Immersive retreat variant — multi-night stay at the house. Reuses the
+      // brand chrome but swaps in retreat-specific arrival/orientation/packing
+      // sections. Triggered by the front-end forms when an immersive package is
+      // selected (immersive-3day / immersive-6day).
+      if (data.variant === "immersive") {
+        return buildImmersiveWelcomeLetter({
+          firstName,
+          proposalTitle,
+          lineItems,
+          checkInDate: sessionDate,
+          checkInWindow: data.arrival_time ? String(data.arrival_time) : "4pm – 6pm",
+          nights: Number(data.nights) || (proposalTitle.toLowerCase().includes("six") ? 5 : proposalTitle.toLowerCase().includes("three") ? 2 : 5),
+        });
+      }
+
       const includedItems = lineItems.length > 0
         ? lineItems.map((li: any) => {
             const qty = Number(li.quantity || 1);
@@ -2898,6 +2913,321 @@ The Within Center Team`,
     default:
       throw new Error(`Unknown email type: ${type}`);
   }
+}
+
+// Immersive-retreat welcome letter — for guests booked into a multi-night stay
+// (3-day or 6-day retreat). Same brand styling as the standard welcome letter
+// but reorders/swaps sections for an arrival-at-the-house flow: check-in
+// window, gate + carport directions, weather + swimsuit packing list, what's
+// already provided, daily rhythm, and a departure / integration note.
+function buildImmersiveWelcomeLetter({
+  firstName,
+  proposalTitle,
+  lineItems,
+  checkInDate,
+  checkInWindow,
+  nights,
+}: {
+  firstName: string;
+  proposalTitle: string;
+  lineItems: any[];
+  checkInDate: string;
+  checkInWindow: string;
+  nights: number;
+}) {
+  const includedItems = lineItems.length > 0
+    ? lineItems.map((li: any) => {
+        const qty = Number(li.quantity || 1);
+        const desc = String(li.description || "");
+        const label = qty > 1 ? `<strong>${qty} ×</strong> ${desc}` : desc;
+        return `<li>${label}</li>`;
+      }).join("")
+    : `
+        <li><strong>${nights}</strong> nights of residential stay at AWKN Ranch</li>
+        <li>Private guided ketamine ceremonies during the retreat</li>
+        <li>Group integration circles and daily practices</li>
+        <li>Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space</li>
+        <li>All meals and on-site care</li>
+      `;
+
+  const forecastUrl = "https://weather.com/weather/tenday/l/Austin+TX";
+
+  return {
+    subject: `Welcome to your AWKN Ranch immersive retreat — ${proposalTitle}`,
+    html: `
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
+
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">WITHIN CENTER</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">at AWKN Ranch · Austin, Texas</div>
+  </div>
+
+  <!-- Welcome hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Welcome · ${proposalTitle}</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">We're honored to host you, ${firstName}.</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">For the next ${nights} nights, the ranch is yours. Our whole team — medical, integration, guides, kitchen, care, and operations — is here to hold you through this, mind, body, and spirit.</p>
+  </div>
+
+  <!-- Your retreat at a glance -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="border:1px solid rgba(201,148,62,0.25);border-radius:4px;padding:20px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;">Check-in</td>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b4c3b;padding-bottom:4px;text-align:right;">Window</td>
+        </tr>
+        <tr>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#1c1618;font-weight:500;">${checkInDate}</td>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#c9943e;font-weight:500;text-align:right;">${checkInWindow}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;padding-top:10px;"><strong style="color:#1c1618;">${nights} nights</strong> at the ranch. Your facilitator will share your full daily schedule on arrival.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- What's included -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Package Includes</div>
+      <ul style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.85;margin:0;padding-left:18px;">
+        ${includedItems}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Arrival / finding the house -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Arriving at the Ranch</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 16px 0;">Check in at the house</h2>
+    <div style="background:#1c1618;border-radius:4px;padding:22px 26px;text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;line-height:1.4;">7600 Grove Crest Circle<br>Austin, TX</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);margin-top:10px;">Gate code: <strong style="color:#c9943e;letter-spacing:0.05em;">2321#</strong> (enter)</div>
+    </div>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;line-height:1.7;margin:16px 0 0 0;">Once through the gate, <strong style="color:#1c1618;">stay right</strong> and follow the drive up to the main house. <strong style="color:#1c1618;">Park near the carport</strong> and walk in to check in — someone from our team will be there to greet you and show you to your room. Plan to arrive between <strong style="color:#1c1618;">${checkInWindow}</strong>; if your travel runs late, just text Justin at <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> so we can hold dinner.</p>
+  </div>
+
+  <!-- Weather / what to bring -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Packing for the Land</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 16px 0;">Texas can swing — pack in layers</h2>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.7;margin:0 0 16px 0;text-align:center;">A few days out, take a look at the <a href="${forecastUrl}" style="color:#c9943e;text-decoration:none;font-weight:600;">10-day Austin forecast</a>. Mornings can be cool, afternoons warm, evenings breezy on the porch.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td width="50%" valign="top" style="padding-right:12px;">
+          <div style="background:#faf8f5;border:1px solid rgba(201,148,62,0.18);border-radius:4px;padding:18px 20px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">What to Bring</div>
+            <ul style="font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;line-height:1.7;margin:0;padding-left:16px;">
+              <li><strong>Swimsuit</strong> — pool, hot tub, sauna, cold plunge are all yours</li>
+              <li>Layered clothing (the forecast will guide you)</li>
+              <li>Loose, soft clothes for ceremony — something you'd nap in</li>
+              <li>Slippers or sandals for around the house</li>
+              <li>Journal + pen for integration</li>
+              <li>Reusable water bottle</li>
+              <li>Any prescriptions in original containers</li>
+              <li>A grounding object (photo, stone, note)</li>
+            </ul>
+          </div>
+        </td>
+        <td width="50%" valign="top" style="padding-left:12px;">
+          <div style="background:#faf8f5;border:1px solid rgba(201,148,62,0.18);border-radius:4px;padding:18px 20px;">
+            <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Already Provided</div>
+            <ul style="font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;line-height:1.7;margin:0;padding-left:16px;">
+              <li>All meals, snacks, tea, coffee</li>
+              <li>Bed linens, bath + pool towels, robe</li>
+              <li>Basic toiletries — shampoo, conditioner, body wash, soap</li>
+              <li>Yoga mats, meditation cushions, blankets</li>
+              <li>Eye masks, headphones, ceremony music</li>
+              <li>Fully stocked kitchen between meals</li>
+              <li>Wi-Fi (password shared at check-in)</li>
+            </ul>
+            <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:#6b4c3b;line-height:1.6;margin-top:10px;">Travel light. We've thought through the rest.</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Daily rhythm -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">A Day in Retreat</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 18px 0;">A gentle, deliberate rhythm</h2>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.8;margin:0 0 14px 0;">Days move slowly here on purpose. A typical rhythm — flexible to the group and your needs:</p>
+    <ul style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.85;margin:0;padding-left:20px;">
+      <li><strong>Mornings</strong> — gentle movement or breathwork on the deck, then a shared breakfast</li>
+      <li><strong>Ceremony days</strong> — held in the temple space, fully supported, with rest and integration to follow</li>
+      <li><strong>Integration days</strong> — small group circles, one-on-one coaching, journaling, walks on the land</li>
+      <li><strong>Afternoons</strong> — open time for sauna, cold plunge, hot tub, pool, or simply doing nothing</li>
+      <li><strong>Evenings</strong> — group dinner, then quiet time. Lights low after 10pm so the body can settle</li>
+    </ul>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:16px 0 0 0;">You'll get the full schedule on arrival. Nothing here is forced — you can opt out of anything that doesn't feel right.</p>
+  </div>
+
+  <!-- Fasting window -->
+  <div style="padding:0 40px 16px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Before Each Ceremony</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Your fasting window</h2>
+  </div>
+
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:26px 30px;">
+      <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.25);">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No solid food</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">3 hours before each ceremony</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">Non-negotiable. Our kitchen will time meals around your ceremony schedule, so you don't have to think about it.</div>
+      </div>
+      <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.25);">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No alcohol or cannabis</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">48 hours before arrival, and through the retreat</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">They dull the nervous system and muddy the experience. Step away early — your body will thank you.</div>
+      </div>
+      <div style="padding-top:16px;">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">Hydrate the days leading in</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">Drink water like it's your job</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">Continue your prescribed medications as normal unless our clinician has told you otherwise.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The land + amenities -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">The Land</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 18px 0;">Yours to wander</h2>
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.85;margin:0;">The pool, hot tub, sauna, and cold plunge are open to you throughout your stay. The temple holds our ceremonies and group practice. Common areas in the house are shared; your bedroom is yours alone. Phones are welcome in your room and the kitchen, but we encourage leaving them tucked away during ceremony, meals, and circle. We're a quiet, secluded ranch — let the land hold you.</p>
+  </div>
+
+  <!-- Your team -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:6px;">Your Core Team</div>
+    <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;text-align:center;margin:0 0 20px 0;">Who to reach, for what</h2>
+    <div style="padding-bottom:16px;border-bottom:1px solid rgba(201,148,62,0.18);">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Leslie Glace</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Schedule &amp; Client Care</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Your retreat schedule and any pre-arrival changes. <a href="mailto:leslie@within.center" style="color:#c9943e;text-decoration:none;">leslie@within.center</a></div>
+    </div>
+    <div style="padding-top:16px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#1c1618;font-weight:500;">Justin De La Cruz</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#c9943e;margin:2px 0 6px 0;">Managing Director · Day-of Contact</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.6;">Anything at all — directions, late arrivals, after-hours, questions on the road. Call or text <a href="tel:5127961886" style="color:#c9943e;text-decoration:none;white-space:nowrap;">512-796-1886</a> or email <a href="mailto:justin@within.center" style="color:#c9943e;text-decoration:none;">justin@within.center</a>.</div>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#6b4c3b;line-height:1.6;margin:18px 0 0 0;text-align:center;">Plus medical, integration coaches, guides, kitchen, retreat care, and operations — the whole team looks forward to meeting you.</p>
+  </div>
+
+  <!-- Departure & integration -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:8px;">Departure &amp; What Comes After</div>
+      <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.8;margin:0;">Check-out is by <strong>11am</strong> on your final day, after a slow morning and breakfast together. We'll reach out within a week to schedule your post-retreat integration call — the work continues, gently, after you head home. Protect the days following: no big meetings, no hard conversations. Integration happens in rest.</p>
+    </div>
+  </div>
+
+  <!-- WhatsApp community -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:28px 30px;text-align:center;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Stay Connected</div>
+      <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:500;color:#ffffff;margin:0 0 10px 0;line-height:1.3;">Join the Within Center WhatsApp community</h3>
+      <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:15px;color:rgba(255,255,255,0.75);line-height:1.6;margin:0 0 18px 0;">Where we share weekly classes, retreats, gatherings, events, and member-only specials.</p>
+      <a href="https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:12px 26px;border-radius:3px;">Join the Community</a>
+    </div>
+  </div>
+
+  <!-- Signoff -->
+  <div style="padding:0 40px 36px 40px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#1c1618;line-height:1.7;margin:0 0 20px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+      We can't wait to welcome you to the ranch. Until then, breathe slow, drink water, and let the anticipation soften.
+    </p>
+    <div style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;line-height:1.8;">
+      <a href="mailto:info@within.center" style="color:#c9943e;text-decoration:none;">info@within.center</a> &nbsp;·&nbsp;
+      <a href="tel:5129692399" style="color:#c9943e;text-decoration:none;">512-969-2399</a>
+    </div>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#1c1618;margin:20px 0 0 0;">With care,<br><em style="color:#6b4c3b;">The Within Center Team</em></p>
+  </div>
+
+  <!-- Footer disclaimer -->
+  <div style="padding:0 40px 32px 40px;text-align:center;font-family:'Inter',sans-serif;font-size:11px;color:rgba(28,22,24,0.45);line-height:1.7;">
+    <strong style="color:rgba(28,22,24,0.6);">MEDICAL DISCLAIMER</strong> · These are general preparation instructions. If our medical team has given you different guidance, follow theirs. Not medical advice.
+    <br><br>
+    © 2026 Hearth Space Health, Inc. · 7600 Grove Crest Circle, Austin, TX<br>
+    Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(28,22,24,0.5);text-decoration:underline;">AWKN Ranch</a>
+  </div>
+
+</div>
+    `,
+    text: `Welcome to your AWKN Ranch immersive retreat — ${proposalTitle}
+
+Hi ${firstName},
+
+For the next ${nights} nights, the ranch is yours. We're honored to host you.
+
+CHECK-IN
+${checkInDate} · ${checkInWindow}
+${nights} nights at the ranch — your facilitator will share the full daily schedule on arrival.
+
+YOUR PACKAGE INCLUDES
+${lineItems.length > 0
+  ? lineItems.map((li: any) => `- ${Number(li.quantity || 1) > 1 ? Number(li.quantity) + ' × ' : ''}${li.description}`).join('\n')
+  : `- ${nights} nights of residential stay\n- Private guided ketamine ceremonies\n- Group integration circles and daily practices\n- Full access to AWKN amenities — saunas, cold plunges, hot tub, temple\n- All meals and on-site care`}
+
+ARRIVING AT THE RANCH
+7600 Grove Crest Circle, Austin, TX
+Gate code: 2321# (enter)
+Once through the gate, STAY RIGHT and follow the drive up to the main house. Park near the carport and walk in to check in. If your travel runs late, text Justin at 512-796-1886.
+
+WEATHER & WHAT TO BRING
+A few days out, check the 10-day Austin forecast: ${forecastUrl}
+Mornings cool, afternoons warm, evenings breezy — pack in layers.
+
+What to bring:
+- SWIMSUIT — pool, hot tub, sauna, cold plunge
+- Layered clothing
+- Loose, soft clothes for ceremony
+- Slippers or sandals for around the house
+- Journal + pen
+- Reusable water bottle
+- Any prescriptions in original containers
+- A grounding object
+
+Already provided (travel light):
+- All meals, snacks, tea, coffee
+- Bed linens, bath + pool towels, robe
+- Basic toiletries
+- Yoga mats, meditation cushions, blankets
+- Eye masks, headphones, ceremony music
+- Wi-Fi (password at check-in)
+
+A DAY IN RETREAT
+- Mornings — gentle movement or breathwork, shared breakfast
+- Ceremony days — held in the temple space, fully supported
+- Integration days — group circles, coaching, journaling, walks
+- Afternoons — sauna, cold plunge, hot tub, pool, or rest
+- Evenings — group dinner, quiet after 10pm
+
+Nothing here is forced. You can opt out of anything that doesn't feel right.
+
+BEFORE EACH CEREMONY (THE FASTING WINDOW)
+- No solid food: 3 hours before each ceremony (non-negotiable)
+- No alcohol or cannabis: 48 hours before arrival, and through the retreat
+- Hydrate the days leading in
+- Continue prescribed medications as normal unless told otherwise
+
+YOUR CORE TEAM
+- Leslie Glace — Schedule & Client Care · leslie@within.center
+- Justin De La Cruz — Managing Director, day-of contact · 512-796-1886 · justin@within.center
+
+DEPARTURE & WHAT COMES AFTER
+Check-out by 11am on your final day, after a slow morning and breakfast. We'll reach out within a week to schedule your post-retreat integration call. Protect the days after — no big meetings, no hard conversations. Integration happens in rest.
+
+JOIN THE WHATSAPP COMMUNITY
+https://chat.whatsapp.com/JYVkug3HYOCLGnrMsGodtB?mode=wwt
+
+Questions? info@within.center · 512-969-2399
+
+With care,
+The Within Center Team`,
+  };
 }
 
 const corsHeaders = {

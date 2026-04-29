@@ -1451,11 +1451,11 @@ The ${bizLabel} Team</textarea>
       </div>
       <div class="crm-form-row" style="display:flex;gap:12px;">
         <div class="crm-form-field" style="flex:1;">
-          <label>First session date (optional)</label>
+          <label id="welcome-date-label">First session date (optional)</label>
           <input type="date" class="crm-input" id="welcome-session-date">
         </div>
         <div class="crm-form-field" style="flex:1;">
-          <label>Arrive by (optional)</label>
+          <label id="welcome-arrival-label">Arrive by (optional)</label>
           <input type="text" class="crm-input" id="welcome-arrival-time" placeholder="e.g. 9:30 AM">
         </div>
       </div>
@@ -1501,10 +1501,37 @@ The ${bizLabel} Team</textarea>
       }
     };
 
+    // Switch the date/arrival field labels + arrival default based on whether
+    // the selected package is an immersive retreat (multi-night house stay) or
+    // a standard outpatient session program. Mirrored in clients.js.
+    const applyVariantLabels = (packageKey) => {
+      const isImmersive = packageKey === 'immersive-3day' || packageKey === 'immersive-6day';
+      const dateLabel = document.getElementById('welcome-date-label');
+      const arrivalLabel = document.getElementById('welcome-arrival-label');
+      const arrivalInput = document.getElementById('welcome-arrival-time');
+      if (isImmersive) {
+        if (dateLabel) dateLabel.textContent = 'Check-in date';
+        if (arrivalLabel) arrivalLabel.textContent = 'Check-in window';
+        if (arrivalInput) {
+          arrivalInput.placeholder = 'e.g. 4pm – 6pm';
+          if (!arrivalInput.value) arrivalInput.value = '4pm – 6pm';
+        }
+      } else {
+        if (dateLabel) dateLabel.textContent = 'First session date (optional)';
+        if (arrivalLabel) arrivalLabel.textContent = 'Arrive by (optional)';
+        if (arrivalInput) {
+          arrivalInput.placeholder = 'e.g. 9:30 AM';
+          if (arrivalInput.value === '4pm – 6pm') arrivalInput.value = '';
+        }
+      }
+    };
+
     loadPackageItems('heal');
+    applyVariantLabels('heal');
 
     document.getElementById('welcome-package').addEventListener('change', (e) => {
       loadPackageItems(e.target.value);
+      applyVariantLabels(e.target.value);
     });
 
     document.getElementById('btn-welcome-add-item').addEventListener('click', () => {
@@ -1521,6 +1548,8 @@ The ${bizLabel} Team</textarea>
     };
 
     const buildPayload = ({ preview, toOverride } = {}) => {
+      const packageKey = document.getElementById('welcome-package').value;
+      const isImmersive = packageKey === 'immersive-3day' || packageKey === 'immersive-6day';
       return {
         type: 'welcome_letter',
         to: toOverride || lead.email,
@@ -1532,6 +1561,8 @@ The ${bizLabel} Team</textarea>
           session_date: document.getElementById('welcome-session-date')?.value || null,
           arrival_time: document.getElementById('welcome-arrival-time')?.value.trim() || null,
           line_items: collectItems(),
+          variant: isImmersive ? 'immersive' : undefined,
+          nights: packageKey === 'immersive-6day' ? 5 : packageKey === 'immersive-3day' ? 2 : undefined,
         },
       };
     };
