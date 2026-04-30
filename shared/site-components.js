@@ -66,32 +66,30 @@ function renderHeader(options = {}) {
   const headerClass = transparent ? 'aap-header--transparent' : 'aap-header--solid';
   const colorClass = light ? 'aap-header--light' : 'aap-header--dark';
 
-  // Team-portal variant: enlarged logo image stacked with a "Team Portal"
-  // subtag, no public-site nav. Auth widget stays on the right so admins can
-  // still see who they're signed in as.
+  // Team-portal variant: enlarged AWKN wordmark (tight crop, minimal
+  // whitespace) with a "Team Portal" subtag below it. Auth widget pinned
+  // to the top-right corner so admins can see who they're signed in as.
   //
   // The shared .aap-header is position:fixed with height: var(--aap-header-height)
   // (44px default) and #appContent uses the same variable for its top padding.
-  // Bumping the variable on the page in team-portal mode is what keeps the
-  // page from sliding under the taller header.
+  // Bumping the variable on :root.team-portal-active keeps the page from
+  // sliding under the taller header.
   if (teamPortal) {
+    const teamLogoSrc = `${LOGO_BASE}/wordmark-black-tight.png`;
     return `
-      <header class="aap-header ${headerClass} ${colorClass} aap-header--team-portal" id="aap-header" style="--aap-header-height: 140px; height: 140px;">
-        <div class="aap-header__inner" style="position:relative;height:100%;padding-top:10px;padding-bottom:8px;">
-          <div style="flex:1;"></div>
-          <a href="${logoHref}" class="aap-header__logo" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;">
-            <img src="${light ? IMAGES.iconInverted : IMAGES.icon}" alt="AWKN" class="aap-header__icon aap-header__icon--team" data-light-src="${IMAGES.iconInverted}" data-dark-src="${IMAGES.icon}" style="display:block;height:90px;width:auto;object-fit:contain;" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
+      <header class="aap-header ${headerClass} ${colorClass} aap-header--team-portal" id="aap-header" style="--aap-header-height: 130px; height: 130px;">
+        <div class="aap-header__inner" style="position:relative;height:100%;justify-content:center;padding-top:14px;padding-bottom:10px;">
+          <a href="${logoHref}" class="aap-header__logo" style="display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;">
+            <img src="${teamLogoSrc}" alt="AWKN" class="aap-header__icon aap-header__icon--team" style="display:block;height:78px;width:auto;object-fit:contain;" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
             <span style="font-family:'Inter','Helvetica Neue',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:${light ? '#fff' : '#6b4c3b'};line-height:1;">Team Portal</span>
           </a>
-          <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;">
-            <div id="aapHeaderAuth" class="aap-header-auth"></div>
-          </div>
+          <div id="aapHeaderAuth" class="aap-header-auth" style="position:absolute;top:14px;right:24px;"></div>
         </div>
       </header>
       <style>
         /* Page shell uses --aap-header-height for top padding; bump it in
            team-portal mode so #appContent slides past the taller header. */
-        :root.team-portal-active { --aap-header-height: 140px; }
+        :root.team-portal-active { --aap-header-height: 130px; }
       </style>
     `;
   }
