@@ -187,6 +187,102 @@
       .res-grid { grid-template-columns: 1fr; }
       .res-featured-content { padding: 2rem 1.5rem; }
     }
+
+    /* ── Section headers for the two-part library ── */
+    .res-section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 3rem;
+    }
+    .res-section-eyebrow {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.85rem;
+    }
+    .res-section-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.7rem, 2.8vw, 2.2rem);
+      color: var(--dark);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+    }
+    .res-section-lead {
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.8;
+    }
+
+    /* ── In the Press & Beyond (curated external) ── */
+    .res-press-section {
+      background: var(--cream, #faf6ef);
+      padding: 5rem 2rem 6rem;
+      border-top: 1px solid var(--border);
+    }
+    .res-press-inner { max-width: 1000px; margin: 0 auto; }
+    .res-press-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .res-press-item {
+      display: grid;
+      grid-template-columns: 180px 1fr auto;
+      gap: 1.75rem;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      text-decoration: none;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .res-press-item:hover {
+      border-color: rgba(201,148,62,0.4);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .res-press-pub {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .res-press-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      color: var(--dark);
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 0.4rem;
+    }
+    .res-press-note {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.65;
+      font-style: italic;
+    }
+    .res-press-arrow {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      transition: transform 0.25s;
+    }
+    .res-press-item:hover .res-press-arrow { transform: translate(3px, -3px); }
+
+    @media (max-width: 700px) {
+      .res-press-item {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+        padding: 1.4rem 1.4rem 1.5rem;
+      }
+      .res-press-arrow { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -258,125 +354,70 @@
     </div>
   </header>
 
-  <!-- ── RESOURCES ── -->
+  <!-- ── SECTION 1: ORIGINAL WRITING (the SEO engine) ── -->
   <section class="res-section">
 
-    <!-- Tabs (visual only — content below is shown for all tabs as the library grows) -->
-    <div class="res-cat-tabs" role="tablist">
-      <button class="res-cat-tab active">All</button>
-      <button class="res-cat-tab">The Medicine</button>
-      <button class="res-cat-tab">Integration</button>
-      <button class="res-cat-tab">Mental Health</button>
-      <button class="res-cat-tab">Retreats</button>
-      <button class="res-cat-tab">Stories</button>
+    <div class="res-section-header">
+      <span class="res-section-eyebrow">From Within Center</span>
+      <h2 class="res-section-title">Original writing from our team</h2>
+      <p class="res-section-lead">Articles, guides, and stories on ceremonial ketamine, integration, mental health, and the lived experience of inner work &mdash; written by the people who hold the container.</p>
     </div>
 
-    <!-- FEATURED -->
-    <a href="#" class="res-featured" style="text-decoration:none;">
-      <img src="/awkn-ranch/pricing/images/ceremony-circle.jpg" alt="Ceremony circle" class="res-featured-img">
-      <div class="res-featured-content">
-        <div class="res-cat">Featured &middot; The Medicine</div>
-        <h2>What Ceremonial Ketamine Actually Does to the Brain</h2>
-        <p>A grounded look at the neuroscience of ketamine-assisted therapy &mdash; what we know, what we don&rsquo;t, and why the ceremonial container matters as much as the molecule.</p>
-        <span class="read-link">Read Article</span>
+    <!-- Coming-soon empty state — replace with featured + grid as posts are written -->
+    <div class="res-empty-note">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.5rem; color:var(--dark); font-weight:600; margin-bottom:0.85rem;">Articles in progress.</div>
+      <p style="margin:0;">We&rsquo;re writing the first essays for this library &mdash; pieces on ceremonial ketamine, integration, mental health, and the lived experience of inner work. They&rsquo;ll appear here as they&rsquo;re published.</p>
+      <p style="margin:1.5rem 0 0;">In the meantime, our <a href="research/" style="color:var(--gold); font-weight:600;">Research &amp; Press library</a> collects the most useful peer-reviewed studies and major-publication journalism on this work.</p>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 2: IN THE PRESS & BEYOND (curated external reading) ── -->
+  <section class="res-press-section">
+    <div class="res-press-inner">
+
+      <div class="res-section-header">
+        <span class="res-section-eyebrow">In the Press &amp; Beyond</span>
+        <h2 class="res-section-title">From the wider conversation</h2>
+        <p class="res-section-lead">A few highlights from our curated library of peer-reviewed studies and major-publication journalism on ceremonial ketamine and psychedelic-assisted therapy.</p>
       </div>
-    </a>
 
-    <!-- GRID -->
-    <div class="res-grid">
+      <div class="res-press-list">
 
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/ketamine-therapy-3.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">The Medicine</div>
-          <div class="res-title">Ceremonial Ketamine vs. Psychedelic Therapy: What&rsquo;s the Difference?</div>
-          <div class="res-excerpt">Many people searching for psilocybin, MDMA, or DMT therapy find ceremonial ketamine. Here is how they compare and why ketamine is the only legal option in the U.S. today.</div>
-          <div class="res-meta"><span>10 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
+        <a href="https://www.newyorker.com/magazine/2015/02/09/trip-treatment" target="_blank" rel="noopener nofollow" class="res-press-item">
+          <span class="res-press-pub">The New Yorker</span>
+          <div>
+            <div class="res-press-title">The Trip Treatment</div>
+            <div class="res-press-note">Michael Pollan&rsquo;s 2015 long-form piece that launched the modern psychedelic therapy conversation &mdash; from inside the first Hopkins psilocybin trials.</div>
+          </div>
+          <span class="res-press-arrow"></span>
+        </a>
 
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/client-integration.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Integration</div>
-          <div class="res-title">The Days After: A Practical Guide to Integration</div>
-          <div class="res-excerpt">Insight without integration fades. Here is how to turn what arose during ceremony into changes that stay with you in daily life.</div>
-          <div class="res-meta"><span>8 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
+        <a href="https://www.npr.org/sections/health-shots/2018/06/04/615671405/from-chaos-to-calm-a-life-changed-by-ketamine" target="_blank" rel="noopener nofollow" class="res-press-item">
+          <span class="res-press-pub">NPR Shots</span>
+          <div>
+            <div class="res-press-title">From Chaos to Calm: A Life Changed by Ketamine</div>
+            <div class="res-press-note">A patient&rsquo;s first-person account of how ketamine ended decades of suicidal depression.</div>
+          </div>
+          <span class="res-press-arrow"></span>
+        </a>
 
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/client-meditation.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Mental Health</div>
-          <div class="res-title">When Therapy Isn&rsquo;t Enough: Treatment-Resistant Depression</div>
-          <div class="res-excerpt">For people who&rsquo;ve tried multiple medications and many years of therapy, ceremonial ketamine can offer something fundamentally different.</div>
-          <div class="res-meta"><span>12 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
+        <a href="https://www.nature.com/articles/s41591-023-02705-w" target="_blank" rel="noopener nofollow" class="res-press-item">
+          <span class="res-press-pub">Nature Medicine</span>
+          <div>
+            <div class="res-press-title">Magnesium&ndash;Ibogaine Therapy in Veterans with Traumatic Brain Injuries</div>
+            <div class="res-press-note">Stanford study: 30 special-ops veterans with TBI saw an 88% drop in PTSD symptoms after ibogaine therapy.</div>
+          </div>
+          <span class="res-press-arrow"></span>
+        </a>
 
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/dome-exterior.jpeg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Retreats</div>
-          <div class="res-title">What to Expect at a Mental Health Retreat</div>
-          <div class="res-excerpt">A day-by-day walk-through of an immersive retreat at AWKN Ranch &mdash; what mornings look like, what ceremony feels like, and what happens after you leave.</div>
-          <div class="res-meta"><span>9 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
+      </div>
 
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/client-hug.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Stories</div>
-          <div class="res-title">Beyond the Battlefield: Retreats for Veterans</div>
-          <div class="res-excerpt">Why so many veterans struggling with PTSD are turning to ceremonial ketamine &mdash; and what the work has looked like for the ones who&rsquo;ve done it with us.</div>
-          <div class="res-meta"><span>11 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
-
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/ketamine-couples.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Stories</div>
-          <div class="res-title">A Couples Reset: When Two People Heal Together</div>
-          <div class="res-excerpt">Most couples therapy works in words. Sometimes a shared ceremonial experience does what twenty hours of conversation can&rsquo;t.</div>
-          <div class="res-meta"><span>7 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
-
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/ceremonial-drum.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">The Medicine</div>
-          <div class="res-title">Why We Call It &ldquo;Ceremonial&rdquo;</div>
-          <div class="res-excerpt">A look at what changes when ketamine is offered as a ceremony rather than a procedure &mdash; and why the container matters as much as the medicine.</div>
-          <div class="res-meta"><span>6 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
-
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/client-yoga.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Mental Health</div>
-          <div class="res-title">Burnout: A Modern Diagnosis That Needs an Old Solution</div>
-          <div class="res-excerpt">Why the high-functioning, capable, &ldquo;fine&rdquo; people are often the ones whose nervous systems need this work most.</div>
-          <div class="res-meta"><span>9 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
-
-      <a href="#" class="res-card" style="text-decoration:none;">
-        <img src="/awkn-ranch/pricing/images/grounds.jpg" alt="" class="res-img">
-        <div class="res-body">
-          <div class="res-cat">Retreats</div>
-          <div class="res-title">Texas Wellness Retreats: Your Guide</div>
-          <div class="res-excerpt">An honest look at the wellness retreat landscape in Texas &mdash; from yoga and meditation to ceremonial medicine work, and how to choose what fits.</div>
-          <div class="res-meta"><span>14 min read</span><span class="arrow">›</span></div>
-        </div>
-      </a>
-
+      <div style="text-align:center; margin-top:3rem;">
+        <a href="research/" style="display:inline-block; padding:1rem 2rem; border:1px solid var(--gold); color:var(--gold); text-decoration:none; font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase; font-weight:600; border-radius:var(--radius); transition:background 0.25s, color 0.25s;" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">View Full Research Library &rarr;</a>
+        <p style="font-size:0.82rem; color:var(--grey); margin-top:1rem; line-height:1.7;">30+ studies and articles, organized by condition: depression, anxiety, OCD, trauma, veterans, neuroplasticity, and more.</p>
+      </div>
     </div>
-
   </section>
 
   <!-- ── CTA ── -->
@@ -419,8 +460,17 @@
       document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
       document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
-      // Tab toggle (visual only — no filtering yet, content is universal until categories are populated)
-      document.querySelectorAll('.res-cat-tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.res-cat-tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');});});
+      // Category filter — show/hide cards based on data-cat / data-filter
+      document.querySelectorAll('.res-cat-tab').forEach(function(t){
+        t.addEventListener('click',function(){
+          document.querySelectorAll('.res-cat-tab').forEach(function(x){x.classList.remove('active');});
+          t.classList.add('active');
+          var f=t.getAttribute('data-filter')||'all';
+          document.querySelectorAll('[data-cat]').forEach(function(card){
+            card.style.display=(f==='all'||card.getAttribute('data-cat')===f)?'':'none';
+          });
+        });
+      });
     })();
   </script>
 </body>
