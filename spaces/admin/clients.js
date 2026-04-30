@@ -64,6 +64,7 @@ let scheduleStaffFilter = 'all';  // 'all' | facilitator_id | 'unassigned'
 
 // House tab state
 let houseSelectedDate = new Date().toISOString().slice(0, 10);
+let houseViewMode = 'night'; // 'night' | 'week' | 'month'
 
 function mondayOf(date) {
   const d = new Date(date);
@@ -3986,35 +3987,95 @@ async function cancelBooking(bookingId, { reschedule = false } = {}) {
 }
 
 // ---------- House tab (Phase 6, live) ----------
+// Three view modes share the same data shape (stays + beds + rooms):
+//   night \u2014 single-night room cards (the original layout)
+//   week  \u2014 7-day grid: beds as rows, days as columns, cells show client name
+//   month \u2014 calendar grid: each day shows occupancy ratio + heat color, click to drill into Night view
 
-function renderHousePanel() {
-  const panel = document.getElementById('clients-panel-house');
-  if (!panel) return;
+function houseClientName(leadId) {
+  const c = clients.find(x => x.id === leadId);
+  if (!c) return 'Client';
+  return `${c.first_name || ''} ${c.last_name || ''}`.trim() || 'Client';
+}
 
-  // Treat selected date as the *night* (check-in on or before, check-out after)
-  const d = new Date(houseSelectedDate + 'T12:00:00');
-  const occupancyFor = (bedId) => stays.find(s =>
-    s.bed_id === bedId &&
-    s.status !== 'cancelled' &&
-    new Date(s.check_in_at) <= d &&
-    new Date(s.check_out_at) > d
-  );
-
-  const clientName = (leadId) => {
-    const c = clients.find(x => x.id === leadId);
-    if (!c) return 'Client';
-    return `${c.first_name || ''} ${c.last_name || ''}`.trim() || 'Client';
-  };
-
-  const roomsSorted = [...lodgingSpaces].sort((a, b) => {
+function houseRoomsSorted() {
+  return [...lodgingSpaces].sort((a, b) => {
     const fa = a.floor === 'downstairs' ? 0 : 1;
     const fb = b.floor === 'downstairs' ? 0 : 1;
     if (fa !== fb) return fa - fb;
     return (a.name || '').localeCompare(b.name || '');
   });
+}
+
+function houseOccupancyForBedOnDate(bedId, dateObj) {
+  return stays.find(s =>
+    s.bed_id === bedId &&
+    s.status !== 'cancelled' &&
+    new Date(s.check_in_at) <= dateObj &&
+    new Date(s.check_out_at) > dateObj
+  );
+}
+
+function houseStartOfWeek(dateStr) {
+  // Monday as week start, matching the Schedule grid convention.
+  const d = new Date(dateStr + 'T12:00:00');
+  const dow = d.getDay();
+  const diff = dow === 0 ? -6 : 1 - dow;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function renderHousePanel() {
+  const panel = document.getElementById('clients-panel-house');
+  if (!panel) return;
+
+  const rooms = houseRoomsSorted();
+  if (rooms.length === 0) {
+    panel.innerHTML = `${renderHouseToolbar({ totalBeds: 0, occupiedBeds: 0, label: '' })}
+      <div style="padding:36px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No lodging rooms configured.</div>`;
+    return;
+  }
+
+  if (houseViewMode === 'week')  return renderHouseWeekView(panel, rooms);
+  if (houseViewMode === 'month') return renderHouseMonthView(panel, rooms);
+  return renderHouseNightView(panel, rooms);
+}
+
+// Toolbar shared across all three modes \u2014 view toggle, date controls, summary.
+function renderHouseToolbar({ totalBeds, occupiedBeds, label }) {
+  const tab = (mode, text) => {
+    const active = houseViewMode === mode;
+    return `<button class="crm-btn crm-btn-sm" data-house-mode="${mode}" style="${active ? 'background:var(--accent,#c9943e);color:#fff;border-color:var(--accent,#c9943e);' : ''}">${text}</button>`;
+  };
+
+  const dateOrLabel = houseViewMode === 'night'
+    ? `<input type="date" class="crm-input" id="house-date" value="${escapeHtml(houseSelectedDate)}">`
+    : `<span style="font-size:13px;font-weight:600;color:var(--text,#2a1f23);min-width:180px;">${escapeHtml(label)}</span>`;
+
+  return `
+    <div class="crm-pipeline-toolbar" style="flex-wrap:wrap;gap:8px;">
+      <div style="display:inline-flex;gap:2px;background:var(--bg,#faf9f6);border:1px solid var(--border-color,#eee);border-radius:8px;padding:2px;">
+        ${tab('night', 'Night')}${tab('week', 'Week')}${tab('month', 'Month')}
+      </div>
+      ${dateOrLabel}
+      <button class="crm-btn crm-btn-sm" id="house-today">Today</button>
+      <button class="crm-btn crm-btn-sm" id="house-prev">&laquo;</button>
+      <button class="crm-btn crm-btn-sm" id="house-next">&raquo;</button>
+      ${houseViewMode === 'night' ? `<button class="crm-btn crm-btn-sm" id="house-weekly-email" title="Phase 7 \u2014 coming soon">Send weekly summary</button>` : ''}
+      <span style="margin-left:auto;font-size:13px;color:var(--text,#2a1f23);font-weight:600;">
+        ${occupiedBeds} / ${totalBeds} ${houseViewMode === 'night' ? 'beds occupied' : 'bed-nights booked'}
+      </span>
+    </div>
+  `;
+}
+
+// ---- Night view (original layout) ----
+function renderHouseNightView(panel, rooms) {
+  const d = new Date(houseSelectedDate + 'T12:00:00');
+  const occupancyFor = (bedId) => houseOccupancyForBedOnDate(bedId, d);
 
   let totalBeds = 0, occupiedBeds = 0;
-  roomsSorted.forEach(sp => {
+  rooms.forEach(sp => {
     const roomBeds = beds.filter(b => b.space_id === sp.id);
     totalBeds += roomBeds.length;
     occupiedBeds += roomBeds.filter(b => occupancyFor(b.id)).length;
@@ -4037,7 +4098,7 @@ function renderHousePanel() {
         <div style="display:flex;flex-direction:column;gap:4px;">
           ${roomBeds.map(b => {
             const occ = occupancyFor(b.id);
-            const name = occ ? clientName(occ.lead_id) : null;
+            const name = occ ? houseClientName(occ.lead_id) : null;
             return `
               <div class="${occ ? 'clients-bed-row' : ''}" ${occ ? `data-client-id="${occ.lead_id}" style="cursor:pointer;"` : ''}>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${occ ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:12px;">
@@ -4053,22 +4114,151 @@ function renderHousePanel() {
   };
 
   panel.innerHTML = `
-    <div class="crm-pipeline-toolbar">
-      <label style="font-size:13px;color:var(--text-muted,#666);">Night of</label>
-      <input type="date" class="crm-input" id="house-date" value="${escapeHtml(houseSelectedDate)}">
-      <button class="crm-btn crm-btn-sm" id="house-today">Today</button>
-      <button class="crm-btn crm-btn-sm" id="house-prev">&laquo;</button>
-      <button class="crm-btn crm-btn-sm" id="house-next">&raquo;</button>
-      <button class="crm-btn crm-btn-sm" id="house-weekly-email" title="Phase 7 \u2014 coming soon">Send weekly summary</button>
-      <span style="margin-left:auto;font-size:13px;color:var(--text,#2a1f23);font-weight:600;">
-        ${occupiedBeds} / ${totalBeds} beds occupied
-      </span>
-    </div>
+    ${renderHouseToolbar({ totalBeds, occupiedBeds, label: '' })}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">${rooms.map(roomCard).join('')}</div>
+  `;
+}
 
-    ${roomsSorted.length === 0
-      ? `<div style="padding:36px 24px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No lodging rooms configured.</div>`
-      : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">${roomsSorted.map(roomCard).join('')}</div>`
-    }
+// ---- Week view ----
+// Beds in rows, 7 days as columns. Cells show client name when occupied.
+function renderHouseWeekView(panel, rooms) {
+  const start = houseStartOfWeek(houseSelectedDate);
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+  const startLabel = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endLabel = days[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const label = `Week of ${startLabel} \u2013 ${endLabel}`;
+
+  // Bed-night totals for the summary stat.
+  let totalBedNights = 0, occupiedBedNights = 0;
+  rooms.forEach(sp => {
+    const roomBeds = beds.filter(b => b.space_id === sp.id);
+    days.forEach(d => {
+      totalBedNights += roomBeds.length;
+      occupiedBedNights += roomBeds.filter(b => houseOccupancyForBedOnDate(b.id, d)).length;
+    });
+  });
+
+  // Render each room as a section with a sub-table of its beds.
+  const roomBlock = (sp) => {
+    const roomBeds = beds.filter(b => b.space_id === sp.id).sort((a, b) => a.sort_order - b.sort_order);
+    const bathBadge = sp.has_private_bath
+      ? '<span style="font-size:10px;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:999px;font-weight:600;margin-left:8px;">Private bath</span>'
+      : '<span style="font-size:10px;color:var(--text-muted,#888);background:var(--bg,#faf9f6);padding:1px 6px;border-radius:999px;margin-left:8px;">Shared bath</span>';
+    const rows = roomBeds.map(b => {
+      const cells = days.map(d => {
+        const occ = houseOccupancyForBedOnDate(b.id, d);
+        const name = occ ? houseClientName(occ.lead_id) : null;
+        return `
+          <td class="${occ ? 'clients-bed-row' : ''}" ${occ ? `data-client-id="${occ.lead_id}" style="cursor:pointer;"` : 'style="text-align:center;"'}>
+            <div style="padding:6px 8px;background:${occ ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:11px;font-weight:${occ ? '600' : '400'};color:${occ ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:28px;display:flex;align-items:center;justify-content:${occ ? 'flex-start' : 'center'};">
+              ${name ? escapeHtml(name) : '\u2014'}
+            </div>
+          </td>
+        `;
+      }).join('');
+      return `<tr><td style="padding:6px 12px 6px 0;font-size:12px;color:var(--text-muted,#666);font-weight:500;white-space:nowrap;">${escapeHtml(b.label)}</td>${cells}</tr>`;
+    }).join('');
+
+    return `
+      <div style="border:1px solid var(--border-color,#eee);border-radius:10px;padding:14px;background:#fff;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:15px;color:var(--text,#2a1f23);margin-bottom:10px;">
+          ${escapeHtml(sp.name)} <span style="font-size:11px;color:var(--text-muted,#888);font-weight:400;text-transform:capitalize;">\u00b7 ${escapeHtml(sp.floor || '')}</span>${bathBadge}
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="border-collapse:separate;border-spacing:4px;width:100%;">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:0 12px 8px 0;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">Bed</th>
+                ${days.map(d => {
+                  const isToday = d.toDateString() === new Date().toDateString();
+                  return `<th style="text-align:center;padding:0 0 8px 0;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:${isToday ? 'var(--accent,#c9943e)' : 'var(--text-muted,#888)'};">
+                    ${d.toLocaleDateString('en-US', { weekday: 'short' })}<br>
+                    <span style="font-size:13px;font-weight:700;color:${isToday ? 'var(--accent,#c9943e)' : 'var(--text,#2a1f23)'};">${d.getDate()}</span>
+                  </th>`;
+                }).join('')}
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  };
+
+  panel.innerHTML = `
+    ${renderHouseToolbar({ totalBeds: totalBedNights, occupiedBeds: occupiedBedNights, label })}
+    ${rooms.map(roomBlock).join('')}
+  `;
+}
+
+// ---- Month view ----
+// Calendar grid with one cell per day. Each cell shows occupancy ratio and a
+// warm tint scaled by occupancy %. Click a day to drill into Night view.
+function renderHouseMonthView(panel, rooms) {
+  const selected = new Date(houseSelectedDate + 'T12:00:00');
+  const monthStart = new Date(selected.getFullYear(), selected.getMonth(), 1);
+  const monthEnd = new Date(selected.getFullYear(), selected.getMonth() + 1, 0);
+  const label = monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Pad to start on Sunday and end on Saturday so the grid is a clean rectangle.
+  const gridStart = new Date(monthStart);
+  gridStart.setDate(monthStart.getDate() - monthStart.getDay());
+  const gridEnd = new Date(monthEnd);
+  gridEnd.setDate(monthEnd.getDate() + (6 - monthEnd.getDay()));
+
+  const totalBeds = rooms.reduce((acc, sp) => acc + beds.filter(b => b.space_id === sp.id).length, 0);
+  const cells = [];
+  let monthOccupied = 0, monthTotal = 0;
+
+  for (let d = new Date(gridStart); d <= gridEnd; d.setDate(d.getDate() + 1)) {
+    const date = new Date(d);
+    const inMonth = date.getMonth() === selected.getMonth();
+    const occCount = beds.filter(b => houseOccupancyForBedOnDate(b.id, date)).length;
+    const ratio = totalBeds ? occCount / totalBeds : 0;
+    if (inMonth) { monthOccupied += occCount; monthTotal += totalBeds; }
+
+    const isToday = date.toDateString() === new Date().toDateString();
+    const isSelected = date.toISOString().slice(0, 10) === houseSelectedDate;
+    const dateIso = date.toISOString().slice(0, 10);
+
+    // Warm-tint heatmap: 0% = bg, 100% = #c9943e at 0.4 alpha
+    const tint = inMonth && occCount > 0 ? `rgba(201,148,62,${0.08 + ratio * 0.32})` : 'transparent';
+
+    cells.push(`
+      <button class="house-month-cell" data-house-day="${dateIso}" style="
+        position:relative;
+        min-height:88px;
+        padding:8px 10px;
+        border:1px solid ${isSelected ? 'var(--accent,#c9943e)' : 'var(--border-color,#eee)'};
+        border-radius:8px;
+        background:${tint};
+        text-align:left;
+        font:inherit;
+        cursor:pointer;
+        opacity:${inMonth ? '1' : '0.35'};
+      ">
+        <div style="font-size:14px;font-weight:${isToday ? '700' : '500'};color:${isToday ? 'var(--accent,#c9943e)' : 'var(--text,#2a1f23)'};margin-bottom:6px;">
+          ${date.getDate()}
+        </div>
+        <div style="font-size:11px;color:${occCount === 0 ? 'var(--text-muted,#aaa)' : 'var(--text,#2a1f23)'};font-weight:${occCount > 0 ? '600' : '400'};">
+          ${inMonth ? `${occCount}/${totalBeds} beds` : ''}
+        </div>
+      </button>
+    `);
+  }
+
+  const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  panel.innerHTML = `
+    ${renderHouseToolbar({ totalBeds: monthTotal, occupiedBeds: monthOccupied, label })}
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
+      ${dayHeaders.map(h => `<div style="text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);">${h}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">${cells.join('')}</div>
   `;
 }
 
@@ -4944,15 +5134,32 @@ function handlePanelClicks(e) {
     openClientDetail(bedRow.dataset.clientId);
     return;
   }
+  // View-mode toggle (Night / Week / Month).
+  const modeBtn = target.closest('[data-house-mode]');
+  if (modeBtn) {
+    houseViewMode = modeBtn.dataset.houseMode;
+    renderHousePanel();
+    return;
+  }
+  // Month cell \u2192 drill into Night view for that day.
+  const monthCell = target.closest('[data-house-day]');
+  if (monthCell) {
+    houseSelectedDate = monthCell.dataset.houseDay;
+    houseViewMode = 'night';
+    renderHousePanel();
+    return;
+  }
   if (target.id === 'house-today') {
     houseSelectedDate = new Date().toISOString().slice(0, 10);
     renderHousePanel();
     return;
   }
   if (target.id === 'house-prev' || target.id === 'house-next') {
-    const delta = target.id === 'house-prev' ? -1 : 1;
+    const sign = target.id === 'house-prev' ? -1 : 1;
     const d = new Date(houseSelectedDate + 'T12:00:00');
-    d.setDate(d.getDate() + delta);
+    if (houseViewMode === 'week')      d.setDate(d.getDate() + 7 * sign);
+    else if (houseViewMode === 'month') d.setMonth(d.getMonth() + sign);
+    else                                 d.setDate(d.getDate() + sign);
     houseSelectedDate = d.toISOString().slice(0, 10);
     renderHousePanel();
     return;
