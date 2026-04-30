@@ -634,11 +634,49 @@ serve(async (req) => {
       agreementRow = data;
     }
 
+    // Send the signing-link email from noreply@within.center via Resend, so the
+    // guest gets it from the same address as the rest of our Within emails
+    // (welcome letter, etc.). SignWell's send_email is intentionally false so
+    // this is the only outbound notification.
+    let emailSent = false;
+    if (signingUrl) {
+      try {
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+        const emailResp = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+            "apikey": anonKey,
+          },
+          body: JSON.stringify({
+            type: "retreat_agreement_to_sign",
+            to: lead.email,
+            data: {
+              recipient_first_name: lead.first_name || "",
+              accommodation_type: accommodationType,
+              arrival_date: arrivalDate,
+              signing_url: signingUrl,
+            },
+          }),
+        });
+        emailSent = emailResp.ok;
+        if (!emailResp.ok) {
+          const err = await emailResp.text();
+          console.error("retreat_agreement_to_sign send failed:", emailResp.status, err);
+        }
+      } catch (e) {
+        console.error("retreat_agreement_to_sign send threw:", e);
+      }
+    }
+
     // Log activity on the lead.
     await supabase.from("crm_activities").insert({
       lead_id: body.lead_id,
-      activity_type: "note",
-      description: `Retreat agreement sent to ${lead.email} for SignWell signature`,
+      activity_type: "email",
+      description: emailSent
+        ? `Retreat agreement sent to ${lead.email} for SignWell signature`
+        : `Retreat agreement created for ${lead.email}, signing email FAILED to send — link: ${signingUrl || "(none)"}`,
       created_by: appUser.id,
     }).then(() => {}, (e: any) => console.error("activity insert error:", e));
 
@@ -647,6 +685,7 @@ serve(async (req) => {
       agreement_id: agreementRow?.id || null,
       signwell_document_id: signwellDocumentId,
       signing_url: signingUrl,
+      email_sent: emailSent,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (err) {

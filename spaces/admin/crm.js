@@ -1856,12 +1856,14 @@ function openSendRetreatAgreementForm(lead) {
     btn.textContent = 'Sending…';
     try {
       const result = await callCreate(collectPayload(false));
-      showToast('Retreat agreement sent for signature', 'success');
+      showToast(
+        result?.email_sent
+          ? `Retreat agreement emailed to ${lead.email}`
+          : 'Agreement created in SignWell, but the signing-link email failed to send — check function logs',
+        result?.email_sent ? 'success' : 'error'
+      );
       form.style.display = 'none';
       await openLeadDetail(lead.id);
-      if (result.signing_url) {
-        showToast(`Signing URL ready (also emailed via SignWell). ${result.signing_url}`, 'success');
-      }
     } catch (err) {
       console.error('Retreat agreement send error:', err);
       showToast('Send failed: ' + (err.message || err), 'error');

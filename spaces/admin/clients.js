@@ -2055,8 +2055,13 @@ function openSendRetreatAgreementModal(leadId) {
     btn.disabled = true;
     btn.textContent = 'Sending…';
     try {
-      await callCreate(collectPayload(false));
-      showToast('Retreat agreement sent for signature', 'success');
+      const result = await callCreate(collectPayload(false));
+      showToast(
+        result?.email_sent
+          ? `Retreat agreement emailed to ${c.email}`
+          : 'Agreement created in SignWell, but the signing-link email failed to send — check function logs',
+        result?.email_sent ? 'success' : 'error'
+      );
       // Reload agreements + close modal + reopen drawer so the badge appears.
       const { data } = await supabase.from('within_retreat_agreements').select('*').order('created_at', { ascending: false });
       retreatAgreements = data || [];

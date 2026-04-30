@@ -47,6 +47,7 @@ type EmailType =
   | "proposal_sent"
   // CRM rental agreement e-sign request (AWKN Ranch only, separate from proposal email)
   | "agreement_to_sign"
+  | "retreat_agreement_to_sign"
   // Within Center welcome letter (HEAL package, prep instructions)
   | "welcome_letter"
   // Admin notifications
@@ -1171,6 +1172,90 @@ Sign your rental agreement: ${data.signing_url || ''}
 Questions? Reply to this email or write admin@awknranch.com.
 
 — The AWKN Ranch Team`
+      };
+    }
+
+    case "retreat_agreement_to_sign": {
+      // Within-branded version of agreement_to_sign for immersive retreat clients.
+      // Sent after create-retreat-agreement finishes uploading the SignWell doc;
+      // delivered via Resend from noreply@within.center so it lands in the same
+      // thread aesthetic as the welcome letter.
+      const arrivalDate = data.arrival_date
+        ? new Date(data.arrival_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const accommodation = String(data.accommodation_type || '');
+      return {
+        subject: `Please sign your Within retreat agreement`,
+        html: `
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
+
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">WITHIN CENTER</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">at AWKN Ranch · Austin, Texas</div>
+  </div>
+
+  <!-- Hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Retreat Agreement</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:500;color:#1c1618;margin:0 0 14px 0;line-height:1.25;">A small step before your retreat, ${String(data.recipient_first_name || 'there')}.</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:17px;color:#6b4c3b;margin:0;line-height:1.6;">Your Within retreat agreement is ready for your signature. It covers the practical and legal terms of your stay so we can both arrive prepared.</p>
+  </div>
+
+  ${arrivalDate || accommodation ? `
+  <!-- Arrival details -->
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:22px 26px;">
+      ${arrivalDate ? `<div style="margin-bottom:10px;">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:4px;">Arrival</div>
+        <div style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;font-weight:600;">${arrivalDate}</div>
+      </div>` : ''}
+      ${accommodation ? `<div>
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:4px;">Accommodation</div>
+        <div style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;font-weight:600;">${accommodation}</div>
+      </div>` : ''}
+    </div>
+  </div>` : ''}
+
+  <!-- Body -->
+  <div style="padding:0 40px 12px 40px;">
+    <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.7;margin:0 0 14px 0;">
+      Please review and sign the agreement at the link below. Signing takes about two minutes via SignWell's secure e-signature portal. Your separate Medical Consent and Informed Consent for Ketamine-Assisted Therapy remain in place — this agreement covers lodging, conduct, payment, and the on-site policies for your stay.
+    </p>
+  </div>
+
+  <!-- Sign CTA -->
+  <div style="padding:8px 40px 32px 40px;text-align:center;">
+    <a href="${String(data.signing_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#1c1618;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Sign Retreat Agreement</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure e-signature via SignWell</p>
+  </div>
+
+  <!-- Signoff -->
+  <div style="padding:0 40px 36px 40px;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:#1c1618;line-height:1.7;margin:0 0 16px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+      Questions? Reply to this email or write <a href="mailto:info@within.center" style="color:#c9943e;text-decoration:none;">info@within.center</a>.
+    </p>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#1c1618;margin:0;">With care,<br><em style="color:#6b4c3b;">The Within Center Team</em></p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:0 40px 32px 40px;text-align:center;font-family:'Inter',sans-serif;font-size:11px;color:rgba(28,22,24,0.45);line-height:1.7;">
+    © 2026 Hearth Space Health, Inc. · 7600 Grove Crest Circle, Austin, TX
+  </div>
+</div>
+        `,
+        text: `Your Within retreat agreement is ready for signature.
+
+Hi ${data.recipient_first_name || 'there'},
+
+Please review and sign your retreat agreement${arrivalDate ? ` for your arrival on ${arrivalDate}` : ''}. Signing takes about two minutes via the secure SignWell link below. Your separate Medical Consent and Informed Consent for Ketamine-Assisted Therapy remain in place — this agreement covers lodging, conduct, payment, and the on-site policies for your stay.
+
+Sign your retreat agreement: ${data.signing_url || ''}
+
+Questions? Reply to this email or write info@within.center.
+
+With care,
+The Within Center Team`
       };
     }
 
@@ -3491,6 +3576,7 @@ serve(async (req) => {
       "staff_invitation",  // has its own full branded layout
       "proposal_sent",     // has its own full branded layout
       "agreement_to_sign", // has its own full branded layout
+      "retreat_agreement_to_sign", // has its own full branded layout (Within)
       "welcome_letter",    // Within Center welcome letter — self-contained layout
       "pai_email_reply",   // PAI-branded layout
       "payment_statement", // has its own full layout
