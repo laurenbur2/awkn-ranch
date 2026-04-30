@@ -443,15 +443,16 @@ function injectSiteNav() {
   const target = document.getElementById('siteHeader');
   if (!target) return;
 
-  // Team-portal pages don't show the deploy version next to the wordmark —
-  // it adds visual noise without informing the admin's task. Version still
-  // tracks via setupVersionInfo() for diagnostics if needed.
+  // Team-portal pages get the dedicated branded header: large AWKN logo
+  // image, "Team Portal" subtag below. Public nav is hidden — admins use the
+  // pillar tabs rendered separately by this shell.
   target.innerHTML = renderHeader({
     transparent: false,
     light: false,
     version: '',
     showRoleBadge: true,
     logoHref: '/awkn-ranch/spaces/admin/dashboard.html',
+    teamPortal: true,
   });
 
   initSiteComponents();

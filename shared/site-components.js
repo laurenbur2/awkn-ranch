@@ -61,10 +61,28 @@ const AUTH_LINK = { text: 'Sign In', href: `${BASE_PATH}/login/` };
  * @param {string} options.version - Version string for display in header
  */
 function renderHeader(options = {}) {
-  const { transparent = false, light = true, activePage = '', showMistiq = false, version = '', logoHref = `${BASE_PATH}/` } = options;
+  const { transparent = false, light = true, activePage = '', showMistiq = false, version = '', logoHref = `${BASE_PATH}/`, teamPortal = false } = options;
 
   const headerClass = transparent ? 'aap-header--transparent' : 'aap-header--solid';
   const colorClass = light ? 'aap-header--light' : 'aap-header--dark';
+
+  // Team-portal variant: enlarged logo image stacked with a "Team Portal"
+  // subtag, no public-site nav. Auth widget stays on the right so admins can
+  // still see who they're signed in as.
+  if (teamPortal) {
+    return `
+      <header class="aap-header ${headerClass} ${colorClass} aap-header--team-portal" id="aap-header">
+        <div class="aap-header__inner" style="justify-content:center;position:relative;padding-top:16px;padding-bottom:8px;">
+          <a href="${logoHref}" class="aap-header__logo" style="display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;">
+            <img src="${light ? IMAGES.iconInverted : IMAGES.icon}" alt="AWKN" class="aap-header__icon aap-header__icon--team" data-light-src="${IMAGES.iconInverted}" data-dark-src="${IMAGES.icon}" style="display:block;height:96px;width:auto;object-fit:contain;" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
+            <span style="font-family:'Inter','Helvetica Neue',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:${light ? '#fff' : '#6b4c3b'};line-height:1;">Team Portal</span>
+          </a>
+
+          <div id="aapHeaderAuth" class="aap-header-auth" style="position:absolute;right:24px;top:50%;transform:translateY(-50%);"></div>
+        </div>
+      </header>
+    `;
+  }
 
   // Build navigation links - include Mistiq only if showMistiq is true
   const links = showMistiq ? [...NAV_LINKS, MISTIQ_LINK] : NAV_LINKS;
