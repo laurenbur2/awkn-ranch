@@ -76,6 +76,9 @@ function renderHeader(options = {}) {
   // sliding under the taller header.
   if (teamPortal) {
     const teamLogoSrc = `${LOGO_BASE}/wordmark-black-tight.png`;
+    // Auth widget lives OUTSIDE .aap-header__inner so it pins to the right
+    // edge of the page itself, not the right edge of the max-width content
+    // box. .aap-header is full-width and position:fixed.
     return `
       <header class="aap-header ${headerClass} ${colorClass} aap-header--team-portal" id="aap-header" style="--aap-header-height: 130px; height: 130px;">
         <div class="aap-header__inner" style="position:relative;height:100%;justify-content:center;padding-top:14px;padding-bottom:10px;">
@@ -83,8 +86,8 @@ function renderHeader(options = {}) {
             <img src="${teamLogoSrc}" alt="AWKN" class="aap-header__icon aap-header__icon--team" style="display:block;height:78px;width:auto;object-fit:contain;" onerror="this.onerror=null;this.src='${ALPACA_ICON_FALLBACK}'">
             <span style="font-family:'Inter','Helvetica Neue',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:${light ? '#fff' : '#6b4c3b'};line-height:1;">Team Portal</span>
           </a>
-          <div id="aapHeaderAuth" class="aap-header-auth" style="position:absolute;top:14px;right:24px;"></div>
         </div>
+        <div id="aapHeaderAuth" class="aap-header-auth" style="position:absolute;top:18px;right:28px;z-index:1;"></div>
       </header>
       <style>
         /* Page shell uses --aap-header-height for top padding; bump it in
