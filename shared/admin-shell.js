@@ -446,6 +446,12 @@ function injectSiteNav() {
   // Team-portal pages get the dedicated branded header: large AWKN logo
   // image, "Team Portal" subtag below. Public nav is hidden — admins use the
   // pillar tabs rendered separately by this shell.
+  //
+  // The team-portal layout is taller than the public site's 44px header. Set
+  // a class on the html root so the CSS rule injected by renderHeader bumps
+  // --aap-header-height, which #appContent uses for its padding-top — that's
+  // what keeps the pillar nav and page content from sliding under the header.
+  document.documentElement.classList.add('team-portal-active');
   target.innerHTML = renderHeader({
     transparent: false,
     light: false,
