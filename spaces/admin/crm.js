@@ -1429,7 +1429,7 @@ The ${bizLabel} Team</textarea>
       'immersive-6day': {
         title: 'Six-Day Immersive Retreat',
         items: [
-          { description: 'Private guided ketamine ceremonies during the retreat', quantity: 2 },
+          { description: 'Guided ketamine ceremonies during the retreat', quantity: 2 },
           { description: 'Nights of residential stay at AWKN Ranch', quantity: 5 },
           { description: 'Integration coaching sessions', quantity: 2 },
           { description: 'Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space', quantity: 1 },
@@ -1439,7 +1439,7 @@ The ${bizLabel} Team</textarea>
       'immersive-3day': {
         title: 'Three-Day Immersive Retreat',
         items: [
-          { description: 'Private guided ketamine ceremony during the retreat', quantity: 1 },
+          { description: 'Guided ketamine ceremony during the retreat', quantity: 1 },
           { description: 'Nights of residential stay at AWKN Ranch', quantity: 2 },
           { description: 'Integration circle and daily practices', quantity: 1 },
           { description: 'Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space', quantity: 1 },

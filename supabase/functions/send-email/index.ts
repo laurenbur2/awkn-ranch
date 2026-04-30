@@ -3035,7 +3035,7 @@ function buildImmersiveWelcomeLetter({
       }).join("")
     : `
         <li><strong>${nights}</strong> nights of residential stay at AWKN Ranch</li>
-        <li>Private guided ketamine ceremonies during the retreat</li>
+        <li>Guided ketamine ceremonies during the retreat</li>
         <li>Group integration circles and daily practices</li>
         <li>Full access to AWKN amenities — saunas, cold plunges, hot tub, temple space</li>
         <li>All meals and on-site care</li>
@@ -3270,7 +3270,7 @@ ${nights} nights at the ranch — your facilitator will share the full daily sch
 YOUR PACKAGE INCLUDES
 ${lineItems.length > 0
   ? lineItems.map((li: any) => `- ${Number(li.quantity || 1) > 1 ? Number(li.quantity) + ' × ' : ''}${li.description}`).join('\n')
-  : `- ${nights} nights of residential stay\n- Private guided ketamine ceremonies\n- Group integration circles and daily practices\n- Full access to AWKN amenities — saunas, cold plunges, hot tub, temple\n- All meals and on-site care`}
+  : `- ${nights} nights of residential stay\n- Guided ketamine ceremonies\n- Group integration circles and daily practices\n- Full access to AWKN amenities — saunas, cold plunges, hot tub, temple\n- All meals and on-site care`}
 
 ARRIVING AT THE RANCH
 7600 Grove Crest Circle, Austin, TX
