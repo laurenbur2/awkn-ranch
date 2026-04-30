@@ -34,6 +34,7 @@ let showInactiveFacilitators = false;
 let clients = [];           // crm_leads in `active_client` stage (business_line=within)
 let packages = [];          // client_packages + nested sessions
 let stays = [];             // client_stays + nested bed+space
+let retreatAgreements = []; // within_retreat_agreements rows for all loaded clients
 let activeClientStageId = null;
 
 // Lodging inventory (used by House tab + Stay modal bed picker)
@@ -173,7 +174,7 @@ async function loadClientsData() {
     return;
   }
 
-  const [clientsRes, pkgsRes, sessRes, staysRes] = await Promise.all([
+  const [clientsRes, pkgsRes, sessRes, staysRes, agreementsRes] = await Promise.all([
     supabase.from('crm_leads')
       .select(`
         id, first_name, last_name, email, phone, city, state, created_at, notes, business_line, stage_id,
@@ -190,6 +191,7 @@ async function loadClientsData() {
     supabase.from('client_packages').select('*').order('created_at', { ascending: false }),
     supabase.from('client_package_sessions').select('*').order('created_at'),
     supabase.from('client_stays').select('*').order('check_in_at', { ascending: false }),
+    supabase.from('within_retreat_agreements').select('*').order('created_at', { ascending: false }),
   ]);
 
   if (clientsRes.error) { console.error('clients load error:', clientsRes.error); showToast('Failed to load clients', 'error'); }
@@ -202,10 +204,17 @@ async function loadClientsData() {
   }));
 
   stays = staysRes.data || [];
+  retreatAgreements = agreementsRes?.data || [];
 }
 
 function getClientPackages(leadId) {
   return packages.filter(p => p.lead_id === leadId);
+}
+
+// Most recent within retreat agreement for a lead — null when none on file.
+// Sorted desc on load so the first match is the most recent.
+function getLatestRetreatAgreement(leadId) {
+  return retreatAgreements.find(a => a.lead_id === leadId) || null;
 }
 function getClientStays(leadId) {
   return stays.filter(s => s.lead_id === leadId);
@@ -876,6 +885,7 @@ function renderClientMoreMenu(leadId) {
     { sep: true },
     { action: 'send-invoice',         label: 'Send invoice\u2026' },
     { action: 'send-welcome-letter',  label: 'Send welcome letter\u2026' },
+    { action: 'send-retreat-agreement', label: 'Send retreat agreement\u2026' },
     { action: 'send-intake-link',     label: 'Send intake / waiver link' },
     { action: 'send-reminder',        label: 'Send schedule reminder' },
     { sep: true },
@@ -1775,6 +1785,7 @@ function renderDocumentsTab(c) {
   const proposals = proposalsByLead.get(c.id);
   const loading = proposals === undefined;
   const contracts = (proposals || []).filter(p => p.signwell_document_id);
+  const clientAgreements = retreatAgreements.filter(a => a.lead_id === c.id);
 
   return `
     <section style="margin-bottom:20px;">
@@ -1785,6 +1796,13 @@ function renderDocumentsTab(c) {
       </div>
     </section>
 
+    <section style="margin-bottom:20px;">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Retreat Agreement</h3>
+      ${clientAgreements.length
+        ? clientAgreements.map(renderRetreatAgreementRow).join('')
+        : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No retreat agreement on file. Use "Send retreat agreement\u2026" in the More menu to send one.</div>`}
+    </section>
+
     <section>
       <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);">Signed Contracts</h3>
       ${loading
@@ -1793,6 +1811,28 @@ function renderDocumentsTab(c) {
           ? contracts.map(renderContractRow).join('')
           : `<div style="padding:16px;background:var(--bg,#faf9f6);border-radius:8px;color:var(--text-muted,#888);font-size:13px;text-align:center;">No signed contracts on file.</div>`}
     </section>
+  `;
+}
+
+function renderRetreatAgreementRow(a) {
+  const signed = a.status === 'signed';
+  const sentLine = a.sent_at ? `Sent ${formatDate(a.sent_at)}` : 'Not yet sent';
+  const signedLine = signed
+    ? `Signed ${formatDate(a.signed_at)}${a.signed_by_name ? ' by ' + escapeHtml(a.signed_by_name) : ''}`
+    : sentLine + ', awaiting signature';
+  const dates = (a.merge_data?.arrival_date && a.merge_data?.departure_date)
+    ? `${a.merge_data.arrival_date} \u2192 ${a.merge_data.departure_date}`
+    : '';
+  const accom = a.merge_data?.accommodation_type || '';
+  const subtitle = [dates, accom].filter(Boolean).join(' \u00b7 ');
+  return `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;background:#fff;margin-bottom:6px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;">Within Retreat Agreement${subtitle ? ' \u00b7 ' + escapeHtml(subtitle) : ''}</div>
+        <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">${signedLine}</div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${signed ? '#15803d' : '#b4691f'};text-transform:uppercase;letter-spacing:.5px;">${signed ? 'Signed' : (a.status || 'pending')}</span>
+    </div>
   `;
 }
 
@@ -1858,11 +1898,221 @@ function handleClientMoreItem(leadId, item) {
     case 'send-welcome-letter':
       openSendWelcomeLetterModal(leadId);
       return;
+    case 'send-retreat-agreement':
+      openSendRetreatAgreementModal(leadId);
+      return;
     case 'send-intake-link':
     case 'send-reminder':
       showToast('Coming soon \u2014 use the CRM to send for now.', 'info');
       return;
   }
+}
+
+// ---------- Send Retreat Agreement modal ----------
+
+// Opens a modal that collects retreat-specific fields (accommodation, dates,
+// fees) and calls the create-retreat-agreement edge function. The function
+// builds the SignWell-ready PDF, uploads it, and SignWell emails the signing
+// link. The `within_retreat_agreements` row is updated to status='sent'.
+function openSendRetreatAgreementModal(leadId) {
+  const c = clients.find(cl => cl.id === leadId);
+  if (!c) { showToast('Client not found', 'error'); return; }
+  if (!c.email) { showToast('This client has no email address on file.', 'error'); return; }
+
+  const fullName = `${c.first_name || ''} ${c.last_name || ''}`.trim() || '(no name)';
+
+  // Auto-fill defaults from latest retreat package on file (if any).
+  const clientPkgs = getClientPackages(leadId);
+  const newestPkg = clientPkgs[0];
+  const defaultAccommodation = newestPkg?.occupancy === 'shared' ? 'Shared' : 'Private';
+  const defaultArrival = newestPkg?.check_in_at ? String(newestPkg.check_in_at).slice(0, 10) : '';
+  const defaultDeparture = newestPkg?.check_out_at ? String(newestPkg.check_out_at).slice(0, 10) : '';
+  const defaultTotal = newestPkg?.price_cents ? (newestPkg.price_cents / 100) : 0;
+  const defaultDeposit = Math.round(defaultTotal * 0.1 * 100) / 100;
+  const defaultBalance = Math.max(0, Math.round((defaultTotal - defaultDeposit) * 100) / 100);
+
+  // Default emergency contact from lead's hospitality fields, when present.
+  const ec = [c.emergency_contact_name, c.emergency_contact_relationship, c.emergency_contact_phone]
+    .filter(Boolean).join(' — ');
+
+  const modal = document.getElementById('clients-modal');
+  modal.innerHTML = `
+    <div class="crm-modal-overlay" id="clients-modal-overlay">
+      <div class="crm-modal-content" style="max-width:680px;">
+        <div class="crm-modal-header">
+          <h2>Send retreat agreement to ${escapeHtml(fullName)}</h2>
+          <button class="crm-modal-close" id="clients-modal-close-btn">&times;</button>
+        </div>
+        <div class="crm-modal-body" style="padding:20px;">
+          <div class="crm-form-field">
+            <label>To</label>
+            <input type="email" class="crm-input" id="ra-to" value="${escapeHtml(c.email)}" readonly style="background:#f3f4f6">
+          </div>
+          <div class="crm-form-row" style="display:flex;gap:12px;">
+            <div class="crm-form-field" style="flex:1;">
+              <label>Accommodation</label>
+              <select class="crm-select" id="ra-accommodation">
+                <option value="Private" ${defaultAccommodation === 'Private' ? 'selected' : ''}>Private</option>
+                <option value="Shared" ${defaultAccommodation === 'Shared' ? 'selected' : ''}>Shared</option>
+              </select>
+            </div>
+            <div class="crm-form-field" style="flex:1;">
+              <label>Arrival date</label>
+              <input type="date" class="crm-input" id="ra-arrival" value="${defaultArrival}">
+            </div>
+            <div class="crm-form-field" style="flex:1;">
+              <label>Departure date</label>
+              <input type="date" class="crm-input" id="ra-departure" value="${defaultDeparture}">
+            </div>
+          </div>
+          <div class="crm-form-row" style="display:flex;gap:12px;">
+            <div class="crm-form-field" style="flex:1;">
+              <label>Total fee ($)</label>
+              <input type="number" class="crm-input" id="ra-total" min="0" step="0.01" value="${defaultTotal.toFixed(2)}">
+            </div>
+            <div class="crm-form-field" style="flex:1;">
+              <label>Deposit paid ($)</label>
+              <input type="number" class="crm-input" id="ra-deposit" min="0" step="0.01" value="${defaultDeposit.toFixed(2)}">
+            </div>
+            <div class="crm-form-field" style="flex:1;">
+              <label>Remaining balance ($)</label>
+              <input type="number" class="crm-input" id="ra-balance" min="0" step="0.01" value="${defaultBalance.toFixed(2)}" readonly style="background:#f3f4f6">
+            </div>
+          </div>
+          <div class="crm-form-field">
+            <label>Emergency contact (free text)</label>
+            <input type="text" class="crm-input" id="ra-emergency" value="${escapeHtml(ec)}" placeholder="e.g. Jamie Doe (sister) — 512-555-0100">
+          </div>
+        </div>
+        <div class="crm-modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-color,#eee);display:flex;gap:8px;justify-content:flex-end;">
+          <button class="crm-btn crm-btn-sm" id="btn-cancel-retreat-agreement">Cancel</button>
+          <button class="crm-btn crm-btn-sm" id="btn-preview-retreat-agreement">Preview PDF</button>
+          <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-retreat-agreement">Send for signature</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const recalcBalance = () => {
+    const total = Number(document.getElementById('ra-total').value || 0);
+    const deposit = Number(document.getElementById('ra-deposit').value || 0);
+    const bal = Math.max(0, Math.round((total - deposit) * 100) / 100);
+    document.getElementById('ra-balance').value = bal.toFixed(2);
+  };
+  document.getElementById('ra-total').addEventListener('input', recalcBalance);
+  document.getElementById('ra-deposit').addEventListener('input', recalcBalance);
+
+  const collectPayload = (preview = false) => ({
+    lead_id: leadId,
+    package_id: newestPkg?.id || null,
+    accommodation_type: document.getElementById('ra-accommodation').value,
+    arrival_date: document.getElementById('ra-arrival').value || null,
+    departure_date: document.getElementById('ra-departure').value || null,
+    total_fee: Number(document.getElementById('ra-total').value || 0),
+    deposit_amount: Number(document.getElementById('ra-deposit').value || 0),
+    remaining_balance: Number(document.getElementById('ra-balance').value || 0),
+    emergency_contact: document.getElementById('ra-emergency').value.trim() || null,
+    preview,
+  });
+
+  const callCreate = async (payload) => {
+    const session = await supabase.auth.getSession();
+    const token = session?.data?.session?.access_token;
+    const resp = await fetch(SUPABASE_URL + '/functions/v1/create-retreat-agreement', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(result.error || result.detail || ('Request failed (HTTP ' + resp.status + ')'));
+    return result;
+  };
+
+  document.getElementById('btn-preview-retreat-agreement').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-preview-retreat-agreement');
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Building preview…';
+    try {
+      const result = await callCreate(collectPayload(true));
+      if (!result.pdf_base64) throw new Error('Preview returned no PDF');
+      showRetreatPdfPreview({ pdfBase64: result.pdf_base64, filename: result.filename || 'retreat-agreement.pdf' });
+    } catch (err) {
+      console.error('Retreat agreement preview error:', err);
+      showToast('Preview failed: ' + (err.message || err), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  });
+
+  document.getElementById('btn-confirm-send-retreat-agreement').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-confirm-send-retreat-agreement');
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      await callCreate(collectPayload(false));
+      showToast('Retreat agreement sent for signature', 'success');
+      // Reload agreements + close modal + reopen drawer so the badge appears.
+      const { data } = await supabase.from('within_retreat_agreements').select('*').order('created_at', { ascending: false });
+      retreatAgreements = data || [];
+      openClientDetail(leadId);
+    } catch (err) {
+      console.error('Retreat agreement send error:', err);
+      showToast('Send failed: ' + (err.message || err), 'error');
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  });
+
+  const backToDrawer = () => openClientDetail(leadId);
+  document.getElementById('clients-modal-close-btn').addEventListener('click', backToDrawer);
+  document.getElementById('btn-cancel-retreat-agreement').addEventListener('click', backToDrawer);
+  document.getElementById('clients-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'clients-modal-overlay') backToDrawer();
+  });
+}
+
+// PDF preview modal — mirrors the rental PDF preview from crm.js. Shown over
+// the retreat-agreement modal so the admin can verify the rendered document
+// before sending it for signature.
+function showRetreatPdfPreview({ pdfBase64, filename }) {
+  const existing = document.getElementById('clients-pdf-preview-modal');
+  if (existing) existing.remove();
+
+  const byteChars = atob(pdfBase64);
+  const bytes = new Uint8Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  const wrap = document.createElement('div');
+  wrap.id = 'clients-pdf-preview-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:#fff;width:100%;max-width:900px;height:92vh;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+      <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;background:#f8fafc;">
+        <div style="flex:1;min-width:0;font-size:12px;color:#475569;line-height:1.5;">
+          <div><strong style="color:#1e293b;">Retreat Agreement Preview</strong> — exactly what the guest will see when they open the SignWell link. Not yet sent.</div>
+        </div>
+        <a href="${blobUrl}" download="${escapeHtml(filename)}" class="crm-btn" style="text-decoration:none;">Download</a>
+        <button type="button" id="clients-pdf-preview-close" class="crm-btn">Close</button>
+      </div>
+      <iframe id="clients-pdf-preview-iframe" src="${blobUrl}" style="flex:1;width:100%;border:0;background:#525659;"></iframe>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const close = () => {
+    URL.revokeObjectURL(blobUrl);
+    wrap.remove();
+  };
+  wrap.querySelector('#clients-pdf-preview-close').addEventListener('click', close);
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
 }
 
 // ---------- Send Welcome Letter modal ----------

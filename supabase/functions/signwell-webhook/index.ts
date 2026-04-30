@@ -117,16 +117,57 @@ Deno.serve(async (req) => {
       .eq('signwell_document_id', documentId)
       .maybeSingle();
 
+    // Try to find a Within retreat agreement with this document ID. Used for the
+    // immersive-retreat client signing flow — different table than crm_proposals
+    // because it isn't tied to a rental proposal.
+    const { data: retreatAgreement } = await supabase
+      .from('within_retreat_agreements')
+      .select('id, lead_id, package_id, status')
+      .eq('signwell_document_id', documentId)
+      .maybeSingle();
+
     // Determine which type of document this is
     const isRental = !rentalError && rentalApp;
     const isEvent = !eventError && eventRequest;
     const isProposal = !!crmProposal;
+    const isRetreat = !!retreatAgreement;
 
-    if (!isRental && !isEvent && !isProposal) {
-      console.error('No matching application/request/proposal found for document:', documentId);
+    if (!isRental && !isEvent && !isProposal && !isRetreat) {
+      console.error('No matching application/request/proposal/retreat found for document:', documentId);
       return new Response(
         JSON.stringify({ error: 'Document not found in system' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Short-circuit for Within retreat agreements: stamp signed_at + signer,
+    // log activity, send confirmation email, return. No payment plumbing here —
+    // payment for retreats happens out-of-band before/at check-in.
+    if (isRetreat) {
+      const signer = (payload.recipients || []).find(r => r.status === 'completed') || payload.recipients?.[0];
+      const signedAt = payload.completed_at || new Date().toISOString();
+      await supabase
+        .from('within_retreat_agreements')
+        .update({
+          status: 'signed',
+          signed_at: signedAt,
+          signed_by_name: signer?.name || null,
+          signed_by_email: signer?.email || null,
+        })
+        .eq('id', retreatAgreement.id);
+
+      if (retreatAgreement.lead_id) {
+        await supabase.from('crm_activities').insert({
+          lead_id: retreatAgreement.lead_id,
+          activity_type: 'note',
+          description: `Retreat agreement signed by ${signer?.name || signer?.email || 'guest'}`,
+        });
+      }
+
+      console.log('Retreat agreement signed:', { agreement_id: retreatAgreement.id, documentId });
+      return new Response(
+        JSON.stringify({ success: true, type: 'retreat', agreement_id: retreatAgreement.id }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

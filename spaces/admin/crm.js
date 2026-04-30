@@ -766,6 +766,25 @@ async function openLeadDetail(leadId) {
     console.error('Error loading activities:', err);
   }
 
+  // Load latest Within retreat agreement for this lead (for status badge).
+  let leadRetreatAgreement = null;
+  if (lead.business_line === 'within') {
+    try {
+      const { data } = await supabase
+        .from('within_retreat_agreements')
+        .select('*')
+        .eq('lead_id', lead.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+      leadRetreatAgreement = data?.[0] || null;
+    } catch (err) {
+      console.error('Error loading retreat agreement:', err);
+    }
+  }
+  // Stash on the lead instance so the renderer can pick it up without changing
+  // every signature in this 4000-line file.
+  lead._retreatAgreement = leadRetreatAgreement;
+
   const fullName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Unnamed Lead';
   const initials = (((lead.first_name || '')[0] || '') + ((lead.last_name || '')[0] || '')).toUpperCase()
     || (lead.email || '?')[0].toUpperCase();
@@ -827,6 +846,7 @@ async function openLeadDetail(leadId) {
                 ${lead.business_line === 'awkn_ranch' ? '<button class="crm-menu-item" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
                 ${lead.business_line === 'awkn_ranch' && lead.email ? '<button class="crm-menu-item" id="btn-send-agreement-from-lead">Send Agreement to Sign</button>' : ''}
                 ${lead.business_line === 'within' && lead.email ? '<button class="crm-menu-item" id="btn-send-welcome-letter">Send Welcome Letter</button>' : ''}
+                ${lead.business_line === 'within' && lead.email ? '<button class="crm-menu-item" id="btn-send-retreat-agreement">Send Retreat Agreement</button>' : ''}
                 ${lead.email ? '<button class="crm-menu-item" id="btn-send-feedback">Send Feedback Form</button>' : ''}
                 ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-success" id="btn-mark-won">Mark Won</button>' : ''}
                 ${lead.status === 'open' ? '<button class="crm-menu-item crm-menu-item-danger" id="btn-mark-lost">Mark Lost</button>' : ''}
@@ -966,6 +986,8 @@ async function openLeadDetail(leadId) {
                   `).join('')}
             </div>
             ` : ''}
+
+            ${lead.business_line === 'within' ? renderRetreatAgreementCard(lead._retreatAgreement) : ''}
           </aside>
         </div>
       </div>
@@ -1353,6 +1375,13 @@ The ${bizLabel} Team</textarea>
     });
   });
 
+  // Send Retreat Agreement — Within immersive-retreat clients only. Triggers
+  // the create-retreat-agreement edge function which builds a SignWell-ready
+  // PDF, uploads it to SignWell, and emails the signing link to the guest.
+  document.getElementById('btn-send-retreat-agreement')?.addEventListener('click', () => {
+    openSendRetreatAgreementForm(lead);
+  });
+
   // Send Welcome Letter — Within Center welcome with prep instructions.
   // Package is selected from a preset list, with a custom option for ad-hoc items.
   document.getElementById('btn-send-welcome-letter')?.addEventListener('click', () => {
@@ -1662,6 +1691,38 @@ The ${bizLabel} Team</textarea>
   });
 }
 
+// Right-rail status card for the Within retreat agreement on a lead.
+// Empty state when none has been sent yet.
+function renderRetreatAgreementCard(agreement) {
+  if (!agreement) {
+    return `
+      <div class="crm-prop-card">
+        <div class="crm-prop-card-head">Retreat Agreement</div>
+        <div class="crm-rail-empty">Not yet sent. Use "Send Retreat Agreement" in the More menu.</div>
+      </div>
+    `;
+  }
+  const signed = agreement.status === 'signed';
+  const sentAt = agreement.sent_at ? new Date(agreement.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const signedAt = agreement.signed_at ? new Date(agreement.signed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const statusColor = signed ? '#3d8b7a' : '#b4691f';
+  const statusLabel = signed ? '✓ Signed' : (agreement.status || 'pending');
+  return `
+    <div class="crm-prop-card">
+      <div class="crm-prop-card-head">Retreat Agreement</div>
+      <div style="padding:8px 12px;">
+        <div style="font-size:12px;font-weight:700;color:${statusColor};text-transform:uppercase;letter-spacing:.5px;">${escapeHtml(statusLabel)}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:4px;line-height:1.4;">
+          ${signed
+            ? `Signed ${signedAt}${agreement.signed_by_name ? ' by ' + escapeHtml(agreement.signed_by_name) : ''}`
+            : `Sent ${sentAt}, awaiting signature`}
+        </div>
+        ${agreement.signing_url && !signed ? `<div style="margin-top:8px;"><a href="${escapeHtml(agreement.signing_url)}" target="_blank" style="font-size:12px;color:#4338ca;text-decoration:none;">View signing link ↗</a></div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
 function openInlineActionForm() {
   let form = document.getElementById('crm-quick-action-form');
   if (!form) {
@@ -1674,6 +1735,144 @@ function openInlineActionForm() {
   form.style.display = 'block';
   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   return form;
+}
+
+// Inline form for sending the Within Retreat Agreement to an immersive-retreat
+// client. Mirrors the rental agreement review form but with retreat-specific
+// fields (accommodation, arrival/departure dates, total/deposit/balance).
+function openSendRetreatAgreementForm(lead) {
+  const form = openInlineActionForm();
+  const fmtMoney = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  form.innerHTML = `
+    <h4 class="crm-inline-form-title">Send Retreat Agreement</h4>
+    <div class="crm-form-field">
+      <label>To</label>
+      <input type="email" class="crm-input" id="ra-to" value="${escapeHtml(lead.email || '')}" readonly style="background:#f3f4f6">
+    </div>
+    <div class="crm-form-row" style="display:flex;gap:12px;">
+      <div class="crm-form-field" style="flex:1;">
+        <label>Accommodation</label>
+        <select class="crm-select" id="ra-accommodation">
+          <option value="Private" selected>Private</option>
+          <option value="Shared">Shared</option>
+        </select>
+      </div>
+      <div class="crm-form-field" style="flex:1;">
+        <label>Arrival date</label>
+        <input type="date" class="crm-input" id="ra-arrival">
+      </div>
+      <div class="crm-form-field" style="flex:1;">
+        <label>Departure date</label>
+        <input type="date" class="crm-input" id="ra-departure">
+      </div>
+    </div>
+    <div class="crm-form-row" style="display:flex;gap:12px;">
+      <div class="crm-form-field" style="flex:1;">
+        <label>Total fee ($)</label>
+        <input type="number" class="crm-input" id="ra-total" min="0" step="0.01" value="0">
+      </div>
+      <div class="crm-form-field" style="flex:1;">
+        <label>Deposit paid ($)</label>
+        <input type="number" class="crm-input" id="ra-deposit" min="0" step="0.01" value="0">
+      </div>
+      <div class="crm-form-field" style="flex:1;">
+        <label>Remaining balance ($)</label>
+        <input type="number" class="crm-input" id="ra-balance" min="0" step="0.01" value="0" readonly style="background:#f3f4f6">
+      </div>
+    </div>
+    <div class="crm-form-field">
+      <label>Emergency contact (optional, free text)</label>
+      <input type="text" class="crm-input" id="ra-emergency" placeholder="e.g. Jamie Doe (sister) — 512-555-0100">
+    </div>
+    <div class="crm-form-actions">
+      <button class="crm-btn crm-btn-sm" id="btn-preview-retreat-agreement">Preview PDF</button>
+      <button class="crm-btn crm-btn-sm crm-btn-primary" id="btn-confirm-send-retreat-agreement">Send to ${escapeHtml(lead.email)}</button>
+      <button class="crm-btn crm-btn-sm" id="btn-cancel-retreat-agreement">Cancel</button>
+    </div>
+  `;
+
+  // Auto-recalc balance = total - deposit.
+  const recalcBalance = () => {
+    const total = Number(document.getElementById('ra-total').value || 0);
+    const deposit = Number(document.getElementById('ra-deposit').value || 0);
+    const bal = Math.max(0, Math.round((total - deposit) * 100) / 100);
+    document.getElementById('ra-balance').value = bal.toFixed(2);
+  };
+  document.getElementById('ra-total').addEventListener('input', recalcBalance);
+  document.getElementById('ra-deposit').addEventListener('input', recalcBalance);
+
+  const collectPayload = (preview = false) => ({
+    lead_id: lead.id,
+    accommodation_type: document.getElementById('ra-accommodation').value,
+    arrival_date: document.getElementById('ra-arrival').value || null,
+    departure_date: document.getElementById('ra-departure').value || null,
+    total_fee: Number(document.getElementById('ra-total').value || 0),
+    deposit_amount: Number(document.getElementById('ra-deposit').value || 0),
+    remaining_balance: Number(document.getElementById('ra-balance').value || 0),
+    emergency_contact: document.getElementById('ra-emergency').value.trim() || null,
+    preview,
+  });
+
+  const callCreate = async (payload) => {
+    const session = await supabase.auth.getSession();
+    const token = session?.data?.session?.access_token;
+    const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+    const resp = await fetch(supabaseUrl + '/functions/v1/create-retreat-agreement', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(result.error || result.detail || ('Request failed (HTTP ' + resp.status + ')'));
+    return result;
+  };
+
+  document.getElementById('btn-preview-retreat-agreement').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-preview-retreat-agreement');
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Building preview…';
+    try {
+      const result = await callCreate(collectPayload(true));
+      if (!result.pdf_base64) throw new Error('Preview returned no PDF');
+      showPdfPreviewModal({ pdfBase64: result.pdf_base64, filename: result.filename || 'retreat-agreement.pdf' });
+    } catch (err) {
+      console.error('Retreat agreement preview error:', err);
+      showToast('Preview failed: ' + (err.message || err), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  });
+
+  document.getElementById('btn-confirm-send-retreat-agreement').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-confirm-send-retreat-agreement');
+    const prev = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      const result = await callCreate(collectPayload(false));
+      showToast('Retreat agreement sent for signature', 'success');
+      form.style.display = 'none';
+      await openLeadDetail(lead.id);
+      if (result.signing_url) {
+        showToast(`Signing URL ready (also emailed via SignWell). ${result.signing_url}`, 'success');
+      }
+    } catch (err) {
+      console.error('Retreat agreement send error:', err);
+      showToast('Send failed: ' + (err.message || err), 'error');
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  });
+
+  document.getElementById('btn-cancel-retreat-agreement').addEventListener('click', () => {
+    form.style.display = 'none';
+  });
 }
 
 // Inline review panel shown before sending a rental agreement. Lets the admin
