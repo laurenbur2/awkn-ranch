@@ -130,7 +130,7 @@ async function loadAllData() {
     supabase.from('spaces').select('id, name, slug, floor, has_private_bath, space_type, is_archived').eq('is_archived', false).in('space_type', ['lodging', 'session']),
     supabase.from('beds').select('*').eq('is_archived', false).order('sort_order'),
     supabase.from('app_users').select('id, display_name, first_name, last_name, email, role, can_schedule, is_archived').in('role', ['admin', 'staff', 'oracle']).eq('is_archived', false).order('display_name'),
-    supabase.from('crm_service_packages').select('id, name, slug, price_regular, price_promo, description, includes, business_line, is_active, sort_order').eq('business_line', 'within').order('sort_order').order('name'),
+    supabase.from('crm_service_packages').select('id, name, slug, price_regular, price_promo, description, includes, business_line, is_active, sort_order, category').eq('business_line', 'within').order('sort_order').order('name'),
     supabase.from('crm_service_package_items').select('package_id, service_id, quantity, sort_order'),
     supabase.from('facilitators').select('*').order('last_name', { nullsFirst: false }).order('first_name'),
     supabase.from('facilitator_services').select('facilitator_id, service_id'),
@@ -2644,7 +2644,8 @@ function openPackageModal(leadId) {
   }
 
   const retreatTemplates = servicePackageTemplates.filter(t => parseRetreatDuration(t.name));
-  const otherTemplates = servicePackageTemplates.filter(t => !parseRetreatDuration(t.name));
+  const integrationTemplates = servicePackageTemplates.filter(t => t.category === 'integration');
+  const otherTemplates = servicePackageTemplates.filter(t => !parseRetreatDuration(t.name) && t.category !== 'integration');
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -2663,6 +2664,9 @@ function openPackageModal(leadId) {
               <option value="custom">Custom (build from scratch)</option>
               ${retreatTemplates.length ? `<optgroup label="Retreats / Immersives">
                 ${retreatTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
+              </optgroup>` : ''}
+              ${integrationTemplates.length ? `<optgroup label="Integration Packages">
+                ${integrationTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
               </optgroup>` : ''}
               ${otherTemplates.length ? `<optgroup label="Packages">
                 ${otherTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
@@ -4169,43 +4173,65 @@ function renderPackagesSection() {
     return html;
   }
 
-  html += `
-    <div class="crm-table-wrap">
-      <table class="crm-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Includes</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${visible.map(p => {
-            const items = packageItemsByPkgId.get(p.id) || [];
-            const chips = items.map(it => {
-              const svc = svcById.get(it.service_id);
-              if (!svc) return '';
-              const qty = it.quantity > 1 ? `${it.quantity}&times; ` : '';
-              return `<span style="display:inline-block;padding:2px 10px;margin:1px 3px 1px 0;background:#f3ece0;color:#6b4a1f;border:1px solid #e6d9c2;border-radius:999px;font-size:11px;font-weight:500;">${qty}${escapeHtml(svc.name)}</span>`;
-            }).filter(Boolean).join('');
-            const priceDisplay = p.price_regular ? `$${Number(p.price_regular).toLocaleString()}` : '—';
-            return `
-              <tr class="clients-package-row" data-package-id="${p.id}" style="cursor:pointer;">
-                <td><strong>${escapeHtml(p.name)}</strong>${p.description ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(p.description)}</div>` : ''}</td>
-                <td>${priceDisplay}</td>
-                <td style="max-width:420px;">${chips || '<span style="color:var(--text-muted,#888);">—</span>'}</td>
-                <td>${p.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
-                <td><button class="crm-btn crm-btn-xs" data-edit-package="${p.id}">Edit</button></td>
+  // Group by category for visual structure. "Retreats / Immersives" derived
+  // from the name (6D/5N pattern); explicit category column drives the rest.
+  const CATEGORY_ORDER = [
+    { key: 'retreats',    label: 'Retreats / Immersives' },
+    { key: 'integration', label: 'Integration Packages' },
+    { key: 'other',       label: 'Packages' },
+  ];
+  const groupOf = (p) => {
+    if (parseRetreatDuration(p.name)) return 'retreats';
+    if (p.category === 'integration') return 'integration';
+    return 'other';
+  };
+  const grouped = new Map(CATEGORY_ORDER.map(g => [g.key, []]));
+  visible.forEach(p => grouped.get(groupOf(p)).push(p));
+
+  const renderRow = (p) => {
+    const items = packageItemsByPkgId.get(p.id) || [];
+    const chips = items.map(it => {
+      const svc = svcById.get(it.service_id);
+      if (!svc) return '';
+      const qty = it.quantity > 1 ? `${it.quantity}&times; ` : '';
+      return `<span style="display:inline-block;padding:2px 10px;margin:1px 3px 1px 0;background:#f3ece0;color:#6b4a1f;border:1px solid #e6d9c2;border-radius:999px;font-size:11px;font-weight:500;">${qty}${escapeHtml(svc.name)}</span>`;
+    }).filter(Boolean).join('');
+    const priceDisplay = p.price_regular ? `$${Number(p.price_regular).toLocaleString()}` : '—';
+    return `
+      <tr class="clients-package-row" data-package-id="${p.id}" style="cursor:pointer;">
+        <td><strong>${escapeHtml(p.name)}</strong>${p.description ? `<div style="font-size:12px;color:var(--text-muted,#888);margin-top:2px;">${escapeHtml(p.description)}</div>` : ''}</td>
+        <td>${priceDisplay}</td>
+        <td style="max-width:420px;">${chips || '<span style="color:var(--text-muted,#888);">—</span>'}</td>
+        <td>${p.is_active ? '<span style="color:#16a34a;">Active</span>' : '<span style="color:var(--text-muted,#888);">Inactive</span>'}</td>
+        <td><button class="crm-btn crm-btn-xs" data-edit-package="${p.id}">Edit</button></td>
+      </tr>
+    `;
+  };
+
+  html += CATEGORY_ORDER.map(g => {
+    const rows = grouped.get(g.key) || [];
+    if (!rows.length) return '';
+    return `
+      <div style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#666);margin-bottom:6px;">${escapeHtml(g.label)}</div>
+        <div class="crm-table-wrap">
+          <table class="crm-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Includes</th>
+                <th>Status</th>
+                <th></th>
               </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>
-    </div>
-  `;
+            </thead>
+            <tbody>${rows.map(renderRow).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+  html += `</div>`;
   return html;
 }
 
@@ -4245,6 +4271,14 @@ function openPackageTemplateModal(pkg = null) {
           <div class="crm-form-field" style="margin-top:12px;">
             <label>Description</label>
             <textarea class="crm-textarea" id="pkgt-desc" rows="2">${escapeHtml(pkg?.description || '')}</textarea>
+          </div>
+          <div class="crm-form-field" style="margin-top:12px;">
+            <label>Category</label>
+            <select class="crm-select" id="pkgt-category">
+              <option value="" ${!pkg?.category ? 'selected' : ''}>Auto (Retreats / Packages)</option>
+              <option value="integration" ${pkg?.category === 'integration' ? 'selected' : ''}>Integration Packages</option>
+            </select>
+            <div style="font-size:11px;color:var(--text-muted,#888);margin-top:4px;">Drives the optgroup label in the package picker and the section header in the catalog list.</div>
           </div>
           <div class="crm-form-field" style="margin-top:12px;">
             <label style="display:inline-flex;align-items:center;gap:6px;font-weight:400;">
@@ -4315,6 +4349,7 @@ async function savePackageTemplate(existing) {
     price_promo: promoRaw === '' ? null : Number(promoRaw),
     description: document.getElementById('pkgt-desc').value.trim() || null,
     is_active: document.getElementById('pkgt-active').checked,
+    category: document.getElementById('pkgt-category')?.value || null,
     business_line: 'within',
   };
 
