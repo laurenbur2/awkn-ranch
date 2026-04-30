@@ -443,13 +443,13 @@ function injectSiteNav() {
   const target = document.getElementById('siteHeader');
   if (!target) return;
 
-  const versionEl = document.querySelector('[data-site-version]');
-  const version = versionEl?.textContent?.trim() || '';
-
+  // Team-portal pages don't show the deploy version next to the wordmark —
+  // it adds visual noise without informing the admin's task. Version still
+  // tracks via setupVersionInfo() for diagnostics if needed.
   target.innerHTML = renderHeader({
     transparent: false,
     light: false,
-    version,
+    version: '',
     showRoleBadge: true,
     logoHref: '/awkn-ranch/spaces/admin/dashboard.html',
   });
