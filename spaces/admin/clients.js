@@ -886,9 +886,7 @@ function renderClientMoreMenu(leadId) {
     { sep: true },
     { action: 'send-invoice',         label: 'Send invoice\u2026' },
     { action: 'send-welcome-letter',  label: 'Send welcome letter\u2026' },
-    { action: 'send-retreat-agreement', label: 'Send retreat agreement\u2026' },
-    { action: 'send-intake-link',     label: 'Send intake / waiver link' },
-    { action: 'send-reminder',        label: 'Send schedule reminder' },
+    { action: 'send-retreat-agreement', label: 'Send retreat agreement / waiver\u2026' },
     { sep: true },
     { action: 'open-in-crm',          label: 'Open in CRM \u2197' },
   ];
@@ -1901,10 +1899,6 @@ function handleClientMoreItem(leadId, item) {
       return;
     case 'send-retreat-agreement':
       openSendRetreatAgreementModal(leadId);
-      return;
-    case 'send-intake-link':
-    case 'send-reminder':
-      showToast('Coming soon \u2014 use the CRM to send for now.', 'info');
       return;
   }
 }
