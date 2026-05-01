@@ -423,8 +423,40 @@
   <script>
     function submitContactForm(e) {
       e.preventDefault();
-      document.getElementById('contactFormBody').style.display = 'none';
-      document.getElementById('contactFormThanks').style.display = '';
+      var form = document.getElementById('contactForm');
+      var submitBtn = form.querySelector('.contact-form-submit');
+      var originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      var data = new FormData();
+      data.append('First Name', document.getElementById('cfFirstName').value.trim());
+      data.append('Last Name', document.getElementById('cfLastName').value.trim());
+      data.append('Phone', document.getElementById('cfPhone').value.trim());
+      data.append('email', document.getElementById('cfEmail').value.trim());
+      data.append('City', document.getElementById('cfCity').value.trim());
+      data.append('State', document.getElementById('cfState').value.trim());
+      data.append('Message', document.getElementById('cfMessage').value.trim());
+      data.append('_subject', 'New inquiry from Within Center contact form');
+      data.append('_autoresponse', "Thank you for reaching out to Within Center.\n\nWe've received your message and a member of our team will be in touch with you shortly.\n\nIf your need is urgent, please call us at 512-969-2399.\n\n— The Within Center Team");
+      data.append('_template', 'table');
+      data.append('_captcha', 'false');
+
+      fetch('https://formsubmit.co/ajax/intake@within.center', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      })
+      .then(function(resp){ if (!resp.ok) throw new Error('submit failed'); return resp.json(); })
+      .then(function(){
+        document.getElementById('contactFormBody').style.display = 'none';
+        document.getElementById('contactFormThanks').style.display = '';
+      })
+      .catch(function(){
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        alert('Something went wrong. Please try again or call 512-969-2399.');
+      });
     }
     function closeContactModal() {
       var modal = document.getElementById('contactFormModal');
