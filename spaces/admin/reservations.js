@@ -37,6 +37,10 @@ let activityBookings = [];
 // these overlay onto the Spaces calendar so booking clashes are visible
 // across both sides (venue rentals + Within client sessions).
 let withinSessionBookings = [];
+// Venue events (crm_leads with business_line='awkn_ranch') — also overlay
+// onto the Spaces calendar so the team sees the full picture (rentals +
+// Within sessions + confirmed venue events) on one grid.
+let venueEventBookings = [];
 
 // Calendar state
 let currentDate = getAustinToday();
@@ -129,17 +133,19 @@ async function loadBookings() {
   const startDT = start.toISOString();
   const endDT = end.toISOString();
 
-  const [rooms, spaces, activities, withins] = await Promise.all([
+  const [rooms, spaces, activities, withins, venueEvts] = await Promise.all([
     bookingService.getRoomBookings(startISO, endISO),
     bookingService.getSpaceBookings(startDT, endDT),
     bookingService.getActivityBookings(startDT, endDT),
     loadWithinSessionsForRange(startDT, endDT),
+    loadVenueEventsForRange(startISO, endISO),
   ]);
 
   roomBookings = rooms;
   spaceBookings = spaces;
   activityBookings = activities;
   withinSessionBookings = withins;
+  venueEventBookings = venueEvts;
 }
 
 // Pull Within client sessions whose space is set, normalize them into a
@@ -181,6 +187,71 @@ async function loadWithinSessionsForRange(startISO, endISO) {
       _leadId: s.lead_id,
     };
   });
+}
+
+// Pull venue events (crm_leads, business_line='awkn_ranch') in the visible
+// window and normalize them into space-booking-shaped objects (one per
+// space the event uses, including additional_space_ids). Multi-day events
+// are exploded into one row per day so the day/week grid renders them on
+// every day they occupy. Only confirmed-stage events surface here so the
+// calendar isn't muddied by inquiries / proposals.
+async function loadVenueEventsForRange(startISO, endISO) {
+  const { data, error } = await supabase
+    .from('crm_leads')
+    .select(`
+      id, first_name, last_name, event_date, event_end_date,
+      event_start_time, event_end_time, event_type, guest_count,
+      space_id, additional_space_ids, estimated_value,
+      stage:crm_pipeline_stages(slug)
+    `)
+    .eq('business_line', 'awkn_ranch')
+    .not('event_date', 'is', null)
+    .or(`event_date.lte.${endISO},event_end_date.lte.${endISO}`)
+    .or(`event_date.gte.${startISO},event_end_date.gte.${startISO}`);
+
+  if (error) {
+    console.warn('venue events overlay load failed:', error);
+    return [];
+  }
+
+  const CONFIRMED = new Set(['invoice_paid','event_scheduled','event_complete','feedback_form_sent']);
+  const out = [];
+
+  for (const e of (data || [])) {
+    if (!CONFIRMED.has((e.stage?.slug || '').toLowerCase())) continue;
+    if (!e.space_id && !(e.additional_space_ids || []).length) continue;
+
+    const guest = ((e.first_name || '') + ' ' + (e.last_name || '')).trim() || 'Venue event';
+    const spaceIds = [e.space_id, ...((e.additional_space_ids || []))].filter(Boolean);
+
+    // Build one row per day in [event_date, event_end_date], one per space.
+    const startDay = new Date(e.event_date + 'T12:00:00');
+    const endDay = new Date(((e.event_end_date && e.event_end_date >= e.event_date) ? e.event_end_date : e.event_date) + 'T12:00:00');
+    const cur = new Date(startDay);
+    while (cur <= endDay) {
+      const dateStr = cur.toISOString().split('T')[0];
+      const startTime = e.event_start_time || '09:00';
+      const endTime   = e.event_end_time   || '17:00';
+      const startISO = `${dateStr}T${startTime.length === 5 ? startTime + ':00' : startTime}`;
+      const endISO   = `${dateStr}T${endTime.length   === 5 ? endTime   + ':00' : endTime}`;
+      for (const spId of spaceIds) {
+        out.push({
+          id: `venue-${e.id}-${dateStr}-${spId}`,
+          space_id: spId,
+          start_datetime: startISO,
+          end_datetime: endISO,
+          status: 'venue_event',
+          client_name: guest,
+          booking_type: e.event_type || 'Venue event',
+          total_amount: e.estimated_value || '',
+          _isVenueEvent: true,
+          _leadId: e.id,
+        });
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+  }
+  return out;
 }
 
 async function updateStats() {
@@ -392,11 +463,11 @@ function renderRentalsCalendar() {
   const container = document.getElementById('calRentals');
   const spaces = [...allRentalSpaces, ...allWellnessSpaces];
 
-  // Merge venue rentals + Within sessions so a Temple booking from either
-  // side blocks the slot visually. Within rows are tagged with _isWithin
-  // so renderSingleDayGrid can color them differently and route clicks to
-  // the Within schedule.
-  const merged = [...spaceBookings, ...withinSessionBookings];
+  // Merge venue rentals + Within sessions + venue events so a Temple
+  // booking from any source blocks the slot visually. Each set is tagged
+  // (_isWithin / _isVenueEvent) so renderSingleDayGrid can color them
+  // differently and route clicks to the right place.
+  const merged = [...spaceBookings, ...withinSessionBookings, ...venueEventBookings];
 
   if (currentView === 'month') {
     renderRentalMonthView(container, spaces, merged);
@@ -436,15 +507,23 @@ function renderRentalMonthView(container, spaces, allBookings = spaceBookings) {
       const todayCls = isToday(day) ? ' tl-today' : '';
       const weekendCls = (day.getDay() === 0 || day.getDay() === 6) ? ' tl-weekend' : '';
       const dayBookings = allBookings.filter(b => b.space_id === space.id && b.start_datetime?.startsWith(dateStr));
-      const hasVenue = dayBookings.some(b => !b._isWithin);
+      const hasRental = dayBookings.some(b => !b._isWithin && !b._isVenueEvent);
       const hasWithin = dayBookings.some(b => b._isWithin);
+      const hasEvent  = dayBookings.some(b => b._isVenueEvent);
       html += `<div class="tl-cell${todayCls}${weekendCls}" data-space="${space.id}" data-date="${dateStr}">`;
-      if (hasVenue && hasWithin) {
-        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:linear-gradient(135deg,rgba(37,99,235,0.2) 0 50%,rgba(99,102,241,0.25) 50% 100%);"></div>`;
-      } else if (hasVenue) {
-        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:rgba(37,99,235,0.2);"></div>`;
-      } else if (hasWithin) {
-        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:rgba(99,102,241,0.25);"></div>`;
+      // Color priority: rentals (blue) + within (indigo) + events (green).
+      // When multiple sources land on the same day we render a stacked
+      // gradient so each is visible at a glance.
+      const segs = [];
+      if (hasRental) segs.push('rgba(37,99,235,0.22)');
+      if (hasWithin) segs.push('rgba(99,102,241,0.25)');
+      if (hasEvent)  segs.push('rgba(22,163,74,0.22)');
+      if (segs.length === 1) {
+        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:${segs[0]};"></div>`;
+      } else if (segs.length > 1) {
+        const step = 100 / segs.length;
+        const stops = segs.map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`).join(',');
+        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:linear-gradient(135deg,${stops});"></div>`;
       }
       html += `</div>`;
     }
@@ -624,13 +703,17 @@ function renderSingleDayGrid(columns, bookings, mode, date) {
             color = '#6366F1'; // indigo — Within sessions
             title = `Within · ${bk.client_name || 'Client'}`;
             sub = bk.booking_type || 'Within session';
+          } else if (bk._isVenueEvent) {
+            color = '#16A34A'; // green — confirmed venue events
+            title = `Event · ${bk.client_name || 'Venue event'}`;
+            sub = bk.booking_type || 'Venue event';
           } else {
             color = bookingService.SPACE_STATUS_COLORS[bk.status] || '#2563EB';
             title = bk.client_name || 'Client';
             sub = `${bk.booking_type} · $${bk.total_amount}`;
           }
 
-          const bookingType = bk._isWithin ? 'within' : mode;
+          const bookingType = bk._isWithin ? 'within' : (bk._isVenueEvent ? 'venue' : mode);
           html += `<div class="tg-booking" style="background:${color}; height:${blockHeight}px;" data-booking-id="${bk.id}" data-booking-type="${bookingType}">
             <span class="tg-booking-title">${title}</span>
             <span class="tg-booking-sub">${sub}</span>
@@ -665,6 +748,17 @@ function attachTimeGridHandlers(container, mode) {
       // that page (not the venue booking modal) so admins can edit there.
       if (type === 'within') {
         window.location.href = `within-schedule.html`;
+        return;
+      }
+      // Venue events are crm_leads — bounce to the events page (the lead
+      // drawer there is the canonical edit surface).
+      if (type === 'venue') {
+        const venueRow = venueEventBookings.find(b => b.id === id);
+        if (venueRow?._leadId) {
+          window.location.href = `venue-events.html`;
+          return;
+        }
+        window.location.href = `venue-events.html`;
         return;
       }
       let booking;
