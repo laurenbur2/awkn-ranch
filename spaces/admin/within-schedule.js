@@ -33,6 +33,10 @@ let services = [];                         // service catalog for display + clas
 let allSpaces = [];                        // every space the admin can put a session in
 let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
 let nsSearchDebounce  = null;
+// Set true by runConflictCheck when the chosen space is already booked at
+// the chosen window (another Within session or a confirmed venue rental).
+// saveNewSession refuses to insert while this is true.
+let nsHasHardConflict = false;
 
 // ============================================================================
 // Boot
@@ -548,6 +552,8 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
   document.getElementById('nsNotes').value = '';
   hideNsError();
   hideNsConflict();
+  nsHasHardConflict = false;
+  refreshNsSaveButtonState();
 
   // Pre-fill date + start time when launched by a grid click; default to
   // today + empty otherwise.
@@ -575,9 +581,21 @@ function hideNsError() {
   const el = document.getElementById('nsError');
   el.style.display = 'none'; el.textContent = '';
 }
-function showNsConflict(msg) {
+function showNsConflict(msg, hard = false) {
   const el = document.getElementById('nsConflict');
-  el.innerHTML = msg; el.style.display = '';
+  el.innerHTML = msg;
+  el.style.display = '';
+  // Hard conflicts get a red border to match the blocking semantics; soft
+  // warnings stay yellow per the existing CSS.
+  if (hard) {
+    el.style.background = '#fee2e2';
+    el.style.borderColor = '#dc2626';
+    el.style.color = '#991b1b';
+  } else {
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.color = '';
+  }
 }
 function hideNsConflict() {
   const el = document.getElementById('nsConflict');
@@ -601,11 +619,16 @@ function addMinutesToTime(timeStr, minutes) {
 }
 
 // Look up overlapping bookings on the chosen space + time window. Hits
-// scheduling_bookings (other Within sessions) and crm_leads (venue events
-// where business_line='awkn_ranch'). Shows a yellow warning banner if
-// anything overlaps. Doesn't block the create — just informs.
+// scheduling_bookings (other Within sessions), booking_spaces (venue
+// rentals), and crm_leads (CRM-stage venue events). Shows a red banner and
+// sets nsHasHardConflict=true if a real overlap exists, which blocks the
+// save. Soft-only signals (CRM events without confirmed times) keep their
+// yellow warning style without blocking.
 async function runConflictCheck() {
   hideNsConflict();
+  nsHasHardConflict = false;
+  refreshNsSaveButtonState();
+
   const spaceId = document.getElementById('nsSpace').value;
   const date    = document.getElementById('nsDate').value;
   const start   = document.getElementById('nsStart').value;
@@ -620,16 +643,25 @@ async function runConflictCheck() {
   const startISO = startDt.toISOString();
   const endISO   = endDt.toISOString();
 
-  const [sessRes, leadRes] = await Promise.all([
+  const [sessRes, venueRes, leadRes] = await Promise.all([
     // Other Within sessions on the same space, overlapping window
     supabase
       .from('scheduling_bookings')
       .select('id, start_datetime, end_datetime, status, lead:crm_leads(first_name, last_name)')
       .eq('space_id', spaceId)
+      .is('cancelled_at', null)
       .neq('status', 'cancelled')
       .lt('start_datetime', endISO)
       .gt('end_datetime',   startISO),
-    // Venue events booked on this space — only the confirmed ones
+    // Venue rentals (booking_spaces) — anything not cancelled is binding
+    supabase
+      .from('booking_spaces')
+      .select('id, client_name, start_datetime, end_datetime, status, booking_type')
+      .eq('space_id', spaceId)
+      .neq('status', 'cancelled')
+      .lt('start_datetime', endISO)
+      .gt('end_datetime',   startISO),
+    // CRM-stage venue events on this space — confirmed stages block too
     supabase
       .from('crm_leads')
       .select('id, first_name, last_name, event_date, event_start_time, event_end_time, stage:crm_pipeline_stages(slug)')
@@ -639,6 +671,7 @@ async function runConflictCheck() {
   ]);
 
   const sessConflicts = sessRes.data || [];
+  const venueRentalConflicts = venueRes.data || [];
   const venueConflicts = (leadRes.data || []).filter(lead => {
     const slug = (lead.stage?.slug || '').toLowerCase();
     if (!['invoice_paid', 'event_scheduled', 'event_complete', 'feedback_form_sent'].includes(slug)) return false;
@@ -646,17 +679,41 @@ async function runConflictCheck() {
     return lead.event_start_time < end && lead.event_end_time > start;
   });
 
-  if (sessConflicts.length === 0 && venueConflicts.length === 0) return;
+  const total = sessConflicts.length + venueRentalConflicts.length + venueConflicts.length;
+  if (total === 0) return;
 
-  const lines = [];
+  // Any of these is a hard conflict — same space, same window, confirmed.
+  nsHasHardConflict = true;
+  refreshNsSaveButtonState();
+
+  const lines = ['<strong>This space is already booked at this time. Pick a different space or time.</strong>'];
   if (sessConflicts.length > 0) {
-    lines.push(`<strong>⚠️ ${sessConflicts.length} Within session${sessConflicts.length === 1 ? '' : 's'}</strong> already booked on this space at this time.`);
+    const names = sessConflicts.map(s => ((s.lead?.first_name || '') + ' ' + (s.lead?.last_name || '')).trim() || 'Within client');
+    lines.push(`• Within session${sessConflicts.length === 1 ? '' : 's'}: ${esc(names.join(', '))}`);
+  }
+  if (venueRentalConflicts.length > 0) {
+    const names = venueRentalConflicts.map(v => v.client_name || 'venue rental');
+    lines.push(`• Venue rental${venueRentalConflicts.length === 1 ? '' : 's'}: ${esc(names.join(', '))}`);
   }
   if (venueConflicts.length > 0) {
     const names = venueConflicts.map(v => ((v.first_name || '') + ' ' + (v.last_name || '')).trim() || 'unnamed');
-    lines.push(`<strong>⚠️ Venue event${venueConflicts.length === 1 ? '' : 's'} confirmed</strong> on this space today: ${esc(names.join(', '))}.`);
+    lines.push(`• Venue event${venueConflicts.length === 1 ? '' : 's'}: ${esc(names.join(', '))}`);
   }
-  showNsConflict(lines.join('<br>'));
+  showNsConflict(lines.join('<br>'), /* hard */ true);
+}
+
+// Disable Save while a hard conflict is on the form. Re-enabled when the
+// user picks a different space/time and conflict check comes back clean.
+function refreshNsSaveButtonState() {
+  const btn = document.getElementById('nsSave');
+  if (!btn) return;
+  if (nsHasHardConflict) {
+    btn.disabled = true;
+    btn.title = 'This space is already booked at this time.';
+  } else {
+    btn.disabled = false;
+    btn.title = '';
+  }
 }
 
 async function saveNewSession() {
@@ -674,6 +731,13 @@ async function saveNewSession() {
   const otherLocation = document.getElementById('nsOtherLocation').value.trim();
   if (spaceVal === '__other__' && !otherLocation) {
     showNsError('Type a location for "Other".');
+    return;
+  }
+  // Re-run the conflict check so we never insert against a stale flag, then
+  // refuse if there's a real overlap.
+  await runConflictCheck();
+  if (nsHasHardConflict) {
+    showNsError('That space is already booked at this time. Pick a different space or time.');
     return;
   }
 

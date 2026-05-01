@@ -33,6 +33,10 @@ let allActivityTypes = [];
 let roomBookings = [];
 let spaceBookings = [];
 let activityBookings = [];
+// Within sessions (from scheduling_bookings) that have a space assigned —
+// these overlay onto the Spaces calendar so booking clashes are visible
+// across both sides (venue rentals + Within client sessions).
+let withinSessionBookings = [];
 
 // Calendar state
 let currentDate = getAustinToday();
@@ -125,15 +129,58 @@ async function loadBookings() {
   const startDT = start.toISOString();
   const endDT = end.toISOString();
 
-  const [rooms, spaces, activities] = await Promise.all([
+  const [rooms, spaces, activities, withins] = await Promise.all([
     bookingService.getRoomBookings(startISO, endISO),
     bookingService.getSpaceBookings(startDT, endDT),
     bookingService.getActivityBookings(startDT, endDT),
+    loadWithinSessionsForRange(startDT, endDT),
   ]);
 
   roomBookings = rooms;
   spaceBookings = spaces;
   activityBookings = activities;
+  withinSessionBookings = withins;
+}
+
+// Pull Within client sessions whose space is set, normalize them into a
+// space-booking-shaped object so the rentals calendar can render them as
+// overlays. Cancelled rows and admin-detached rows (profile_id IS NOT NULL
+// would be public-portal bookings; we keep those too since a confirmed
+// Within session still occupies the space) are excluded by status only.
+async function loadWithinSessionsForRange(startISO, endISO) {
+  const { data, error } = await supabase
+    .from('scheduling_bookings')
+    .select(`
+      id, space_id, start_datetime, end_datetime, status, notes,
+      lead_id, service_id,
+      lead:crm_leads(first_name, last_name, business_line),
+      service:services(name)
+    `)
+    .not('space_id', 'is', null)
+    .is('cancelled_at', null)
+    .neq('status', 'cancelled')
+    .lt('start_datetime', endISO)
+    .gt('end_datetime', startISO);
+
+  if (error) {
+    console.warn('within-session overlay load failed:', error);
+    return [];
+  }
+  return (data || []).map(s => {
+    const name = ((s.lead?.first_name || '') + ' ' + (s.lead?.last_name || '')).trim() || 'Within client';
+    return {
+      id: s.id,
+      space_id: s.space_id,
+      start_datetime: s.start_datetime,
+      end_datetime: s.end_datetime,
+      status: 'within_session',
+      client_name: name,
+      booking_type: s.service?.name || 'Within session',
+      total_amount: '',
+      _isWithin: true,
+      _leadId: s.lead_id,
+    };
+  });
 }
 
 async function updateStats() {
@@ -345,15 +392,21 @@ function renderRentalsCalendar() {
   const container = document.getElementById('calRentals');
   const spaces = [...allRentalSpaces, ...allWellnessSpaces];
 
+  // Merge venue rentals + Within sessions so a Temple booking from either
+  // side blocks the slot visually. Within rows are tagged with _isWithin
+  // so renderSingleDayGrid can color them differently and route clicks to
+  // the Within schedule.
+  const merged = [...spaceBookings, ...withinSessionBookings];
+
   if (currentView === 'month') {
-    renderRentalMonthView(container, spaces);
+    renderRentalMonthView(container, spaces, merged);
     return;
   }
 
-  renderTimeGrid(container, spaces, spaceBookings, 'rental');
+  renderTimeGrid(container, spaces, merged, 'rental');
 }
 
-function renderRentalMonthView(container, spaces) {
+function renderRentalMonthView(container, spaces, allBookings = spaceBookings) {
   const { start, end } = getDateRange();
   const days = getDaysArray(start, end);
 
@@ -382,10 +435,16 @@ function renderRentalMonthView(container, spaces) {
       const dateStr = toDateStr(day);
       const todayCls = isToday(day) ? ' tl-today' : '';
       const weekendCls = (day.getDay() === 0 || day.getDay() === 6) ? ' tl-weekend' : '';
-      const hasBooking = spaceBookings.some(b => b.space_id === space.id && b.start_datetime.startsWith(dateStr));
+      const dayBookings = allBookings.filter(b => b.space_id === space.id && b.start_datetime?.startsWith(dateStr));
+      const hasVenue = dayBookings.some(b => !b._isWithin);
+      const hasWithin = dayBookings.some(b => b._isWithin);
       html += `<div class="tl-cell${todayCls}${weekendCls}" data-space="${space.id}" data-date="${dateStr}">`;
-      if (hasBooking) {
+      if (hasVenue && hasWithin) {
+        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:linear-gradient(135deg,rgba(37,99,235,0.2) 0 50%,rgba(99,102,241,0.25) 50% 100%);"></div>`;
+      } else if (hasVenue) {
         html += `<div style="position:absolute;inset:3px;border-radius:3px;background:rgba(37,99,235,0.2);"></div>`;
+      } else if (hasWithin) {
+        html += `<div style="position:absolute;inset:3px;border-radius:3px;background:rgba(99,102,241,0.25);"></div>`;
       }
       html += `</div>`;
     }
@@ -561,13 +620,18 @@ function renderSingleDayGrid(columns, bookings, mode, date) {
             color = bk.activity_type?.color || '#8B5CF6';
             title = bk.activity_type?.name || 'Activity';
             sub = `${bk.client_name || 'Client'} · ${bk.space?.booking_name || ''}`;
+          } else if (bk._isWithin) {
+            color = '#6366F1'; // indigo — Within sessions
+            title = `Within · ${bk.client_name || 'Client'}`;
+            sub = bk.booking_type || 'Within session';
           } else {
             color = bookingService.SPACE_STATUS_COLORS[bk.status] || '#2563EB';
             title = bk.client_name || 'Client';
             sub = `${bk.booking_type} · $${bk.total_amount}`;
           }
 
-          html += `<div class="tg-booking" style="background:${color}; height:${blockHeight}px;" data-booking-id="${bk.id}" data-booking-type="${mode}">
+          const bookingType = bk._isWithin ? 'within' : mode;
+          html += `<div class="tg-booking" style="background:${color}; height:${blockHeight}px;" data-booking-id="${bk.id}" data-booking-type="${bookingType}">
             <span class="tg-booking-title">${title}</span>
             <span class="tg-booking-sub">${sub}</span>
           </div>`;
@@ -597,6 +661,12 @@ function attachTimeGridHandlers(container, mode) {
       e.stopPropagation();
       const id = el.dataset.bookingId;
       const type = el.dataset.bookingType;
+      // Within sessions live on the Within Schedule page — clicking opens
+      // that page (not the venue booking modal) so admins can edit there.
+      if (type === 'within') {
+        window.location.href = `within-schedule.html`;
+        return;
+      }
       let booking;
       if (type === 'activity') booking = activityBookings.find(b => b.id === id);
       else booking = spaceBookings.find(b => b.id === id);
