@@ -196,6 +196,26 @@
     @media (max-width: 520px) {
       .contact-form { grid-template-columns: 1fr; }
     }
+    .contact-modal-thanks { text-align: center; padding: 1.2rem 0 0.5rem; }
+    .contact-modal-thanks-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      color: var(--gold);
+    }
+    .contact-modal-thanks-icon svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .contact-modal-thanks p {
+      max-width: 380px;
+      margin: 0 auto 1.6rem;
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
 
     .map-section {
       padding: 5rem 2rem;
@@ -365,23 +385,33 @@
   </section>
 
   <!-- ── CONTACT FORM MODAL ── -->
-  <div id="contactFormModal" class="contact-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div id="contactFormModal" class="contact-modal" onclick="if(event.target===this)closeContactModal()">
     <div class="contact-modal-inner">
-      <button type="button" class="contact-modal-close" onclick="document.getElementById('contactFormModal').classList.remove('open')" aria-label="Close">&times;</button>
-      <div class="contact-modal-title">Send Us a Message</div>
-      <div class="contact-modal-sub">We respond within one business day.</div>
-      <form class="contact-form" onsubmit="submitContactForm(event)">
-        <input type="text" id="cfFirstName" placeholder="First Name" required>
-        <input type="text" id="cfLastName" placeholder="Last Name" required>
-        <input type="tel" id="cfPhone" placeholder="Phone Number">
-        <input type="email" id="cfEmail" placeholder="Email" required>
-        <input type="text" id="cfCity" placeholder="City">
-        <input type="text" id="cfState" placeholder="State">
-        <textarea class="full" id="cfMessage" placeholder="What are you struggling with?" required></textarea>
-        <div class="full" style="text-align:center;">
-          <button type="submit" class="contact-form-submit">Send Message</button>
+      <button type="button" class="contact-modal-close" onclick="closeContactModal()" aria-label="Close">&times;</button>
+      <div id="contactFormBody">
+        <div class="contact-modal-title">Send Us a Message</div>
+        <div class="contact-modal-sub">We respond within one business day.</div>
+        <form id="contactForm" class="contact-form" onsubmit="submitContactForm(event)">
+          <input type="text" id="cfFirstName" placeholder="First Name" required>
+          <input type="text" id="cfLastName" placeholder="Last Name" required>
+          <input type="tel" id="cfPhone" placeholder="Phone Number">
+          <input type="email" id="cfEmail" placeholder="Email" required>
+          <input type="text" id="cfCity" placeholder="City">
+          <input type="text" id="cfState" placeholder="State">
+          <textarea class="full" id="cfMessage" placeholder="What are you struggling with?" required></textarea>
+          <div class="full" style="text-align:center;">
+            <button type="submit" class="contact-form-submit">Send Message</button>
+          </div>
+        </form>
+      </div>
+      <div id="contactFormThanks" class="contact-modal-thanks" style="display:none;">
+        <div class="contact-modal-thanks-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
         </div>
-      </form>
+        <div class="contact-modal-title">Thank you.</div>
+        <p>We&rsquo;ve received your message. Someone from our team will reach out shortly.</p>
+        <button type="button" class="contact-form-submit" onclick="closeContactModal()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -393,29 +423,22 @@
   <script>
     function submitContactForm(e) {
       e.preventDefault();
-      var fn = document.getElementById('cfFirstName').value.trim();
-      var ln = document.getElementById('cfLastName').value.trim();
-      var phone = document.getElementById('cfPhone').value.trim();
-      var email = document.getElementById('cfEmail').value.trim();
-      var city = document.getElementById('cfCity').value.trim();
-      var state = document.getElementById('cfState').value.trim();
-      var msg = document.getElementById('cfMessage').value.trim();
-      var location = city + (city && state ? ', ' : '') + state;
-      var subject = encodeURIComponent('Inquiry from ' + fn + ' ' + ln);
-      var body = encodeURIComponent(
-        'Name: ' + fn + ' ' + ln + '\n' +
-        'Phone: ' + phone + '\n' +
-        'Email: ' + email + '\n' +
-        'Location: ' + location + '\n\n' +
-        'Message:\n' + msg
-      );
-      window.location.href = 'mailto:intake@within.center?subject=' + subject + '&body=' + body;
+      document.getElementById('contactFormBody').style.display = 'none';
+      document.getElementById('contactFormThanks').style.display = '';
+    }
+    function closeContactModal() {
+      var modal = document.getElementById('contactFormModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      setTimeout(function(){
+        document.getElementById('contactFormBody').style.display = '';
+        document.getElementById('contactFormThanks').style.display = 'none';
+        var form = document.getElementById('contactForm');
+        if (form) form.reset();
+      }, 250);
     }
     document.addEventListener('keydown', function(e){
-      if (e.key === 'Escape') {
-        var m = document.getElementById('contactFormModal');
-        if (m) m.classList.remove('open');
-      }
+      if (e.key === 'Escape') closeContactModal();
     });
     (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
     (function(){
