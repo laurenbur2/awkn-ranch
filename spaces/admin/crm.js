@@ -842,7 +842,7 @@ async function openLeadDetail(leadId) {
             <div class="crm-menu-wrap">
               <button class="crm-btn crm-btn-sm" id="btn-more-menu" title="More actions">More ▾</button>
               <div class="crm-menu" id="crm-more-menu" style="display:none">
-                ${lead.business_line === 'within' ? '<button class="crm-menu-item" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
+                ${(lead.business_line === 'within' || lead.business_line === 'awkn_ranch') ? '<button class="crm-menu-item" id="btn-create-invoice-from-lead">Create Invoice</button>' : ''}
                 ${lead.business_line === 'awkn_ranch' ? '<button class="crm-menu-item" id="btn-create-proposal-from-lead">Create Proposal</button>' : ''}
                 ${lead.business_line === 'awkn_ranch' && lead.email ? '<button class="crm-menu-item" id="btn-send-agreement-from-lead">Send Agreement to Sign</button>' : ''}
                 ${lead.business_line === 'within' && lead.email ? '<button class="crm-menu-item" id="btn-send-welcome-letter">Send Welcome Letter</button>' : ''}
@@ -879,16 +879,29 @@ async function openLeadDetail(leadId) {
               <div class="crm-prop-row"><span class="crm-prop-key">Days in stage</span><span class="crm-prop-val">${daysInStage}</span></div>
             </div>
 
-            ${lead.business_line === 'awkn_ranch' && (lead.space?.name || lead.event_type || lead.event_date || lead.guest_count) ? `
-            <div class="crm-prop-card">
-              <div class="crm-prop-card-head">Event</div>
-              ${lead.space?.name ? `<div class="crm-prop-row"><span class="crm-prop-key">Space</span><span class="crm-prop-val"><span class="crm-space-tag">${escapeHtml(lead.space.name)}</span></span></div>` : ''}
-              ${lead.event_type ? `<div class="crm-prop-row"><span class="crm-prop-key">Type</span><span class="crm-prop-val">${escapeHtml(lead.event_type)}</span></div>` : ''}
-              ${lead.event_date ? `<div class="crm-prop-row"><span class="crm-prop-key">Date</span><span class="crm-prop-val">${formatDate(lead.event_date)}</span></div>` : ''}
-              ${lead.guest_count ? `<div class="crm-prop-row"><span class="crm-prop-key">Guests</span><span class="crm-prop-val">${lead.guest_count}</span></div>` : ''}
-              ${(lead.event_start_time || lead.event_end_time) ? `<div class="crm-prop-row"><span class="crm-prop-key">Time</span><span class="crm-prop-val">${escapeHtml(lead.event_start_time || '')}${lead.event_end_time ? ' – ' + escapeHtml(lead.event_end_time) : ''}</span></div>` : ''}
-            </div>
-            ` : ''}
+            ${lead.business_line === 'awkn_ranch' && (lead.space?.name || lead.event_type || lead.event_date || lead.guest_count) ? (() => {
+              // Build the full space list (primary + extras) so multi-space
+              // events like "Temple + Yurts + Dome" show every room here.
+              const extras = (lead.additional_space_ids || [])
+                .map(id => rentalSpaces.find(s => s.id === id)?.name)
+                .filter(Boolean);
+              const allSpaceTags = [
+                ...(lead.space?.name ? [lead.space.name] : []),
+                ...extras,
+              ].map(n => `<span class="crm-space-tag">${escapeHtml(n)}</span>`).join(' ');
+              const dateLabel = lead.event_end_date && lead.event_end_date !== lead.event_date
+                ? `${formatDate(lead.event_date)} – ${formatDate(lead.event_end_date)}`
+                : (lead.event_date ? formatDate(lead.event_date) : '');
+              return `
+              <div class="crm-prop-card">
+                <div class="crm-prop-card-head">Event</div>
+                ${allSpaceTags ? `<div class="crm-prop-row"><span class="crm-prop-key">Space${extras.length ? 's' : ''}</span><span class="crm-prop-val">${allSpaceTags}</span></div>` : ''}
+                ${lead.event_type ? `<div class="crm-prop-row"><span class="crm-prop-key">Type</span><span class="crm-prop-val">${escapeHtml(lead.event_type)}</span></div>` : ''}
+                ${dateLabel ? `<div class="crm-prop-row"><span class="crm-prop-key">Date</span><span class="crm-prop-val">${dateLabel}</span></div>` : ''}
+                ${lead.guest_count ? `<div class="crm-prop-row"><span class="crm-prop-key">Guests</span><span class="crm-prop-val">${lead.guest_count}</span></div>` : ''}
+                ${(lead.event_start_time || lead.event_end_time) ? `<div class="crm-prop-row"><span class="crm-prop-key">Time</span><span class="crm-prop-val">${escapeHtml(lead.event_start_time || '')}${lead.event_end_time ? ' – ' + escapeHtml(lead.event_end_time) : ''}</span></div>` : ''}
+              </div>
+            `;})() : ''}
 
             ${lead.utm_source ? `
             <div class="crm-prop-card">
@@ -2167,7 +2180,7 @@ function openLeadModal(lead = null) {
             <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin-bottom:10px;">Event / Venue Details</div>
             <div class="crm-form-grid">
               <div class="crm-form-field">
-                <label>Requested Space</label>
+                <label>Primary Space</label>
                 <select class="crm-select" id="lead-space">
                   <option value="">— Select space —</option>
                   ${rentalSpaces.map(s => `<option value="${s.id}" ${lead?.space_id === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
@@ -2187,8 +2200,12 @@ function openLeadModal(lead = null) {
                 </select>
               </div>
               <div class="crm-form-field">
-                <label>Event Date</label>
+                <label>Start Date</label>
                 <input type="date" class="crm-input" id="lead-event-date" value="${lead?.event_date || ''}">
+              </div>
+              <div class="crm-form-field">
+                <label>End Date <span style="font-weight:400;color:var(--text-muted,#999);">(blank = single day)</span></label>
+                <input type="date" class="crm-input" id="lead-event-end-date" value="${lead?.event_end_date || ''}">
               </div>
               <div class="crm-form-field">
                 <label>Guest Count</label>
@@ -2201,6 +2218,18 @@ function openLeadModal(lead = null) {
               <div class="crm-form-field">
                 <label>End Time</label>
                 <input type="time" step="300" class="crm-input" id="lead-event-end" value="${lead?.event_end_time || ''}">
+              </div>
+            </div>
+            <div class="crm-form-field" style="margin-top:10px;">
+              <label>Additional Spaces <span style="font-weight:400;color:var(--text-muted,#999);">(events using more than one space)</span></label>
+              <div id="lead-additional-spaces" style="display:flex;flex-wrap:wrap;gap:8px 14px;padding:8px 10px;background:#fff;border:1px solid var(--border-color,#e5e5e5);border-radius:6px;">
+                ${rentalSpaces.map(s => {
+                  const isExtra = (lead?.additional_space_ids || []).includes(s.id);
+                  return `<label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                    <input type="checkbox" data-extra-space-id="${s.id}" ${isExtra ? 'checked' : ''}>
+                    ${escapeHtml(s.name)}
+                  </label>`;
+                }).join('')}
               </div>
             </div>
           </div>
@@ -2267,9 +2296,18 @@ function openLeadModal(lead = null) {
       payload.space_id = document.getElementById('lead-space').value || null;
       payload.event_type = document.getElementById('lead-event-type').value || null;
       payload.event_date = document.getElementById('lead-event-date').value || null;
+      payload.event_end_date = document.getElementById('lead-event-end-date').value || null;
       payload.guest_count = parseInt(document.getElementById('lead-guest-count').value) || null;
       payload.event_start_time = document.getElementById('lead-event-start').value || null;
       payload.event_end_time = document.getElementById('lead-event-end').value || null;
+      // Additional spaces: collect every checkbox EXCEPT the primary (which
+      // already lives in space_id). Empty array → null so the column reads
+      // cleanly as "no extras."
+      const extras = Array.from(document.querySelectorAll('#lead-additional-spaces input[data-extra-space-id]'))
+        .filter(el => el.checked)
+        .map(el => el.dataset.extraSpaceId)
+        .filter(id => id !== payload.space_id);
+      payload.additional_space_ids = extras.length ? extras : null;
     }
 
     try {

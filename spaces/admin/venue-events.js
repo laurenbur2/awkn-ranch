@@ -74,8 +74,8 @@ async function loadAll() {
       .from('crm_leads')
       .select(`
         id, first_name, last_name, email, phone,
-        event_date, event_start_time, event_end_time, event_type, guest_count,
-        space_id, stage_id, estimated_value, actual_revenue,
+        event_date, event_end_date, event_start_time, event_end_time, event_type, guest_count,
+        space_id, additional_space_ids, stage_id, estimated_value, actual_revenue,
         deposit_amount, deposit_paid_at, balance_amount, balance_paid_at,
         notes, internal_staff_notes,
         space:spaces(id, name, slug),
@@ -366,11 +366,28 @@ function renderCalendar() {
     return true;
   });
 
+  // Multi-day events get a tile on every day in [event_date, event_end_date]
+  // (inclusive). Single-day events with no event_end_date just bucket on
+  // event_date as before.
   const eventsByDate = new Map();
   for (const ev of visibleEvents) {
-    const arr = eventsByDate.get(ev.event_date) || [];
-    arr.push(ev);
-    eventsByDate.set(ev.event_date, arr);
+    const startStr = ev.event_date;
+    const endStr = ev.event_end_date && ev.event_end_date >= startStr ? ev.event_end_date : startStr;
+    if (startStr === endStr) {
+      const arr = eventsByDate.get(startStr) || [];
+      arr.push(ev);
+      eventsByDate.set(startStr, arr);
+    } else {
+      const cur = new Date(startStr + 'T12:00:00');
+      const end = new Date(endStr + 'T12:00:00');
+      while (cur <= end) {
+        const key = ymd(cur);
+        const arr = eventsByDate.get(key) || [];
+        arr.push(ev);
+        eventsByDate.set(key, arr);
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
   }
   // Sort each day's events by start time.
   for (const arr of eventsByDate.values()) {
@@ -446,9 +463,17 @@ function openEventDetails(leadId) {
   }
 
   const guest = ((ev.first_name || '') + ' ' + (ev.last_name || '')).trim() || '(unnamed)';
-  const dateStr = formatEventDate(ev.event_date);
+  // Date string handles single-day vs range automatically.
+  const dateStr = ev.event_end_date && ev.event_end_date !== ev.event_date
+    ? `${formatEventDate(ev.event_date)} – ${formatEventDate(ev.event_end_date)}`
+    : formatEventDate(ev.event_date);
   const timeStr = formatTime(ev.event_start_time, ev.event_end_time);
-  const spaceStr = ev.space?.name || '—';
+  // Spaces: primary plus any extras, looked up from allSpaces.
+  const extraNames = (ev.additional_space_ids || [])
+    .map(id => allSpaces.find(s => s.id === id)?.name)
+    .filter(Boolean);
+  const allSpaceNames = [ev.space?.name, ...extraNames].filter(Boolean);
+  const spaceStr = allSpaceNames.length ? allSpaceNames.join(', ') : '—';
   const stageName = ev.stage?.name || '—';
   const eventType = ev.event_type || '—';
   const guestCount = ev.guest_count != null ? String(ev.guest_count) : '—';
@@ -467,7 +492,7 @@ function openEventDetails(leadId) {
     </div>
   `;
   rows.push(row('When', `${esc(dateStr)} · ${esc(timeStr)}`));
-  rows.push(row('Space', esc(spaceStr)));
+  rows.push(row(allSpaceNames.length > 1 ? 'Spaces' : 'Space', esc(spaceStr)));
   rows.push(row('Event type', esc(eventType)));
   rows.push(row('Guest count', esc(guestCount)));
   rows.push(row('Stage', esc(stageName)));
@@ -503,6 +528,7 @@ function openNewEventModal(dateYmd) {
   document.getElementById('nePhone').value = '';
   document.getElementById('neEventType').value = '';
   document.getElementById('neDate').value = dateYmd || '';
+  document.getElementById('neEndDate').value = '';
   document.getElementById('neGuestCount').value = '';
   document.getElementById('neStart').value = '';
   document.getElementById('neEnd').value = '';
@@ -510,11 +536,21 @@ function openNewEventModal(dateYmd) {
   document.getElementById('neNotes').value = '';
   hideError();
 
-  // Populate space dropdown
+  // Populate space dropdown + extra-space checkboxes from the same list.
   const spaceSel = document.getElementById('neSpace');
   spaceSel.innerHTML = '<option value="">— Select a space —</option>'
     + allSpaces.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
   spaceSel.value = '';
+
+  const extras = document.getElementById('neExtraSpaces');
+  if (extras) {
+    extras.innerHTML = allSpaces.map(s => `
+      <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" data-extra-space-id="${esc(s.id)}">
+        ${esc(s.name)}
+      </label>
+    `).join('');
+  }
 
   document.getElementById('neModal').classList.remove('hidden');
   setTimeout(() => document.getElementById('neFirstName').focus(), 30);
@@ -540,19 +576,28 @@ async function createNewEvent() {
   const phone     = document.getElementById('nePhone').value.trim();
   const eventType = document.getElementById('neEventType').value;
   const dateVal   = document.getElementById('neDate').value;
+  const endDateVal = document.getElementById('neEndDate').value || null;
   const guestStr  = document.getElementById('neGuestCount').value;
   const startTime = document.getElementById('neStart').value || null;
   const endTime   = document.getElementById('neEnd').value || null;
   const spaceId   = document.getElementById('neSpace').value || null;
   const estVal    = document.getElementById('neEstimatedValue').value;
   const notes     = document.getElementById('neNotes').value.trim() || null;
+  const extraIds = Array.from(document.querySelectorAll('#neExtraSpaces input[data-extra-space-id]'))
+    .filter(el => el.checked)
+    .map(el => el.dataset.extraSpaceId)
+    .filter(id => id !== spaceId);
 
   if (!firstName && !lastName && !email) {
     showError('Add a client name or email.');
     return;
   }
   if (!dateVal) {
-    showError('Event date is required.');
+    showError('Start date is required.');
+    return;
+  }
+  if (endDateVal && endDateVal < dateVal) {
+    showError('End date must be on or after the start date.');
     return;
   }
   if (startTime && endTime && endTime <= startTime) {
@@ -571,9 +616,11 @@ async function createNewEvent() {
     phone:      phone || null,
     event_type: eventType || null,
     event_date: dateVal,
+    event_end_date: endDateVal,
     event_start_time: startTime,
     event_end_time:   endTime,
     space_id:   spaceId,
+    additional_space_ids: extraIds.length ? extraIds : null,
     guest_count: guestStr ? parseInt(guestStr, 10) : null,
     estimated_value: estVal ? Number(estVal) : null,
     notes,
@@ -589,8 +636,8 @@ async function createNewEvent() {
     .insert([payload])
     .select(`
       id, first_name, last_name, email, phone,
-      event_date, event_start_time, event_end_time, event_type, guest_count,
-      space_id, stage_id, estimated_value, actual_revenue,
+      event_date, event_end_date, event_start_time, event_end_time, event_type, guest_count,
+      space_id, additional_space_ids, stage_id, estimated_value, actual_revenue,
       deposit_amount, deposit_paid_at, balance_amount, balance_paid_at,
       notes, internal_staff_notes,
       space:spaces(id, name, slug),
@@ -731,7 +778,10 @@ function renderTable(events) {
 }
 
 function renderRow(e) {
-  const dateStr = formatEventDate(e.event_date);
+  // Multi-day events show the range; single-day shows just the start.
+  const dateStr = e.event_end_date && e.event_end_date !== e.event_date
+    ? `${formatEventDate(e.event_date)} – ${formatEventDate(e.event_end_date)}`
+    : formatEventDate(e.event_date);
   const relStr  = formatRelative(e.event_date);
   const time    = formatTime(e.event_start_time, e.event_end_time);
   const guest   = ((e.first_name || '') + ' ' + (e.last_name || '')).trim() || '(unnamed)';

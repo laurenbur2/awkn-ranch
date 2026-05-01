@@ -433,12 +433,22 @@
         </div>
         <div class="ve-modal-row row-2">
           <div>
-            <label class="ve-modal-label" for="neDate">Event date</label>
+            <label class="ve-modal-label" for="neDate">Start date</label>
             <input id="neDate" type="date" required>
           </div>
           <div>
+            <label class="ve-modal-label" for="neEndDate">End date <span style="font-weight:500;color:#9ca3af;text-transform:none;">(blank = single day)</span></label>
+            <input id="neEndDate" type="date">
+          </div>
+        </div>
+        <div class="ve-modal-row row-2">
+          <div>
             <label class="ve-modal-label" for="neGuestCount">Guest count <span style="font-weight:500;color:#9ca3af;text-transform:none;">(optional)</span></label>
             <input id="neGuestCount" type="number" min="0" step="1" placeholder="e.g. 25">
+          </div>
+          <div>
+            <label class="ve-modal-label" for="neEstimatedValue">Estimated value <span style="font-weight:500;color:#9ca3af;text-transform:none;">(quote total)</span></label>
+            <input id="neEstimatedValue" type="number" min="0" step="0.01" placeholder="0.00">
           </div>
         </div>
         <div class="ve-modal-row row-2">
@@ -458,8 +468,8 @@
           </select>
         </div>
         <div class="ve-modal-row">
-          <label class="ve-modal-label" for="neEstimatedValue">Estimated value <span style="font-weight:500;color:#9ca3af;text-transform:none;">(quote total)</span></label>
-          <input id="neEstimatedValue" type="number" min="0" step="0.01" placeholder="0.00">
+          <label class="ve-modal-label">Additional spaces <span style="font-weight:500;color:#9ca3af;text-transform:none;">(events using more than one)</span></label>
+          <div id="neExtraSpaces" style="display:flex;flex-wrap:wrap;gap:8px 14px;padding:8px 10px;background:#fff;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;"></div>
         </div>
         <div class="ve-modal-row">
           <label class="ve-modal-label" for="neNotes">Notes</label>
