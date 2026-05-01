@@ -445,6 +445,64 @@
       line-height: 1.7;
     }
     .enhancements-note strong { color: var(--gold); font-style: normal; font-weight: 600; letter-spacing: 0.02em; }
+
+    /* ── ROOM PREVIEW MODAL ─────────────────────────── */
+    .view-room-btn {
+      display: inline-block;
+      margin: 0.4rem 0 1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(28,22,24,0.55);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.3rem 0.5rem;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-color: rgba(28,22,24,0.18);
+      transition: color 0.2s, text-decoration-color 0.2s;
+    }
+    .view-room-btn:hover { color: var(--gold); text-decoration-color: var(--gold); }
+    .room-modal-inner { max-width: 720px; padding: 2.2rem 2rem 1.8rem; }
+    .room-modal-main {
+      width: 100%;
+      height: clamp(260px, 48vh, 440px);
+      border-radius: 8px;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 0.7rem;
+      transition: background-image 0.25s ease;
+    }
+    .room-modal-thumbs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    .room-modal-thumb {
+      height: 78px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .room-modal-thumb:hover { transform: translateY(-1px); }
+    .room-modal-thumb.active { border-color: var(--gold); }
+    .room-modal-cta {
+      margin-top: 1.3rem;
+      text-align: center;
+    }
+    .room-modal-caption {
+      text-align: center;
+      font-size: 0.84rem;
+      color: rgba(28,22,24,0.6);
+      line-height: 1.6;
+      margin: 0.3rem 0 0.9rem;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -625,11 +683,13 @@
         <a href="../book/?pkg=immersive&amp;room=private" class="room-option">
           <div class="room-label">Private Room</div>
           <div class="room-price">$4,799</div>
+          <button type="button" class="view-room-btn" onclick="event.preventDefault();event.stopPropagation();document.getElementById('privateRoomModal').classList.add('open');">View Your Room</button>
           <span class="room-cta">Reserve &rarr;</span>
         </a>
         <a href="../book/?pkg=immersive&amp;room=shared" class="room-option">
           <div class="room-label">Shared Room</div>
           <div class="room-price">$3,999</div>
+          <button type="button" class="view-room-btn" onclick="event.preventDefault();event.stopPropagation();document.getElementById('sharedRoomModal').classList.add('open');">View Your Room</button>
           <span class="room-cta">Reserve &rarr;</span>
         </a>
       </div>
@@ -659,6 +719,41 @@
       </div>
     </div>
   </section>
+
+  <!-- ── ROOM PREVIEW MODALS ───────────────────────── -->
+  <div id="privateRoomModal" class="schedule-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="schedule-modal-inner room-modal-inner">
+      <button type="button" class="schedule-modal-close" onclick="document.getElementById('privateRoomModal').classList.remove('open')" aria-label="Close">&times;</button>
+      <div class="schedule-modal-title">Private Room</div>
+      <div class="room-modal-caption">Your own private bedroom for the duration of your stay.</div>
+      <div class="room-modal-main" id="privateRoomMain" style="background-image:url('/awkn-ranch/pricing/images/rooms/private-1.jpg');"></div>
+      <div class="room-modal-thumbs">
+        <div class="room-modal-thumb active" style="background-image:url('/awkn-ranch/pricing/images/rooms/private-1.jpg');" onclick="setRoomImg('privateRoomMain','/awkn-ranch/pricing/images/rooms/private-1.jpg',this)"></div>
+        <div class="room-modal-thumb" style="background-image:url('/awkn-ranch/pricing/images/rooms/private-2.jpg');" onclick="setRoomImg('privateRoomMain','/awkn-ranch/pricing/images/rooms/private-2.jpg',this)"></div>
+        <div class="room-modal-thumb" style="background-image:url('/awkn-ranch/pricing/images/rooms/private-3.png');" onclick="setRoomImg('privateRoomMain','/awkn-ranch/pricing/images/rooms/private-3.png',this)"></div>
+      </div>
+      <div class="room-modal-cta">
+        <a href="../book/?pkg=immersive&amp;room=private" class="awknhero-cta" style="display:inline-block;">Reserve Private Room</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="sharedRoomModal" class="schedule-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="schedule-modal-inner room-modal-inner">
+      <button type="button" class="schedule-modal-close" onclick="document.getElementById('sharedRoomModal').classList.remove('open')" aria-label="Close">&times;</button>
+      <div class="schedule-modal-title">Shared Room</div>
+      <div class="room-modal-caption">Comfortable shared accommodations &mdash; up to two guests per room.</div>
+      <div class="room-modal-main" id="sharedRoomMain" style="background-image:url('/awkn-ranch/pricing/images/rooms/shared-1.jpg');"></div>
+      <div class="room-modal-thumbs">
+        <div class="room-modal-thumb active" style="background-image:url('/awkn-ranch/pricing/images/rooms/shared-1.jpg');" onclick="setRoomImg('sharedRoomMain','/awkn-ranch/pricing/images/rooms/shared-1.jpg',this)"></div>
+        <div class="room-modal-thumb" style="background-image:url('/awkn-ranch/pricing/images/rooms/shared-2.jpg');" onclick="setRoomImg('sharedRoomMain','/awkn-ranch/pricing/images/rooms/shared-2.jpg',this)"></div>
+        <div class="room-modal-thumb" style="background-image:url('/awkn-ranch/pricing/images/rooms/shared-3.jpg');" onclick="setRoomImg('sharedRoomMain','/awkn-ranch/pricing/images/rooms/shared-3.jpg',this)"></div>
+      </div>
+      <div class="room-modal-cta">
+        <a href="../book/?pkg=immersive&amp;room=shared" class="awknhero-cta" style="display:inline-block;">Reserve Shared Room</a>
+      </div>
+    </div>
+  </div>
 
   <!-- ── SAMPLE SCHEDULE MODAL ─────────────────────── -->
   <div id="sampleScheduleModal" class="schedule-modal" onclick="if(event.target===this)this.classList.remove('open')">
@@ -785,6 +880,20 @@
     <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
   </footer>
   <script>
+    function setRoomImg(targetId, url, thumb) {
+      document.getElementById(targetId).style.backgroundImage = "url('" + url + "')";
+      var thumbs = thumb.parentNode.querySelectorAll('.room-modal-thumb');
+      for (var i = 0; i < thumbs.length; i++) thumbs[i].classList.remove('active');
+      thumb.classList.add('active');
+    }
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') {
+        ['privateRoomModal','sharedRoomModal','sampleScheduleModal'].forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.classList.remove('open');
+        });
+      }
+    });
     (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
     (function(){var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');var allSubs=document.querySelectorAll('.menu-sub');function isOpen(){return panel.classList.contains('open');}function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});backdrop.addEventListener('click',closeMenu);if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});})();
   </script>
