@@ -61,14 +61,21 @@
       margin-top: 0.3rem;
     }
 
+    .contact-cta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+    }
     .contact-cta-card {
-      padding: 2.5rem 2.25rem;
+      padding: 2.25rem 2.25rem;
       background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
       border-radius: var(--radius);
       color: #fff;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      flex: 1;
     }
     .contact-cta-card .eyebrow {
       font-size: 0.55rem;
@@ -90,13 +97,7 @@
       font-size: 0.92rem;
       color: rgba(255,255,255,0.7);
       line-height: 1.7;
-      margin-bottom: 1.75rem;
-    }
-    .contact-cta-card .cta-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-      align-items: flex-start;
+      margin-bottom: 1.5rem;
     }
     .contact-cta-card .btn {
       display: inline-block;
@@ -111,15 +112,10 @@
       border-radius: 999px;
       cursor: pointer;
       font-family: inherit;
+      align-self: flex-start;
       transition: background 0.3s, transform 0.3s;
     }
     .contact-cta-card .btn:hover { background: var(--gold-dark); transform: translateY(-2px); }
-    .contact-cta-card .btn.btn-secondary {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.4);
-      color: #fff;
-    }
-    .contact-cta-card .btn.btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.75); }
 
     /* ── CONTACT MODAL ── */
     .contact-modal {
@@ -329,13 +325,18 @@
 
     </div>
 
-    <div class="contact-cta-card">
-      <div class="eyebrow">Ready to Begin?</div>
-      <h3>Schedule a free consultation.</h3>
-      <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
-      <div class="cta-buttons">
+    <div class="contact-cta-stack">
+      <div class="contact-cta-card">
+        <div class="eyebrow">Ready to Begin?</div>
+        <h3>Schedule a free consultation.</h3>
+        <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
         <a href="../book-a-call/" class="btn">Book a Call</a>
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('contactFormModal').classList.add('open')">Send Us a Message</button>
+      </div>
+      <div class="contact-cta-card">
+        <div class="eyebrow">Have a Question?</div>
+        <h3>Send us a message.</h3>
+        <p>Share what&rsquo;s on your mind and we&rsquo;ll get back to you within one business day.</p>
+        <button type="button" class="btn" onclick="document.getElementById('contactFormModal').classList.add('open')">Send Us a Message</button>
       </div>
     </div>
 
