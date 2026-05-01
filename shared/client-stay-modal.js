@@ -189,23 +189,27 @@ export async function openClientStayModal(opts = {}) {
         const noteVal = root.querySelector('#csm-notes').value || '';
 
         if (!leadId) return alertField('Pick a client first.');
-        if (!bedSel) return alertField('Pick a bed.');
         if (!ci || !co) return alertField('Both check-in and check-out dates are required.');
         if (new Date(co) <= new Date(ci)) return alertField('Check-out must be after check-in.');
 
-        // Conflict check — any other stay on this bed overlapping these dates?
+        // Conflict check only when a specific bed is selected — unassigned
+        // stays don't compete for a bed yet, so there's nothing to overlap.
         const ciIso = ci + 'T15:00:00Z'; // 3pm check-in
         const coIso = co + 'T11:00:00Z'; // 11am check-out
-        const { data: conflicts, error: confErr } = await supabase
-          .from('client_stays')
-          .select('id, check_in_at, check_out_at, lead:crm_leads(first_name, last_name)')
-          .eq('bed_id', bedSel)
-          .in('status', ['upcoming', 'active'])
-          .lt('check_in_at', coIso)
-          .gt('check_out_at', ciIso);
-        if (confErr) {
-          alert('Conflict check failed: ' + confErr.message);
-          return;
+        let conflicts = [];
+        if (bedSel) {
+          const { data, error: confErr } = await supabase
+            .from('client_stays')
+            .select('id, check_in_at, check_out_at, lead:crm_leads(first_name, last_name)')
+            .eq('bed_id', bedSel)
+            .in('status', ['upcoming', 'active'])
+            .lt('check_in_at', coIso)
+            .gt('check_out_at', ciIso);
+          if (confErr) {
+            alert('Conflict check failed: ' + confErr.message);
+            return;
+          }
+          conflicts = data || [];
         }
         const overlapping = (conflicts || []).filter(c => !stay || c.id !== stay.id);
         if (overlapping.length > 0) {
@@ -216,7 +220,7 @@ export async function openClientStayModal(opts = {}) {
 
         const payload = {
           lead_id:      leadId,
-          bed_id:       bedSel,
+          bed_id:       bedSel || null,
           package_id:   pkg || null,
           check_in_at:  ciIso,
           check_out_at: coIso,
@@ -329,9 +333,9 @@ function renderBedBlock({ beds, bedId }) {
 
   return `
     <label class="csm-field" id="csm-bed-block">
-      <span class="csm-label">Bed</span>
-      <select id="csm-bed" required>
-        <option value="">— Select a bed —</option>
+      <span class="csm-label">Bed <span style="font-weight:400;opacity:0.7;">(optional)</span></span>
+      <select id="csm-bed">
+        <option value="">— unassigned —</option>
         ${groups.map(g => `
           <optgroup label="${esc(g.room.name)} (${esc(g.room.floor || '')})">
             ${g.beds.map(b => {

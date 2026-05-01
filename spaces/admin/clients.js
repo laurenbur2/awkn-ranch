@@ -3027,9 +3027,9 @@ function openStayModal(leadId) {
         <div class="crm-modal-body">
           <div class="crm-form-grid">
             <div class="crm-form-field">
-              <label>Room \u00b7 Bed *</label>
-              <select class="crm-select" id="stay-bed" required>
-                <option value="">\u2014 pick a bed \u2014</option>
+              <label>Room \u00b7 Bed <span style="font-weight:400;color:var(--text-muted,#888);">(optional \u2014 assign later)</span></label>
+              <select class="crm-select" id="stay-bed">
+                <option value="">\u2014 unassigned \u2014</option>
                 ${lodgingSpaces.map(sp => {
                   const roomBeds = beds.filter(b => b.space_id === sp.id);
                   if (!roomBeds.length) return '';
@@ -3081,8 +3081,7 @@ function openStayModal(leadId) {
 }
 
 async function saveStay(leadId) {
-  const bedId = document.getElementById('stay-bed').value;
-  if (!bedId) { showToast('Pick a bed', 'error'); return; }
+  const bedId = document.getElementById('stay-bed').value || null;
   const packageId = document.getElementById('stay-package').value || null;
   const checkinDate = document.getElementById('stay-checkin').value;
   const checkoutDate = document.getElementById('stay-checkout').value;
@@ -3090,18 +3089,22 @@ async function saveStay(leadId) {
   if (new Date(checkoutDate) <= new Date(checkinDate)) { showToast('Check-out must be after check-in', 'error'); return; }
   const notes = document.getElementById('stay-notes').value.trim() || null;
 
-  // Conflict check (soft, client-side): any existing stay on the same bed overlapping the window?
   const checkinISO = new Date(checkinDate + 'T15:00:00').toISOString();
   const checkoutISO = new Date(checkoutDate + 'T11:00:00').toISOString();
-  const conflict = stays.find(s =>
-    s.bed_id === bedId && s.status !== 'cancelled' &&
-    new Date(s.check_in_at) < new Date(checkoutISO) &&
-    new Date(s.check_out_at) > new Date(checkinISO)
-  );
-  if (conflict) {
-    const conflictClient = clients.find(c => c.id === conflict.lead_id);
-    const who = conflictClient ? `${conflictClient.first_name || ''} ${conflictClient.last_name || ''}`.trim() : 'another client';
-    if (!confirm(`This bed overlaps with ${who}'s stay (${formatDateShort(conflict.check_in_at)}\u2013${formatDateShort(conflict.check_out_at)}). Create anyway?`)) return;
+
+  // Conflict check only runs when a bed is assigned \u2014 unassigned stays
+  // don't compete for a specific bed yet, so there's nothing to overlap.
+  if (bedId) {
+    const conflict = stays.find(s =>
+      s.bed_id === bedId && s.status !== 'cancelled' &&
+      new Date(s.check_in_at) < new Date(checkoutISO) &&
+      new Date(s.check_out_at) > new Date(checkinISO)
+    );
+    if (conflict) {
+      const conflictClient = clients.find(c => c.id === conflict.lead_id);
+      const who = conflictClient ? `${conflictClient.first_name || ''} ${conflictClient.last_name || ''}`.trim() : 'another client';
+      if (!confirm(`This bed overlaps with ${who}'s stay (${formatDateShort(conflict.check_in_at)}\u2013${formatDateShort(conflict.check_out_at)}). Create anyway?`)) return;
+    }
   }
 
   const now = new Date();
