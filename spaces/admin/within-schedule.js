@@ -31,6 +31,8 @@ let weekAnchor = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let sessions = [];                         // raw rows for the visible window
 let services = [];                         // service catalog for display + classification
 let allSpaces = [];                        // every space the admin can put a session in
+let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
+let facilitators = [];                     // facilitator directory — for STAFF row when facilitator_id is set
 let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
 let nsSearchDebounce  = null;
 // Set true by runConflictCheck when the chosen space is already booked at
@@ -52,6 +54,7 @@ let nsHasHardConflict = false;
       bindNewSessionModal();
       await loadServices();
       await loadSpaces();
+      await loadStaffAndFacilitators();
       await loadAndRender();
       // Refresh every 60s so the now-line updates and any new bookings appear.
       setInterval(loadAndRender, 60_000);
@@ -77,6 +80,36 @@ async function loadServices() {
   services = data || [];
 }
 
+// Mirror Clients › Schedule's STAFF row by populating the same two
+// directories used there. Done in parallel since both are tiny tables.
+async function loadStaffAndFacilitators() {
+  const [staffRes, facRes] = await Promise.all([
+    supabase.from('app_users')
+      .select('id, display_name, first_name, last_name, email')
+      .in('role', ['admin', 'staff', 'oracle'])
+      .eq('is_archived', false),
+    supabase.from('facilitators').select('id, first_name, last_name, email'),
+  ]);
+  staffList = staffRes.data || [];
+  facilitators = facRes.data || [];
+}
+
+function getStaffName(userId) {
+  const u = staffList.find(x => x.id === userId);
+  if (!u) return null;
+  return u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || null;
+}
+function getFacilitatorName(facilitatorId) {
+  const f = facilitators.find(x => x.id === facilitatorId);
+  if (!f) return null;
+  return `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || null;
+}
+function getAssigneeName(b) {
+  if (b.facilitator_id) return getFacilitatorName(b.facilitator_id);
+  if (b.staff_user_id) return getStaffName(b.staff_user_id);
+  return null;
+}
+
 async function loadAndRender() {
   const winStart = new Date(weekAnchor);
   const winEnd = new Date(weekAnchor);
@@ -91,7 +124,8 @@ async function loadAndRender() {
       id, lead_id, service_id, space_id, status, notes,
       start_datetime, end_datetime, staff_user_id, facilitator_id,
       booker_name, booker_email, booker_phone, cancelled_at, profile_id,
-      lead:crm_leads!inner(id, first_name, last_name, email, business_line),
+      package_session_id,
+      lead:crm_leads!inner(id, first_name, last_name, email, phone, business_line),
       space:spaces(id, name)
     `)
     .eq('lead.business_line', 'within')
@@ -345,6 +379,11 @@ function bindModal() {
   });
 }
 
+// Mirrors the Clients › Schedule booking-detail modal: WHEN / CLIENT (with
+// contact) / STAFF / ROOM / STATUS / NOTES rows plus Close · Open client ·
+// Cancel session · Reschedule buttons. Reschedule only shows when the
+// booking is tied to a package_session_id (so the credit can be freed and
+// rebooked from the client's package screen).
 function openModal(s) {
   const modal = document.getElementById('wsModal');
   const body = document.getElementById('wsModalBody');
@@ -352,53 +391,81 @@ function openModal(s) {
   const start = new Date(s.start_datetime);
   const end   = new Date(s.end_datetime);
   const svc = services.find(x => x.id === s.service_id);
-  const guest = clientName(s);
-  const dateStr = start.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  const timeStr = `${formatTime12(start)} – ${formatTime12(end)}`;
+  const svcName = svc?.name || 'Session';
+  const durationMin = svc?.duration_minutes || Math.round((end - start) / 60000);
+  const dateLabel = start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const timeLabel = `${formatTime12(start)} – ${formatTime12(end)}`;
 
-  setText('wsModalTitle', svc ? svc.name : 'Session');
-  body.innerHTML = `
-    <div class="ws-modal-row">
-      <span class="ws-modal-label">Client</span>
-      <span class="ws-modal-value">${esc(guest)}</span>
+  const lead = s.lead || {};
+  const fullName = ((lead.first_name || '') + ' ' + (lead.last_name || '')).trim()
+    || s.booker_name
+    || lead.email
+    || 'Client';
+  const contact = [lead.email || s.booker_email, lead.phone || s.booker_phone]
+    .filter(Boolean).join(' · ');
+  const staff = getAssigneeName(s) || 'Unassigned';
+  const room = s.space?.name || '—';
+  const statusLabel = (s.status || 'scheduled').replace(/_/g, ' ');
+  const isActive = !s.cancelled_at && s.status !== 'cancelled';
+  const hasPackageSession = !!s.package_session_id;
+
+  setText('wsModalTitle', svcName);
+
+  // Two-column rows like clients.js openBookingDetail (label cell + value).
+  const row = (label, value) => `
+    <div style="display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #eee;">
+      <div style="font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;">${esc(label)}</div>
+      <div style="font-size:14px;color:#111;">${value}</div>
     </div>
-    <div class="ws-modal-row">
-      <span class="ws-modal-label">When</span>
-      <span class="ws-modal-value">${esc(dateStr)} · ${esc(timeStr)}</span>
-    </div>
-    <div class="ws-modal-row">
-      <span class="ws-modal-label">Space</span>
-      <span class="ws-modal-value">${esc(s.space?.name || '—')}</span>
-    </div>
-    <div class="ws-modal-row">
-      <span class="ws-modal-label">Status</span>
-      <span class="ws-modal-value">${esc((s.status || 'scheduled').replace(/_/g, ' '))}</span>
-    </div>
-    ${s.lead?.email ? `<div class="ws-modal-row"><span class="ws-modal-label">Email</span><span class="ws-modal-value">${esc(s.lead.email)}</span></div>` : ''}
-    ${s.notes ? `<div class="ws-modal-row"><span class="ws-modal-label">Notes</span><span class="ws-modal-value" style="white-space:pre-wrap;">${esc(s.notes)}</span></div>` : ''}
   `;
-  // Footer: Cancel session button (sets cancelled_at on the booking row),
-  // plus a CRM deep-link when the session is tied to a lead.
-  const links = [];
-  links.push(`<button class="ws-modal-link" data-cancel-session-id="${esc(s.id)}" style="background:none;border:none;color:#b91c1c;font-weight:600;cursor:pointer;padding:0;font:inherit;">Cancel session</button>`);
+  body.style.gap = '0';
+  body.innerHTML = [
+    row('When', `${esc(dateLabel)}<div style="font-size:12px;color:#666;margin-top:2px;">${esc(timeLabel)} &middot; ${durationMin} min</div>`),
+    row('Client', `<div>${esc(fullName)}</div>${contact ? `<div style="font-size:12px;color:#666;margin-top:2px;">${esc(contact)}</div>` : ''}`),
+    row('Staff', esc(staff)),
+    row('Room', esc(room)),
+    row('Status', `<span style="text-transform:capitalize;">${esc(statusLabel)}</span>`),
+    s.notes ? row('Notes', `<span style="white-space:pre-wrap;">${esc(s.notes)}</span>`) : '',
+  ].join('');
+
+  // Buttons: Close · Open client · Cancel session · Reschedule.
+  // Style mirrors the Clients › Schedule modal — secondary outline + danger
+  // outline + primary copper. Reschedule navigates to the client's page so
+  // the existing schedule-modal flow there can pick up the freed session.
+  const btnBase = 'padding:0.5rem 0.95rem;border-radius:8px;border:1px solid #d1d5db;background:#fff;color:#111;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;';
+  const btnDanger = 'padding:0.5rem 0.95rem;border-radius:8px;border:1px solid #fca5a5;background:#fff;color:#b91c1c;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;';
+  const btnPrimary = 'padding:0.5rem 0.95rem;border-radius:8px;border:1px solid #d4883a;background:#d4883a;color:#fff;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;';
+
+  const buttons = [];
+  buttons.push(`<button id="wsBtnClose" style="${btnBase}">Close</button>`);
   if (s.lead_id) {
-    links.push(`<a class="ws-modal-link" href="clients.html?lead=${encodeURIComponent(s.lead_id)}">Open in CRM</a>`);
+    buttons.push(`<a id="wsBtnOpenClient" href="clients.html?lead=${encodeURIComponent(s.lead_id)}" style="${btnBase}">Open client</a>`);
   }
-  foot.innerHTML = links.join(' &nbsp;·&nbsp; ');
+  if (isActive) {
+    buttons.push(`<button id="wsBtnCancel" data-cancel-session-id="${esc(s.id)}" style="${btnDanger}">Cancel session</button>`);
+    if (hasPackageSession && s.lead_id) {
+      buttons.push(`<a id="wsBtnReschedule" href="clients.html?lead=${encodeURIComponent(s.lead_id)}" style="${btnPrimary}">Reschedule</a>`);
+    }
+  }
+  foot.style.justifyContent = 'flex-end';
+  foot.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons.join('')}</div>`;
+
+  document.getElementById('wsBtnClose')?.addEventListener('click', closeModal);
   foot.querySelector('[data-cancel-session-id]')?.addEventListener('click', async (e) => {
-    const id = e.currentTarget.dataset.cancelSessionId;
+    const btn = e.currentTarget;
+    const id = btn.dataset.cancelSessionId;
     if (!id) return;
     if (!confirm('Cancel this session? It will be removed from the schedule.')) return;
-    e.currentTarget.disabled = true;
-    e.currentTarget.textContent = 'Canceling…';
+    btn.disabled = true;
+    btn.textContent = 'Canceling…';
     const { error } = await supabase
       .from('scheduling_bookings')
       .update({ cancelled_at: new Date().toISOString(), status: 'cancelled' })
       .eq('id', id);
     if (error) {
       alert('Cancel failed: ' + error.message);
-      e.currentTarget.disabled = false;
-      e.currentTarget.textContent = 'Cancel session';
+      btn.disabled = false;
+      btn.textContent = 'Cancel session';
       return;
     }
     closeModal();
