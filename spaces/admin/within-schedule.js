@@ -661,7 +661,7 @@ async function deleteMeal() {
   await loadAndRender();
 }
 
-// 'HH:MM:SS' (PostgreSQL TIME) → 'HH:MM' (HTML <input type="time">)
+// 'HH:MM:SS' (PostgreSQL TIME) → 'HH:MM' (HTML <input type="time" step="300">)
 function hhmmFromTime(timeStr) {
   if (!timeStr) return '';
   const parts = String(timeStr).split(':');

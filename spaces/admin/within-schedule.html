@@ -136,10 +136,9 @@
     .ws-event.session.massage     { background: #fdf4ff; color: #6b21a8; border-left-color: #a855f7; }
     .ws-event.session.iv          { background: #fff7ed; color: #9a3412; border-left-color: #f97316; }
 
-    /* Meal events — recurring, stand out as "house" events */
+    /* Meal events — click to edit (rename, move, change times, delete) */
     .ws-event.meal {
       background: #fef3e6; color: #b45309; border-left: 3px solid #d4883a;
-      pointer-events: none; /* meals aren't clickable in V1 */
     }
     .ws-event.meal .ws-event-title { font-weight: 600; }
 
@@ -262,11 +261,11 @@
           </div>
           <div class="ws-modal-row">
             <span class="ws-modal-label">Start</span>
-            <input type="time" id="nsStart" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+            <input type="time" step="300" id="nsStart" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
           </div>
           <div class="ws-modal-row">
             <span class="ws-modal-label">End</span>
-            <input type="time" id="nsEnd" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+            <input type="time" step="300" id="nsEnd" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
           </div>
         </div>
 
@@ -326,12 +325,12 @@
           </div>
           <div class="ws-modal-row">
             <span class="ws-modal-label">Start</span>
-            <input type="time" id="mealStart"
+            <input type="time" step="300" id="mealStart"
                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
           </div>
           <div class="ws-modal-row">
             <span class="ws-modal-label">End</span>
-            <input type="time" id="mealEnd"
+            <input type="time" step="300" id="mealEnd"
                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
           </div>
         </div>

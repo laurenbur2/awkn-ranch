@@ -1132,7 +1132,7 @@ function openSpaceBookingModal(booking = null, presetSpaceId = null, presetDate 
       </div>
       <div class="res-form-group">
         <label class="res-form-label">Start Time</label>
-        <input type="time" class="res-form-input" id="frmSpaceStartTime" value="${isEdit ? booking.start_datetime.split('T')[1]?.substring(0,5) : defaultTime}">
+        <input type="time" step="300" class="res-form-input" id="frmSpaceStartTime" value="${isEdit ? booking.start_datetime.split('T')[1]?.substring(0,5) : defaultTime}">
       </div>
     </div>
     <div class="res-form-row">
@@ -1142,7 +1142,7 @@ function openSpaceBookingModal(booking = null, presetSpaceId = null, presetDate 
       </div>
       <div class="res-form-group">
         <label class="res-form-label">End Time</label>
-        <input type="time" class="res-form-input" id="frmSpaceEndTime" value="${isEdit ? booking.end_datetime.split('T')[1]?.substring(0,5) : '12:00'}">
+        <input type="time" step="300" class="res-form-input" id="frmSpaceEndTime" value="${isEdit ? booking.end_datetime.split('T')[1]?.substring(0,5) : '12:00'}">
       </div>
     </div>
     <div class="res-form-group">
@@ -1206,7 +1206,7 @@ function openActivityBookingModal(booking = null, presetStaffId = null, presetDa
       </div>
       <div class="res-form-group">
         <label class="res-form-label">Start Time</label>
-        <input type="time" class="res-form-input" id="frmActivityTime" value="${isEdit ? booking.start_datetime.split('T')[1]?.substring(0,5) : defaultTime}">
+        <input type="time" step="300" class="res-form-input" id="frmActivityTime" value="${isEdit ? booking.start_datetime.split('T')[1]?.substring(0,5) : defaultTime}">
       </div>
     </div>
     <div class="res-form-group">

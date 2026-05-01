@@ -911,7 +911,7 @@ function openScheduleModal(schedule = null) {
         <div class="form-row">
           <div class="form-group" style="flex:1">
             <label>Time</label>
-            <input type="time" name="time_of_day" required value="${schedule?.time_of_day?.substring(0, 5) || '08:00'}">
+            <input type="time" step="300" name="time_of_day" required value="${schedule?.time_of_day?.substring(0, 5) || '08:00'}">
           </div>
           <div class="form-group" style="flex:1">
             <label>Volume (optional)</label>

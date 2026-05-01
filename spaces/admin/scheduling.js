@@ -292,13 +292,13 @@ function renderProfileForm() {
         </div>
         <div class="sch-day-times">
           ${isEnabled ? `
-            <input type="time" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}">
+            <input type="time" step="300" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}">
             <span class="sch-day-sep">-</span>
-            <input type="time" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}">
+            <input type="time" step="300" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}">
             <button class="sch-day-remove" data-day="${day}" title="Remove">&times;</button>
           ` : `
-            <input type="time" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}" disabled style="display:none">
-            <input type="time" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}" disabled style="display:none">
+            <input type="time" step="300" id="start_${day}" value="${escapeHtml(dayData.start || '09:00')}" disabled style="display:none">
+            <input type="time" step="300" id="end_${day}" value="${escapeHtml(dayData.end || '17:00')}" disabled style="display:none">
             <span class="sch-day-unavailable">Unavailable</span>
             <button class="sch-day-add" data-day="${day}" title="Add hours">+</button>
           `}

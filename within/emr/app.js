@@ -2407,7 +2407,7 @@
   function buildVitalsRow(index) {
     return '<div class="vitals-entry">' +
       '<div class="form-grid form-grid--tight">' +
-      '<div class="form-group"><label>Time</label><input type="time" name="vital_time_' + index + '"></div>' +
+      '<div class="form-group"><label>Time</label><input type="time" step="300" name="vital_time_' + index + '"></div>' +
       '<div class="form-group"><label>BP</label><input type="text" name="vital_bp_' + index + '" placeholder="120/80"></div>' +
       '<div class="form-group"><label>HR</label><input type="number" name="vital_hr_' + index + '" placeholder="bpm"></div>' +
       '<div class="form-group"><label>SpO2</label><input type="number" name="vital_spo2_' + index + '" placeholder="%"></div>' +

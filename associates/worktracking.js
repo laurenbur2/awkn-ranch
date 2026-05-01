@@ -1821,9 +1821,9 @@ function renderSchedule() {
       const hasVal = startVal || endVal;
       html += `<div class="schedule-row">
         <span class="sr-date${isToday ? ' today' : ''}">${dayLabel}</span>
-        <input type="time" data-date="${date}" data-field="start" value="${startVal}">
+        <input type="time" step="300" data-date="${date}" data-field="start" value="${startVal}">
         <span class="sr-arrow">&rarr;</span>
-        <input type="time" data-date="${date}" data-field="end" value="${endVal}">
+        <input type="time" step="300" data-date="${date}" data-field="end" value="${endVal}">
         <span class="sr-planned">${plannedLabel}</span>
         <span class="sr-actual ${actualClass}">${actualLabel}</span>
         <button type="button" class="sr-clear${hasVal ? ' has-value' : ''}" data-date="${date}" title="Clear day">&times;</button>

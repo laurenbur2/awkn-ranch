@@ -2196,11 +2196,11 @@ function openLeadModal(lead = null) {
               </div>
               <div class="crm-form-field">
                 <label>Start Time</label>
-                <input type="time" class="crm-input" id="lead-event-start" value="${lead?.event_start_time || ''}">
+                <input type="time" step="300" class="crm-input" id="lead-event-start" value="${lead?.event_start_time || ''}">
               </div>
               <div class="crm-form-field">
                 <label>End Time</label>
-                <input type="time" class="crm-input" id="lead-event-end" value="${lead?.event_end_time || ''}">
+                <input type="time" step="300" class="crm-input" id="lead-event-end" value="${lead?.event_end_time || ''}">
               </div>
             </div>
           </div>
@@ -3114,19 +3114,19 @@ async function openProposalModal(proposal = null, lead = null) {
             </div>
             <div class="crm-form-field">
               <label>Setup Time</label>
-              <input type="time" class="crm-input" id="prop-setup-time" value="${proposal?.setup_time || ''}">
+              <input type="time" step="300" class="crm-input" id="prop-setup-time" value="${proposal?.setup_time || ''}">
             </div>
             <div class="crm-form-field">
               <label>Event Start</label>
-              <input type="time" class="crm-input" id="prop-event-start" value="${proposal?.event_start || leadDefaults.event_start || ''}">
+              <input type="time" step="300" class="crm-input" id="prop-event-start" value="${proposal?.event_start || leadDefaults.event_start || ''}">
             </div>
             <div class="crm-form-field">
               <label>Event End</label>
-              <input type="time" class="crm-input" id="prop-event-end" value="${proposal?.event_end || leadDefaults.event_end || ''}">
+              <input type="time" step="300" class="crm-input" id="prop-event-end" value="${proposal?.event_end || leadDefaults.event_end || ''}">
             </div>
             <div class="crm-form-field">
               <label>Teardown Time</label>
-              <input type="time" class="crm-input" id="prop-teardown-time" value="${proposal?.teardown_time || ''}">
+              <input type="time" step="300" class="crm-input" id="prop-teardown-time" value="${proposal?.teardown_time || ''}">
             </div>
             <div class="crm-form-field">
               <label>Valid Until</label>
