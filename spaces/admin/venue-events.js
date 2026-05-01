@@ -13,6 +13,10 @@ import { initAdminPage } from '../../shared/admin-shell.js';
 let allEvents = [];
 let allStages = [];
 let allSpaces = [];
+// Within client sessions whose space is a rentable venue space — these are
+// overlaid on the events calendar in indigo so admins see ALL space usage
+// (venue events + Within sessions) at a glance and can spot conflicts.
+let withinSessions = [];
 let filterState = {
   search: '',
   month:  'all',
@@ -59,7 +63,13 @@ async function loadAll() {
   const end = new Date();
   end.setMonth(end.getMonth() + 18);
 
-  const [leadsRes, stagesRes, spacesRes] = await Promise.all([
+  // Within sessions need a 30s slack on the start to make sure we don't
+  // miss anything that ends inside the window but starts before. We only
+  // care about sessions tied to a rentable space (rental_space).
+  const winStartISO = start.toISOString();
+  const winEndISO = end.toISOString();
+
+  const [leadsRes, stagesRes, spacesRes, withinRes] = await Promise.all([
     supabase
       .from('crm_leads')
       .select(`
@@ -89,15 +99,56 @@ async function loadAll() {
       .eq('booking_category', 'rental_space')
       .eq('is_archived', false)
       .order('name'),
+
+    // Within sessions on a rentable venue space, in window. Inner-join the
+    // space so non-rental spaces (wellness rooms, etc.) drop out — we only
+    // overlay the ones that could actually clash with a venue rental.
+    supabase
+      .from('scheduling_bookings')
+      .select(`
+        id, space_id, start_datetime, end_datetime, status, lead_id,
+        lead:crm_leads(first_name, last_name),
+        space:spaces!inner(id, name, booking_category)
+      `)
+      .not('space_id', 'is', null)
+      .is('cancelled_at', null)
+      .neq('status', 'cancelled')
+      .eq('space.booking_category', 'rental_space')
+      .lt('start_datetime', winEndISO)
+      .gt('end_datetime',   winStartISO),
   ]);
 
   if (leadsRes.error)  console.warn('events load error:', leadsRes.error);
   if (stagesRes.error) console.warn('stages load error:', stagesRes.error);
   if (spacesRes.error) console.warn('spaces load error:', spacesRes.error);
+  if (withinRes.error) console.warn('within overlay load error:', withinRes.error);
 
   allEvents = leadsRes.data || [];
   allStages = stagesRes.data || [];
   allSpaces = spacesRes.data || [];
+
+  // Normalize Within sessions into the same shape the calendar consumer
+  // expects (event_date / event_start_time / event_end_time / space) so we
+  // can drop them into eventsByDate without special-casing the layout. The
+  // _isWithin flag is what the renderer + click handler key off of.
+  withinSessions = (withinRes.data || []).map(s => {
+    const startD = new Date(s.start_datetime);
+    const endD   = new Date(s.end_datetime);
+    return {
+      id: `within-${s.id}`,
+      _isWithin: true,
+      _withinId: s.id,
+      first_name: s.lead?.first_name || '',
+      last_name:  s.lead?.last_name  || '',
+      event_date: ymd(startD),
+      event_start_time: hhmmss(startD),
+      event_end_time:   hhmmss(endD),
+      event_type: 'Within session',
+      space_id:   s.space_id,
+      space:      s.space,
+      stage:      { slug: 'within', name: 'Within session' },
+    };
+  });
 
   // Populate stage + space filter dropdowns now that we know what's available.
   const stageSel = document.getElementById('stageFilter');
@@ -296,9 +347,13 @@ function renderCalendar() {
   // — so the visualization stays clean and only commits show up. Earlier-
   // stage leads (inquiry, contacted, tour_call, proposal_sent) still show
   // in the list view so you can track the pipeline.
-  const visibleEvents = allEvents.filter(e => {
+  // Confirmed venue events + every active Within session on a rentable
+  // space. Within rows skip the stage gate (they're not in the CRM
+  // pipeline) but still respect the stage/space/search filters so admins
+  // can narrow the calendar normally.
+  const visibleEvents = [...allEvents, ...withinSessions].filter(e => {
     if (!e.event_date) return false;
-    if (!isConfirmedBooking(e)) return false;
+    if (!e._isWithin && !isConfirmedBooking(e)) return false;
     if (filterState.stage !== 'all' && e.stage?.slug !== filterState.stage) return false;
     if (filterState.space !== 'all' && e.space_id !== filterState.space) return false;
     if (filterState.search) {
@@ -357,6 +412,12 @@ function renderCalendar() {
   grid.querySelectorAll('.ve-cal-event').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
+      // Within sessions live on the Within Schedule page — click bounces
+      // there. Venue events open the existing details modal.
+      if (el.dataset.withinSession) {
+        window.location.href = 'within-schedule.html';
+        return;
+      }
       const id = el.dataset.leadId;
       if (id) openEventDetails(id);
     });
@@ -576,17 +637,25 @@ function bindModals() {
 }
 
 function renderCalendarEvent(ev) {
-  const slug = (ev.stage?.slug || '').toLowerCase();
   let cls = '';
-  if (/lost/.test(slug)) cls = 'stage-lost';
-  else if (/signed/.test(slug)) cls = 'stage-signed';
-  else if (/deposit/.test(slug)) cls = 'stage-deposit';
-  else if (/book|confirmed|scheduled/.test(slug)) cls = 'stage-confirmed';
+  if (ev._isWithin) {
+    cls = 'stage-within';
+  } else {
+    const slug = (ev.stage?.slug || '').toLowerCase();
+    if (/lost/.test(slug)) cls = 'stage-lost';
+    else if (/signed/.test(slug)) cls = 'stage-signed';
+    else if (/deposit/.test(slug)) cls = 'stage-deposit';
+    else if (/book|confirmed|scheduled/.test(slug)) cls = 'stage-confirmed';
+  }
 
   const guest = ((ev.first_name || '') + ' ' + (ev.last_name || '')).trim() || '(unnamed)';
   const space = ev.space?.name ? ` · ${ev.space.name}` : '';
   const time  = ev.event_start_time ? `${formatHourMinShort(ev.event_start_time)} ` : '';
-  return `<div class="ve-cal-event ${cls}" data-lead-id="${esc(ev.id)}" title="${esc(`${guest}${space}${ev.event_type ? ` (${ev.event_type})` : ''}`)}">${esc(time)}${esc(guest)}</div>`;
+  const label = ev._isWithin ? `Within · ${guest}` : guest;
+  const dataAttr = ev._isWithin
+    ? `data-within-session="${esc(ev._withinId)}"`
+    : `data-lead-id="${esc(ev.id)}"`;
+  return `<div class="ve-cal-event ${cls}" ${dataAttr} title="${esc(`${label}${space}${ev.event_type && !ev._isWithin ? ` (${ev.event_type})` : ''}`)}">${esc(time)}${esc(label)}</div>`;
 }
 
 function formatHourMinShort(t) {
@@ -604,6 +673,15 @@ function ymd(d) {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const da = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${da}`;
+}
+
+// Local 'HH:MM:SS' from a Date — matches the crm_leads.event_start_time
+// shape so renderCalendarEvent's existing time formatter Just Works.
+function hhmmss(d) {
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${s}`;
 }
 
 function renderStats() {
