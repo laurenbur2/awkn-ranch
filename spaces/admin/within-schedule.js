@@ -37,6 +37,10 @@ let nsSearchDebounce  = null;
 // the chosen window (another Within session or a confirmed venue rental).
 // saveNewSession refuses to insert while this is true.
 let nsHasHardConflict = false;
+// Set briefly after a drag-drop completes so the synthesized click that
+// follows pointerup doesn't pop the detail modal on top of the move
+// confirm dialog.
+let suppressNextClick = false;
 
 // ============================================================================
 // Boot
@@ -254,11 +258,18 @@ function renderGrid() {
   // Click delegation on the body for session detail open
   if (!body.dataset.bound) {
     body.addEventListener('click', onGridClick);
+    enableDragAndDrop(body);
     body.dataset.bound = '1';
   }
 }
 
 function onGridClick(e) {
+  // A click immediately follows pointerup on a drag — skip it so the
+  // detail/edit modal doesn't open on top of the move confirm dialog.
+  if (suppressNextClick) {
+    suppressNextClick = false;
+    return;
+  }
   // Existing session pill → open the detail modal.
   const evtEl = e.target.closest('.ws-event.session');
   if (evtEl) {
@@ -291,6 +302,183 @@ function onGridClick(e) {
   start.setMinutes(snapped);
   openNewSessionModal({ prefilledStart: start });
 }
+
+// ============================================================================
+// Drag-and-drop — move a session or meal to a new time / day
+// ----------------------------------------------------------------------------
+// Sessions and meals on the grid are absolutely-positioned pills. We listen
+// for pointerdown on the pill, pointermove on the document, and pointerup
+// to compute the drop target (snapped to 5 minutes) then ask the user to
+// confirm before writing the new times back to the DB. A near-zero pointer
+// movement (< 5px) is treated as a click and falls through to onGridClick.
+// ============================================================================
+function enableDragAndDrop(body) {
+  let drag = null;
+
+  body.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return; // left button only
+    const pill = e.target.closest('.ws-event.session, .ws-event.meal');
+    if (!pill) return;
+    if (pill.classList.contains('cancelled')) return;
+
+    const isSession = pill.classList.contains('session');
+    const id = isSession ? pill.dataset.sessionId : pill.dataset.mealId;
+    const record = isSession
+      ? sessions.find(s => s.id === id)
+      : meals.find(m => m.id === id);
+    if (!record) return;
+
+    drag = {
+      pill,
+      isSession,
+      record,
+      startX: e.clientX,
+      startY: e.clientY,
+      pillRect: pill.getBoundingClientRect(),
+      moved: false,
+    };
+    // Don't preventDefault here — we want a plain click (no movement) to
+    // still propagate as a click event for onGridClick.
+  });
+
+  document.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      drag.pill.style.zIndex = '100';
+      drag.pill.style.opacity = '0.85';
+      drag.pill.style.boxShadow = '0 8px 20px rgba(0,0,0,0.20)';
+      drag.pill.style.cursor = 'grabbing';
+      drag.pill.style.pointerEvents = 'none'; // so elementFromPoint sees the day col
+      document.body.style.userSelect = 'none';
+    }
+    drag.pill.style.transform = `translate(${dx}px, ${dy}px)`;
+  });
+
+  document.addEventListener('pointerup', async (e) => {
+    if (!drag) return;
+    const local = drag;
+    drag = null;
+    document.body.style.userSelect = '';
+
+    // Reset pill visuals before any await — pointer-events: none must come off
+    // so the user can interact with the page during the confirm.
+    local.pill.style.transform = '';
+    local.pill.style.opacity = '';
+    local.pill.style.boxShadow = '';
+    local.pill.style.cursor = '';
+    local.pill.style.zIndex = '';
+    local.pill.style.pointerEvents = '';
+
+    if (!local.moved) return; // treat as click — onGridClick takes over
+
+    // Suppress the click that always follows pointerup so the detail modal
+    // doesn't pop on top of our confirm.
+    suppressNextClick = true;
+    setTimeout(() => { suppressNextClick = false; }, 0);
+
+    // Find which day column the pointer is over.
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const dayCol = target?.closest('[data-empty-day-idx]');
+    if (!dayCol) return; // dropped outside the grid — abandon
+
+    const dayIdx = parseInt(dayCol.dataset.emptyDayIdx, 10);
+    const colRect = dayCol.getBoundingClientRect();
+    // Where the TOP of the pill should land = cursor y minus how far down
+    // the pill the user originally clicked.
+    const offsetWithinPill = local.startY - local.pillRect.top;
+    const newPillTop = (e.clientY - colRect.top) - offsetWithinPill;
+    const minutesFromGridStart = Math.max(0, (newPillTop / HOUR_PX) * 60);
+    // Snap to 5-minute increments to match the time-picker step elsewhere.
+    const snapped = Math.round(minutesFromGridStart / 5) * 5;
+
+    const newStart = new Date(weekAnchor);
+    newStart.setDate(newStart.getDate() + dayIdx);
+    newStart.setHours(DAY_START_HOUR, 0, 0, 0);
+    newStart.setMinutes(snapped);
+
+    if (local.isSession) {
+      await dragMoveSession(local.record, newStart);
+    } else {
+      await dragMoveMeal(local.record, newStart);
+    }
+  });
+}
+
+async function dragMoveSession(session, newStart) {
+  const origStart = new Date(session.start_datetime);
+  const origEnd   = new Date(session.end_datetime);
+  const durationMs = origEnd - origStart;
+  const newEnd = new Date(newStart.getTime() + durationMs);
+
+  // No-op if drop landed at the exact same start (within snap precision).
+  if (newStart.getTime() === origStart.getTime()) return;
+
+  const dateLabel = newStart.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const timeLabel = `${formatTime12(newStart)} – ${formatTime12(newEnd)}`;
+  if (!confirm(`Move this session to ${dateLabel} · ${timeLabel}?`)) {
+    render(); // snap visual back to where it was
+    return;
+  }
+
+  const { error } = await supabase
+    .from('scheduling_bookings')
+    .update({
+      start_datetime: newStart.toISOString(),
+      end_datetime:   newEnd.toISOString(),
+    })
+    .eq('id', session.id);
+
+  if (error) {
+    alert('Move failed: ' + error.message);
+    render();
+    return;
+  }
+  await loadAndRender();
+}
+
+async function dragMoveMeal(meal, newStart) {
+  // Meals store start/end as TIME columns + a DATE column, so we split the
+  // new Date into those three pieces.
+  const startTimeStr = `${pad2(newStart.getHours())}:${pad2(newStart.getMinutes())}:00`;
+  const startMs = combineDateTimeLocal(meal.meal_date, hhmmFromTime(meal.start_time));
+  const endMs   = combineDateTimeLocal(meal.meal_date, hhmmFromTime(meal.end_time));
+  const durationMs = endMs - startMs;
+  const newEnd = new Date(newStart.getTime() + durationMs);
+  const endTimeStr = `${pad2(newEnd.getHours())}:${pad2(newEnd.getMinutes())}:00`;
+  const newDateStr = ymd(newStart);
+
+  if (newDateStr === meal.meal_date && startTimeStr === meal.start_time) return;
+
+  const dateLabel = newStart.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const timeLabel = `${formatTime12(newStart)} – ${formatTime12(newEnd)}`;
+  if (!confirm(`Move "${meal.name}" to ${dateLabel} · ${timeLabel}?`)) {
+    render();
+    return;
+  }
+
+  const { error } = await supabase
+    .from('house_meals')
+    .update({
+      meal_date: newDateStr,
+      start_time: startTimeStr,
+      end_time:   endTimeStr,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', meal.id);
+
+  if (error) {
+    alert('Move failed: ' + error.message);
+    render();
+    return;
+  }
+  await loadAndRender();
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
 
 // Build the event list for a given day (meals + sessions for that calendar date).
 function collectDayEvents(date) {
