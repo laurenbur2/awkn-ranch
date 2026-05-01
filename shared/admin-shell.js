@@ -83,8 +83,8 @@ const TAB_ICONS = {
 export const ALL_ADMIN_TABS = [
   // Pillar-exclusive landing tabs (listed first so they win as the pillar's first-available
   // tab in renderContextSwitcher's firstTabForPillar lookup).
-  { id: 'reservations', label: 'Schedule', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master'] },
-  { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat', 'master'] },
+  { id: 'reservations', label: 'Schedules', href: 'reservations.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['master'] },
+  { id: 'retreat-overview', label: 'Rooms', href: 'retreat-house.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['retreat'] },
   { id: 'venue-events', label: 'Events', href: 'venue-events.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'venue-spaces', label: 'Spaces', href: 'venue-spaces.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'venue-clients', label: 'Clients', href: 'venue-clients.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
@@ -292,20 +292,13 @@ export async function renderTabNav(activeTab, authState, section = 'staff', pill
 
   // DevControl manages its own sub-tabs via renderDevControlTabs() — don't overwrite
   if (section !== 'devcontrol') {
-    // Master Calendar pillar has its own tabbed view inside reservations.html
-    // (House Stays / Spaces / Activities), so suppress the outer sub-tab row
-    // — there's nothing to navigate between at this level.
-    if (section === 'staff' && pillar === 'master') {
-      tabsContainer.innerHTML = '';
-    } else {
-      tabsContainer.innerHTML = tabs.map(tab => {
-        const isActive = tab.id === activeTab;
-        const icon = TAB_ICONS[tab.id] || '';
-        // Preserve pillar context when navigating between staff tabs
-        const href = (section === 'staff' && pillar) ? appendPillarParam(tab.href, pillar) : tab.href;
-        return `<a href="${href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
-      }).join('');
-    }
+    tabsContainer.innerHTML = tabs.map(tab => {
+      const isActive = tab.id === activeTab;
+      const icon = TAB_ICONS[tab.id] || '';
+      // Preserve pillar context when navigating between staff tabs
+      const href = (section === 'staff' && pillar) ? appendPillarParam(tab.href, pillar) : tab.href;
+      return `<a href="${href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
+    }).join('');
   }
 
   // ARIA + auto-scroll active tab into view on mobile
