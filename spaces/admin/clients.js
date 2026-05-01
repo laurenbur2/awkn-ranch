@@ -2646,7 +2646,8 @@ function openPackageModal(leadId) {
 
   const retreatTemplates = servicePackageTemplates.filter(t => parseRetreatDuration(t.name));
   const integrationTemplates = servicePackageTemplates.filter(t => t.category === 'integration');
-  const otherTemplates = servicePackageTemplates.filter(t => !parseRetreatDuration(t.name) && t.category !== 'integration');
+  const overnightTemplates = servicePackageTemplates.filter(t => t.category === 'overnight');
+  const otherTemplates = servicePackageTemplates.filter(t => !parseRetreatDuration(t.name) && t.category !== 'integration' && t.category !== 'overnight');
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -2668,6 +2669,9 @@ function openPackageModal(leadId) {
               </optgroup>` : ''}
               ${integrationTemplates.length ? `<optgroup label="Integration Packages">
                 ${integrationTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
+              </optgroup>` : ''}
+              ${overnightTemplates.length ? `<optgroup label="Overnight Stays">
+                ${overnightTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
               </optgroup>` : ''}
               ${otherTemplates.length ? `<optgroup label="Packages">
                 ${otherTemplates.map(t => `<option value="${t.id}">${escapeHtml(t.name)} &mdash; $${Number(t.price_regular).toLocaleString()}</option>`).join('')}
@@ -4368,11 +4372,13 @@ function renderPackagesSection() {
   const CATEGORY_ORDER = [
     { key: 'retreats',    label: 'Retreats / Immersives' },
     { key: 'integration', label: 'Integration Packages' },
+    { key: 'overnight',   label: 'Overnight Stays' },
     { key: 'other',       label: 'Packages' },
   ];
   const groupOf = (p) => {
     if (parseRetreatDuration(p.name)) return 'retreats';
     if (p.category === 'integration') return 'integration';
+    if (p.category === 'overnight')   return 'overnight';
     return 'other';
   };
   const grouped = new Map(CATEGORY_ORDER.map(g => [g.key, []]));
@@ -4467,6 +4473,7 @@ function openPackageTemplateModal(pkg = null) {
             <select class="crm-select" id="pkgt-category">
               <option value="" ${!pkg?.category ? 'selected' : ''}>Auto (Retreats / Packages)</option>
               <option value="integration" ${pkg?.category === 'integration' ? 'selected' : ''}>Integration Packages</option>
+              <option value="overnight" ${pkg?.category === 'overnight' ? 'selected' : ''}>Overnight Stays</option>
             </select>
             <div style="font-size:11px;color:var(--text-muted,#888);margin-top:4px;">Drives the optgroup label in the package picker and the section header in the catalog list.</div>
           </div>
