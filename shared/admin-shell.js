@@ -121,14 +121,13 @@ export const ALL_ADMIN_TABS = [
   { id: 'settings', label: 'Settings', href: 'settings.html', permission: 'view_settings', section: 'admin' },
   { id: 'releases', label: 'Releases', href: 'releases.html', permission: 'view_settings', section: 'admin' },
   { id: 'templates', label: 'Templates', href: 'templates.html', permission: 'view_templates', section: 'admin', feature: 'documents' },
-  { id: 'brand', label: 'Brand', href: 'brand.html', permission: 'view_settings', section: 'admin' },
   { id: 'accounting', label: 'Accounting', href: 'accounting.html', permission: 'view_accounting', section: 'admin' },
-  { id: 'notifications', label: 'Notifications', href: 'notifications.html', permission: 'view_settings', section: 'admin' },
-  { id: 'testdev', label: 'Test Dev', href: 'testdev.html', permission: 'view_settings', section: 'admin' },
   { id: 'lifeofpai', label: 'Life of PAI', href: '/residents/lifeofpaiadmin.html', permission: 'admin_pai_settings', section: 'admin', feature: 'pai' },
   { id: 'openclaw', label: 'AlpaClaw', href: 'alpaclaw.html', permission: 'view_openclaw', section: 'admin', feature: 'pai' },
-  // DevControl is a top-level nav item (in context switcher), not an admin sub-tab — but listed here for permission sync
-  { id: 'devcontrol', label: 'DevControl', href: '/spaces/admin/devcontrol/', permission: 'view_devcontrol', section: 'admin' },
+  // Removed from Admin nav per request: Brand, Notifications, Test Dev, DevControl.
+  // Their pages now redirect to the dashboard for any cached link. Permission
+  // keys (view_devcontrol, view_testdev) intentionally kept in
+  // STAFF_PERMISSION_KEYS so existing user/permission rows still validate.
 ];
 
 // =============================================
