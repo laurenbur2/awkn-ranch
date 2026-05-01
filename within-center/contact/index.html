@@ -61,22 +61,18 @@
       margin-top: 0.3rem;
     }
 
-    .contact-cta-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      height: 100%;
-    }
     .contact-cta-card {
-      padding: 2.25rem 2.25rem;
+      padding: 2.5rem 2.25rem;
       background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
       border-radius: var(--radius);
       color: #fff;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      flex: 1;
+      justify-content: center;
+      gap: 2rem;
     }
+    .cta-block { display: flex; flex-direction: column; }
+    .cta-block + .cta-block { padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
     .contact-cta-card .eyebrow {
       font-size: 0.55rem;
       letter-spacing: 0.3em;
@@ -325,14 +321,14 @@
 
     </div>
 
-    <div class="contact-cta-stack">
-      <div class="contact-cta-card">
+    <div class="contact-cta-card">
+      <div class="cta-block">
         <div class="eyebrow">Ready to Begin?</div>
         <h3>Schedule a free consultation.</h3>
         <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
         <a href="../book-a-call/" class="btn">Book a Call</a>
       </div>
-      <div class="contact-cta-card">
+      <div class="cta-block">
         <div class="eyebrow">Have a Question?</div>
         <h3>Send us a message.</h3>
         <p>Share what&rsquo;s on your mind and we&rsquo;ll get back to you within one business day.</p>
