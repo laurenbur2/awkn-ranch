@@ -1,21 +1,22 @@
 # AWKN — TODO
 
-> Roadmap context: `docs/ECOSYSTEM-MAP.md`. CTO directives drive all priorities.
+> **Active program:** 8-phase cleanup + Next.js refactor.
+> Spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`
+> Latest plan: `docs/superpowers/plans/2026-05-01-phase-0-branch-reset.md` (Phase 0 ✅ complete)
 
 ## Critical (blocks production)
 
-### CTO decisions blocking the alpaca purge (@miceli)
-The 5-batch deletion plan in ECOSYSTEM-MAP.md cannot start Batch 2+ until these are answered:
+### Spec amendment (do at start of Phase 1)
+- [ ] Spec §4 Decision 8 currently says "miceli periodically PRs to main." Per the actual model, miceli does NOT PR to main during this program. Single-line edit on Phase 1's first commit.
 
+### Phase 1 prerequisites — CTO answers needed before purge starts (@miceli)
+
+- [ ] **Vapi decommission — final ops-lead confirmation.** Approved in design; needs explicit "yes" from AWKN ops lead before code/edge-function deletion.
 - [ ] **Vehicles table fate** — Drop `vehicles` (Tesla-flavored) or keep for AWKN use (golf carts, employee fleet, guest assignment)?
-- [ ] **PAI's new identity** — After stripping IoT inventory queries, what should PAI be? (Retreat-guest concierge / staff CRM helper / something else)
+- [ ] **PAI's new identity** — If voice agents are decommissioned wholesale, this question goes away. If kept (ops lead disagrees with decommission), what should PAI be? (Retreat-guest concierge / staff CRM helper / something else)
 - [ ] **New default landing page** — Replaces `/residents/cameras.html` in `login/app.js:90`. Options: `/spaces/admin/`, role-aware, `/portal/`, master-schedule.
-- [ ] **profile.html destination** — Stripe (`create-payment-link/index.ts:128`) and SignWell (`signwell-webhook/index.ts:597,628,900`) email URLs depend on this. Rewrite in place vs redirect to new `/portal/profile`.
+- [ ] **profile.html destination** — Stripe (`create-payment-link/index.ts:128`) and SignWell (`signwell-webhook/index.ts:597,628,900`) email URLs depend on this.
 - [ ] **Alpaca Mac LaunchAgents** — `Sonos HTTP API`, `WiZ Proxy`, `Music Assistant`, `Printer Proxy`, `spirit-whisper-worker`, `sonos-schedule-runner` — confirm Mac can be turned off.
-- [ ] **Confirmation: never delete past migrations** — plan is to add a NEW `<date>_drop_alpaca_iot_tables.sql` migration. (assumed yes — flagging for explicit signoff)
-
-### Deploy backlog
-- [ ] Open PR `miceli` → `main`. ~28 commits (incl. this session's 2 doc commits) not yet shipped to production. `version.json` last bump 2026-04-02.
 
 ## Bugs (broken functionality)
 
@@ -23,52 +24,48 @@ _(none flagged this session)_
 
 ## Tech Debt (code quality)
 
-### Alpaca residue (high — scheduled deletion, see ECOSYSTEM-MAP.md "Vestigial scope")
-- [ ] **Batch 1 — Externals + safe deletes** (low risk, ~12 edge fns + 4 worker dirs + alpaca template skill). Recommended next-session start.
-- [ ] **Batch 2 — Login + payment surgery** (high risk: live Stripe + SignWell flows)
-- [ ] **Batch 3 — Shell + UI surgery** (~10 files: shells, feature manifest, users.js IoT permissions, inventory.js, voice.html, mobile default tab)
-- [ ] **Batch 4 — PAI prompt rewrite** (~6 edge fns: property-ai, vapi-server, ask-question, generate-whispers, resend-inbound-webhook, _shared/email-classifier)
-- [ ] **Batch 5 — Bulk delete + DB drop migration** (after 1-4 merged: `rm -rf /residents/`, ~69 IoT vendor files, `shared/resident-shell.js`, `shared/services/resident-device-scope.js`, doc scrubs)
+### Phase 1 — Alpaca purge + repo hygiene (next active phase)
 
-### Repo hygiene
-- [ ] Purge `.next/` and `/out/` directories tracked in git from abandoned prior Next.js attempt
-- [ ] Dedupe `*2.md` macOS-duplicate files (`CLAUDE-TEMPLATE 2.md`, `SECRETS-BITWARDEN 2.md`, `LOCAL-AI-SETUP 2.md`, `TESTING-GUIDE 2.md`, `alpacappsinfra 2.html`, `20260331_create_spaces_and_ranch_house 2.sql`, etc.)
-- [ ] Finish branding rename: `package.json` name still `your-app-infra`, R2 bucket `your-app`, README has `USERNAME/REPO` placeholder
-- [ ] Kill stale branches: `claude/romantic-maxwell`, `fix/remove-external-service-ci`, `founder-ideas`, `hero-update`
+Six passes, per spec §7. Pre-Phase-1 brainstorm produces the implementation plan.
 
-### Quality gates
-- [ ] No tests / no TypeScript / no CI gates on money handlers (Stripe, Square, PayPal). Add at least smoke tests for payment edge functions.
-- [ ] Audit auto-merge agentic systems (Bug Scout, Feature Builder) — they push to `main` without visible governance
+- [ ] **Pass 1** — Bulk delete `/residents/`, IoT files, build artifacts, `*2.md` dupes, branding rename
+- [ ] **Pass 2** — Cross-reference grep sweep (deletion manifest)
+- [ ] **Pass 3** — Page-by-page admin BOS audit (interactive, ~25-30 pages, chunked by pillar)
+- [ ] **Pass 4** — Vapi decommission (pending CTO confirm above)
+- [ ] **Pass 5** — Supabase + droplet cleanup (audit → snapshot → test-DB rehearsal → soft-delete on prod)
+- [ ] **Pass 6** — Restore + update project docs
 
-### Infra ownership
-- [ ] Migrate Resend, Cloudflare R2, DigitalOcean droplet from founder's personal Google account (`wingsiebird@gmail.com`) to a business workspace
+### Phase 2-7 (deferred to their own brainstorms)
 
-### Pillar model
-- [ ] Lock in the Ranch / Within / Retreat / Venue pillar model BEFORE any public-site rebuild — marketing IA needs to inherit it. Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`.
+See spec §8-13 for scope. Not actionable until Phase 1 lands.
+
+### Cross-cutting
+
+- [ ] No tests / no TypeScript / no CI gates on money handlers (Stripe, Square, PayPal). Addressed incrementally as each phase touches the relevant code.
+- [ ] Audit auto-merge agentic systems (Bug Scout, Feature Builder) — they push to `main` without visible governance. Critical to pause/repoint before Phase 6.
+- [ ] Migrate Resend, Cloudflare R2, DigitalOcean droplet from founder's personal Google account (`wingsiebird@gmail.com`) to a business workspace.
+- [ ] Lock in Pillar model (Ranch / Within / Retreat / Venue) **before Phase 6**. Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`.
+- [ ] Kill stale branches: `claude/romantic-maxwell`, `fix/remove-external-service-ci`, `founder-ideas`, `hero-update`.
 
 ## Enhancements (nice to have)
 
-### From ECOSYSTEM-MAP.md roadmap
-- [ ] **Phase 1 — Funnel fix.** Implement `crm_leads` write-path with UTM capture; new `lead_intake` edge function. Rewrite Squarespace `/privatevents` and `/collaborations` forms (still on Squarespace) to POST to Supabase. Single highest-leverage architectural change.
-- [ ] **Phase 2 — within.center SEO triage.** Pull Ahrefs / SEMrush per-URL traffic; identify the 5-10% of ~410 programmatic location pages that earn traffic; bulk-redirect-and-deindex the rest before Google penalty hits under Site Reputation Abuse / Helpful Content.
-- [ ] **Phase 3 — `awknranch.com` Next.js rebuild** (replace Squarespace; 15 marketing + 49 events + MDX blog scaffold + B2B forms → `crm_leads`)
-- [ ] **Phase 4 — `within.center` Next.js rebuild** (replace WordPress; migrate 51 real blog posts; kill ~410 programmatic pages with redirects; Article + LocalBusiness + FAQPage schema)
-- [ ] **Phase 5 — Client portal MVP** (greenfield Next.js; Bookings, Pay, Sign, Pre-Arrival, Messages, Schedule, Receipts)
-- [ ] **Phase 6 — EMR + greenfield admin modules** (BI dashboards, housekeeping turn boards, capacity/yield manager, EMR isolation decision)
+### Side decisions deferred to relevant phase brainstorms
 
-### Side decisions to make
-- [ ] **Pricing inconsistency on awknranch.com** — `/membership` $199, `/offerings2` $119/$149/$349, `/membership-1` $144/$199/$444. Reconcile during content audit.
-- [ ] **Event platform consolidation** — Eventbrite / Partiful / Luma / direct Stripe / Recess all live. Pick one or two.
-- [ ] **EMR strategy** — stay on Tellescope (cheap, HIPAA-compliant) or invest in in-house? Affects portal scope.
-- [ ] **CRM consolidation** — does within.center's LeadConnector / GoHighLevel CRM eventually fold into the AWKN admin BOS?
-- [ ] **Subdomain shape** — unified `app.*` vs separate apps per brand
-- [ ] **within.center blog authorship post-migration** — MDX (engineers) vs headless CMS (clinicians)
+- [ ] **Pricing inconsistency on awknranch.com** — `/membership` $199, `/offerings2` $119/$149/$349, `/membership-1` $144/$199/$444. Resolve in Phase 3.
+- [ ] **Event platform consolidation** — Eventbrite / Partiful / Luma / direct Stripe / Recess all live. Pick one or two. Phase 3.
+- [ ] **EMR strategy** — stay on Tellescope (cheap, HIPAA-compliant) or invest in in-house? Affects Phase 5 portal scope.
+- [ ] **CRM consolidation** — does within.center's LeadConnector / GoHighLevel CRM eventually fold into the AWKN admin BOS? Phase 4.
+- [ ] **Subdomain shape** — unified `app.*` vs separate apps per brand. Phase 5.
+- [ ] **within.center blog authorship post-migration** — MDX (engineers) vs headless CMS (clinicians). Phase 4.
 
 ## Resumption Pointers (for next session)
 
-When picking this back up, the fastest paths to value:
+When picking this back up, fastest paths to value:
 
-1. **Read `docs/ECOSYSTEM-MAP.md`** end-to-end (~15 min) — full context.
-2. **Answer the 6 CTO questions in Critical** above — unblocks the alpaca purge.
-3. **Run Batch 1 of the deletion manifest** — low risk, visible progress, doesn't depend on the CTO answers.
-4. The framework brainstorm (ruflo shared-memory adoption into `~/.claude/FRAMEWORK.md` multi-agent model) is **paused** pending validation. **Validation is in:** the 4-agent + 2-agent investigations this session both successfully shared findings via the `awkn-investigation` and `awkn-deletion-audit` ruflo memory namespaces. The shared-context-pool concept is real and works. Resume that brainstorm once the AWKN purge isn't the dominant priority.
+1. **Run `/resume`** to load this state.
+2. **Read the program spec** (`docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`) — full context.
+3. **Brainstorm Phase 1** via `superpowers:brainstorming`. Goal: produce a Phase 1 spec at `docs/superpowers/specs/2026-MM-DD-phase-1-alpaca-purge-design.md`.
+4. **Get CTO answers** on the Critical items above before plan-writing for Pass 3+.
+5. **Pass 1 (bulk delete) doesn't depend on CTO answers** — runnable as soon as the Phase 1 plan is approved.
+
+The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` holds pre-reset copies of the 4 docs + spec + plan as insurance. Delete it whenever (recommend: end of Phase 2).
