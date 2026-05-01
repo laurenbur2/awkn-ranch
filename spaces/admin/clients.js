@@ -2716,9 +2716,9 @@ function openPackageModal(leadId) {
                 <input type="date" class="crm-input" id="pkg-checkout" readonly style="background:#f5f0e3;">
               </div>
               <div class="crm-form-field" style="grid-column:1 / -1;">
-                <label>Room &middot; Bed *</label>
+                <label>Room &middot; Bed <span style="font-weight:400;color:var(--text-muted,#888);">(optional — assign later)</span></label>
                 <select class="crm-select" id="pkg-bed">
-                  <option value="">&mdash; pick a bed &mdash;</option>
+                  <option value="">&mdash; unassigned &mdash;</option>
                   ${lodgingSpaces.map(sp => {
                     const roomBeds = beds.filter(b => b.space_id === sp.id);
                     if (!roomBeds.length) return '';
@@ -2932,10 +2932,10 @@ async function savePackage(leadId) {
   if (retreatDur || isOvernight) {
     const checkinYmd = document.getElementById('pkg-checkin').value;
     const checkoutYmd = document.getElementById('pkg-checkout').value;
-    const bedId = document.getElementById('pkg-bed').value;
+    const bedId = document.getElementById('pkg-bed').value || null;
     if (!checkinYmd || !checkoutYmd) { showToast('Pick check-in and check-out dates', 'error'); return; }
     if (new Date(checkoutYmd) <= new Date(checkinYmd)) { showToast('Check-out must be after check-in', 'error'); return; }
-    if (!bedId) { showToast('Pick a room / bed', 'error'); return; }
+    // Bed is optional — stay can be booked unassigned and a bed picked later.
     stayPayload = {
       lead_id: leadId,
       bed_id: bedId,
