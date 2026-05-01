@@ -13,14 +13,10 @@ const DAY_START_HOUR = 8;   // 8am
 const DAY_END_HOUR   = 22;  // 10pm (exclusive — last hour shown is 9pm-10pm)
 const HOUR_PX        = 70;  // matches --hour-h in CSS
 
-// Day-of-week numbers: 0 = Sunday, 1 = Monday, ..., 6 = Saturday.
-// Recurring meal events. These are visualized only — not stored anywhere yet,
-// just hardcoded so they show up consistently every week.
-const MEALS = [
-  { name: 'Continental Breakfast', daysOfWeek: [1, 2, 3, 4, 5], startHour: 9.5, durationHours: 1   }, // Mon–Fri 9:30am
-  { name: 'Lunch',                 daysOfWeek: [2, 3],          startHour: 12,  durationHours: 1   }, // Tue & Wed 12pm
-  { name: 'Dinner',                daysOfWeek: [0, 1, 2, 3, 4], startHour: 18,  durationHours: 1.5 }, // Sun–Thu 6pm
-];
+// Meals come from house_meals (one row per concrete meal entry — date,
+// start_time, end_time, name, description). The hardcoded recurring
+// pattern was migrated to seeded rows so the team can edit/move/delete
+// individual meals from the schedule UI.
 
 const DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -29,8 +25,10 @@ const DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // ============================================================================
 let weekAnchor = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let sessions = [];                         // raw rows for the visible window
+let meals = [];                            // house_meals rows for the visible window
 let services = [];                         // service catalog for display + classification
 let allSpaces = [];                        // every space the admin can put a session in
+let editingMealId = null;                  // set when the meal modal is in edit mode
 let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
 let facilitators = [];                     // facilitator directory — for STAFF row when facilitator_id is set
 let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
@@ -52,6 +50,7 @@ let nsHasHardConflict = false;
       bindToolbar();
       bindModal();
       bindNewSessionModal();
+      bindMealModal();
       await loadServices();
       await loadSpaces();
       await loadStaffAndFacilitators();
@@ -78,6 +77,28 @@ async function loadSpaces() {
 async function loadServices() {
   const { data } = await supabase.from('services').select('id, slug, name, duration_minutes');
   services = data || [];
+}
+
+// Pull meals for the visible Sun–Sat window. Inclusive on both ends because
+// meal_date is a DATE (no time component).
+async function loadMealsForRange(winStart, winEnd) {
+  const startStr = ymd(winStart);
+  const endDate = new Date(winEnd);
+  endDate.setDate(endDate.getDate() - 1); // winEnd is exclusive (next Sunday)
+  const endStr = ymd(endDate);
+  const { data, error } = await supabase
+    .from('house_meals')
+    .select('id, meal_date, start_time, end_time, name, description, notes')
+    .gte('meal_date', startStr)
+    .lte('meal_date', endStr)
+    .order('meal_date')
+    .order('start_time');
+  if (error) {
+    console.warn('house_meals load error:', error);
+    meals = [];
+  } else {
+    meals = data || [];
+  }
 }
 
 // Mirror Clients › Schedule's STAFF row by populating the same two
@@ -114,6 +135,8 @@ async function loadAndRender() {
   const winStart = new Date(weekAnchor);
   const winEnd = new Date(weekAnchor);
   winEnd.setDate(winEnd.getDate() + 7);
+
+  await loadMealsForRange(winStart, winEnd);
 
   // Pull the same set the Within › Clients › Schedule subtab pulls — admin-
   // created bookings (profile_id null), uncancelled, restricted to Within
@@ -244,8 +267,15 @@ function onGridClick(e) {
     if (session) openModal(session);
     return;
   }
-  // Click on a meal block — silent. Meals aren't editable from this view.
-  if (e.target.closest('.ws-event.meal')) return;
+  // Meal pill → open the edit-meal modal (rename, move, change times,
+  // edit description, or delete).
+  const mealEl = e.target.closest('.ws-event.meal');
+  if (mealEl) {
+    const id = mealEl.dataset.mealId;
+    const meal = meals.find(m => m.id === id);
+    if (meal) openMealModal(meal);
+    return;
+  }
   // Empty area inside a day column → open the New Session modal pre-filled
   // with the clicked day + start time (snapped to 15 minutes).
   const dayCol = e.target.closest('[data-empty-day-idx]');
@@ -264,23 +294,21 @@ function onGridClick(e) {
 
 // Build the event list for a given day (meals + sessions for that calendar date).
 function collectDayEvents(date) {
-  const dow = date.getDay();
+  const dayKey = ymd(date);
   const out = [];
 
-  for (const meal of MEALS) {
-    if (!meal.daysOfWeek.includes(dow)) continue;
-    const start = new Date(date);
-    start.setHours(Math.floor(meal.startHour), Math.round((meal.startHour % 1) * 60), 0, 0);
-    const end = new Date(start);
-    end.setMinutes(end.getMinutes() + meal.durationHours * 60);
+  for (const m of meals) {
+    if (m.meal_date !== dayKey) continue;
     out.push({
       kind: 'meal',
-      name: meal.name,
-      start, end,
+      meal: m,
+      name: m.name,
+      description: m.description || '',
+      start: combineDateTimeLocal(m.meal_date, hhmmFromTime(m.start_time)),
+      end:   combineDateTimeLocal(m.meal_date, hhmmFromTime(m.end_time)),
     });
   }
 
-  const dayKey = ymd(date);
   for (const s of sessions) {
     const start = new Date(s.start_datetime);
     if (ymd(start) !== dayKey) continue;
@@ -345,9 +373,10 @@ function renderEvent(e) {
 
   if (e.kind === 'meal') {
     return `
-      <div class="ws-event meal" style="${style}">
+      <div class="ws-event meal" data-meal-id="${esc(e.meal?.id || '')}" style="${style};cursor:pointer;">
         <div class="ws-event-time">${formatTimeRange(e.start, e.end)}</div>
         <div class="ws-event-title">${esc(e.name)}</div>
+        ${e.description ? `<div class="ws-event-sub">${esc(e.description)}</div>` : ''}
       </div>
     `;
   }
@@ -495,6 +524,123 @@ function bindToolbar() {
     loadAndRender();
   });
   document.getElementById('btnNewSession')?.addEventListener('click', openNewSessionModal);
+  document.getElementById('btnNewMeal')?.addEventListener('click', () => openMealModal(null));
+}
+
+// ============================================================================
+// Meal modal — add / edit / delete a house_meals row
+// ============================================================================
+function bindMealModal() {
+  document.getElementById('mealClose')?.addEventListener('click', closeMealModal);
+  document.getElementById('mealCancel')?.addEventListener('click', closeMealModal);
+  document.getElementById('mealModal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'mealModal') closeMealModal();
+  });
+  document.getElementById('mealSave')?.addEventListener('click', saveMeal);
+  document.getElementById('mealDelete')?.addEventListener('click', deleteMeal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('mealModal').classList.contains('hidden')) {
+      closeMealModal();
+    }
+  });
+}
+
+function openMealModal(meal) {
+  editingMealId = meal?.id || null;
+  setText('mealModalTitle', editingMealId ? 'Edit Meal' : 'New Meal');
+  document.getElementById('mealError').style.display = 'none';
+  document.getElementById('mealError').textContent = '';
+  document.getElementById('mealName').value = meal?.name || '';
+  document.getElementById('mealDescription').value = meal?.description || '';
+  document.getElementById('mealNotes').value = meal?.notes || '';
+  document.getElementById('mealDate').value = meal?.meal_date || ymd(new Date());
+  document.getElementById('mealStart').value = meal ? hhmmFromTime(meal.start_time) : '';
+  document.getElementById('mealEnd').value   = meal ? hhmmFromTime(meal.end_time)   : '';
+  document.getElementById('mealDelete').style.display = editingMealId ? '' : 'none';
+  document.getElementById('mealModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('mealName').focus(), 30);
+}
+
+function closeMealModal() {
+  document.getElementById('mealModal').classList.add('hidden');
+  editingMealId = null;
+}
+
+function showMealError(msg) {
+  const el = document.getElementById('mealError');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+async function saveMeal() {
+  const name        = document.getElementById('mealName').value.trim();
+  const description = document.getElementById('mealDescription').value.trim();
+  const notes       = document.getElementById('mealNotes').value.trim();
+  const date        = document.getElementById('mealDate').value;
+  const start       = document.getElementById('mealStart').value;
+  const end         = document.getElementById('mealEnd').value;
+
+  if (!name)  { showMealError('Name is required.'); return; }
+  if (!date)  { showMealError('Date is required.'); return; }
+  if (!start) { showMealError('Start time is required.'); return; }
+  if (!end)   { showMealError('End time is required.'); return; }
+  if (end <= start) { showMealError('End must be after start.'); return; }
+
+  const payload = {
+    name,
+    description: description || null,
+    notes: notes || null,
+    meal_date: date,
+    start_time: start,
+    end_time: end,
+  };
+
+  const btn = document.getElementById('mealSave');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  let error;
+  if (editingMealId) {
+    payload.updated_at = new Date().toISOString();
+    ({ error } = await supabase.from('house_meals').update(payload).eq('id', editingMealId));
+  } else {
+    ({ error } = await supabase.from('house_meals').insert([payload]));
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Save Meal';
+
+  if (error) {
+    showMealError('Could not save: ' + error.message);
+    return;
+  }
+
+  closeMealModal();
+  await loadAndRender();
+}
+
+async function deleteMeal() {
+  if (!editingMealId) return;
+  if (!confirm('Delete this meal? It will be removed from the schedule.')) return;
+  const btn = document.getElementById('mealDelete');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  const { error } = await supabase.from('house_meals').delete().eq('id', editingMealId);
+  btn.disabled = false;
+  btn.textContent = 'Delete';
+  if (error) {
+    showMealError('Delete failed: ' + error.message);
+    return;
+  }
+  closeMealModal();
+  await loadAndRender();
+}
+
+// 'HH:MM:SS' (PostgreSQL TIME) → 'HH:MM' (HTML <input type="time">)
+function hhmmFromTime(timeStr) {
+  if (!timeStr) return '';
+  const parts = String(timeStr).split(':');
+  return `${parts[0] || '00'}:${parts[1] || '00'}`;
 }
 
 // ============================================================================

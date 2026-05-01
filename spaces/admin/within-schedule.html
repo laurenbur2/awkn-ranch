@@ -217,6 +217,7 @@
         <button class="ws-tb-btn" id="btnToday">Today</button>
         <button class="ws-tb-btn" id="btnNext" aria-label="Next week">→</button>
         <span class="ws-tb-range" id="tbRange">—</span>
+        <button class="ws-tb-btn" id="btnNewMeal">+ New Meal</button>
         <button class="ws-tb-btn ws-tb-btn-primary" id="btnNewSession">+ New Session</button>
       </div>
       <div class="ws-grid-wrap">
@@ -291,6 +292,62 @@
       <div class="ws-modal-foot">
         <button class="ws-tb-btn" id="nsCancel">Cancel</button>
         <button class="ws-tb-btn ws-tb-btn-primary" id="nsSave">Create Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meal modal — add new or edit/delete an existing meal entry -->
+  <div class="ws-modal-overlay hidden" id="mealModal">
+    <div class="ws-modal" style="max-width: 480px;">
+      <div class="ws-modal-head">
+        <span class="ws-modal-title" id="mealModalTitle">New Meal</span>
+        <button class="ws-modal-x" id="mealClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ws-modal-body">
+        <div id="mealError" style="background:#fef2f2;color:#991b1b;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fecaca;display:none;"></div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Name</span>
+          <input type="text" id="mealName" placeholder="e.g., Continental Breakfast, Lunch, Dinner"
+                 style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">What's being served <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="mealDescription" rows="2" placeholder="Pancakes &amp; fruit, garden salad with grilled chicken, etc."
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Date</span>
+            <input type="date" id="mealDate"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Start</span>
+            <input type="time" id="mealStart"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">End</span>
+            <input type="time" id="mealEnd"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Notes <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="mealNotes" rows="2" placeholder="Anything else the team should know…"
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="ws-modal-foot" style="justify-content:space-between;">
+        <button class="ws-tb-btn" id="mealDelete" style="color:#b91c1c;border-color:#fca5a5;display:none;">Delete</button>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="ws-tb-btn" id="mealCancel">Cancel</button>
+          <button class="ws-tb-btn ws-tb-btn-primary" id="mealSave">Save Meal</button>
+        </div>
       </div>
     </div>
   </div>
