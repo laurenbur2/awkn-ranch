@@ -75,12 +75,13 @@
           </div>
         </div>
 
-        <!-- Sub-tab Navigation -->
+        <!-- Sub-tab Navigation. Spaces is leftmost + default since it's the
+             primary use-case of the Master Calendar; House Stays redirects to
+             the Retreat House Rooms page (the master source for per-bed
+             occupancy across Within + venue + public stays). -->
         <div class="res-subtabs" id="resSubtabs">
-          <!-- House Stays redirects to the Retreat House Rooms page (the master
-               source for per-bed occupancy with Within + venue + public stays). -->
-          <button class="res-subtab" data-tab="house">House Stays</button>
           <button class="res-subtab active" data-tab="rentals">Spaces</button>
+          <button class="res-subtab" data-tab="house">House Stays</button>
           <button class="res-subtab" data-tab="activities">Events</button>
         </div>
 

@@ -76,7 +76,7 @@ const TAB_ICONS = {
 // When property_config.features is NOT set, all tabs show (backward compatible).
 //
 // `pillars` (staff-section tabs only): which business pillar(s) this tab belongs to.
-// Values: 'shared' (cross-business / Today), 'master' (Master Calendar),
+// Values: 'master' (Master Calendar — default landing),
 // 'within' (Within Center), 'ranch' (AWKN Ranch venue), 'retreat' (AWKN Retreat House).
 // A tab can list multiple pillars if it surfaces in more than one.
 // Tabs with no `pillars` are pillar-agnostic (visible in any staff pillar) — used for hidden direct-URL tabs.
@@ -89,19 +89,22 @@ export const ALL_ADMIN_TABS = [
   { id: 'venue-spaces', label: 'Spaces', href: 'venue-spaces.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   { id: 'venue-clients', label: 'Clients', href: 'venue-clients.html', permission: 'view_crm', section: 'staff', pillars: ['ranch'] },
   // Staff section — primary admin tabs (Mindbody-style)
-  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', pillars: ['shared'] },
-  { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', pillars: ['shared'] },
+  // Dashboard / Staff / Sales / Inventory used to live under the 'shared'
+  // (Today) pillar, which has been removed. Pages still load via direct
+  // URL but they no longer surface in the pillar nav.
+  { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', permission: 'view_dashboard', section: 'staff', feature: '_hidden' },
+  { id: 'staff', label: 'Staff', href: 'staff.html', permission: 'view_staff_directory', section: 'staff', feature: '_hidden' },
   { id: 'within-schedule', label: 'Schedule', href: 'within-schedule.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
   { id: 'memberships', label: 'Memberships', href: 'memberships.html', permission: 'view_rentals', section: 'staff', feature: 'rentals', pillars: ['memberships'] },
   { id: 'clients', label: 'Clients', href: 'clients.html', permission: 'view_crm', section: 'staff', pillars: ['within'] },
-  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['shared', 'within', 'ranch', 'retreat'] },
+  { id: 'crm', label: 'CRM', href: 'crm.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
   { id: 'packages', label: 'Packages', href: 'packages.html', permission: 'view_crm', section: 'staff', pillars: ['within', 'ranch', 'retreat'] },
   // Old events.html still exists at its URL but is no longer in the pillar
   // nav — it's been superseded by the unified Events page (venue-events.html)
   // which handles both list and calendar views off crm_leads.
   { id: 'events', label: 'Events', href: 'events.html', permission: 'view_events', section: 'staff', feature: '_hidden' },
-  { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', pillars: ['shared'] },
-  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', pillars: ['shared'] },
+  { id: 'purchases', label: 'Sales', href: 'purchases.html', permission: 'view_purchases', section: 'staff', feature: '_hidden' },
+  { id: 'inventory', label: 'Inventory', href: 'inventory.html', permission: 'view_inventory', section: 'staff', feature: '_hidden' },
   // Hidden but still accessible via direct URL — no pillar filtering.
   // (The old generic spaces admin page was retired — see spaces.html which
   // now redirects to the dashboard. Venue Rental's "Spaces" tab is the
@@ -136,9 +139,8 @@ export const ALL_ADMIN_TABS = [
 // Within the staff section, tabs are filtered by the active pillar.
 // Pillar buttons appear in this display order. Admin / DevControl are
 // rendered separately at the end (they're sections, not pillars).
-const PILLAR_ORDER = ['shared', 'master', 'within', 'ranch', 'retreat', 'memberships'];
+const PILLAR_ORDER = ['master', 'within', 'ranch', 'retreat', 'memberships'];
 const PILLAR_LABELS = {
-  shared:      'Today',
   master:      'Master Calendar',
   memberships: 'Memberships',
   within:      'Within',
@@ -146,7 +148,7 @@ const PILLAR_LABELS = {
   retreat:     'Retreat House',
 };
 const PILLAR_STORAGE_KEY = 'awkn.activePillar';
-const DEFAULT_PILLAR = 'shared';
+const DEFAULT_PILLAR = 'master';
 
 /**
  * Resolve the active pillar from the URL (?pillar=) or localStorage.

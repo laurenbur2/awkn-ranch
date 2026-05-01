@@ -30,10 +30,12 @@ const signUpPane = document.getElementById('signUpPane');
 try { localStorage.removeItem('awkn-ranch-login-redirect'); } catch (e) { /* ignore */ }
 
 // Get redirect URL from query params or sessionStorage (survives OAuth round-trip).
+// Default landing is the Master Calendar (Spaces tab) — the Today pillar +
+// the standalone Dashboard page have been retired.
 const urlParams = new URLSearchParams(window.location.search);
 const redirectUrl = urlParams.get('redirect')
   || sessionStorage.getItem('awkn-ranch-login-redirect')
-  || '/awkn-ranch/spaces/admin/dashboard.html';
+  || '/awkn-ranch/spaces/admin/reservations.html?pillar=master';
 
 console.log('[LOGIN]', 'Page loaded', { redirectUrl, href: window.location.href });
 
@@ -86,13 +88,17 @@ function getRedirectTarget(role) {
     target = '/awkn-ranch/spaces/';
   }
   // Resident/associate users go to resident area by default (not admin)
-  else if ((target === '/awkn-ranch/spaces/admin/' || target === '/awkn-ranch/spaces/admin/dashboard.html') && ['resident', 'associate'].includes(role)) {
+  else if ((target === '/awkn-ranch/spaces/admin/'
+            || target === '/awkn-ranch/spaces/admin/dashboard.html'
+            || target === '/awkn-ranch/spaces/admin/reservations.html?pillar=master')
+           && ['resident', 'associate'].includes(role)) {
     target = '/awkn-ranch/residents/cameras.html';
   }
-  // Team-portal users (oracle/admin/staff) always land on the dashboard, ignoring
-  // any stale redirect (bookmarks, sessionStorage from the old spaces.html default).
+  // Team-portal users (oracle/admin/staff) always land on the Master Calendar,
+  // ignoring any stale redirect (bookmarks, sessionStorage from the old
+  // spaces.html / dashboard.html defaults).
   else if (['oracle', 'admin', 'staff'].includes(role) && target.startsWith('/awkn-ranch/spaces/admin/')) {
-    target = '/awkn-ranch/spaces/admin/dashboard.html';
+    target = '/awkn-ranch/spaces/admin/reservations.html?pillar=master';
   }
   return target;
 }
