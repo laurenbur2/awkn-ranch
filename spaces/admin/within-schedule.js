@@ -78,16 +78,21 @@ async function loadAndRender() {
   const winEnd = new Date(weekAnchor);
   winEnd.setDate(winEnd.getDate() + 7);
 
+  // Pull the same set the Within › Clients › Schedule subtab pulls — admin-
+  // created bookings (profile_id null), uncancelled, restricted to Within
+  // clients via the joined business_line. Keeps the two views in sync.
   const { data, error } = await supabase
     .from('scheduling_bookings')
     .select(`
       id, lead_id, service_id, space_id, status, notes,
       start_datetime, end_datetime, staff_user_id, facilitator_id,
-      booker_name, booker_email, booker_phone,
+      booker_name, booker_email, booker_phone, cancelled_at, profile_id,
       lead:crm_leads!inner(id, first_name, last_name, email, business_line),
       space:spaces(id, name)
     `)
     .eq('lead.business_line', 'within')
+    .is('cancelled_at', null)
+    .is('profile_id', null)
     .gte('start_datetime', winStart.toISOString())
     .lt('start_datetime', winEnd.toISOString())
     .order('start_datetime');
@@ -96,7 +101,7 @@ async function loadAndRender() {
     console.warn('within-schedule load error:', error);
     sessions = [];
   } else {
-    sessions = (data || []).filter(s => s.status !== 'cancelled' || true); // include cancelled, render dimmed
+    sessions = data || [];
   }
 
   render();
@@ -176,7 +181,7 @@ function renderGrid() {
     }
 
     dayCols.push(`
-      <div class="ws-day-col ${isToday ? 'is-today' : ''}" style="height:${totalHeight}px;">
+      <div class="ws-day-col ${isToday ? 'is-today' : ''}" data-empty-day-idx="${dayIdx}" style="height:${totalHeight}px;cursor:cell;">
         ${events.map(renderEvent).join('')}
         ${nowLine}
       </div>
@@ -193,11 +198,30 @@ function renderGrid() {
 }
 
 function onGridClick(e) {
+  // Existing session pill → open the detail modal.
   const evtEl = e.target.closest('.ws-event.session');
-  if (!evtEl) return;
-  const id = evtEl.dataset.sessionId;
-  const session = sessions.find(s => s.id === id);
-  if (session) openModal(session);
+  if (evtEl) {
+    const id = evtEl.dataset.sessionId;
+    const session = sessions.find(s => s.id === id);
+    if (session) openModal(session);
+    return;
+  }
+  // Click on a meal block — silent. Meals aren't editable from this view.
+  if (e.target.closest('.ws-event.meal')) return;
+  // Empty area inside a day column → open the New Session modal pre-filled
+  // with the clicked day + start time (snapped to 15 minutes).
+  const dayCol = e.target.closest('[data-empty-day-idx]');
+  if (!dayCol) return;
+  const rect = dayCol.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const rawMinutes = (y / HOUR_PX) * 60;
+  const snapped = Math.max(0, Math.floor(rawMinutes / 15) * 15);
+  const dayIdx = parseInt(dayCol.dataset.emptyDayIdx, 10);
+  const start = new Date(weekAnchor);
+  start.setDate(start.getDate() + dayIdx);
+  start.setHours(DAY_START_HOUR, 0, 0, 0);
+  start.setMinutes(snapped);
+  openNewSessionModal({ prefilledStart: start });
 }
 
 // Build the event list for a given day (meals + sessions for that calendar date).
@@ -349,9 +373,33 @@ function openModal(s) {
     ${s.lead?.email ? `<div class="ws-modal-row"><span class="ws-modal-label">Email</span><span class="ws-modal-value">${esc(s.lead.email)}</span></div>` : ''}
     ${s.notes ? `<div class="ws-modal-row"><span class="ws-modal-label">Notes</span><span class="ws-modal-value" style="white-space:pre-wrap;">${esc(s.notes)}</span></div>` : ''}
   `;
-  foot.innerHTML = s.lead_id
-    ? `<a class="ws-modal-link" href="clients.html?lead=${encodeURIComponent(s.lead_id)}">Open in CRM</a>`
-    : '';
+  // Footer: Cancel session button (sets cancelled_at on the booking row),
+  // plus a CRM deep-link when the session is tied to a lead.
+  const links = [];
+  links.push(`<button class="ws-modal-link" data-cancel-session-id="${esc(s.id)}" style="background:none;border:none;color:#b91c1c;font-weight:600;cursor:pointer;padding:0;font:inherit;">Cancel session</button>`);
+  if (s.lead_id) {
+    links.push(`<a class="ws-modal-link" href="clients.html?lead=${encodeURIComponent(s.lead_id)}">Open in CRM</a>`);
+  }
+  foot.innerHTML = links.join(' &nbsp;·&nbsp; ');
+  foot.querySelector('[data-cancel-session-id]')?.addEventListener('click', async (e) => {
+    const id = e.currentTarget.dataset.cancelSessionId;
+    if (!id) return;
+    if (!confirm('Cancel this session? It will be removed from the schedule.')) return;
+    e.currentTarget.disabled = true;
+    e.currentTarget.textContent = 'Canceling…';
+    const { error } = await supabase
+      .from('scheduling_bookings')
+      .update({ cancelled_at: new Date().toISOString(), status: 'cancelled' })
+      .eq('id', id);
+    if (error) {
+      alert('Cancel failed: ' + error.message);
+      e.currentTarget.disabled = false;
+      e.currentTarget.textContent = 'Cancel session';
+      return;
+    }
+    closeModal();
+    await loadAndRender();
+  });
   modal.classList.remove('hidden');
 }
 
@@ -486,15 +534,13 @@ function bindNewSessionModal() {
   });
 }
 
-function openNewSessionModal() {
+function openNewSessionModal({ prefilledStart = null } = {}) {
   // Reset state
   nsSelectedLeadId = null;
   document.getElementById('nsClientSearch').value = '';
   document.getElementById('nsSelectedClient').style.display = 'none';
   document.getElementById('nsClientResults').style.display = 'none';
   document.getElementById('nsService').value = '';
-  document.getElementById('nsDate').value = ymd(new Date());
-  document.getElementById('nsStart').value = '';
   document.getElementById('nsEnd').value = '';
   document.getElementById('nsSpace').value = '';
   document.getElementById('nsOtherWrap').style.display = 'none';
@@ -502,6 +548,18 @@ function openNewSessionModal() {
   document.getElementById('nsNotes').value = '';
   hideNsError();
   hideNsConflict();
+
+  // Pre-fill date + start time when launched by a grid click; default to
+  // today + empty otherwise.
+  if (prefilledStart) {
+    document.getElementById('nsDate').value = ymd(prefilledStart);
+    const hh = String(prefilledStart.getHours()).padStart(2, '0');
+    const mm = String(prefilledStart.getMinutes()).padStart(2, '0');
+    document.getElementById('nsStart').value = `${hh}:${mm}`;
+  } else {
+    document.getElementById('nsDate').value = ymd(new Date());
+    document.getElementById('nsStart').value = '';
+  }
 
   document.getElementById('nsModal').classList.remove('hidden');
   setTimeout(() => document.getElementById('nsClientSearch').focus(), 30);
