@@ -292,13 +292,20 @@ export async function renderTabNav(activeTab, authState, section = 'staff', pill
 
   // DevControl manages its own sub-tabs via renderDevControlTabs() — don't overwrite
   if (section !== 'devcontrol') {
-    tabsContainer.innerHTML = tabs.map(tab => {
-      const isActive = tab.id === activeTab;
-      const icon = TAB_ICONS[tab.id] || '';
-      // Preserve pillar context when navigating between staff tabs
-      const href = (section === 'staff' && pillar) ? appendPillarParam(tab.href, pillar) : tab.href;
-      return `<a href="${href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
-    }).join('');
+    // Master Calendar pillar has its own tabbed view inside reservations.html
+    // (House Stays / Spaces / Activities), so suppress the outer sub-tab row
+    // — there's nothing to navigate between at this level.
+    if (section === 'staff' && pillar === 'master') {
+      tabsContainer.innerHTML = '';
+    } else {
+      tabsContainer.innerHTML = tabs.map(tab => {
+        const isActive = tab.id === activeTab;
+        const icon = TAB_ICONS[tab.id] || '';
+        // Preserve pillar context when navigating between staff tabs
+        const href = (section === 'staff' && pillar) ? appendPillarParam(tab.href, pillar) : tab.href;
+        return `<a href="${href}" class="manage-tab${isActive ? ' active' : ''}">${icon}${tab.label}</a>`;
+      }).join('');
+    }
   }
 
   // ARIA + auto-scroll active tab into view on mobile
