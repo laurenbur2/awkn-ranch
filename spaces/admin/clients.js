@@ -2705,14 +2705,14 @@ function openPackageModal(leadId) {
           </div>
 
           <div id="pkg-retreat-section" style="display:none;margin-top:14px;padding:12px;background:#fff8ec;border:1px solid #f2d69a;border-radius:8px;">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a5a1a;margin-bottom:8px;">Retreat stay</div>
+            <div id="pkg-stay-title" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8a5a1a;margin-bottom:8px;">Retreat stay</div>
             <div class="crm-form-grid">
               <div class="crm-form-field">
                 <label>Check-in *</label>
                 <input type="date" class="crm-input" id="pkg-checkin" value="${today}">
               </div>
               <div class="crm-form-field">
-                <label>Check-out (auto)</label>
+                <label id="pkg-checkout-label">Check-out (auto)</label>
                 <input type="date" class="crm-input" id="pkg-checkout" readonly style="background:#f5f0e3;">
               </div>
               <div class="crm-form-field" style="grid-column:1 / -1;">
@@ -2729,6 +2729,7 @@ function openPackageModal(leadId) {
                 </select>
               </div>
             </div>
+            <div id="pkg-overnight-summary" style="display:none;margin-top:10px;padding:8px 10px;background:#fff;border:1px dashed #f2d69a;border-radius:6px;font-size:12px;color:#8a5a1a;"></div>
           </div>
 
           <div style="margin-top:14px;">
@@ -2769,7 +2770,11 @@ function openPackageModal(leadId) {
   document.getElementById('btn-save-pkg').addEventListener('click', () => savePackage(leadId));
 
   document.getElementById('pkg-template').addEventListener('change', onTemplateChange);
-  document.getElementById('pkg-checkin').addEventListener('change', recomputeCheckout);
+  document.getElementById('pkg-checkin').addEventListener('change', () => {
+    recomputeCheckout();
+    recomputeOvernightTotal();
+  });
+  document.getElementById('pkg-checkout').addEventListener('change', recomputeOvernightTotal);
 }
 
 function onTemplateChange(e) {
@@ -2824,11 +2829,39 @@ function onTemplateChange(e) {
   hintEl.style.display = hintParts.length ? 'block' : 'none';
 
   const dur = parseRetreatDuration(tpl.name);
+  const isOvernight = tpl.category === 'overnight';
+  const stayTitle = document.getElementById('pkg-stay-title');
+  const checkoutLabel = document.getElementById('pkg-checkout-label');
+  const checkoutInput = document.getElementById('pkg-checkout');
+  const overnightSummary = document.getElementById('pkg-overnight-summary');
+
   if (dur) {
+    // Retreat: check-out auto-derived from the duration baked in the name.
     retreatSection.style.display = 'block';
+    if (stayTitle) stayTitle.textContent = 'Retreat stay';
+    if (checkoutLabel) checkoutLabel.textContent = 'Check-out (auto)';
+    if (checkoutInput) {
+      checkoutInput.readOnly = true;
+      checkoutInput.style.background = '#f5f0e3';
+    }
+    if (overnightSummary) overnightSummary.style.display = 'none';
     recomputeCheckout();
+  } else if (isOvernight) {
+    // Overnight: variable-length stay, price = nights × per-night rate.
+    retreatSection.style.display = 'block';
+    if (stayTitle) stayTitle.textContent = 'Overnight stay';
+    if (checkoutLabel) checkoutLabel.textContent = 'Check-out *';
+    if (checkoutInput) {
+      checkoutInput.readOnly = false;
+      checkoutInput.style.background = '';
+      // Default to one night out so the price preview shows immediately.
+      const checkin = document.getElementById('pkg-checkin')?.value;
+      if (checkin && !checkoutInput.value) checkoutInput.value = addDaysIso(checkin, 1);
+    }
+    recomputeOvernightTotal();
   } else {
     retreatSection.style.display = 'none';
+    if (overnightSummary) overnightSummary.style.display = 'none';
   }
 }
 
@@ -2839,6 +2872,46 @@ function recomputeCheckout() {
   if (!dur) return;
   const checkin = document.getElementById('pkg-checkin')?.value;
   document.getElementById('pkg-checkout').value = checkin ? addDaysIso(checkin, dur.nights) : '';
+}
+
+// Overnight presets sell at a per-night rate — recompute nights × rate
+// whenever check-in or check-out moves, and reflect both the line preview
+// and the bound Price ($) input so the saved package row carries the total.
+function recomputeOvernightTotal() {
+  const templateId = document.getElementById('pkg-template')?.value;
+  const tpl = servicePackageTemplates.find(t => t.id === templateId);
+  if (!tpl || tpl.category !== 'overnight') return;
+
+  const checkin = document.getElementById('pkg-checkin')?.value;
+  const checkout = document.getElementById('pkg-checkout')?.value;
+  const summary = document.getElementById('pkg-overnight-summary');
+  const priceInput = document.getElementById('pkg-price');
+  const perNightRate = Number(tpl.price_regular || 0);
+
+  if (!summary || !priceInput) return;
+
+  if (!checkin || !checkout) {
+    summary.style.display = 'none';
+    return;
+  }
+
+  // Inclusive of check-in night, exclusive of check-out night.
+  const inDate = new Date(checkin + 'T00:00:00');
+  const outDate = new Date(checkout + 'T00:00:00');
+  const nights = Math.round((outDate - inDate) / (1000 * 60 * 60 * 24));
+
+  if (nights <= 0) {
+    summary.style.display = 'block';
+    summary.textContent = 'Check-out must be after check-in.';
+    summary.style.color = '#b91c1c';
+    return;
+  }
+
+  const total = nights * perNightRate;
+  priceInput.value = total.toFixed(2);
+  summary.style.display = 'block';
+  summary.style.color = '#8a5a1a';
+  summary.innerHTML = `<strong>${nights}</strong> night${nights === 1 ? '' : 's'} &times; $${perNightRate.toLocaleString()} = <strong>$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
 }
 
 async function savePackage(leadId) {
@@ -2853,13 +2926,15 @@ async function savePackage(leadId) {
   const templateId = document.getElementById('pkg-template').value;
   const tpl = templateId !== 'custom' ? servicePackageTemplates.find(t => t.id === templateId) : null;
   const retreatDur = tpl ? parseRetreatDuration(tpl.name) : null;
+  const isOvernight = tpl?.category === 'overnight';
 
   let stayPayload = null;
-  if (retreatDur) {
+  if (retreatDur || isOvernight) {
     const checkinYmd = document.getElementById('pkg-checkin').value;
     const checkoutYmd = document.getElementById('pkg-checkout').value;
     const bedId = document.getElementById('pkg-bed').value;
-    if (!checkinYmd || !checkoutYmd) { showToast('Pick a check-in date', 'error'); return; }
+    if (!checkinYmd || !checkoutYmd) { showToast('Pick check-in and check-out dates', 'error'); return; }
+    if (new Date(checkoutYmd) <= new Date(checkinYmd)) { showToast('Check-out must be after check-in', 'error'); return; }
     if (!bedId) { showToast('Pick a room / bed', 'error'); return; }
     stayPayload = {
       lead_id: leadId,
