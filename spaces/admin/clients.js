@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await loadAllData();
       renderAll();
       setupEventListeners();
+      handleLeadDeepLink();
     },
   });
 });
@@ -784,6 +785,33 @@ function computeRemainingByService(pkgs) {
     }
   }
   return remaining;
+}
+
+// Open the client drawer for a `?lead=<id>` URL param (used by the
+// Within Schedule's "Open client" button and any other deep-link). We
+// also force the Clients subtab so the drawer renders over the right
+// panel, since the user's last-visited subtab (House, Schedule, etc.)
+// would otherwise stick. If `?schedule=<package_session_id>` is also
+// present (Reschedule flow from within-schedule.js), pop the schedule
+// modal directly after the drawer mounts.
+function handleLeadDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const leadId = params.get('lead');
+  const scheduleSessionId = params.get('schedule');
+  if (!leadId) return;
+  if (currentSubtab !== 'clients') {
+    currentSubtab = 'clients';
+    try { localStorage.setItem('clients-subtab', 'clients'); } catch (e) { /* ignore */ }
+    renderAll();
+  }
+  // Defer one tick so the Clients panel is in the DOM before the drawer mounts.
+  setTimeout(() => {
+    openClientDetail(leadId);
+    if (scheduleSessionId) {
+      // Wait for the drawer to render before stacking the schedule modal.
+      setTimeout(() => openScheduleSessionModal(scheduleSessionId), 50);
+    }
+  }, 0);
 }
 
 function openClientDetail(leadId) {

@@ -473,13 +473,38 @@ function openModal(s) {
   if (isActive) {
     buttons.push(`<button id="wsBtnCancel" data-cancel-session-id="${esc(s.id)}" style="${btnDanger}">Cancel session</button>`);
     if (hasPackageSession && s.lead_id) {
-      buttons.push(`<a id="wsBtnReschedule" href="clients.html?lead=${encodeURIComponent(s.lead_id)}" style="${btnPrimary}">Reschedule</a>`);
+      // Reschedule mirrors the Clients › Schedule flow: cancel this booking
+      // (which frees the session credit back to "unscheduled") and bounce
+      // to the client's drawer with ?schedule=<package_session_id>, which
+      // pops the schedule modal pre-loaded on that session.
+      buttons.push(`<button id="wsBtnReschedule" data-reschedule-session-id="${esc(s.id)}" data-package-session-id="${esc(s.package_session_id)}" data-lead-id="${esc(s.lead_id)}" style="${btnPrimary}">Reschedule</button>`);
     }
   }
   foot.style.justifyContent = 'flex-end';
   foot.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons.join('')}</div>`;
 
   document.getElementById('wsBtnClose')?.addEventListener('click', closeModal);
+  foot.querySelector('[data-reschedule-session-id]')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const id = btn.dataset.rescheduleSessionId;
+    const leadId = btn.dataset.leadId;
+    const pkgSessionId = btn.dataset.packageSessionId;
+    if (!id || !leadId || !pkgSessionId) return;
+    if (!confirm('Cancel this session and pick a new time?')) return;
+    btn.disabled = true;
+    btn.textContent = 'Working…';
+    const { error } = await supabase
+      .from('scheduling_bookings')
+      .update({ cancelled_at: new Date().toISOString(), status: 'cancelled' })
+      .eq('id', id);
+    if (error) {
+      alert('Cancel failed: ' + error.message);
+      btn.disabled = false;
+      btn.textContent = 'Reschedule';
+      return;
+    }
+    window.location.href = `clients.html?lead=${encodeURIComponent(leadId)}&schedule=${encodeURIComponent(pkgSessionId)}`;
+  });
   foot.querySelector('[data-cancel-session-id]')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const id = btn.dataset.cancelSessionId;
