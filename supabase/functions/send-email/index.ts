@@ -2833,9 +2833,17 @@ This is an automated weekly schedule report from AWKN Ranch.`
       <li><strong>No alcohol or cannabis for 48 hours</strong> before. They dull the nervous system and muddy the experience.</li>
       <li><strong>Continue your prescribed medications</strong> as normal unless our clinician has told you otherwise. Confirm timing with us if you're on benzodiazepines, lamotrigine, or stimulants.</li>
       <li><strong>Sit with your intention.</strong> One honest question or feeling — not a list of fixes.</li>
-      <li><strong>Arrange your ride home</strong> in advance. You cannot drive for the rest of the day. Staying on the ranch? We'll walk you to your room.</li>
+      <li><strong>You are not allowed to drive on the same day as your ceremony.</strong> If you are not staying onsite, you must arrange for a ride to pick you up — please confirm this in advance, not the morning of. Staying on the ranch? We'll walk you to your room.</li>
       <li><strong>Protect the day after.</strong> No big meetings, no hard conversations. Integration happens in rest.</li>
     </ul>
+  </div>
+
+  <!-- Driving callout — high-visibility safety reminder -->
+  <div style="padding:0 40px 32px 40px;">
+    <div style="background:#fff8ec;border:1px solid #f2d69a;border-left:4px solid #c9943e;border-radius:4px;padding:18px 22px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8a5a1a;font-weight:700;margin-bottom:6px;">Important — Your Ride Home</div>
+      <p style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.7;margin:0;">Clients are <strong>not allowed to drive on the same day as a ketamine ceremony.</strong> If you are not staying onsite, you must <strong>arrange for someone to pick you up.</strong> Please lock this in before the day of your session — not the morning of.</p>
+    </div>
   </div>
 
   <!-- What to bring / Morning of -->
@@ -2964,8 +2972,10 @@ THE WEEK LEADING IN
 - No alcohol or cannabis for 48 hours before
 - Continue prescribed medications as normal unless told otherwise
 - Sit with your intention
-- Arrange your ride home in advance — you cannot drive the rest of the day
 - Protect the day after
+
+IMPORTANT — YOUR RIDE HOME
+Clients are NOT allowed to drive on the same day as a ketamine ceremony. If you are not staying onsite, you must arrange for someone to pick you up. Please lock this in before the day of your session — not the morning of.
 
 WHAT TO BRING
 Loose warm clothing, cozy socks, a grounding object, a journal, current medication list.
@@ -3175,6 +3185,11 @@ function buildImmersiveWelcomeLetter({
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">48 hours before arrival, and through the retreat</div>
         <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">They dull the nervous system and muddy the experience. Step away early — your body will thank you.</div>
       </div>
+      <div style="padding:16px 0;border-bottom:1px solid rgba(201,148,62,0.25);">
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">No driving on ceremony days</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">You will not drive on the same day as a ceremony</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.6;margin-top:4px;">You're staying onsite, so this is mostly handled — but if you need to leave the property for any reason on a ceremony day, you must arrange for a ride. Driving yourself isn't an option.</div>
+      </div>
       <div style="padding-top:16px;">
         <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:4px;">Hydrate the days leading in</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#ffffff;font-weight:500;">Drink water like it's your job</div>
@@ -3311,6 +3326,7 @@ Nothing here is forced. You can opt out of anything that doesn't feel right.
 BEFORE EACH CEREMONY (THE FASTING WINDOW)
 - No solid food: 3 hours before each ceremony (non-negotiable)
 - No alcohol or cannabis: 48 hours before arrival, and through the retreat
+- No driving on the same day as a ceremony — if you leave the property for any reason on a ceremony day, you must arrange a ride
 - Hydrate the days leading in
 - Continue prescribed medications as normal unless told otherwise
 
