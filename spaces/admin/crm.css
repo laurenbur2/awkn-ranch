@@ -191,10 +191,14 @@
 .crm-biz-tag-within { background: #d1fae5; color: #065f46; }
 .crm-biz-tag-ranch { background: #d4883a; color: #fff; }
 
-/* Modal System */
-#crm-modal { position: fixed; inset: 0; z-index: 1000; }
+/* Modal System
+ * z-index 1100 sits above the team-portal site header (.aap-header,
+ * z-index 1000), so modals don't slip under the fixed banner. */
+#crm-modal,
+#clients-modal { position: fixed; inset: 0; z-index: 1100; }
 .crm-modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  z-index: 1100;
   display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 .crm-modal-content {
