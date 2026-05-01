@@ -4205,9 +4205,9 @@ function renderHouseNightView(panel, rooms) {
             const name = occ ? houseClientName(occ.lead_id) : null;
             return `
               <div class="${occ ? 'clients-bed-row' : ''}" ${occ ? `data-client-id="${occ.lead_id}" style="cursor:pointer;"` : ''}>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${occ ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:12px;">
-                  <span style="color:var(--text-muted,#666);">${escapeHtml(b.label)}</span>
-                  <span style="font-weight:${occ ? '600' : '400'};color:${occ ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};">${name ? escapeHtml(name) : 'available'}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:${occ ? '#dcfce7' : 'var(--bg,#faf9f6)'};border-left:${occ ? '3px solid #16a34a' : 'none'};border-radius:6px;font-size:12px;">
+                  <span style="color:${occ ? '#14532d' : 'var(--text-muted,#666)'};">${escapeHtml(b.label)}</span>
+                  <span style="font-weight:${occ ? '700' : '400'};color:${occ ? '#14532d' : 'var(--text-muted,#aaa)'};">${name ? escapeHtml(name) : 'available'}</span>
                 </div>
               </div>
             `;
@@ -4258,7 +4258,7 @@ function renderHouseWeekView(panel, rooms) {
         const name = occ ? houseClientName(occ.lead_id) : null;
         return `
           <td class="${occ ? 'clients-bed-row' : ''}" ${occ ? `data-client-id="${occ.lead_id}" style="cursor:pointer;"` : 'style="text-align:center;"'}>
-            <div style="padding:6px 8px;background:${occ ? '#fff8ec' : 'var(--bg,#faf9f6)'};border-radius:6px;font-size:11px;font-weight:${occ ? '600' : '400'};color:${occ ? 'var(--text,#2a1f23)' : 'var(--text-muted,#aaa)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:28px;display:flex;align-items:center;justify-content:${occ ? 'flex-start' : 'center'};">
+            <div style="padding:6px 8px;background:${occ ? '#dcfce7' : 'var(--bg,#faf9f6)'};border-left:${occ ? '3px solid #16a34a' : 'none'};border-radius:6px;font-size:11px;font-weight:${occ ? '700' : '400'};color:${occ ? '#14532d' : 'var(--text-muted,#aaa)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:28px;display:flex;align-items:center;justify-content:${occ ? 'flex-start' : 'center'};">
               ${name ? escapeHtml(name) : '\u2014'}
             </div>
           </td>
