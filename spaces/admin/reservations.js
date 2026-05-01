@@ -242,9 +242,10 @@ async function refresh() {
 function renderCalendar() {
   updateToolbarDate();
 
-  if (currentTab === 'house') renderHouseCalendar();
-  else if (currentTab === 'rentals') renderRentalsCalendar();
-  else if (currentTab === 'activities') renderActivitiesCalendar();
+  // House and Activities/Events tabs are iframe-embedded — no inner render.
+  // They each load their own calendar (retreat-house.html and venue-events.html
+  // respectively) and run their own toolbar/filters inside the iframe.
+  if (currentTab === 'rentals') renderRentalsCalendar();
   else if (currentTab === 'combined') renderCombinedCalendar();
 }
 

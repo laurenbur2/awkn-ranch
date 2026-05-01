@@ -81,7 +81,7 @@
                source for per-bed occupancy with Within + venue + public stays). -->
           <button class="res-subtab" data-tab="house">House Stays</button>
           <button class="res-subtab active" data-tab="rentals">Spaces</button>
-          <button class="res-subtab" data-tab="activities">Activities</button>
+          <button class="res-subtab" data-tab="activities">Events</button>
         </div>
 
         <!-- Calendar Toolbar -->
@@ -128,21 +128,16 @@
             <div class="res-calendar" id="calRentals"></div>
           </div>
 
-          <!-- Activities Calendar -->
+          <!-- Events Calendar — embeds the Venue Rental events calendar from
+               venue-events.html (?embed=1 strips the chrome so only the
+               events grid + filters render inside the iframe). The standalone
+               page at venue-events.html still works for users who navigate
+               there directly. -->
           <div class="res-panel" id="panelActivities">
-            <div class="res-filter-bar" id="activityFilterBar">
-              <div class="res-filter-left">
-                <label class="res-filter-label">Provider</label>
-                <select class="res-filter-select" id="staffFilter">
-                  <option value="all">All Staff</option>
-                  <!-- Populated by JS -->
-                </select>
-              </div>
-              <div class="res-filter-right">
-                <button class="res-btn res-btn--sm" id="btnManageStaff">Manage Staff</button>
-              </div>
-            </div>
-            <div class="res-calendar" id="calActivities"></div>
+            <iframe id="venueEventsFrame"
+                    src="venue-events.html?embed=1&pillar=master"
+                    style="width:100%; min-height: 1200px; border: none; background: transparent;"
+                    title="Venue events calendar"></iframe>
           </div>
 
         </div>
