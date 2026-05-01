@@ -412,7 +412,9 @@ async function renderContextSwitcher(userRole, activeSection = 'staff', activePi
       ? (firstAdminTab.href.startsWith('/') ? firstAdminTab.href : `/awkn-ranch/spaces/admin/${firstAdminTab.href}`)
       : '/awkn-ranch/spaces/admin/users.html';
     tabs.push({ id: 'admin', label: 'Admin', href: adminHref, kind: 'section' });
-    tabs.push({ id: 'devcontrol', label: 'DevControl', href: '/awkn-ranch/spaces/admin/devcontrol.html', kind: 'section' });
+    // DevControl pillar removed per request — page retired (devcontrol.html
+    // now redirects to dashboard). Permission key 'view_devcontrol' kept in
+    // STAFF_PERMISSION_KEYS so existing user profiles still validate.
   }
 
   // Hide if only one tab (nothing to switch between)
