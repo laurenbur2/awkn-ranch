@@ -7,9 +7,9 @@ window.WITHIN_PACKAGES = {
     name: 'Discover',
     tagline: 'A gentle first step into the medicine',
     description: 'One private guided ketamine ceremony, fully held. Includes preparation, ceremony, and an integration coaching session.',
-    price: 799,        // total package price in USD
-    strike: 1250,      // original price (optional, for strikethrough)
-    label: 'April Special — Limited Time',
+    price: 1250,
+    strike: null,
+    label: 'Single Ceremony Investment',
     depositPct: 0.10,
   },
   heal: {
