@@ -27,6 +27,7 @@ let weekAnchor = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let sessions = [];                         // raw rows for the visible window
 let meals = [];                            // house_meals rows for the visible window
 let services = [];                         // service catalog for display + classification
+let addonServiceIds = new Set();           // service IDs flagged as add-ons (slug starts with addon_)
 let allSpaces = [];                        // every space the admin can put a session in
 let editingMealId = null;                  // set when the meal modal is in edit mode
 let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
@@ -79,8 +80,24 @@ async function loadSpaces() {
 }
 
 async function loadServices() {
-  const { data } = await supabase.from('services').select('id, slug, name, duration_minutes');
-  services = data || [];
+  // Active services only, sorted for stable UI. Also resolve which services
+  // are wired to an add-on package (slug starts with addon_) so the Service
+  // dropdown can group them as "Add-ons" instead of mixing them with the
+  // core ketamine/integration session list.
+  const [svcRes, addonRes] = await Promise.all([
+    supabase
+      .from('services')
+      .select('id, slug, name, duration_minutes, is_active, sort_order')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true, nullsFirst: false })
+      .order('name'),
+    supabase
+      .from('crm_service_package_items')
+      .select('service_id, package:crm_service_packages!inner(slug)')
+      .like('package.slug', 'addon_%'),
+  ]);
+  services = svcRes.data || [];
+  addonServiceIds = new Set((addonRes.data || []).map(r => r.service_id));
 }
 
 // Pull meals for the visible Sun–Sat window. Inclusive on both ends because
@@ -867,16 +884,43 @@ function bindNewSessionModal() {
   });
   document.getElementById('nsSave')?.addEventListener('click', saveNewSession);
 
-  // Service dropdown
+  // Service dropdown — split into Sessions vs Add-ons so the staff member
+  // can scan the list quickly. Membership is driven by which services are
+  // attached to an addon_* package in the catalog (loadServices populates
+  // addonServiceIds).
   const svcSel = document.getElementById('nsService');
+  const sessionSvcs = services.filter(s => !addonServiceIds.has(s.id));
+  const addonSvcs   = services.filter(s =>  addonServiceIds.has(s.id));
+  const renderSvcOption = s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration_minutes} min)</option>`;
   svcSel.innerHTML = '<option value="">— Select service —</option>'
-    + services.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration_minutes} min)</option>`).join('');
+    + (sessionSvcs.length
+        ? `<optgroup label="Sessions">${sessionSvcs.map(renderSvcOption).join('')}</optgroup>`
+        : '')
+    + (addonSvcs.length
+        ? `<optgroup label="Add-ons">${addonSvcs.map(renderSvcOption).join('')}</optgroup>`
+        : '');
 
-  // Space dropdown — list every session-capable + rentable space, plus an
-  // "Other" option that reveals a free-text location field.
+  // Space dropdown — group Wellness Rooms, Ceremonial spaces (Temple / Dome),
+  // and Yurts so the team can scan quickly. Plus an "Other" escape hatch
+  // for unusual locations that aren't real spaces.
   const spcSel = document.getElementById('nsSpace');
+  const wellnessSpaces = allSpaces.filter(s => s.booking_category === 'wellness_room');
+  const yurtSpaces     = allSpaces.filter(s => /yurt/i.test(s.name));
+  const ceremonialSpaces = allSpaces.filter(s =>
+    s.booking_category === 'rental_space' && !yurtSpaces.includes(s)
+  );
+  const otherSpaces = allSpaces.filter(s =>
+    !wellnessSpaces.includes(s) && !yurtSpaces.includes(s) && !ceremonialSpaces.includes(s)
+  );
+  const renderSpcOption = s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`;
+  const groups = [
+    { label: 'Ceremonial', items: ceremonialSpaces },
+    { label: 'Yurts',       items: yurtSpaces },
+    { label: 'Wellness Rooms', items: wellnessSpaces },
+    { label: 'Other',       items: otherSpaces },
+  ].filter(g => g.items.length);
   spcSel.innerHTML = '<option value="">— Select a space —</option>'
-    + allSpaces.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')
+    + groups.map(g => `<optgroup label="${esc(g.label)}">${g.items.map(renderSpcOption).join('')}</optgroup>`).join('')
     + '<option value="__other__">Other (specify location)</option>';
 
   // Show/hide the Other location text field based on selection
