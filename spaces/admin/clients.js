@@ -1346,8 +1346,9 @@ function renderStayList(clientStays) {
   return clientStays.map(s => {
     const statusColor = s.status === 'active' ? '#16a34a' : (s.status === 'upcoming' ? '#4338ca' : (s.status === 'completed' ? '#64748b' : '#dc2626'));
     return `
-      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+      <div style="position:relative;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <button data-action="remove-stay" data-stay-id="${s.id}" title="Remove stay" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:var(--text-muted,#bbb);font-size:16px;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#b91c1c';" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted,#bbb)';">&times;</button>
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;padding-right:28px;">
           <div>
             <div style="font-weight:600;font-size:14px;">${escapeHtml(getBedLabel(s.bed_id))}</div>
             <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
@@ -1360,6 +1361,25 @@ function renderStayList(clientStays) {
       </div>
     `;
   }).join('');
+}
+
+async function removeClientStay(stayId) {
+  const stay = stays.find(s => s.id === stayId);
+  if (!stay) { showToast('Stay not found', 'error'); return; }
+  const dateRange = `${formatDate(stay.check_in_at)} \u2192 ${formatDate(stay.check_out_at)}`;
+  const bedLabel = stay.bed_id ? getBedLabel(stay.bed_id) : 'Unassigned';
+  if (!confirm(`Remove this retreat stay?\n\n${bedLabel}\n${dateRange}\n\nThis cannot be undone. The room will free up on the calendar.`)) return;
+
+  const leadId = stay.lead_id;
+  const { error } = await supabase.from('client_stays').delete().eq('id', stayId);
+  if (error) {
+    console.error('Remove stay error:', error);
+    showToast(error.message || 'Failed to remove stay', 'error');
+    return;
+  }
+  showToast('Stay removed', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
 }
 
 // ---------- Integration Notes (EMR-style chart notes) ----------
@@ -5326,6 +5346,10 @@ function handlePanelClicks(e) {
     }
     if (action === 'remove-package') {
       removeClientPackage(actionBtn.dataset.packageId);
+      return;
+    }
+    if (action === 'remove-stay') {
+      removeClientStay(actionBtn.dataset.stayId);
       return;
     }
     const leadId = actionBtn.dataset.clientId;
