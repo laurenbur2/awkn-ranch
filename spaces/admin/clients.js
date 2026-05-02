@@ -3598,7 +3598,27 @@ function renderBookingPickerSessionStep() {
     }
   }
 
-  const rows = unscheduled.length
+  // Add-on services pulled from the package catalog (slug starts with addon_).
+  // These let staff book one-off sessions (massage, sound journey, etc.) that
+  // aren't pre-paid on the client's package \u2014 picking one creates a fresh
+  // unscheduled session credit on their newest active package, then routes
+  // straight into the schedule modal.
+  const activeClientPkgs = getClientPackages(client.id).filter(p => p.status === 'active');
+  const targetPkg = activeClientPkgs[0] || null;
+  const addonOptions = (allServicePackages || [])
+    .filter(p => p.is_active && p.slug && p.slug.startsWith('addon_'))
+    .map(p => {
+      const items = packageItemsByPkgId.get(p.id) || [];
+      const svcId = items[0]?.service_id;
+      const svc = svcId ? services.find(x => x.id === svcId) : null;
+      return svc ? { pkgName: p.name, service: svc } : null;
+    })
+    .filter(Boolean)
+    // Hide add-ons whose service already has an unscheduled credit on the
+    // package \u2014 staff would just pick the existing credit row above.
+    .filter(opt => !unscheduled.some(u => u.session.service_id === opt.service.id));
+
+  const sessionRows = unscheduled.length
     ? unscheduled.map(({ session, pkg }) => {
         const svc = services.find(x => x.id === session.service_id);
         return `
@@ -3611,7 +3631,36 @@ function renderBookingPickerSessionStep() {
           </button>
         `;
       }).join('')
-    : `<div style="padding:20px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No unscheduled sessions on this client\u2019s packages.</div>`;
+    : `<div style="padding:14px 12px;text-align:center;color:var(--text-muted,#888);font-size:13px;background:var(--bg,#faf9f6);border-radius:8px;">No unscheduled session credits on this client\u2019s packages.</div>`;
+
+  const addonRows = addonOptions.length
+    ? addonOptions.map(({ pkgName, service }) => {
+        const disabled = !targetPkg;
+        return `
+          <button type="button" class="crm-btn" ${disabled ? 'disabled' : `data-picker-addon-service="${service.id}"`} style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:#fff;${disabled ? 'opacity:.55;cursor:not-allowed;' : ''}">
+            <span>
+              <span style="font-weight:600;">${escapeHtml(service.name)}</span>
+              <span style="color:var(--text-muted,#888);font-size:12px;margin-left:8px;">${service.duration_minutes || 60} min</span>
+            </span>
+            <span style="font-size:12px;color:var(--text-muted,#666);">${escapeHtml(pkgName)}</span>
+          </button>
+        `;
+      }).join('')
+    : '';
+
+  const addonNote = addonOptions.length && !targetPkg
+    ? `<div style="margin-top:6px;font-size:11px;color:#b4691f;">Add an active package to this client first to book an add-on.</div>`
+    : '';
+
+  const rows = `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin:0 0 8px;">Unscheduled credits</div>
+    ${sessionRows}
+    ${addonRows ? `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin:14px 0 8px;">Add-ons (one-off)</div>
+      ${addonRows}
+      ${addonNote}
+    ` : ''}
+  `;
 
   const timeLabel = pickerPrefilledStart ? formatPrefilledStartLabel(pickerPrefilledStart) : 'No time selected';
 
@@ -3652,6 +3701,33 @@ function renderBookingPickerSessionStep() {
       pickerSelectedClientId = null;
       pickerClientSearch = '';
       openScheduleSessionModal(sessionId, { prefilledStart, returnTo: 'schedule' });
+    });
+  });
+  modal.querySelectorAll('[data-picker-addon-service]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const serviceId = btn.dataset.pickerAddonService;
+      const clientId = pickerSelectedClientId;
+      const prefilledStart = pickerPrefilledStart;
+      const activePkgs = getClientPackages(clientId).filter(p => p.status === 'active');
+      const pkg = activePkgs[0];
+      if (!pkg) { showToast('Add an active package to this client first.', 'error'); return; }
+      btn.disabled = true;
+      const insertRes = await supabase
+        .from('client_package_sessions')
+        .insert({ package_id: pkg.id, service_id: serviceId, status: 'unscheduled' })
+        .select()
+        .single();
+      if (insertRes.error) {
+        console.error('Add-on credit insert error:', insertRes.error);
+        showToast(insertRes.error.message || 'Failed to add session credit', 'error');
+        btn.disabled = false;
+        return;
+      }
+      pickerPrefilledStart = null;
+      pickerSelectedClientId = null;
+      pickerClientSearch = '';
+      await loadClientsData();
+      openScheduleSessionModal(insertRes.data.id, { prefilledStart, returnTo: 'schedule' });
     });
   });
 }
