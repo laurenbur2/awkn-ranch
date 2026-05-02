@@ -1271,8 +1271,9 @@ function renderPackageList(pkgs) {
     const unscheduled = sessions.filter(s => s.status === 'unscheduled').length;
     const statusColor = p.status === 'active' ? '#16a34a' : (p.status === 'completed' ? '#64748b' : '#dc2626');
     return `
-      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:6px;">
+      <div style="position:relative;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <button data-action="remove-package" data-package-id="${p.id}" title="Remove package" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:var(--text-muted,#bbb);font-size:16px;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#b91c1c';" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted,#bbb)';">&times;</button>
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:6px;padding-right:28px;">
           <div>
             <div style="font-weight:600;font-size:14px;">${escapeHtml(p.name)}</div>
             <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(p.occupancy_rate)} &middot; ${formatPriceCents(p.price_cents)}${p.paid_at ? ' &middot; paid' : ' &middot; unpaid'}</div>
@@ -1290,6 +1291,33 @@ function renderPackageList(pkgs) {
       </div>
     `;
   }).join('');
+}
+
+async function removeClientPackage(packageId) {
+  const pkg = packages.find(p => p.id === packageId);
+  if (!pkg) { showToast('Package not found', 'error'); return; }
+  const sessions = pkg.sessions || [];
+  const done = sessions.filter(s => s.status === 'completed').length;
+  const scheduled = sessions.filter(s => s.status === 'scheduled').length;
+
+  let warning = `Remove "${pkg.name}"? This cannot be undone.`;
+  if (sessions.length) warning += `\n\nAll ${sessions.length} session${sessions.length === 1 ? '' : 's'} on this package will be deleted.`;
+  if (done) warning += `\n⚠ ${done} completed session${done === 1 ? '' : 's'} on record will be removed.`;
+  if (scheduled) warning += `\n⚠ ${scheduled} scheduled session${scheduled === 1 ? ' will lose its' : 's will lose their'} package link (the booking itself stays).`;
+  warning += `\n\nLinked retreat stays and agreements stay intact — they just lose the link to this package.`;
+
+  if (!confirm(warning)) return;
+
+  const leadId = pkg.lead_id;
+  const { error } = await supabase.from('client_packages').delete().eq('id', packageId);
+  if (error) {
+    console.error('Remove package error:', error);
+    showToast(error.message || 'Failed to remove package', 'error');
+    return;
+  }
+  showToast('Package removed', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
 }
 
 function sessionPillBg(status) {
@@ -5218,6 +5246,10 @@ function handlePanelClicks(e) {
     }
     if (action === 'send-invoice-confirm') {
       handleSendInvoiceConfirm(actionBtn.dataset.proposalId, currentDrawerLeadId, actionBtn);
+      return;
+    }
+    if (action === 'remove-package') {
+      removeClientPackage(actionBtn.dataset.packageId);
       return;
     }
     const leadId = actionBtn.dataset.clientId;
