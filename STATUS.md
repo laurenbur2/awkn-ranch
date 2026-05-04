@@ -1,6 +1,6 @@
 # AWKN — Status
 
-**Last Updated:** 2026-05-04 (post-Pass-6)
+**Last Updated:** 2026-05-04 (post-Phase-2)
 **Last Updated By:** Matthew Miceli (`miceli`)
 
 ## Project Overview
@@ -9,59 +9,59 @@ Bespoke Business Operating System (BOS) backing two consumer brands:
 - **AWKN Ranch** — Austin wellness retreat property (`awknranch.com`, Squarespace today)
 - **Within Center** — clinical brand for ketamine/inpatient retreats (`within.center`, WordPress today)
 
-Single integrated business. Admin BOS at `/spaces/admin/` is the source of truth.
+Single integrated business. Legacy admin BOS at `/spaces/admin/` is the source of truth and continues deploying to GitHub Pages. New Next.js app lives in `awkn-web-app/` (subfolder, coexists with legacy).
 
-Architecture, surface inventory, Next.js migration plan, and deletion manifest live in `docs/ECOSYSTEM-MAP.md`.
+Architecture and migration plan: `docs/ECOSYSTEM-MAP.md` + `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`.
 
 ## Active program
 
 **8-phase cleanup + Next.js refactor** in flight on `miceli`.
 
-- Program spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`
-- Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
-- Phase 1 plan: `docs/superpowers/plans/2026-05-03-phase-1-alpaca-purge.md`
+**Phase 0** ✅ branch reset · **Phase 1** ✅ Alpaca purge · **Phase 2** ✅ Next.js scaffold + auth · **Phase 3** ⏳ awknranch.com rebuild (next).
 
-**Phase 0** ✅ complete. **Phase 1 Pass 1-4** ✅ complete. **Phase 1 Pass 5** ✅ partial — done except tasks 5.2 (local clone — **abandoned**, no parallel DB) and 5.4 (droplet poller stop — needs SSH config). **Phase 1 Pass 6** ✅ complete (this session). Phase 1 functionally done; ready for Phase 2 brainstorm.
+### Phase 2 deltas (this session) — single multi-domain app
 
-**Pass 6 deltas (this session):**
-- Aggressive cleanup beyond original Pass 6 scope. CTO call: skip the local DB clone entirely (Pass 5.2 abandoned), don't make any DB changes during the rest of the refactor program — read-only prod queries plus discipline. Push through to Next.js refactor.
-- Deletes: `awkn-pre-reset-2026-05-01/` insurance folder, `CUSTOMIZATION.md` (alpacapps-template wizard doc, obsolete), 9 orphan `shared/services/*-data.js` files (1,506 LOC, zero imports), `shared/resident-shell.js` (804 LOC orphan), entire `infra/` directory (8 files — alpacapps-template promotion scaffolding), `shared/update-checker.js` (alpacaplayhouse.com upstream poller), `mobile/android/` stale Gradle cache. **Resolves "upstream-template-sync" open CTO question by negative answer — AWKN forked, doesn't track upstream.**
-- Surgery: `shared/feature-registry.js` (stripped 11 IoT/Alpaca features), `shared/associate-shell.js` + `shared/personal-page-shell.js` (stripped resident-shell lineage comments), inbound `/infra/` link removal from `contact/index.html`, `spaces/verify.html` (×2), `clauded/architecture.html` (×2), `clauded/sessions.html` (×2).
-- Doc rewrites reflecting actual state: `docs/KEY-FILES.md`, `docs/SCHEMA.md` (drift warning + IoT/Vapi/Spotify table sections removed), `docs/INTEGRATIONS.md` (IoT/Vapi/PAI/Camera Talkback/Hostinger OpenClaw/Brave/Spotify/Home Automation removed; Square/WhatsApp/Google Calendar added; vendor + category lists pruned), `docs/ECOSYSTEM-MAP.md` (full rewrite — original "do NOT migrate BOS" verdict replaced with current program-spec direction).
-- CLAUDE.md "Vestigial scope" section converted from "do not extend" guard to "deletion log + cutover residue" reference.
+CTO pivot from program spec §4 Decision 3: instead of a four-app monorepo, **one Next.js app at `awkn-web-app/`** serves all four surfaces via hostname-based proxy rewriting (awknranch / within / portal / bos). Simpler dev, one deploy, one Vercel project later.
 
-**Branching model:** `miceli` is the long-lived workspace where the entire transformation lives. Work commits directly to `miceli` — no per-phase sub-branches (overrides program spec §4 Decision 8). Periodic `git pull origin main` ingests teammate work; do NOT push `miceli` → `main` during the program.
+- **2.1** ✅ Scaffold via `/seed`. T3-flavored stack: Next.js 16 + React 19 + tRPC + Drizzle + Supabase Auth + Tailwind v4 + shadcn/ui. Multi-domain proxy + `NEXT_PUBLIC_DISABLE_AUTH` dev bypass + AWKN brand tokens (cream + amber + DM Sans, ported from legacy `styles/tokens.css`). Within tokens are placeholder until Phase 4.
+- **2.2** ✅ 70+ stub routes via route manifest + `<RouteStub>` + `<DomainNav>`. Idempotent `scripts/scaffold-stubs.mjs` regenerator. Click-through every link without 404s.
+- **2.3** ✅ `drizzle-kit pull` against live prod (72 tables, 873 cols, 80 FKs, 180 RLS policies). Schema in `src/server/db/schema.ts`. Lazy DB client. Live AWKN spaces render on `bos.localhost:3000/spaces`.
+- **2.4** ✅ Supabase Auth via shadcn primitives. `getCurrentUser()` joins auth.users → app_users → role. Sign-out endpoint. Bypass off → 307 to clean `/login` → form renders → signed-in role displays. Smoke-tested.
 
-**DB strategy:** zero prod DB writes during Phase 1. Local Postgres clone via `supabase start` becomes the dev target through Phases 2-6. Prod gets touched once at end-of-program cutover against the crystallized schema (overrides program spec §4 Decision 7). **Read-only** prod queries via `supabase db query --linked` are allowed and have been used during Pass 2 audits.
+**Vercel deployment deferred** — user call. New app runs locally; production deploy comes when ready.
+
+### Branching + DB rules
+
+- **Branching:** `miceli` is the long-lived workspace. Strategic well-scoped commits direct to `miceli`. No per-phase sub-branches.
+- **DB:** read-only prod via `supabase db query --linked` and `drizzle-kit pull`. **No parallel local clone** (Pass 5.2 abandoned). Single prod-write event reserved for end-of-program cutover.
 
 ## Feature Status
 
 | Area | State | Notes |
 |---|---|---|
-| Admin BOS (CRM, Master Schedule, Venue Spaces, Proposals) | ✅ Live | ~25-30 real AWKN pages |
-| Voice / PAI / Vapi | ✅ Decommissioned | Pass 4 removed all source. Prod-side undeploy of vapi-server / vapi-webhook / property-ai / generate-whispers / reprocess-pai-email functions bundled with end-of-program cutover (Task 2.11). Bitwarden secrets cleanup pending (manual). |
-| Payments (Stripe + Square + PayPal) | ✅ Live | Untested — no CI gates on money flows. Stripe `create-payment-link` configured but 0 payments processed. |
-| SignWell webhook | 🟡 Empirically dead | Missing tables in prod; CTO question whether to delete or keep dormant |
-| AlpacaPlayhouse residue (`/residents/`, IoT) | ✅ Mostly removed | Pass 2 deleted ~46k LOC. Last hot spot `property-ai/index.ts` rolls into Pass 4 with Vapi/PAI decommission. |
-| Mobile app (`mobile/`) | ✅ Deleted 2026-05-03 | 1.1MB Capacitor 8 + iOS + Android, 100% IoT, never shipped. CTO confirmed delete. |
-| `/directory/` page | 🟡 Phase 5 scaffolding | Schema mismatch in prod (app_users missing slug/bio/etc.); preserved for client portal rebuild |
-| Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; Phases 3-4 migration |
-| Client portal | ⏳ Not built | Phase 5 greenfield |
+| Legacy BOS at `spaces/admin/` | ✅ Live on GitHub Pages | Source of truth until Phase 6 cutover |
+| New Next.js app `awkn-web-app/` | 🟡 Phase 2 done | Stub UI; one real DB-backed page; auth wired. No Vercel deploy yet |
+| Voice / PAI / Vapi | ✅ Decommissioned | Source removed in Pass 4. 5 prod edge fns still need undeployment at end-of-program cutover |
+| Payments (Stripe + Square + PayPal) | ✅ Live (legacy) | Untested — no CI gates on money flows |
+| SignWell webhook | 🟡 Empirically dead | Tables missing in prod; COO call pending on delete vs dormant |
+| AlpacaPlayhouse residue | ✅ Removed | Phase 1 deleted ~50k+ LOC |
+| Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; Phases 3-4 migrate |
+| Client portal | ⏳ Phase 5 | Greenfield |
 
 ## Known Limitations
 
-- ~30% of codebase was AlpacaPlayhouse residue — Passes 2+3 removed ~46k LOC (1930+ files). Remaining: Pass 4 Vapi/PAI decommission (which absorbs `property-ai/index.ts` + 3 admin pages + faq surgery).
-- No tests, no TypeScript, no CI gates on money handlers — addressed incrementally as each phase touches the relevant code.
+- No tests / no TypeScript on legacy BOS / no CI gates on money handlers — addressed incrementally per phase.
 - Founder's personal Google account owns prod assets (Resend, R2, DO droplet) — bus-factor risk.
-- IA mid-refactor — Pillar model (Ranch / Within / Retreat / Venue) being introduced; events/schedule pages overlap. Should freeze before Phase 6. Pass 3 tags each page with its pillar as it audits.
-- AWKN profile system (`/directory/`) has a schema gap — `app_users` is missing the columns the page queries (`slug`, `bio`, `pronouns`, etc.). Phase 5 will close the gap.
+- IA mid-refactor — Pillar model (Ranch / Within / Retreat / Venue) needs to be locked before Phase 6.
+- AWKN profile system (`/directory/`) has a schema gap — `app_users` is missing `slug`/`bio`/`pronouns`. Phase 5 closes the gap.
+- Within Center brand tokens not yet defined in repo. Phase 4 will source from live within.center.
 
 ## Recent Changes (last 5)
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-05-04 | **Pass 6 complete (this session):** Aggressive Phase-1 close-out. Decision: abandon Pass 5.2 (no parallel DB during refactor — read-only prod + discipline instead). Deletes: insurance folder, CUSTOMIZATION.md, 9 orphan IoT shared/services/*-data.js files, shared/resident-shell.js (804 LOC), entire infra/ dir (8 files, alpacapps-template promotion scaffolding), shared/update-checker.js, mobile/android/ stale gradle cache. Surgery: feature-registry.js (-11 IoT features), associate-shell.js + personal-page-shell.js lineage comments, /infra/ inbound links from contact/verify/architecture/sessions. Doc rewrites: KEY-FILES.md, SCHEMA.md (drift warning), INTEGRATIONS.md (added Square + WhatsApp + Google Calendar; removed all IoT/Vapi/PAI/Camera Talkback/Hostinger OpenClaw/Brave/Spotify), ECOSYSTEM-MAP.md (full rewrite — original "do NOT migrate BOS" verdict replaced with program-spec direction), CLAUDE.md vestigial-scope section. Resolves upstream-template-sync open CTO question (negative answer — AWKN doesn't track upstream). | Miceli |
-| 2026-05-04 | **Pass 5 partial (prior session):** (5.1) Read-only prod audit found prod DB already schema-clean of Alpaca/IoT/PAI/Vapi residue. Only 5 deployed edge functions need undeployment at cutover. Output: `docs/superpowers/work/2026-05-04-prod-db-audit.md`. (5.3) BOS local toggle wired in `shared/supabase.js`. (5.5) Cutover runbook at `docs/migrations/2026-05-04-prod-cleanup-runbook.md`. (5.6) `docs/LOCAL-DEV.md` authored. Tasks 5.2 (local clone, abandoned in Pass 6) and 5.4 (droplet pollers, deferred to cutover) not done. Commits: `7b7b7c3f`, `9a485741`. | Miceli |
-| 2026-05-03 | **Pass 4 complete (prior session):** Wholesale Vapi/PAI/AlpaClaw decommission. 4 batches, 22 files, ~9,500 LOC removed. (A) 13 wholesale deletes (`e4ea7abb`): 5 edge functions (`property-ai`/`vapi-server`/`vapi-webhook`/`reprocess-pai-email`/`generate-whispers`), 6 admin pages (`ai-admin`/`pai-imagery`/`voice` html+js), 2 shared modules (`pai-widget`/`voice-service`). (B) Shell surgery (`4ec3e349`): admin-shell, resident-shell, feature-registry — strip nav entries, permissions, icons, feature defs. (C) Page surgery (`9d4e3d06`): faq.{html,js} (-615 LOC: voice config, impersonation, askViaPai), accounting.{html,js} (vapi vendor + PAI cost tracking), contact/index.html (1-line). (D) Webhook surgery (`acc506fe`): `resend-inbound-webhook/index.ts` 3563→2580 (-985 LOC); all 13 PAI/AlpaClaw functions removed; herd/payments/guestbook/claudero/forwarding flows preserved; PAI-routed classifier actions fall through to forward_admin. | Miceli |
-| 2026-05-03 | **Pass 3 complete (this session):** 41 admin BOS pages audited across 7 chunks — 1 deletion total (`lifeofpaiadmin.html` broken redirect), 5 intentional legacy redirects preserved (Justin's design: testdev/devcontrol/manage/spaces/brand), 4 pages tagged for Pass 4 (PAI/Vapi cluster). Pillar tags: 4 Ranch / 2 Within / 1 Retreat / 1 Memberships / 1 Master / 28 Cross-cutting. New deliverable: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`. | Miceli |
-| 2026-05-03 | **Pass 2 functionally complete (prior session):** 3 whole-file deletes (`mobile/` 1.1MB Capacitor IoT scaffolding; `feature-manifest.json` + `setup-alpacapps-infra` skill; `spaces/admin/inventory.{html,js}` 523-line Alpaca infra dashboard) — CTO chose delete-entirely over strip in all three cases. `property-ai/index.ts` reclassified to Pass 4 wholesale delete. ~46k LOC removed across Pass 2's 20 commits. | Miceli |
+| 2026-05-04 | **Phase 2.4 (this session):** Supabase Auth wired against existing app_users. Login form (shadcn Card/Input/Button/Alert/Label), `getCurrentUser()` server helper joining auth.users → app_users, sign-out endpoint, clean redirect URLs. Bypass off → 307 to /login → form renders → signed-in role displays. Commits: `01fcd5da`. | Miceli |
+| 2026-05-04 | **Phase 2.3 (this session):** `drizzle-kit pull` introspected prod (72 tables / 873 cols / 80 FKs / 180 policies). Schema → `src/server/db/schema.ts`. Lazy DB Proxy client + split SUPABASE_DB_PASSWORD config. Live AWKN spaces render on `/bos/spaces` (Ranch House, Bali Yurt, Temple, etc). Two manual fixes to drizzle-kit output (last_name default + auth.users FK). Commit: `da65987e`. | Miceli |
+| 2026-05-04 | **Phase 2 polish (this session):** Ported AWKN brand tokens (cream + amber + DM Sans) into multi-theme architecture (`themes/awkn.css` + placeholder `themes/within.css`). Renamed `middleware.ts` → `proxy.ts` (Next 16 successor). Build clean, deprecation warning gone. Commit: `0495c63e`. | Miceli |
+| 2026-05-04 | **Phase 2.2 (this session):** Stubbed 70+ routes for full ecosystem click-through. Route manifest at `src/lib/routes.ts`, universal `<RouteStub>`, per-domain `<DomainNav>`, idempotent `scripts/scaffold-stubs.mjs`. 74 total routes including dev landing + tRPC. All 200, 404 sanity checks correct. Commit: `79897bb6`. | Miceli |
+| 2026-05-04 | **Phase 2.1 (this session):** Next.js scaffold via `/seed` into `awkn-web-app/`. CTO pivot to single multi-domain app (not 4-app monorepo per spec). Stack: Next 16 + React 19 + tRPC 11 + Drizzle + Supabase Auth + Tailwind v4 + shadcn/ui. Hostname-based proxy. NEXT_PUBLIC_DISABLE_AUTH dev bypass. All 5 endpoints HTTP 200. Commit: `094c356d`. | Miceli |
