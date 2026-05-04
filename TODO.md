@@ -51,7 +51,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
 - [~] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~7 chunks). Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
   - [x] Chunk 1: PAI/Vapi cluster (5 pages — `lifeofpaiadmin` deleted, 4 others → Pass 4)
   - [x] Chunk 2: Internal/dev cluster — 5 pages audited, zero deletions (all AWKN-legitimate or intentional legacy redirects per Justin's `0dfd75a4`)
-  - [ ] Chunk 3: Operations (`rentals`, `spaces`, `projects`, `highlights-order`)
+  - [x] Chunk 3: Operations — 4 pages audited, zero deletions (rentals/projects/highlights-order are real AWKN; spaces.html is another legacy redirect)
   - [ ] Chunk 4: CRM/sales (`crm`, `clients`, `packages`, `purchases`, `memberships`)
   - [ ] Chunk 5: Schedule (`events`, `scheduling`, `planlist`, `reservations`)
   - [ ] Chunk 6: People + Settings (`staff`, `users`, `job-titles`, `worktracking`, `settings`, `accounting`, `brand`, `templates`, `passwords`, `releases`)

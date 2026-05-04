@@ -37,3 +37,16 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 **No same-commit code changes** — chunk 2 is audit-only.
 
 **Pattern noted:** the recency-of-edits memory caveat applies in reverse here. Justin's substantive retirement comments (`admin-shell.js:126-129, 410-412`) are the deciding signal that these "redirect-only" pages are intentional and should be preserved.
+
+## Chunk 3 — Operations cluster (audited 2026-05-03)
+
+**Outcome: zero deletions.** All 4 pages are mainline AWKN operational pages or intentional legacy redirects.
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `rentals.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 4504 LOC. Real AWKN rental/lodging admin (Within inpatient stays + Ranch lodging + Retreat House). Imports `rental-service`, `email-service`, `sms-service`, `lease-template-service`, `pdf-service`, `signwell-service`. "tenant" appears only as person-name variable, no IoT residue. |
+| `spaces.html` | `spaces/admin/` | Cross-cutting | Keep — intentional legacy redirect to `./dashboard.html`. Inline comment: "The old generic spaces admin page was retired. Venue Rental's 'Spaces' tab (venue-spaces.html) is the current resource-calendar view; the team-portal landing is dashboard.html. Send any stale link to the dashboard." Same pattern as testdev/devcontrol/manage. |
+| `projects.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 1040 LOC. Task management ("Create, edit, delete, and reassign tasks"). Imports `project-service`, `media-service`. AWKN-relevant for property maintenance, retreat prep, etc. |
+| `highlights-order.html` | `spaces/admin/` | Cross-cutting | Keep. 464 LOC, no separate .js (logic inline). Admin tool that reads `media_tag_assignments` filtered by 'highlights' tag and reorders display for consumer-facing pages. |
+
+**No same-commit code changes** — chunk 3 is audit-only.
