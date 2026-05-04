@@ -37,17 +37,7 @@ The platform uses three shell patterns that control navigation and access:
 | `shared/public-shell.js` | `index.html`, `contact/`, `events/` | Nav links, footer content |
 | `shared/associate-shell.js` | `associates/*` | Staff-specific tabs |
 
-### 4. Feature Selection
-
-Features are controlled by `feature-manifest.json`. The setup wizard enables/disables features based on the chosen persona. Each feature maps to:
-- Shared JS modules
-- Supabase edge functions
-- Database tables
-- Page directories
-
-To disable a feature post-setup: remove its entry from `feature-manifest.json` and delete the associated files.
-
-### 5. Context System (CLAUDE.md + docs/)
+### 4. Context System (CLAUDE.md + docs/)
 
 On-demand context loading minimizes tokens per conversation:
 
@@ -98,7 +88,6 @@ Tab visibility is controlled by `shared/feature-registry.js` and role permission
 
 ## Checklist for New Organizations
 
-- [ ] Clone repo and run `/setup-alpacapps-infra`
 - [ ] Supabase credentials set in `shared/supabase.js`
 - [ ] Property name/address updated in `shared/config-loader.js`
 - [ ] Branding (colors, logos) updated in `styles/tokens.css` and `assets/branding/`

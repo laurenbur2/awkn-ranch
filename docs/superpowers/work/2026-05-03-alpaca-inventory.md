@@ -141,7 +141,11 @@ Deep coupling — this is the PAI assistant brain. Hits are everywhere. Represen
 #### docs/INTEGRATIONS.md (64 hits)
 Documentation of every integration. Half the file is IoT-specific (Govee, Nest, Tesla, Anova, Glowforge, Sonos sections at lines 36–411). Pass 2 should rip out the IoT sections; keep AWKN-relevant integrations (Stripe, Square, PayPal, Resend, etc.).
 
-#### feature-manifest.json (37 hits)
+#### feature-manifest.json — ✅ DELETED 2026-05-03 (whole file)
+
+**CTO decision (2026-05-03):** delete entirely instead of stripping IoT/Vapi flags. The file's only consumer was the `setup-alpacapps-infra` wizard skill (also deleted in same commit). AWKN doesn't spawn other projects from this template. Documentation role is already covered by `docs/KEY-FILES.md` + `docs/ECOSYSTEM-MAP.md`. Companion: stripped 3-line comment in `supabase/functions/_shared/api-permissions.ts:40-43` referencing the manifest, and `CUSTOMIZATION.md` §4 + checklist item.
+
+Original (pre-delete) hot-spot notes follow for historical reference:
 Lines 247–511: feature-flag definitions for govee/cameras/sonos/tesla/anova/printer/glowforge/vapi. Pass 2 rewrites this to AWKN-only features.
 
 #### spaces/admin/inventory.js (28 hits)

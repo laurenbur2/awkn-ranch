@@ -38,9 +38,6 @@ export interface PermissionEntry {
 }
 
 // ─── Master permission matrix ───────────────────────────────────────
-// Resources are grouped by feature category for the setup wizard.
-// When generating a template for cloners, only include resources
-// for enabled features. See feature-manifest.json for mappings.
 
 export const PERMISSIONS: Record<string, Record<string, PermissionEntry>> = {
 

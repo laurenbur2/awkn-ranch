@@ -35,7 +35,7 @@ Roughly 30% of the codebase is leftover from the seed project (`alpacapps-infra`
 | Workers | `tesla-poller`, `lg-poller`, IoT-related entries on the DigitalOcean droplet | Stop + remove |
 | Edge functions | `govee_*`, `nest_*`, `tesla_*`, IoT bridges | Deprecate + delete |
 | DB tables | `govee_devices`, `nest_devices`, `tesla_accounts`, `tesla_vehicles`, `lg_appliances`, `anova_ovens`, `glowforge_machines`, `printer_devices`, `sonos_*`, `camera_streams` | Drop after data export confirms zero AWKN usage |
-| Template scaffolding | `setup-alpacapps-infra` skill references in CLAUDE.md, `infra/infra-upgrade-guide.md`, R2 bucket `your-app`, `package.json` name `your-app-infra`, `.next/` and `/out/` from a previous abandoned Next.js attempt | Strip + rebrand |
+| Template scaffolding | `setup-alpacapps-infra` skill ✅ deleted 2026-05-03 along with `feature-manifest.json`. `infra/` upgrade guide + R2 bucket `your-app` rename open as separate CTO question. `.next/`, `/out/`, `package.json` rename ✅ resolved earlier in Pass 2. | Strip + rebrand |
 
 **Net effect of purge:** smaller surface area, the home-server SPOF risk evaporates, the founder's-personal-Google-account bus-factor risk shrinks (most of those credentials power IoT), and the codebase truly matches its CLAUDE.md framing.
 
