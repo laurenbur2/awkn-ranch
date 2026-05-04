@@ -204,17 +204,4 @@ if (fs.existsSync(mobileAppIndex)) {
   console.warn('  ⚠️  mobile/app/index.html not found');
 }
 
-// Fix login redirect: login page should redirect back to / (the mobile app) instead of /residents/
-// Patch the login app.js to use /mobile/app/index.html for resident redirects
-const loginAppJs = path.join(WWW, 'login', 'app.js');
-if (fs.existsSync(loginAppJs)) {
-  let loginJs = fs.readFileSync(loginAppJs, 'utf8');
-  loginJs = loginJs.replace(
-    "targetUrl = '/residents/cameras.html'",
-    "targetUrl = '/mobile/app/index.html'"
-  );
-  fs.writeFileSync(loginAppJs, loginJs, 'utf8');
-  console.log('  ✅ Login redirect patched for mobile app');
-}
-
 console.log(`\n✅ Done! ${DIRS_TO_COPY.length} directories + ${FILES_TO_COPY.length} files copied to mobile/www/\n`);
