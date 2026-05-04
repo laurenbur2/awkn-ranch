@@ -263,10 +263,16 @@ Phase 1 action: **do not delete.** Phase 5 brainstorm input.
 - Line 442: function default `profileHref = '/residents/profile.html'`
 - Line 470: mobile nav `<a href="/residents/profile.html" ...>` — Open Question #2.
 
-### Mobile shell
+### Mobile shell — ⚠️ ESCALATED 2026-05-03: whole-dir CTO question
 
-#### mobile/app/tabs/music-tab.js
-- Line 12: `} from '../../../shared/services/sonos-data.js';` — only matched mobile tab; **siblings (`cameras-tab.js`, `cars-tab.js`, `climate-tab.js`, `lights-tab.js`) didn't match the regex but are pure IoT residue too.** See Supplementary identifiers.
+**Audit finding (2026-05-03):** the entire `mobile/` directory (1.1MB) is **100% IoT control scaffolding**. All 5 tabs in `mobile/app/tabs/` are IoT surfaces (cameras, music, lights, climate, cars). `mobile-app.js` orchestrates only those tabs. Apple Developer + Match cert repo never set up; app has never shipped. Only Justin/Lauren commits are bulk template-rename sweeps.
+
+`mobile/app/tabs/music-tab.js` line 12 imports from `../../../shared/services/sonos-data.js` — that file was deleted in `f373917d` (Pass 2 batch 4), so the mobile app **no longer parses cleanly**.
+
+CTO question added to TODO.md: delete `mobile/` entirely vs. preserve as future client-portal scaffolding. If AWKN moves to Next.js per program spec, future mobile may use RN or PWA, so the Capacitor scaffolding may not be reusable anyway.
+
+#### mobile/app/tabs/music-tab.js (specific manifest reference)
+- Line 12: `} from '../../../shared/services/sonos-data.js';` — broken import after `f373917d`. Resolved by whichever decision the CTO makes on `mobile/` as a whole.
 
 #### mobile/fastlane/Appfile
 - Line 4: `app_identifier("com.alpacaplayhouse.app")`
