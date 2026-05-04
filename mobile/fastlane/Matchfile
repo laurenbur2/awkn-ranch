@@ -2,7 +2,7 @@
 # Match stores certificates and provisioning profiles in a private git repo
 # This will be configured once Apple Developer enrollment is complete
 
-# git_url("https://github.com/rsonnad/alpacapps-certs.git")  # Private repo for certs
+# git_url("https://github.com/laurenbur2/awkn-ranch-certs.git")  # Private repo for certs
 type("appstore")
-app_identifier("com.alpacaplayhouse.app")
-# username("rahulio@alpacaplayhouse.com")  # Uncomment once Apple Developer is set up
+app_identifier("com.awknranch.app")
+# username("...@awknranch.com")  # Uncomment once Apple Developer is set up

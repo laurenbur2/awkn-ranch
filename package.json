@@ -1,7 +1,7 @@
 {
-  "name": "your-app-infra",
+  "name": "awkn-ranch",
   "version": "1.0.0",
-  "description": "Property management platform template. Clone and customize for your organization.",
+  "description": "Bespoke Business Operating System backing AWKN Ranch (Austin wellness retreat) and Within Center (clinical brand for ketamine/inpatient retreats). Static HTML/JS + Tailwind v4 on GitHub Pages, Supabase backend.",
   "main": "app.js",
   "directories": {
     "doc": "docs"
@@ -10,7 +10,7 @@
     "css:build": "tailwindcss -i styles/tailwind.css -o styles/tailwind.out.css --minify",
     "css:watch": "tailwindcss -i styles/tailwind.css -o styles/tailwind.out.css --watch"
   },
-  "keywords": ["property-management", "supabase", "tailwind", "github-pages"],
+  "keywords": ["awkn-ranch", "within-center", "business-operating-system", "wellness-retreat", "supabase", "tailwind", "github-pages"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
