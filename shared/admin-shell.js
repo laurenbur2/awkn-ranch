@@ -313,7 +313,7 @@ export async function renderTabNav(activeTab, authState, section = 'staff', pill
 // USER INFO (HEADER AVATAR + NAME)
 // =============================================
 
-function renderUserInfo(el, appUser, profileHref) {
+function renderUserInfo(el, appUser) {
   if (!el) return;
   const name = appUser.display_name || appUser.email;
   const initials = getInitials(name);
@@ -328,8 +328,6 @@ function renderUserInfo(el, appUser, profileHref) {
       ${avatarHtml}<span class="user-profile-name">${escapeHtml(name)}</span>
     </button>
     <div class="user-menu-dropdown hidden">
-      <a href="${profileHref}" class="user-menu-item">Profile</a>
-      <a href="/residents/lighting.html" class="user-menu-item">Intranet</a>
       <button class="user-menu-item user-menu-signout" id="headerSignOutBtn">Sign Out</button>
     </div>`;
 
@@ -694,7 +692,7 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
       const siteAuthEl = document.getElementById('aapHeaderAuth');
       const legacyUserInfo = document.getElementById('userInfo');
       if (siteAuthEl) {
-        renderUserInfo(siteAuthEl, state.appUser, '/residents/profile.html');
+        renderUserInfo(siteAuthEl, state.appUser);
         siteAuthEl.classList.add('user-info');
         const signInLink = document.getElementById('aapSignInLink');
         if (signInLink) signInLink.style.display = 'none';
@@ -702,7 +700,7 @@ export async function initAdminPage({ activeTab, requiredRole = 'staff', require
         if (mobileSignInLink) mobileSignInLink.closest('li')?.remove();
         if (legacyUserInfo) legacyUserInfo.style.display = 'none';
       } else if (legacyUserInfo) {
-        renderUserInfo(legacyUserInfo, state.appUser, '/residents/profile.html');
+        renderUserInfo(legacyUserInfo, state.appUser);
       }
 
       // Update role badge and admin-only visibility

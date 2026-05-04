@@ -568,7 +568,6 @@ function renderUserMenu(state) {
       ${avatarHtml}<span class="user-profile-name">${esc(name)}</span>
     </button>
     <div class="user-menu-dropdown hidden">
-      <a href="/residents/profile.html" class="user-menu-item">Profile</a>
       ${navLinks}
       <button class="user-menu-item user-menu-signout" id="ppSignOutBtn">Sign Out</button>
     </div>`;

@@ -89,8 +89,6 @@ function renderContextSwitcher() {
   }
 
   const tabs = [
-    { id: 'devices', label: 'Devices', href: '/residents/devices.html' },
-    { id: 'resident', label: 'Residents', href: '/residents/' },
     { id: 'associate', label: 'Associates', href: '/associates/worktracking.html' },
     { id: 'staff', label: 'Staff', href: '/spaces/admin/' },
     { id: 'admin', label: 'Admin', href: '/spaces/admin/users.html' },
@@ -116,7 +114,7 @@ function renderContextSwitcher() {
 // USER INFO (HEADER AVATAR + NAME)
 // =============================================
 
-function renderUserInfo(el, appUser, profileHref) {
+function renderUserInfo(el, appUser) {
   if (!el) return;
   const name = appUser.display_name || appUser.email;
   const initials = getInitials(name);
@@ -132,7 +130,6 @@ function renderUserInfo(el, appUser, profileHref) {
     </button>
     <div class="user-menu-dropdown hidden">
       <div id="roleBadge" class="role-badge dropdown-role-badge" style="display:none"></div>
-      <a href="${profileHref}" class="user-menu-item">Profile</a>
       <button type="button" class="user-menu-item user-menu-signout" id="headerSignOutBtn">Sign Out</button>
     </div>`;
 
@@ -384,7 +381,7 @@ export async function initAssociatePage({ activeTab, onReady }) {
       const siteAuthEl = document.getElementById('aapHeaderAuth');
       const legacyUserInfo = document.getElementById('userInfo');
       if (siteAuthEl) {
-        renderUserInfo(siteAuthEl, state.appUser, '/residents/profile.html');
+        renderUserInfo(siteAuthEl, state.appUser);
         siteAuthEl.classList.add('user-info');
         const signInLink = document.getElementById('aapSignInLink');
         if (signInLink) signInLink.style.display = 'none';
@@ -392,7 +389,7 @@ export async function initAssociatePage({ activeTab, onReady }) {
         if (mobileSignInLink) mobileSignInLink.closest('li')?.remove();
         if (legacyUserInfo) legacyUserInfo.style.display = 'none';
       } else if (legacyUserInfo) {
-        renderUserInfo(legacyUserInfo, state.appUser, '/residents/profile.html');
+        renderUserInfo(legacyUserInfo, state.appUser);
       }
 
       // Update role badge
