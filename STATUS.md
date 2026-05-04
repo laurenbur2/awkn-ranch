@@ -1,6 +1,6 @@
 # AWKN — Status
 
-**Last Updated:** 2026-05-01
+**Last Updated:** 2026-05-03
 **Last Updated By:** Matthew Miceli (`miceli`)
 
 ## Project Overview
@@ -15,35 +15,43 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 
 ## Active program
 
-**8-phase cleanup + Next.js refactor** in flight on `miceli`. Spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`. Phase 0 complete; Phase 1 next.
+**8-phase cleanup + Next.js refactor** in flight on `miceli`.
 
-**Branching model for this program:** `miceli` is the long-lived workspace where the entire transformation lives. `main` is read-only baseline (ingest teammate work via `git pull`; do NOT PR refactor work back to `main` during the program). Periodic `git pull origin main` keeps miceli current with team work like Justin's `8d9cfe2` venue-events commit.
+- Program spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`
+- Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
+- Phase 1 plan: `docs/superpowers/plans/2026-05-03-phase-1-alpaca-purge.md`
+
+**Phase 0** ✅ complete. **Phase 1** in progress: **Pass 1 ✅ complete** (inventory manifest + gitignore); **Pass 2 next**.
+
+**Branching model:** `miceli` is the long-lived workspace where the entire transformation lives. Work commits directly to `miceli` — no per-phase sub-branches (overrides program spec §4 Decision 8). Periodic `git pull origin main` ingests teammate work; do NOT push `miceli` → `main` during the program.
+
+**DB strategy:** zero prod DB writes during Phase 1. Local Postgres clone via `supabase start` becomes the dev target through Phases 2-6. Prod gets touched once at end-of-program cutover against the crystallized schema (overrides program spec §4 Decision 7).
 
 ## Feature Status
 
 | Area | State | Notes |
 |---|---|---|
 | Admin BOS (CRM, Master Schedule, Venue Spaces, Proposals) | ✅ Live | ~25-30 real AWKN pages |
-| Voice / PAI / Vapi | ⏳ Decommission approved | Phase 1 Pass 4 (pending ops-lead final confirmation) |
+| Voice / PAI / Vapi | 🔴 Decommission planned | Wholesale removal in Phase 1 Pass 4 (CTO confirmed 2026-05-03) |
 | Payments (Stripe + Square + PayPal) | ✅ Live | Untested — no CI gates on money flows |
-| AlpacaPlayhouse residue (`/residents/`, IoT) | 🔴 Vestigial | Phase 1 (~100 files, ~53k lines) |
+| AlpacaPlayhouse residue (`/residents/`, IoT) | 🔴 Removal in progress | Phase 1 Pass 1 inventory complete; Pass 2 deletes ~37k LOC |
 | Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; Phases 3-4 migration |
 | Client portal | ⏳ Not built | Phase 5 greenfield |
 
 ## Known Limitations
 
-- ~30% of codebase is AlpacaPlayhouse residue with deep cross-refs (login default page, Stripe redirects, SignWell email URLs, PAI system prompt). Phase 1 surfaces these via page-by-page audit.
+- ~30% of codebase is AlpacaPlayhouse residue — Pass 1 inventory manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md` catalogs 149 unique files (~37k LOC) for Pass 2-4 removal.
 - No tests, no TypeScript, no CI gates on money handlers — addressed incrementally as each phase touches the relevant code.
-- Build artifacts `/.next/` and `/out/` tracked in git from a prior abandoned Next.js attempt — Phase 1 Pass 1 removes.
+- Build artifacts `/.next/` and `/out/` still tracked in git — gitignored 2026-05-03; Pass 2 Category 5 untracks + deletes.
 - Founder's personal Google account owns prod assets (Resend, R2, DO droplet) — bus-factor risk.
-- IA mid-refactor — Pillar model (Ranch / Within / Retreat / Venue) being introduced; events/schedule pages overlap. Should freeze before Phase 6.
+- IA mid-refactor — Pillar model (Ranch / Within / Retreat / Venue) being introduced; events/schedule pages overlap. Should freeze before Phase 6. Pass 3 tags each page with its pillar as it audits.
 
 ## Recent Changes (last 5)
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-03 | Phase 1 Pass 1 complete: 531-line alpaca inventory manifest + gitignore updates (154a1f59) | Miceli |
+| 2026-05-03 | Phase 1 implementation plan: 1824 lines, ~40 tasks across 6 passes (bc791a13) | Miceli |
+| 2026-05-03 | Phase 1 design spec — refines program spec §7 + Decisions 7+8 (ecd1ee73) | Miceli |
+| 2026-05-03 | Merged 47 teammate commits from origin/main: Within Center pages, Master Calendar, retreat sessions (6a557556) | Justin/Lauren via merge |
 | 2026-05-01 | Phase 0 complete: miceli reset to origin/main, AWKN docs + program spec restored (0fb33b6) | Miceli |
-| 2026-05-01 | Program-level spec: 8-phase cleanup + Next.js refactor (folded into 0fb33b6) | Miceli |
-| 2026-05-01 | Venue events: multi-space + date range + import 64 events from master sheet (8d9cfe2) | Justin DeLaCruz |
-| 2026-04-28 | AWKN ecosystem map — surface inventory, Next.js fit, phased roadmap (in 0fb33b6) | Miceli |
-| 2026-04-28 | Customize CLAUDE.md for AWKN, mark alpaca residue as vestigial (in 0fb33b6) | Miceli |
