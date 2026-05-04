@@ -1,6 +1,30 @@
 // Supabase client configuration with auth support
-const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+//
+// Runtime toggle: point at a local Supabase clone instead of prod.
+// Triggers (any one): ?local=1 URL param, localStorage key 'awkn_local_db'='true',
+// or window.AWKN_LOCAL_DB=true. Default = prod (unchanged behavior).
+// See docs/LOCAL-DEV.md.
+const useLocalDb = (typeof window !== 'undefined') && (
+  window.AWKN_LOCAL_DB === true ||
+  new URLSearchParams(window.location.search).get('local') === '1' ||
+  (typeof localStorage !== 'undefined' && localStorage.getItem('awkn_local_db') === 'true')
+);
+
+const PROD_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+const PROD_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+// Supabase CLI local stack defaults (stable across versions). Override via
+// window.AWKN_LOCAL_SUPABASE_URL / window.AWKN_LOCAL_ANON_KEY if your
+// `supabase start` printed different values.
+const LOCAL_URL = (typeof window !== 'undefined' && window.AWKN_LOCAL_SUPABASE_URL) || 'http://127.0.0.1:54321';
+const LOCAL_ANON_KEY = (typeof window !== 'undefined' && window.AWKN_LOCAL_ANON_KEY) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+
+const SUPABASE_URL = useLocalDb ? LOCAL_URL : PROD_URL;
+const SUPABASE_ANON_KEY = useLocalDb ? LOCAL_ANON_KEY : PROD_ANON_KEY;
+
+if (useLocalDb) {
+  console.log('[supabase.js] Local DB mode active — pointing at', SUPABASE_URL);
+}
 
 // Classic <script src=".../supabase.min.js"> tags in <body> always finish before
 // deferred module scripts start evaluating, so window.supabase.createClient is
@@ -21,7 +45,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     detectSessionInUrl: true,
     storage: window.localStorage,
-    storageKey: 'awkn-ranch-auth',
+    storageKey: useLocalDb ? 'awkn-ranch-auth-local' : 'awkn-ranch-auth',
     flowType: 'pkce',
   },
 });
