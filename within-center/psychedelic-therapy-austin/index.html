@@ -16,9 +16,11 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://within.center/psychedelic-therapy-austin/">
   <meta property="og:site_name" content="Within Center">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://within.center/images/hero.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Psychedelic Therapy in Austin, TX | Within Center">
   <meta name="twitter:description" content="Legal, ceremonial ketamine therapy in Austin, Texas — a psychedelic-assisted approach to anxiety, depression, trauma, and burnout.">
+  <meta name="twitter:image" content="https://within.center/images/hero.jpg">
 
   <script type="application/ld+json">
   {
@@ -29,6 +31,7 @@
     "url": "https://within.center/psychedelic-therapy-austin/",
     "telephone": "+1-512-969-2399",
     "email": "intake@within.center",
+    "image": "https://within.center/images/hero.jpg",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "7600 Stillridge Dr",
@@ -98,6 +101,298 @@
     ]
   }
   </script>
+
+  <style>
+    /* ── Trust strip under hero ────────────────────────── */
+    .trust-strip {
+      background: var(--dark);
+      color: rgba(255,255,255,0.78);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 3.5rem;
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(201,148,62,0.35);
+    }
+    .trust-strip span { display: inline-flex; align-items: center; gap: 0.55rem; }
+    .trust-strip span::before {
+      content: ''; width: 5px; height: 5px;
+      border-radius: 50%; background: var(--gold);
+      display: inline-block;
+    }
+
+    /* ── Conditions grid ───────────────────────────────── */
+    .conditions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .condition-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+    .condition-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(201,148,62,0.3);
+    }
+    .condition-card .condition-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--dark);
+      margin-bottom: 0.6rem;
+    }
+    .condition-card .condition-title em {
+      color: var(--gold); font-style: italic;
+    }
+    .condition-card p {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.75;
+    }
+    @media (max-width: 900px) {
+      .conditions-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .conditions-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Two-column comparison ─────────────────────────── */
+    .compare-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .compare-col {
+      padding: 2.5rem 2rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .compare-col.cold {
+      background: rgba(107,101,105,0.04);
+    }
+    .compare-col.warm {
+      background: var(--white);
+      border-color: rgba(201,148,62,0.35);
+      box-shadow: var(--shadow-md);
+    }
+    .compare-col h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-col.warm h3 em { color: var(--gold); font-style: italic; }
+    .compare-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .compare-col li {
+      padding: 0.85rem 0 0.85rem 1.5rem;
+      position: relative;
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+    .compare-col li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--grey);
+    }
+    .compare-col.warm li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 0.85rem;
+      top: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .compare-wrap { grid-template-columns: 1fr; }
+    }
+
+    /* ── Space block (image + text side by side) ───────── */
+    .space-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 460px;
+      background: var(--white);
+    }
+    .space-block-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .space-block-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 3.5rem;
+    }
+    .space-block-text .s-eyebrow { margin-bottom: 0.6rem; }
+    .space-block-text h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.7rem, 3vw, 2.2rem);
+      font-weight: 400;
+      color: var(--dark);
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+    .space-block-text h2 em { color: var(--gold); font-style: italic; }
+    .space-block-text p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 900px) {
+      .space-block { grid-template-columns: 1fr; }
+      .space-block-img { height: 320px; }
+      .space-block-text { padding: 3rem 2rem; }
+    }
+
+    /* ── Pull quote ────────────────────────────────────── */
+    .pull-quote {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    .pull-quote p {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--dark);
+      line-height: 1.5;
+    }
+    .pull-quote p em { color: var(--gold); }
+    .pull-quote .quote-mark {
+      display: block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 4rem;
+      color: var(--gold);
+      line-height: 0.5;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── FAQ accordion-style block ─────────────────────── */
+    .faq-block {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .faq-block h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 400;
+      color: var(--dark);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 1.75rem 0;
+    }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-item h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+    .faq-item p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin: 0;
+    }
+    .faq-block .faq-foot {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+    .faq-block .faq-foot a {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      border-bottom: 1px solid var(--gold);
+      padding-bottom: 0.25rem;
+    }
+
+    /* ── Final CTA ─────────────────────────────────────── */
+    .final-cta {
+      position: relative;
+      text-align: center;
+      padding: 7rem 2rem;
+      overflow: hidden;
+      background: var(--dark);
+    }
+    .final-cta-bg {
+      position: absolute; inset: 0;
+      background-image: url('../images/ceremony-space.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.3);
+    }
+    .final-cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+    .final-cta .eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .final-cta h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 1.25rem;
+      line-height: 1.15;
+    }
+    .final-cta p {
+      font-size: 0.98rem;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.85;
+      margin-bottom: 2.5rem;
+    }
+    .final-cta .cta-row {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    }
+    .final-cta .phone-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: rgba(255,255,255,0.95);
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 1.1rem 2.2rem;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 4px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .final-cta .phone-cta:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.5);
+    }
+  </style>
 </head>
 <body>
 
@@ -160,65 +455,140 @@
     </ul>
   </aside>
 
+  <!-- ── HERO ──────────────────────────────────────── -->
   <header class="page-hero" style="background-color:var(--dark);">
+    <div class="page-hero-bg" style="background-image:url('../images/hero.jpg');"></div>
     <div class="page-hero-inner">
-      <span class="page-hero-eyebrow">Psychedelic Therapy in Austin</span>
-      <h1>Psychedelic Therapy in Austin, Texas</h1>
-      <p class="lead">Legal, ceremonial ketamine therapy &mdash; the psychedelic-assisted path to healing anxiety, depression, trauma, and burnout. Held with intention, supported by integration, grounded in licensed medical care.</p>
+      <span class="page-hero-eyebrow">Psychedelic Therapy &middot; Austin, TX</span>
+      <h1>The Psychedelic Path to Healing in Austin</h1>
+      <p class="lead">Legal, ceremonial ketamine therapy &mdash; held with intention, supported by integration, grounded in licensed medical care. The only psychedelic-assisted therapy currently available in Texas.</p>
     </div>
   </header>
 
+  <!-- ── TRUST STRIP ───────────────────────────────── -->
+  <div class="trust-strip">
+    <span>FDA-Approved Medicine</span>
+    <span>Board-Certified Team</span>
+    <span>Free Consultation</span>
+    <span>Austin, Texas</span>
+  </div>
+
+  <!-- ── INTRO PROSE ───────────────────────────────── -->
   <section class="bg-white">
     <div class="prose">
       <p>If you have been searching for psychedelic therapy in Austin, you have likely found a confusing landscape. Headlines speak of psilocybin and MDMA breakthroughs, but most of those medicines remain federally restricted. The question becomes: what psychedelic-assisted therapy is actually available in Texas right now, and what is it like?</p>
-      <p>At Within Center, we offer ceremonial ketamine therapy &mdash; the only legal, psychedelic-assisted medicine available in Austin. Ketamine is FDA-approved, used safely for decades, and produces a non-ordinary state of consciousness similar in many ways to classical psychedelics. Held in the right container, with the right preparation and the right integration, it can do profound therapeutic work.</p>
+      <p>At Within Center, we offer ceremonial ketamine therapy &mdash; the only legal, psychedelic-assisted medicine available in Austin. Ketamine is FDA-approved, used safely in medicine for over fifty years, and produces a non-ordinary state of consciousness similar in many ways to classical psychedelics. Held in the right container, with the right preparation and the right integration, it can do profound therapeutic work.</p>
 
       <h2>What is psychedelic therapy?</h2>
       <p>Psychedelic-assisted therapy uses a non-ordinary state of consciousness &mdash; produced by a medicine like ketamine, psilocybin, MDMA, or DMT &mdash; as a doorway into deeper psychological work. The medicine quiets the mind's usual defenses. Old patterns can loosen. Long-held grief, anxiety, and stuck stories can be met with tenderness instead of resistance.</p>
       <p>What separates psychedelic therapy from recreational use is the framework: a careful preparation phase, an intentional session held by trained clinicians, and an integration phase afterward where insights become lasting change.</p>
-
-      <h2>Which psychedelic therapies are legal in Austin?</h2>
-      <p>Currently in Texas, only ketamine is legally available for therapeutic use outside of formal clinical trials. Psilocybin (psychedelic mushrooms), MDMA, DMT, and ayahuasca remain federally restricted. While some of these medicines are in late-stage clinical research, they are not yet a path you can walk in Austin.</p>
-      <p>Ketamine, by contrast, has been used safely in medicine since the 1970s. It received FDA recognition for treatment-resistant depression in 2019. When held ceremonially &mdash; with preparation, intention, and integration &mdash; it functions as a true psychedelic-assisted therapy.</p>
-
-      <h2>What we offer in Austin</h2>
-      <p>Within Center is located at 7600 Stillridge Dr, Austin, TX 78736 &mdash; a private wellness sanctuary in West Austin. Our work is led by a board-certified psychiatric team and supported by ceremonial guides trained specifically in psychedelic-assisted therapy.</p>
-      <p>We are not a clinic. We are a sacred container.</p>
-
-      <h2>Who psychedelic therapy is for</h2>
-      <p>Our clients come to us for many reasons &mdash; treatment-resistant anxiety or depression, unresolved trauma, burnout, grief, relationship strain, or a deeper calling they cannot yet name. What they share is a readiness: a willingness to stop managing symptoms and begin the real work of healing.</p>
-      <p>Psychedelic therapy is not for everyone, and we are honest about that. Your first step with us is a free consultation, where we listen first and help you decide whether this path is right for you.</p>
     </div>
   </section>
 
+  <!-- ── PULL QUOTE ────────────────────────────────── -->
   <section class="bg-cream">
-    <div class="container-wide">
-      <div style="text-align:center;">
-        <div class="s-eyebrow">Our Signature Experience</div>
-        <div class="s-title">Immerse in Your Healing</div>
-        <p class="s-desc centered">The deepest psychedelic-assisted work happens when you step away from everything. Live at AWKN Ranch &mdash; our private twelve-acre sanctuary outside Austin &mdash; with guided ceremonies, integration, daily wellness rituals, and a live-in team devoted to your healing.</p>
+    <div class="pull-quote">
+      <span class="quote-mark">&ldquo;</span>
+      <p>Ketamine, used at carefully chosen doses, opens a softer, more spacious state of awareness. In that opening, the nervous system can <em>regulate</em>. What was unreachable becomes reachable.</p>
+    </div>
+  </section>
+
+  <!-- ── CONDITIONS GRID ───────────────────────────── -->
+  <section class="bg-white">
+    <div class="container-wide" style="padding-top:5rem; padding-bottom:5rem;">
+      <div style="text-align:center; max-width:680px; margin:0 auto;">
+        <div class="s-eyebrow">What we work with</div>
+        <div class="s-title">Conditions Psychedelic Therapy Can Address</div>
+        <p class="s-desc centered">Ceremonial ketamine therapy is most often used to support people who have not found lasting relief through traditional approaches. Every client begins with a free clinical consultation.</p>
       </div>
-      <div style="text-align:center; margin-top:2rem; display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
-        <a href="../immersive-retreat/" class="awknhero-cta">6-Day Retreat</a>
-        <a href="../immersive-retreat/3-day/" class="awknhero-cta secondary" style="color:var(--dark); border-color:var(--dark);">3-Day Retreat</a>
+      <div class="conditions-grid">
+        <div class="condition-card">
+          <div class="condition-title">Treatment-Resistant <em>Depression</em></div>
+          <p>For people who have tried multiple medications and therapies without sustained relief. Ketamine works through a different mechanism &mdash; often producing change in days rather than months.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-title">Anxiety &amp; <em>Panic</em></div>
+          <p>Including generalized anxiety, social anxiety, and the chronic vigilance that follows trauma. Ceremonial sessions help the nervous system find safety again.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-title">PTSD &amp; <em>Complex Trauma</em></div>
+          <p>For survivors of acute or developmental trauma. The medicine creates distance from overwhelming material so it can be processed at a sustainable pace.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-title">Burnout &amp; <em>Existential Fatigue</em></div>
+          <p>The exhaustion that comes from years of pushing without rest, grief without time to feel it, or living a life that no longer fits.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-title">Grief &amp; <em>Loss</em></div>
+          <p>For loss that has not moved &mdash; the death of a loved one, the end of a relationship, or the loss of a self you used to be. Ceremonial work creates space to meet it.</p>
+        </div>
+        <div class="condition-card">
+          <div class="condition-title">Spiritual &amp; <em>Existential Work</em></div>
+          <p>For those drawn to deeper inner work who feel a calling toward meaning, purpose, or reconnection &mdash; even without a clinical diagnosis.</p>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- ── SPACE BLOCK (image + text) ────────────────── -->
+  <section class="space-block">
+    <img src="../images/ceremony-space.jpg" alt="Ceremonial therapy space at Within Center, Austin Texas" class="space-block-img">
+    <div class="space-block-text">
+      <span class="s-eyebrow">A held container</span>
+      <h2>This is not a clinic. This is a <em>sacred container</em>.</h2>
+      <p>Most ketamine treatment in Austin happens in a medical office &mdash; bright lights, a recliner, a 45-minute infusion, and a quick goodbye. That has its place. It is also not what we do.</p>
+      <p>At Within Center, every ceremony is held in an intentional space with soft light, music chosen by your guide, and a clinician beside you for the duration of the journey. Preparation comes first. Integration follows. The medicine is one part of a much larger arc.</p>
+    </div>
+  </section>
+
+  <!-- ── COMPARISON ────────────────────────────────── -->
+  <section class="bg-cream">
+    <div class="container-wide" style="padding-top:5rem; padding-bottom:5rem;">
+      <div style="text-align:center; max-width:680px; margin:0 auto;">
+        <div class="s-eyebrow">How we differ</div>
+        <div class="s-title">Most Ketamine Clinics vs. Within Center</div>
+        <p class="s-desc centered">Both follow medical protocols. Only one holds the medicine ceremonially.</p>
+      </div>
+      <div class="compare-wrap">
+        <div class="compare-col cold">
+          <h3>A typical ketamine clinic</h3>
+          <ul>
+            <li>Brief 40&ndash;60 minute IV infusion in a clinical room</li>
+            <li>Minimal preparation beyond medical screening</li>
+            <li>Limited or no integration support afterward</li>
+            <li>Treats ketamine as a medication, not a medicine journey</li>
+            <li>Goal: symptom reduction</li>
+          </ul>
+        </div>
+        <div class="compare-col warm">
+          <h3>Ceremonial ketamine at <em>Within Center</em></h3>
+          <ul>
+            <li>Multi-hour sessions held in a private ceremonial space</li>
+            <li>Intentional preparation, eyeshades, curated music, and a clinician held beside you</li>
+            <li>Built-in integration coaching to translate insight into lasting change</li>
+            <li>Treats ketamine as a psychedelic-assisted experience</li>
+            <li>Goal: transformation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PACKAGES ──────────────────────────────────── -->
   <section class="bg-white">
-    <div class="container-wide">
-      <div style="text-align:center;">
-        <div class="s-eyebrow">Day Experiences</div>
-        <div class="s-title">Psychedelic Therapy Without Overnight Stay</div>
-        <p class="s-desc centered">Live in or near Austin? Our day experience packages bring the same ceremonial care, clinical rigor, and integration support without overnight accommodations.</p>
+    <div class="container-wide" style="padding-top:5rem; padding-bottom:5rem;">
+      <div style="text-align:center; max-width:680px; margin:0 auto;">
+        <div class="s-eyebrow">Our packages</div>
+        <div class="s-title">Ways to Begin Your Psychedelic Therapy Journey</div>
+        <p class="s-desc centered">From a single ceremony to a full residential retreat. Each path is matched to where you are right now.</p>
       </div>
       <div class="package-grid">
 
         <div class="package-card">
-          <div class="package-name">AWKN</div>
-          <div class="package-sessions">Six guided ketamine ceremonies</div>
-          <div class="package-who">Ready for deep transformation and breakthrough. A six-ceremony container to move through what has kept you stuck and step into lasting change.</div>
-          <a href="../ceremonial-ketamine/awkn/" class="package-link">Learn More</a>
+          <div class="package-name">Discover</div>
+          <div class="package-sessions">One guided ketamine ceremony</div>
+          <div class="package-who">Curious about psychedelic therapy? A fully held introduction &mdash; explore the benefits of ceremonial ketamine and see what opens.</div>
+          <a href="../ceremonial-ketamine/discover/" class="package-link">Learn More</a>
         </div>
 
         <div class="package-card">
@@ -229,51 +599,78 @@
         </div>
 
         <div class="package-card">
-          <div class="package-name">Couples Reset</div>
-          <div class="package-sessions">One shared ceremony for two</div>
-          <div class="package-who">Rekindle and open up together. A shared ceremony designed to break down walls, restore connection, and deepen understanding with your significant other.</div>
-          <a href="../ceremonial-ketamine/twin-flame/" class="package-link">Learn More</a>
+          <div class="package-name">AWKN</div>
+          <div class="package-sessions">Six guided ketamine ceremonies</div>
+          <div class="package-who">Ready for deep transformation. A six-ceremony container to move through what has kept you stuck and step into lasting change.</div>
+          <a href="../ceremonial-ketamine/awkn/" class="package-link">Learn More</a>
         </div>
 
         <div class="package-card">
-          <div class="package-name">Discover</div>
-          <div class="package-sessions">One guided ketamine ceremony</div>
-          <div class="package-who">Curious about psychedelic therapy? This single ceremony is a fully held introduction &mdash; explore the benefits of ceremonial ketamine and see what opens.</div>
-          <a href="../ceremonial-ketamine/discover/" class="package-link">Learn More</a>
+          <div class="package-name">Couples Reset</div>
+          <div class="package-sessions">One shared ceremony for two</div>
+          <div class="package-who">Rekindle and open up together. A shared ceremony designed to break down walls, restore connection, and deepen understanding with your partner.</div>
+          <a href="../ceremonial-ketamine/twin-flame/" class="package-link">Learn More</a>
         </div>
 
+      </div>
+
+      <div style="text-align:center; margin-top:3.5rem;">
+        <p style="font-size:0.95rem; color:var(--grey); margin-bottom:1.5rem;">Looking for a fully residential experience?</p>
+        <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+          <a href="../immersive-retreat/" class="awknhero-cta">6-Day Retreat at AWKN Ranch</a>
+          <a href="../immersive-retreat/3-day/" class="awknhero-cta secondary" style="color:var(--dark); border-color:var(--dark);">3-Day Retreat</a>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- ── FAQ ───────────────────────────────────────── -->
   <section class="bg-cream">
-    <div class="prose">
-      <h2>Frequently asked questions about psychedelic therapy in Austin</h2>
+    <div class="faq-block">
+      <h2>Frequently asked questions</h2>
 
-      <h3>Is psychedelic therapy legal in Austin, Texas?</h3>
-      <p>Ketamine-assisted psychedelic therapy is legal in Austin and throughout Texas. Psilocybin, MDMA, and DMT are not currently legal for therapeutic use in Texas outside of formal clinical trials.</p>
+      <div class="faq-item">
+        <h3>Is psychedelic therapy legal in Austin, Texas?</h3>
+        <p>Ketamine-assisted psychedelic therapy is legal in Austin and throughout Texas. Psilocybin, MDMA, and DMT are not currently legal for therapeutic use in Texas outside of formal clinical trials.</p>
+      </div>
 
-      <h3>What conditions does psychedelic therapy treat?</h3>
-      <p>Treatment-resistant depression, anxiety, PTSD, complex trauma, burnout, grief, and existential or spiritual distress. Every client begins with a clinical consultation to determine whether the work is the right fit.</p>
+      <div class="faq-item">
+        <h3>What conditions does psychedelic therapy treat?</h3>
+        <p>Treatment-resistant depression, anxiety, PTSD, complex trauma, burnout, grief, and existential or spiritual distress. Every client begins with a clinical consultation to determine whether the work is the right fit.</p>
+      </div>
 
-      <h3>How is ceremonial ketamine therapy different from a ketamine clinic?</h3>
-      <p>Most ketamine clinics offer brief IV infusions in a clinical setting. Ceremonial ketamine therapy at Within Center is held as a psychedelic-assisted experience: longer sessions, intentional preparation, a held container, music, and integration coaching afterward &mdash; all under licensed medical supervision.</p>
+      <div class="faq-item">
+        <h3>How is ceremonial ketamine therapy different from a ketamine clinic?</h3>
+        <p>Most ketamine clinics offer brief IV infusions in a clinical setting. Ceremonial ketamine therapy at Within Center is held as a psychedelic-assisted experience: longer sessions, intentional preparation, a held container, music, and integration coaching afterward &mdash; all under licensed medical supervision.</p>
+      </div>
 
-      <h3>Do you offer psilocybin, MDMA, or DMT therapy in Austin?</h3>
-      <p>No. Psilocybin, MDMA, and DMT remain federally restricted and are not legally available for therapeutic use in Texas. We work exclusively with ketamine &mdash; the only legal psychedelic medicine currently available &mdash; held in a ceremonial, integration-supported framework.</p>
+      <div class="faq-item">
+        <h3>Do you offer psilocybin, MDMA, or DMT therapy in Austin?</h3>
+        <p>No. Psilocybin, MDMA, and DMT remain federally restricted and are not legally available for therapeutic use in Texas. We work exclusively with ketamine &mdash; the only legal psychedelic medicine currently available &mdash; held in a ceremonial, integration-supported framework.</p>
+      </div>
 
-      <h3>How much does psychedelic therapy in Austin cost?</h3>
-      <p>Within Center offers several packages, from a single-ceremony Discover experience to multi-ceremony arcs and full residential retreats at AWKN Ranch. Specific pricing is shared during your free consultation, where we help match you to the right level of care.</p>
+      <div class="faq-item">
+        <h3>How much does psychedelic therapy in Austin cost?</h3>
+        <p>Within Center offers several packages, from a single-ceremony Discover experience to multi-ceremony arcs and full residential retreats at AWKN Ranch. Specific pricing is shared during your free consultation, where we help match you to the right level of care.</p>
+      </div>
 
-      <p style="margin-top:2rem;"><a href="../faq/">Read more frequently asked questions &rarr;</a></p>
+      <div class="faq-foot">
+        <a href="../faq/">Read all FAQs &rarr;</a>
+      </div>
     </div>
   </section>
 
-  <section style="position:relative; text-align:center; padding:6rem 2rem; overflow:hidden; background:var(--dark);">
-    <div style="position:relative; z-index:1;">
-      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.2vw,2.2rem); font-weight:700; color:#fff; margin-bottom:0.75rem;">Begin Your Journey</h2>
-      <p style="font-size:0.95rem; color:rgba(255,255,255,0.7); max-width:480px; margin:0 auto 2rem; line-height:1.75;">Schedule a free consultation with our Austin team to learn whether psychedelic-assisted therapy is right for you. We will listen first.</p>
-      <a href="../contact/" class="awknhero-cta">Contact Us</a>
+  <!-- ── FINAL CTA ─────────────────────────────────── -->
+  <section class="final-cta">
+    <div class="final-cta-bg"></div>
+    <div class="final-cta-inner">
+      <span class="eyebrow">Begin Your Journey</span>
+      <h2>Schedule a Free Consultation</h2>
+      <p>Tell us what brought you here. We will listen first, and help you decide whether psychedelic-assisted therapy is the right path for you.</p>
+      <div class="cta-row">
+        <a href="../contact/" class="awknhero-cta">Contact Us</a>
+        <a href="tel:5129692399" class="phone-cta">Call 512-969-2399</a>
+      </div>
     </div>
   </section>
 
