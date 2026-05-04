@@ -9,14 +9,19 @@
 ### Spec amendment (do at start of Phase 1)
 - [ ] Spec §4 Decision 8 currently says "miceli periodically PRs to main." Per the actual model, miceli does NOT PR to main during this program. Single-line edit on Phase 1's first commit.
 
-### Phase 1 prerequisites — CTO answers needed before purge starts (@miceli)
+### Phase 1 prerequisites — CTO answers (@miceli)
 
-- [ ] **Vapi decommission — final ops-lead confirmation.** Approved in design; needs explicit "yes" from AWKN ops lead before code/edge-function deletion.
-- [ ] **Vehicles table fate** — Drop `vehicles` (Tesla-flavored) or keep for AWKN use (golf carts, employee fleet, guest assignment)?
-- [ ] **PAI's new identity** — If voice agents are decommissioned wholesale, this question goes away. If kept (ops lead disagrees with decommission), what should PAI be? (Retreat-guest concierge / staff CRM helper / something else)
+**Resolved 2026-05-03:**
+- [x] **Vapi decommission** — GO. Approved wholesale (Pass 4 unblocked).
+- [x] **Vehicles table** — DROP. Not needed for AWKN.
+- [x] **PAI's new identity** — moot (Vapi decommissioned wholesale).
+- [x] **Mac LaunchAgents** — all irrelevant. No Mac running background processes for AWKN. Pass 5 droplet-stop has no Mac side.
+
+**Still open (will surface during bit-by-bit review):**
 - [ ] **New default landing page** — Replaces `/residents/cameras.html` in `login/app.js:90`. Options: `/spaces/admin/`, role-aware, `/portal/`, master-schedule.
 - [ ] **profile.html destination** — Stripe (`create-payment-link/index.ts:128`) and SignWell (`signwell-webhook/index.ts:597,628,900`) email URLs depend on this.
-- [ ] **Alpaca Mac LaunchAgents** — `Sonos HTTP API`, `WiZ Proxy`, `Music Assistant`, `Printer Proxy`, `spirit-whisper-worker`, `sonos-schedule-runner` — confirm Mac can be turned off.
+
+**Process directive:** Phase 1 purge runs bit-by-bit — files reviewed in chunks with user before deletion, not bulk-deleted from manifest. Applies to all 6 passes, including Pass 1.
 
 ## Bugs (broken functionality)
 
