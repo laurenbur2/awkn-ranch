@@ -50,28 +50,6 @@ const media = await mediaService.uploadMedia(file, { category: 'mktg', caption: 
 await mediaService.linkMediaToSpace(media.id, spaceId, displayOrder);
 ```
 
-## Building Mobile App
-```bash
-cd mobile
-npm run sync            # Full rebuild + sync to both platforms
-npm run sync:ios        # Sync to one platform only
-npm run open:ios        # Opens Xcode — press Play (▶) to run
-npm run open:android    # Opens Android Studio — press Run
-```
-
-## Adding a New Mobile Tab Module
-```javascript
-// mobile/app/tabs/example-tab.js
-import { ExampleService } from '../../../shared/services/example-data.js';
-import { PollManager } from '../../../shared/services/poll-manager.js';
-let poll;
-export async function init(appUser) {
-  const container = document.getElementById('exampleContent');
-  poll = new PollManager(() => refreshData(), 30000);
-  poll.start();
-}
-```
-
 ## Sending SMS
 ```javascript
 import { smsService } from '../shared/sms-service.js';
@@ -101,8 +79,6 @@ const messages = await smsService.getConversation(personId);
 1. Check both card view and table view in consumer and admin views
 2. Test on mobile web (responsive breakpoint at 768px)
 3. Verify availability badges show correct dates
-4. **Mobile app**: After changing `shared/services/` or `mobile/app/` files, rebuild with `cd mobile && npm run sync`
-5. **Mobile app login**: Test both email/password and Google Sign In on both platforms
 
 ### Email Template Previewing
 

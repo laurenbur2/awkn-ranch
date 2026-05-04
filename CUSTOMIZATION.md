@@ -96,14 +96,6 @@ Tab visibility is controlled by `shared/feature-registry.js` and role permission
 | Admin | Settings, Brand, Templates, Accounting, SMS, Voice, DevControl |
 | Devices | Inventory, Purchases |
 
-### 9. Mobile App
-
-`mobile/` contains a Capacitor 8 wrapper (iOS + Android). Customize:
-- `mobile/capacitor.config.ts` — App ID, server URL
-- `mobile/android/.../AndroidManifest.xml` — Package name
-- `mobile/ios/.../Info.plist` — Bundle identifier
-- App icons and splash screens in platform-specific asset directories
-
 ## Checklist for New Organizations
 
 - [ ] Clone repo and run `/setup-alpacapps-infra`

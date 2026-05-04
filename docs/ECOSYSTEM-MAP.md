@@ -50,7 +50,7 @@ A precise deletion manifest (with cross-reference verification) is the next deli
 | Admin BOS (`laurenbur2.github.io/awkn-ranch/spaces/admin/`) | Vanilla HTML/JS + Tailwind v4 + Supabase | ~25-30 real admin pages (after alpaca purge) | The actual operating system | **Yes** — Postgres source of truth |
 | `/residents/` (vestigial) | Same shell | ~30+ pages | AlpacaPlayhouse tenant IoT | Scheduled for deletion |
 | `/within/emr/` | Same admin shell | scaffolding only | Within Center EMR (HIPAA territory) | TBD — currently leans on Tellescope |
-| `/pay/`, `/mobile/` | Same admin shell + Capacitor 8 | small | Payment links, mobile shell | Yes |
+| `/pay/` | Same admin shell | small | Payment links | Yes |
 | `/clauded/` | Same admin shell | small | Internal dev dashboard | Yes |
 
 ## Per-surface decision: where Next.js earns its complexity

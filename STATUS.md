@@ -36,7 +36,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 | Payments (Stripe + Square + PayPal) | ✅ Live | Untested — no CI gates on money flows. Stripe `create-payment-link` configured but 0 payments processed. |
 | SignWell webhook | 🟡 Empirically dead | Missing tables in prod; CTO question whether to delete or keep dormant |
 | AlpacaPlayhouse residue (`/residents/`, IoT) | ✅ Mostly removed | Pass 2 deleted ~38k LOC. Hot spots (property-ai IoT loaders, admin inventory.js) remain. |
-| Mobile app (`mobile/`) | 🟡 100% IoT | Has never shipped. CTO question whether to delete or preserve scaffolding. |
+| Mobile app (`mobile/`) | ✅ Deleted 2026-05-03 | 1.1MB Capacitor 8 + iOS + Android, 100% IoT, never shipped. CTO confirmed delete. |
 | `/directory/` page | 🟡 Phase 5 scaffolding | Schema mismatch in prod (app_users missing slug/bio/etc.); preserved for client portal rebuild |
 | Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; Phases 3-4 migration |
 | Client portal | ⏳ Not built | Phase 5 greenfield |
@@ -53,6 +53,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-03 | `mobile/` directory deleted (1.1MB Capacitor 8 + iOS + Android, 100% IoT, never shipped). Companion alpaca-skill `mobile-setup.md` reference removed. Doc references stripped from README, CUSTOMIZATION, PATTERNS, KEY-FILES, ECOSYSTEM-MAP. Resolves CTO question #4. | Miceli |
 | 2026-05-03 | Phase 1 Pass 2 ~85% complete: Tier 1 bulk deletes (build artifacts, /residents/, IoT pollers + edge functions, macOS dupes), Tier 2 surgery (login redirects, profile.html refs, shared shells, 24 admin context-switchers, 404 cleanup, branding rename, README + LICENSE rewrite, home-assistant-control delete). 17 commits, ~38k LOC removed. (`6267b816` → `a2cce3cd`) | Miceli |
 | 2026-05-03 | Empirical prod-DB audit via Supabase Management API: zero users with role=resident/associate; SignWell tables mostly missing; 0 stripe_payments ever; app_users schema mismatched with /directory/ query | Miceli |
 | 2026-05-03 | 4 manifest reclassifications: `/directory/`, `infra/`, `shared/resident-shell.js` as KEEP/Phase 5 scaffolding; `mobile/` escalated to CTO question | Miceli |

@@ -31,7 +31,6 @@ styles/        Tailwind v4 design tokens
 supabase/
   functions/   Edge functions
   migrations/  Database migrations
-mobile/        Capacitor iOS/Android app
 infra/         AWKN Ranch infra setup wizard
 docs/          Project documentation (load on demand per CLAUDE.md)
 ```

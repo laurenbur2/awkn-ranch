@@ -45,18 +45,6 @@
 - `glowforge-data.js` - Glowforge laser cutter status via `glowforge-control` edge function
 - `printer-data.js` - FlashForge 3D printer state + control via `printer-control` edge function
 
-## Mobile App (`/mobile/`)
-- `capacitor.config.ts` - App config (ID: `com.awknranch.app`, plugins, platform settings)
-- `scripts/copy-web.js` - Build script: copies web assets → www/, injects capacitor.js, patches redirects
-- `app/index.html` - App shell (loading overlay, login overlay, tab sections, bottom nav bar)
-- `app/mobile.css` - Dark theme stylesheet (all mobile CSS in one file)
-- `app/mobile-app.js` - Orchestrator (auth, tab switching, lazy loading via dynamic import())
-- `app/tabs/cameras-tab.js` - HLS camera feeds with quality switching, auto-reconnect
-- `app/tabs/music-tab.js` - Sonos zones: play/pause, volume, scenes, favorites
-- `app/tabs/lights-tab.js` - Govee groups: on/off, brightness, color presets
-- `app/tabs/climate-tab.js` - Nest thermostats: temp +/-, mode, eco toggle
-- `app/tabs/cars-tab.js` - Tesla vehicles: battery, lock/unlock, flash lights
-
 ## Payment Page (`/pay/`)
 - `index.html` - Self-service payment page for tenants (Stripe PaymentElement + manual methods)
 - URL params: `?amount=`, `?description=`, `?person_id=`, `?person_name=`, `?email=`, `?payment_type=`, `?reference_type=`, `?reference_id=`

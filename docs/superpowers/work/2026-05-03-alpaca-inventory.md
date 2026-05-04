@@ -263,25 +263,11 @@ Phase 1 action: **do not delete.** Phase 5 brainstorm input.
 - Line 442: function default `profileHref = '/residents/profile.html'`
 - Line 470: mobile nav `<a href="/residents/profile.html" ...>` — Open Question #2.
 
-### Mobile shell — ⚠️ ESCALATED 2026-05-03: whole-dir CTO question
+### Mobile shell — ✅ DELETED 2026-05-03 (whole directory)
 
-**Audit finding (2026-05-03):** the entire `mobile/` directory (1.1MB) is **100% IoT control scaffolding**. All 5 tabs in `mobile/app/tabs/` are IoT surfaces (cameras, music, lights, climate, cars). `mobile-app.js` orchestrates only those tabs. Apple Developer + Match cert repo never set up; app has never shipped. Only Justin/Lauren commits are bulk template-rename sweeps.
+**Audit finding (2026-05-03):** the entire `mobile/` directory (1.1MB) was **100% IoT control scaffolding**. All 5 tabs in `mobile/app/tabs/` were IoT surfaces (cameras, music, lights, climate, cars). `mobile-app.js` orchestrated only those tabs. Apple Developer + Match cert repo never set up; app never shipped. `music-tab.js` already had a broken import to the deleted `sonos-data.js` (f373917d).
 
-`mobile/app/tabs/music-tab.js` line 12 imports from `../../../shared/services/sonos-data.js` — that file was deleted in `f373917d` (Pass 2 batch 4), so the mobile app **no longer parses cleanly**.
-
-CTO question added to TODO.md: delete `mobile/` entirely vs. preserve as future client-portal scaffolding. If AWKN moves to Next.js per program spec, future mobile may use RN or PWA, so the Capacitor scaffolding may not be reusable anyway.
-
-#### mobile/app/tabs/music-tab.js (specific manifest reference)
-- Line 12: `} from '../../../shared/services/sonos-data.js';` — broken import after `f373917d`. Resolved by whichever decision the CTO makes on `mobile/` as a whole.
-
-#### mobile/fastlane/Appfile
-- Line 4: `app_identifier("com.alpacaplayhouse.app")`
-- Line 5: `# apple_id("rahulio@alpacaplayhouse.com")`
-
-#### mobile/fastlane/Matchfile
-- Line 5: `# git_url("https://github.com/rsonnad/alpacapps-certs.git")`
-- Line 7: `app_identifier("com.alpacaplayhouse.app")`
-- Line 8: `# username("rahulio@alpacaplayhouse.com")`
+CTO confirmed delete (2026-05-03). Capacitor 8 scaffolding has limited reuse value — future mobile likely RN or PWA per program spec. Companion file `.claude/skills/setup-alpacapps-infra/references/mobile-setup.md` removed in the same commit. Doc references stripped from `README.md`, `CUSTOMIZATION.md` §9, `docs/PATTERNS.md` (Building Mobile App + Adding Tab Module + Testing item 4), `docs/KEY-FILES.md`, `docs/ECOSYSTEM-MAP.md` surface table.
 
 ### Project meta-files
 
@@ -481,7 +467,7 @@ These directories/files are clearly Alpaca/IoT residue but didn't match the Step
 
 1. **`supabase/functions/lg-control/index.ts`** — IoT edge function for LG ThinQ. The regex includes `lg-poller` (no — actually only `blink|wiz_|music[_-]assistant`, `lg` is not a regex token at all). Internal contents say `LgControlRequest`, `applianceId`, `LG ThinQ` — none of those hit the regex. Catch via Tier 1 Category 4.
 
-2. **`mobile/app/tabs/cameras-tab.js`, `cars-tab.js`, `climate-tab.js`, `lights-tab.js`** — sibling IoT mobile tabs. Use terms like `vehicles`, `thermostats`, `Hls`, `loadVehicles`, `Govee` (capitalized — regex is case-sensitive and matched `govee` only when lowercase elsewhere; the JSDoc on `lights-tab.js` says "Govee" capital-G which doesn't hit `govee`). All four are IoT mobile tab residue. Pass 2: include with `mobile/app/tabs/music-tab.js` deletion.
+2. **`mobile/app/tabs/cameras-tab.js`, `cars-tab.js`, `climate-tab.js`, `lights-tab.js`** — sibling IoT mobile tabs. Use terms like `vehicles`, `thermostats`, `Hls`, `loadVehicles`, `Govee` (capitalized — regex is case-sensitive and matched `govee` only when lowercase elsewhere; the JSDoc on `lights-tab.js` says "Govee" capital-G which doesn't hit `govee`). All four were IoT mobile tab residue. ✅ Resolved 2026-05-03: entire `mobile/` directory deleted.
 
 3. **`auth/tesla/`** (referenced in 404.html line 55, feature-manifest line 297) — Tesla OAuth callback dir. Should also be Tier 1.
 
