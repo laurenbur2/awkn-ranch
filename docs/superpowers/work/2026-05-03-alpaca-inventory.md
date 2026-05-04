@@ -333,8 +333,18 @@ Self-referential — these docs describe the alpaca-purge plan or list residue. 
 
 ### Other admin / app surfaces
 
-#### directory/app.js
-- Line 165: `<a href="/residents/profile.html">Edit Profile</a>` — Open Question #2.
+#### directory/app.js — ⚠️ RECLASSIFIED 2026-05-03: Phase 5 scaffolding, NOT residue
+
+The whole `/directory/` system (`directory/index.html`, `directory/app.js`, `directory/styles.css`) is **incomplete scaffolding for AWKN's planned client profile feature**. Confirmed by user 2026-05-03: profiles were intentionally scaffolded for AWKN but never finished.
+
+- `directory/index.html` is AWKN-branded (`<title>AWKN Ranch</title>`, AWKN site CSS).
+- `directory/app.js` queries `app_users` for `slug, bio, pronouns, instagram, gender, whatsapp, phone2, birthday, links, nationality, location_base, privacy_settings` — **none of those columns exist on `app_users` in prod today** (verified via Supabase Management API). The page returns PostgREST 400 in prod; non-functional.
+
+Phase 1 action: **do not delete.** Pass 2 surgery completed in `3d0c8a7f`:
+- Stripped the broken `<a href="/residents/profile.html">Edit Profile</a>` at line 165.
+- Added `TODO(Phase 5)` comment so the schema gap is discoverable when client portal lands.
+
+Phase 5 brainstorm input: the missing `app_users` columns and the now-deleted `/residents/profile.html` editor UX are inputs to the client portal scope.
 
 #### clauded/sessions.html
 - Line 359: `'https://claude-sessions.your-app.workers.dev'` — Cloudflare Worker URL with `your-app` placeholder. Rename.
