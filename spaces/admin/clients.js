@@ -1271,8 +1271,9 @@ function renderPackageList(pkgs) {
     const unscheduled = sessions.filter(s => s.status === 'unscheduled').length;
     const statusColor = p.status === 'active' ? '#16a34a' : (p.status === 'completed' ? '#64748b' : '#dc2626');
     return `
-      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:6px;">
+      <div style="position:relative;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <button data-action="remove-package" data-package-id="${p.id}" title="Remove package" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:var(--text-muted,#bbb);font-size:16px;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#b91c1c';" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted,#bbb)';">&times;</button>
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:6px;padding-right:28px;">
           <div>
             <div style="font-weight:600;font-size:14px;">${escapeHtml(p.name)}</div>
             <div style="font-size:11px;color:var(--text-muted,#888);text-transform:capitalize;">${escapeHtml(p.occupancy_rate)} &middot; ${formatPriceCents(p.price_cents)}${p.paid_at ? ' &middot; paid' : ' &middot; unpaid'}</div>
@@ -1290,6 +1291,33 @@ function renderPackageList(pkgs) {
       </div>
     `;
   }).join('');
+}
+
+async function removeClientPackage(packageId) {
+  const pkg = packages.find(p => p.id === packageId);
+  if (!pkg) { showToast('Package not found', 'error'); return; }
+  const sessions = pkg.sessions || [];
+  const done = sessions.filter(s => s.status === 'completed').length;
+  const scheduled = sessions.filter(s => s.status === 'scheduled').length;
+
+  let warning = `Remove "${pkg.name}"? This cannot be undone.`;
+  if (sessions.length) warning += `\n\nAll ${sessions.length} session${sessions.length === 1 ? '' : 's'} on this package will be deleted.`;
+  if (done) warning += `\n⚠ ${done} completed session${done === 1 ? '' : 's'} on record will be removed.`;
+  if (scheduled) warning += `\n⚠ ${scheduled} scheduled session${scheduled === 1 ? ' will lose its' : 's will lose their'} package link (the booking itself stays).`;
+  warning += `\n\nLinked retreat stays and agreements stay intact — they just lose the link to this package.`;
+
+  if (!confirm(warning)) return;
+
+  const leadId = pkg.lead_id;
+  const { error } = await supabase.from('client_packages').delete().eq('id', packageId);
+  if (error) {
+    console.error('Remove package error:', error);
+    showToast(error.message || 'Failed to remove package', 'error');
+    return;
+  }
+  showToast('Package removed', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
 }
 
 function sessionPillBg(status) {
@@ -1318,8 +1346,9 @@ function renderStayList(clientStays) {
   return clientStays.map(s => {
     const statusColor = s.status === 'active' ? '#16a34a' : (s.status === 'upcoming' ? '#4338ca' : (s.status === 'completed' ? '#64748b' : '#dc2626'));
     return `
-      <div style="border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+      <div style="position:relative;border:1px solid var(--border-color,#e5e5e5);border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+        <button data-action="remove-stay" data-stay-id="${s.id}" title="Remove stay" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:var(--text-muted,#bbb);font-size:16px;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;padding:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#b91c1c';" onmouseout="this.style.background='transparent';this.style.color='var(--text-muted,#bbb)';">&times;</button>
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;padding-right:28px;">
           <div>
             <div style="font-weight:600;font-size:14px;">${escapeHtml(getBedLabel(s.bed_id))}</div>
             <div style="font-size:12px;color:var(--text-muted,#666);margin-top:2px;">
@@ -1332,6 +1361,25 @@ function renderStayList(clientStays) {
       </div>
     `;
   }).join('');
+}
+
+async function removeClientStay(stayId) {
+  const stay = stays.find(s => s.id === stayId);
+  if (!stay) { showToast('Stay not found', 'error'); return; }
+  const dateRange = `${formatDate(stay.check_in_at)} \u2192 ${formatDate(stay.check_out_at)}`;
+  const bedLabel = stay.bed_id ? getBedLabel(stay.bed_id) : 'Unassigned';
+  if (!confirm(`Remove this retreat stay?\n\n${bedLabel}\n${dateRange}\n\nThis cannot be undone. The room will free up on the calendar.`)) return;
+
+  const leadId = stay.lead_id;
+  const { error } = await supabase.from('client_stays').delete().eq('id', stayId);
+  if (error) {
+    console.error('Remove stay error:', error);
+    showToast(error.message || 'Failed to remove stay', 'error');
+    return;
+  }
+  showToast('Stay removed', 'success');
+  await loadClientsData();
+  openClientDetail(leadId);
 }
 
 // ---------- Integration Notes (EMR-style chart notes) ----------
@@ -3570,7 +3618,27 @@ function renderBookingPickerSessionStep() {
     }
   }
 
-  const rows = unscheduled.length
+  // Add-on services pulled from the package catalog (slug starts with addon_).
+  // These let staff book one-off sessions (massage, sound journey, etc.) that
+  // aren't pre-paid on the client's package \u2014 picking one creates a fresh
+  // unscheduled session credit on their newest active package, then routes
+  // straight into the schedule modal.
+  const activeClientPkgs = getClientPackages(client.id).filter(p => p.status === 'active');
+  const targetPkg = activeClientPkgs[0] || null;
+  const addonOptions = (allServicePackages || [])
+    .filter(p => p.is_active && p.slug && p.slug.startsWith('addon_'))
+    .map(p => {
+      const items = packageItemsByPkgId.get(p.id) || [];
+      const svcId = items[0]?.service_id;
+      const svc = svcId ? services.find(x => x.id === svcId) : null;
+      return svc ? { pkgName: p.name, service: svc } : null;
+    })
+    .filter(Boolean)
+    // Hide add-ons whose service already has an unscheduled credit on the
+    // package \u2014 staff would just pick the existing credit row above.
+    .filter(opt => !unscheduled.some(u => u.session.service_id === opt.service.id));
+
+  const sessionRows = unscheduled.length
     ? unscheduled.map(({ session, pkg }) => {
         const svc = services.find(x => x.id === session.service_id);
         return `
@@ -3583,7 +3651,36 @@ function renderBookingPickerSessionStep() {
           </button>
         `;
       }).join('')
-    : `<div style="padding:20px;text-align:center;color:var(--text-muted,#888);font-size:13px;">No unscheduled sessions on this client\u2019s packages.</div>`;
+    : `<div style="padding:14px 12px;text-align:center;color:var(--text-muted,#888);font-size:13px;background:var(--bg,#faf9f6);border-radius:8px;">No unscheduled session credits on this client\u2019s packages.</div>`;
+
+  const addonRows = addonOptions.length
+    ? addonOptions.map(({ pkgName, service }) => {
+        const disabled = !targetPkg;
+        return `
+          <button type="button" class="crm-btn" ${disabled ? 'disabled' : `data-picker-addon-service="${service.id}"`} style="display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:#fff;${disabled ? 'opacity:.55;cursor:not-allowed;' : ''}">
+            <span>
+              <span style="font-weight:600;">${escapeHtml(service.name)}</span>
+              <span style="color:var(--text-muted,#888);font-size:12px;margin-left:8px;">${service.duration_minutes || 60} min</span>
+            </span>
+            <span style="font-size:12px;color:var(--text-muted,#666);">${escapeHtml(pkgName)}</span>
+          </button>
+        `;
+      }).join('')
+    : '';
+
+  const addonNote = addonOptions.length && !targetPkg
+    ? `<div style="margin-top:6px;font-size:11px;color:#b4691f;">Add an active package to this client first to book an add-on.</div>`
+    : '';
+
+  const rows = `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin:0 0 8px;">Unscheduled credits</div>
+    ${sessionRows}
+    ${addonRows ? `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted,#888);margin:14px 0 8px;">Add-ons (one-off)</div>
+      ${addonRows}
+      ${addonNote}
+    ` : ''}
+  `;
 
   const timeLabel = pickerPrefilledStart ? formatPrefilledStartLabel(pickerPrefilledStart) : 'No time selected';
 
@@ -3624,6 +3721,33 @@ function renderBookingPickerSessionStep() {
       pickerSelectedClientId = null;
       pickerClientSearch = '';
       openScheduleSessionModal(sessionId, { prefilledStart, returnTo: 'schedule' });
+    });
+  });
+  modal.querySelectorAll('[data-picker-addon-service]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const serviceId = btn.dataset.pickerAddonService;
+      const clientId = pickerSelectedClientId;
+      const prefilledStart = pickerPrefilledStart;
+      const activePkgs = getClientPackages(clientId).filter(p => p.status === 'active');
+      const pkg = activePkgs[0];
+      if (!pkg) { showToast('Add an active package to this client first.', 'error'); return; }
+      btn.disabled = true;
+      const insertRes = await supabase
+        .from('client_package_sessions')
+        .insert({ package_id: pkg.id, service_id: serviceId, status: 'unscheduled' })
+        .select()
+        .single();
+      if (insertRes.error) {
+        console.error('Add-on credit insert error:', insertRes.error);
+        showToast(insertRes.error.message || 'Failed to add session credit', 'error');
+        btn.disabled = false;
+        return;
+      }
+      pickerPrefilledStart = null;
+      pickerSelectedClientId = null;
+      pickerClientSearch = '';
+      await loadClientsData();
+      openScheduleSessionModal(insertRes.data.id, { prefilledStart, returnTo: 'schedule' });
     });
   });
 }
@@ -5218,6 +5342,14 @@ function handlePanelClicks(e) {
     }
     if (action === 'send-invoice-confirm') {
       handleSendInvoiceConfirm(actionBtn.dataset.proposalId, currentDrawerLeadId, actionBtn);
+      return;
+    }
+    if (action === 'remove-package') {
+      removeClientPackage(actionBtn.dataset.packageId);
+      return;
+    }
+    if (action === 'remove-stay') {
+      removeClientStay(actionBtn.dataset.stayId);
       return;
     }
     const leadId = actionBtn.dataset.clientId;

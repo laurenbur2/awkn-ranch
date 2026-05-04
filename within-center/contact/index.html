@@ -69,7 +69,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      gap: 2rem;
     }
+    .cta-block { display: flex; flex-direction: column; }
+    .cta-block + .cta-block { padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
     .contact-cta-card .eyebrow {
       font-size: 0.55rem;
       letter-spacing: 0.3em;
@@ -90,7 +93,7 @@
       font-size: 0.92rem;
       color: rgba(255,255,255,0.7);
       line-height: 1.7;
-      margin-bottom: 1.75rem;
+      margin-bottom: 1.5rem;
     }
     .contact-cta-card .btn {
       display: inline-block;
@@ -101,11 +104,118 @@
       font-weight: 600;
       color: #fff;
       background: var(--gold);
+      border: none;
       border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
       align-self: flex-start;
       transition: background 0.3s, transform 0.3s;
     }
     .contact-cta-card .btn:hover { background: var(--gold-dark); transform: translateY(-2px); }
+
+    /* ── CONTACT MODAL ── */
+    .contact-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      overflow-y: auto;
+    }
+    .contact-modal.open { display: flex; }
+    .contact-modal-inner {
+      position: relative;
+      background: #fff;
+      max-width: 560px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 2.4rem 2rem 1.8rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .contact-modal-close {
+      position: absolute;
+      top: 0.8rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: #888;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .contact-modal-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--dark);
+      text-align: center;
+    }
+    .contact-modal-sub {
+      font-size: 0.85rem;
+      color: var(--grey);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .contact-form .full { grid-column: 1 / -1; }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: var(--dark);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus { outline: none; border-color: var(--gold); }
+    .contact-form textarea { min-height: 110px; resize: vertical; font-family: 'Inter', sans-serif; }
+    .contact-form-submit {
+      margin-top: 0.4rem;
+      padding: 0.85rem 2rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #fff;
+      background: var(--gold);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .contact-form-submit:hover { background: var(--gold-dark); transform: translateY(-1px); }
+    @media (max-width: 520px) {
+      .contact-form { grid-template-columns: 1fr; }
+    }
+    .contact-modal-thanks { text-align: center; padding: 1.2rem 0 0.5rem; }
+    .contact-modal-thanks-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      color: var(--gold);
+    }
+    .contact-modal-thanks-icon svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .contact-modal-thanks p {
+      max-width: 380px;
+      margin: 0 auto 1.6rem;
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
 
     .map-section {
       padding: 5rem 2rem;
@@ -232,10 +342,18 @@
     </div>
 
     <div class="contact-cta-card">
-      <div class="eyebrow">Ready to Begin?</div>
-      <h3>Schedule a free consultation.</h3>
-      <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
-      <a href="../book-a-call/" class="btn">Book a Call</a>
+      <div class="cta-block">
+        <div class="eyebrow">Ready to Begin?</div>
+        <h3>Schedule a free consultation.</h3>
+        <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
+        <a href="../book-a-call/" class="btn">Book a Call</a>
+      </div>
+      <div class="cta-block">
+        <div class="eyebrow">Have a Question?</div>
+        <h3>Send us a message.</h3>
+        <p>Share what&rsquo;s on your mind and we&rsquo;ll get back to you within one business day.</p>
+        <button type="button" class="btn" onclick="document.getElementById('contactFormModal').classList.add('open')">Send Us a Message</button>
+      </div>
     </div>
 
   </div>
@@ -266,12 +384,94 @@
     </div>
   </section>
 
+  <!-- ── CONTACT FORM MODAL ── -->
+  <div id="contactFormModal" class="contact-modal" onclick="if(event.target===this)closeContactModal()">
+    <div class="contact-modal-inner">
+      <button type="button" class="contact-modal-close" onclick="closeContactModal()" aria-label="Close">&times;</button>
+      <div id="contactFormBody">
+        <div class="contact-modal-title">Send Us a Message</div>
+        <div class="contact-modal-sub">We respond within one business day.</div>
+        <form id="contactForm" class="contact-form" onsubmit="submitContactForm(event)">
+          <input type="text" id="cfFirstName" placeholder="First Name" required>
+          <input type="text" id="cfLastName" placeholder="Last Name" required>
+          <input type="tel" id="cfPhone" placeholder="Phone Number">
+          <input type="email" id="cfEmail" placeholder="Email" required>
+          <input type="text" id="cfCity" placeholder="City">
+          <input type="text" id="cfState" placeholder="State">
+          <textarea class="full" id="cfMessage" placeholder="What are you struggling with?" required></textarea>
+          <div class="full" style="text-align:center;">
+            <button type="submit" class="contact-form-submit">Send Message</button>
+          </div>
+        </form>
+      </div>
+      <div id="contactFormThanks" class="contact-modal-thanks" style="display:none;">
+        <div class="contact-modal-thanks-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="contact-modal-title">Thank you.</div>
+        <p>We&rsquo;ve received your message. Someone from our team will reach out shortly.</p>
+        <button type="button" class="contact-form-submit" onclick="closeContactModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="medical-disclaimer">
     <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
     <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
   </footer>
 
   <script>
+    function submitContactForm(e) {
+      e.preventDefault();
+      var form = document.getElementById('contactForm');
+      var submitBtn = form.querySelector('.contact-form-submit');
+      var originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      var data = new FormData();
+      data.append('First Name', document.getElementById('cfFirstName').value.trim());
+      data.append('Last Name', document.getElementById('cfLastName').value.trim());
+      data.append('Phone', document.getElementById('cfPhone').value.trim());
+      data.append('email', document.getElementById('cfEmail').value.trim());
+      data.append('City', document.getElementById('cfCity').value.trim());
+      data.append('State', document.getElementById('cfState').value.trim());
+      data.append('Message', document.getElementById('cfMessage').value.trim());
+      data.append('_subject', 'New inquiry from Within Center contact form');
+      data.append('_autoresponse', "Thank you for reaching out to Within Center.\n\nWe've received your message and a member of our team will be in touch with you shortly.\n\nIf your need is urgent, please call us at 512-969-2399.\n\n— The Within Center Team");
+      data.append('_template', 'table');
+      data.append('_captcha', 'false');
+
+      fetch('https://formsubmit.co/ajax/intake@within.center', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      })
+      .then(function(resp){ if (!resp.ok) throw new Error('submit failed'); return resp.json(); })
+      .then(function(){
+        document.getElementById('contactFormBody').style.display = 'none';
+        document.getElementById('contactFormThanks').style.display = '';
+      })
+      .catch(function(){
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        alert('Something went wrong. Please try again or call 512-969-2399.');
+      });
+    }
+    function closeContactModal() {
+      var modal = document.getElementById('contactFormModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      setTimeout(function(){
+        document.getElementById('contactFormBody').style.display = '';
+        document.getElementById('contactFormThanks').style.display = 'none';
+        var form = document.getElementById('contactForm');
+        if (form) form.reset();
+      }, 250);
+    }
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeContactModal();
+    });
     (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
     (function(){
       var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');

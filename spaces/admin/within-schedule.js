@@ -27,6 +27,7 @@ let weekAnchor = startOfWeek(new Date()); // Sunday at 00:00 of the current week
 let sessions = [];                         // raw rows for the visible window
 let meals = [];                            // house_meals rows for the visible window
 let services = [];                         // service catalog for display + classification
+let addonServiceIds = new Set();           // service IDs flagged as add-ons (slug starts with addon_)
 let allSpaces = [];                        // every space the admin can put a session in
 let editingMealId = null;                  // set when the meal modal is in edit mode
 let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
@@ -57,6 +58,10 @@ let suppressNextClick = false;
       bindMealModal();
       await loadServices();
       await loadSpaces();
+      // Now that services + spaces are loaded, fill the New Session dropdowns.
+      // (bindNewSessionModal only attaches event listeners; it can't populate
+      // the option lists because the data isn't fetched until here.)
+      populateNewSessionDropdowns();
       await loadStaffAndFacilitators();
       await loadAndRender();
       // Refresh every 60s so the now-line updates and any new bookings appear.
@@ -79,8 +84,39 @@ async function loadSpaces() {
 }
 
 async function loadServices() {
-  const { data } = await supabase.from('services').select('id, slug, name, duration_minutes');
-  services = data || [];
+  // Active services only, sorted for stable UI.
+  const svcRes = await supabase
+    .from('services')
+    .select('id, slug, name, duration_minutes, is_active, sort_order')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true, nullsFirst: false })
+    .order('name');
+  services = svcRes.data || [];
+
+  // Resolve which services are wired to an add-on package (slug starts with
+  // addon_) so the Service dropdown can group them as "Add-ons" instead of
+  // mixing them with the core ketamine/integration list. Two-step query
+  // (parent then items) — avoids fragile join-filter syntax. If anything
+  // goes wrong here, the dropdown still renders as a flat "Sessions" list.
+  try {
+    const pkgRes = await supabase
+      .from('crm_service_packages')
+      .select('id, slug')
+      .like('slug', 'addon_%');
+    const addonPkgIds = (pkgRes.data || []).map(p => p.id);
+    if (addonPkgIds.length) {
+      const itemsRes = await supabase
+        .from('crm_service_package_items')
+        .select('service_id')
+        .in('package_id', addonPkgIds);
+      addonServiceIds = new Set((itemsRes.data || []).map(r => r.service_id));
+    } else {
+      addonServiceIds = new Set();
+    }
+  } catch (err) {
+    console.warn('Add-on classification failed; treating all services as core:', err);
+    addonServiceIds = new Set();
+  }
 }
 
 // Pull meals for the visible Sun–Sat window. Inclusive on both ends because
@@ -859,6 +895,54 @@ function hhmmFromTime(timeStr) {
 // ============================================================================
 // New Session modal — create a scheduling_bookings row + check conflicts
 // ============================================================================
+// Fill the Service + Space <select>s using the data fetched after boot.
+// Called from onReady AFTER loadServices/loadSpaces resolve, since the bind
+// step (event listeners) has to run synchronously and runs before the data
+// is available.
+function populateNewSessionDropdowns() {
+  // Service dropdown — split into Sessions vs Add-ons. Membership is driven
+  // by which services are attached to an addon_* package in the catalog
+  // (loadServices populates addonServiceIds).
+  const svcSel = document.getElementById('nsService');
+  if (svcSel) {
+    const sessionSvcs = services.filter(s => !addonServiceIds.has(s.id));
+    const addonSvcs   = services.filter(s =>  addonServiceIds.has(s.id));
+    const renderSvcOption = s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration_minutes} min)</option>`;
+    svcSel.innerHTML = '<option value="">— Select service —</option>'
+      + (sessionSvcs.length
+          ? `<optgroup label="Sessions">${sessionSvcs.map(renderSvcOption).join('')}</optgroup>`
+          : '')
+      + (addonSvcs.length
+          ? `<optgroup label="Add-ons">${addonSvcs.map(renderSvcOption).join('')}</optgroup>`
+          : '');
+  }
+
+  // Space dropdown — group Ceremonial (Temple / Dome), Yurts, Wellness
+  // Rooms. Plus an "Other" escape hatch for unusual locations that aren't
+  // real spaces.
+  const spcSel = document.getElementById('nsSpace');
+  if (spcSel) {
+    const wellnessSpaces = allSpaces.filter(s => s.booking_category === 'wellness_room');
+    const yurtSpaces     = allSpaces.filter(s => /yurt/i.test(s.name));
+    const ceremonialSpaces = allSpaces.filter(s =>
+      s.booking_category === 'rental_space' && !yurtSpaces.includes(s)
+    );
+    const otherSpaces = allSpaces.filter(s =>
+      !wellnessSpaces.includes(s) && !yurtSpaces.includes(s) && !ceremonialSpaces.includes(s)
+    );
+    const renderSpcOption = s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`;
+    const groups = [
+      { label: 'Ceremonial',     items: ceremonialSpaces },
+      { label: 'Yurts',          items: yurtSpaces },
+      { label: 'Wellness Rooms', items: wellnessSpaces },
+      { label: 'Other',          items: otherSpaces },
+    ].filter(g => g.items.length);
+    spcSel.innerHTML = '<option value="">— Select a space —</option>'
+      + groups.map(g => `<optgroup label="${esc(g.label)}">${g.items.map(renderSpcOption).join('')}</optgroup>`).join('')
+      + '<option value="__other__">Other (specify location)</option>';
+  }
+}
+
 function bindNewSessionModal() {
   document.getElementById('nsClose')?.addEventListener('click', closeNewSessionModal);
   document.getElementById('nsCancel')?.addEventListener('click', closeNewSessionModal);
@@ -867,17 +951,8 @@ function bindNewSessionModal() {
   });
   document.getElementById('nsSave')?.addEventListener('click', saveNewSession);
 
-  // Service dropdown
   const svcSel = document.getElementById('nsService');
-  svcSel.innerHTML = '<option value="">— Select service —</option>'
-    + services.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration_minutes} min)</option>`).join('');
-
-  // Space dropdown — list every session-capable + rentable space, plus an
-  // "Other" option that reveals a free-text location field.
   const spcSel = document.getElementById('nsSpace');
-  spcSel.innerHTML = '<option value="">— Select a space —</option>'
-    + allSpaces.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')
-    + '<option value="__other__">Other (specify location)</option>';
 
   // Show/hide the Other location text field based on selection
   spcSel.addEventListener('change', () => {

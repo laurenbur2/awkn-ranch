@@ -117,15 +117,16 @@
                calendar grid + stats render inside the iframe). The standalone
                page at retreat-house.html still works for users who navigate
                there directly. -->
-          <div class="res-panel active" id="panelHouse">
+          <div class="res-panel" id="panelHouse">
             <iframe id="houseStaysFrame"
                     src="retreat-house.html?embed=1&pillar=master"
                     style="width:100%; min-height: 1200px; border: none; background: transparent;"
                     title="Per-bed retreat house calendar"></iframe>
           </div>
 
-          <!-- Rental Spaces Calendar -->
-          <div class="res-panel" id="panelRentals">
+          <!-- Rental Spaces Calendar — default visible panel (matches the
+               Spaces sub-tab being the leftmost + active button above). -->
+          <div class="res-panel active" id="panelRentals">
             <div class="res-calendar" id="calRentals"></div>
           </div>
 
