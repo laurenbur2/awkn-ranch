@@ -54,7 +54,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] Chunk 3: Operations — 4 pages audited, zero deletions (rentals/projects/highlights-order are real AWKN; spaces.html is another legacy redirect)
   - [x] Chunk 4: CRM/sales — 5 pages audited, zero deletions (all mainline AWKN: crm, clients, packages, purchases, memberships). Tech-debt flagged: 6 hardcoded anon keys in crm.js + clients.js.
   - [x] Chunk 5: Schedule — 4 pages audited, zero deletions (events/scheduling/planlist/reservations all mainline AWKN). 3 flagged for Phase 6 Pillar IA consolidation.
-  - [ ] Chunk 6: People + Settings (`staff`, `users`, `job-titles`, `worktracking`, `settings`, `accounting`, `brand`, `templates`, `passwords`, `releases`)
+  - [x] Chunk 6: People + Settings — 10 pages audited, zero deletions. `brand.html` confirmed as 5th intentional legacy redirect (joins testdev/devcontrol/manage/spaces). Minor branding inconsistency noted in worktracking/accounting titles for Pass 6.
   - [ ] Chunk 7: Pillar landings + misc (`venue-*`, `within-schedule`, `retreat-house`, `dashboard`, `index`, `media`, `sms-messages`)
 - [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed). **Includes wholesale delete of `supabase/functions/property-ai/index.ts`** (4019 lines, was Pass 2 hot spot until reclassified).
 - [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)

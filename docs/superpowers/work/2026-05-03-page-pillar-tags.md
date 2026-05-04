@@ -81,3 +81,24 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 **Pillar consolidation note (Phase 6 input):** This cluster includes 3 of the 5 pages flagged in TODO.md cross-cutting for "Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`." Pass 3 tags but doesn't decide. Decision belongs in Pillar IA work.
 
 **No same-commit code changes** — chunk 5 is audit-only.
+
+## Chunk 6 — People + Settings cluster (audited 2026-05-03)
+
+**Outcome: zero deletions, zero IoT residue.** All 10 pages are mainline AWKN admin/team surfaces. `brand.html` confirmed as the 5th intentional legacy redirect (joining testdev/devcontrol/manage/spaces).
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `staff.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 340 LOC. Staff directory; respects `app_users.privacy_phone` / `privacy_bio` (values: public/residents/private). |
+| `users.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 2218 LOC. User management admin. Tab `users` in admin section. |
+| `job-titles.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 476 LOC. CRUD for title records + permission bundles via `get_effective_permissions`. |
+| `worktracking.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 1467 LOC. "Hours — Manage associate time entries, rates, and payments." Tab `hours` gated `feature: 'associates'`. |
+| `settings.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 2530 LOC. Payment methods / fee settings / SMS configuration. |
+| `accounting.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 1853 LOC. Transaction ledger + refunds. |
+| `brand.html` | `spaces/admin/` | Cross-cutting | Keep — **5th confirmed intentional legacy redirect** to `./dashboard.html`. Matches `shared/admin-shell.js:126` "Removed from Admin nav per request: Brand, Notifications, Test Dev, DevControl." 17 LOC. |
+| `templates.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 2263 LOC. Document + email template management (two-panel: sidebar nav + editor). Gated `feature: 'documents'`. |
+| `passwords.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 764 LOC. Admin-only credential vault with copy-to-clipboard. |
+| `releases.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 269 LOC. Releases dashboard (history limit 50). |
+
+**Minor branding inconsistency noted (not in Pass 3 scope):** `worktracking.js` and `accounting.js` use "AWKN Ranch Admin" in their titles while sibling admin pages use "AWKN Dashboard". Branding sweep belongs in Pass 6 docs work or its own consistency pass.
+
+**No same-commit code changes** — chunk 6 is audit-only.

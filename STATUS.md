@@ -53,6 +53,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-03 | Pass 3 chunk 6 (People + Settings cluster — 10 pages: staff/users/job-titles/worktracking/settings/accounting/brand/templates/passwords/releases) audited: zero deletions, zero IoT residue. `brand.html` confirmed as 5th intentional legacy redirect (joins testdev/devcontrol/manage/spaces). Minor branding inconsistency flagged in worktracking + accounting titles. | Miceli |
 | 2026-05-03 | Pass 3 chunk 5 (Schedule cluster — `events`, `scheduling`, `planlist`, `reservations`) audited: zero deletions, zero IoT residue. All mainline AWKN. 3 of 5 pages flagged for Phase 6 Pillar IA consolidation (events vs venue-events, scheduling, reservations). | Miceli |
 | 2026-05-03 | Pass 3 chunk 4 (CRM/sales cluster — `crm`, `clients`, `packages`, `purchases`, `memberships`) audited: zero deletions. All 5 mainline AWKN. Tech-debt flagged for separate cleanup: 6 hardcoded SUPABASE_ANON_KEY JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`. | Miceli |
 | 2026-05-03 | Pass 3 chunk 3 (Operations cluster — `rentals`, `spaces`, `projects`, `highlights-order`) audited: zero deletions. All 4 mainline AWKN ops pages preserved. `spaces.html` is another intentional legacy redirect; rentals (4504 LOC), projects (1040 LOC), highlights-order are real AWKN admin pages with no IoT residue. | Miceli |
