@@ -66,3 +66,18 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 **Tech-debt flagged (not in chunk 4 scope, deferred to TODO.md):** 6 hardcoded `SUPABASE_ANON_KEY` JWT literals across `crm.js` (lines 1349, 1619, 1652, 1679, 2078, 3510) and `clients.js` (line 2259). Should import from `shared/supabase.js`. Anon keys are public (RLS-protected) so this is hygiene, not security — but it's a key-rotation footgun (6 places to update vs 1). Cross-cutting tech-debt cleanup, not Phase 1 scope.
 
 **No same-commit code changes** — chunk 4 is audit-only.
+
+## Chunk 5 — Schedule cluster (audited 2026-05-03)
+
+**Outcome: zero deletions, zero IoT residue.** All 4 pages are mainline AWKN scheduling/events surfaces.
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `events.html` + `.js` | `spaces/admin/` | Cross-cutting (Ranch-leaning) | Keep. 1636 LOC. Event requests / pipeline / calendar / agreements. Imports `event-service`, `event-template-service`, `pdf-service`, `signwell-service`. `feature: '_hidden'` per admin-shell.js:103 — superseded by `venue-events.html`. **Consolidation candidate** for the Pillar IA decision (Phase 6) per TODO.md cross-cutting item. |
+| `scheduling.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 900 LOC. "Google Calendar + multi-event-type bookings." Multi-staff scheduling tool. **Also a consolidation candidate** with reservations and the various \*-schedule pages. |
+| `planlist.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 538 LOC. JS header: "PlanList — Public development todo / checklist page. Backed by Supabase todo_categories + todo_items tables. No authentication required." Justin's `0dfd75a4` pruned the orphan tab-map link; page still reachable by direct URL. Pattern matches testdev/devcontrol — intentional preservation. |
+| `reservations.html` + `.js` | `spaces/admin/` | Master Calendar | Keep. 1870 LOC. "Booking Calendar Dashboard — Manages house stays, rental spaces, and activity bookings." Pillar already declared `['master']` in admin-shell.js:84 (the Master Calendar landing tab). |
+
+**Pillar consolidation note (Phase 6 input):** This cluster includes 3 of the 5 pages flagged in TODO.md cross-cutting for "Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`." Pass 3 tags but doesn't decide. Decision belongs in Pillar IA work.
+
+**No same-commit code changes** — chunk 5 is audit-only.
