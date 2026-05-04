@@ -56,7 +56,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] Batch C: page surgery (faq.{html,js} -615 LOC, accounting.{html,js}, contact/index.html)
   - [x] Batch D: webhook surgery (resend-inbound-webhook 3563→2580, all 13 PAI/AlpaClaw functions removed; herd/payments/guestbook/claudero preserved)
   - [→] Batch E: env vars + Bitwarden — repo had no Vapi env files / CI secrets. Bitwarden cleanup is a manual user action (search "vapi", delete/archive). Supabase Functions env vars on the deleted edge functions are deferred to Task 2.11 cutover per prod-discipline rule.
-- [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)
+- [→] **Pass 5** — partial. ✅ 5.1 prod audit (`docs/superpowers/work/2026-05-04-prod-db-audit.md` — prod schema already clean, only 5 edge functions need undeploy at cutover). ✅ 5.3 BOS local toggle (`shared/supabase.js` — `?local=1` / localStorage / `window.AWKN_LOCAL_DB`). ✅ 5.5 Cutover runbook (`docs/migrations/2026-05-04-prod-cleanup-runbook.md` — DDL replaced by undeploy script, no migration needed). ✅ 5.6 `docs/LOCAL-DEV.md`. Deferred: **5.2** (full local clone — `supabase start` was kicked off but Docker pull still in flight at session end; pick up next session by running `supabase status` and the dump/restore steps from LOCAL-DEV.md), **5.4** (droplet pollers — needs SSH config for the droplet, not currently in `~/.ssh/config`; user to set up alias before next attempt).
 - [ ] **Pass 6** — Docs sweep (CUSTOMIZATION, ECOSYSTEM-MAP, INTEGRATIONS, KEY-FILES, SCHEMA, SECRETS-BITWARDEN — all still reference deleted PAI/Vapi surfaces) + delete `awkn-pre-reset-2026-05-01/` insurance folder + `infra/index.html` hero refresh (currently references `property-ai-banner.png`)
 
 ### Phase 2-7 (deferred to their own brainstorms)
@@ -88,22 +88,30 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 When picking this back up:
 
 1. **Run `/resume`** to load this state.
-2. **Pass 5 is next — local Supabase clone.** Steps:
-   - Launch OrbStack (Docker daemon) once before starting
-   - `supabase start` to spin up local Postgres clone
-   - Stop droplet IoT pollers (`tesla-poller`, `lg-poller` — should already be dormant after Pass 2)
-   - Write `LOCAL-DEV.md` documenting the local→prod workflow
-   - Read-only prod audit allowed; **zero prod writes** per prod-discipline rule
-3. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
+2. **Finish Pass 5 (Tasks 5.2 + 5.4):**
+   - **5.2 — Resume local clone.** OrbStack launched but `supabase start` failed mid-pull with **"no space left on device"**. Root cause: **host disk at 99%** (only 126MB free of 228GB). OrbStack uses host disk for the Docker VM, so it can't expand. To unblock:
+     ```bash
+     df -h /                              # confirm — should show >5GB free before retry
+     # Free space on the Mac: clear Trash, Downloads, ~/Library/Caches, old Xcode/Docker caches, etc.
+     # Then:
+     docker system prune -a               # remove any partial pulls
+     supabase start
+     supabase db dump --linked -f /tmp/awkn-prod-dump.sql
+     # Need libpq for psql: brew install libpq && brew link --force libpq
+     psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f /tmp/awkn-prod-dump.sql
+     # Smoke test: open http://localhost:8080/spaces/admin/dashboard.html?local=1
+     ```
+   - **5.4 — Droplet pollers.** Need SSH access set up first. The droplet IP/key path lives in `docs/CREDENTIALS.md` (gitignored). Add a host alias to `~/.ssh/config` (e.g. `Host awkn-droplet`), then SSH in and check `pm2 list` / `systemctl list-units --type=service --state=running | grep -iE 'tesla|lg|nest|govee|sonos'`. After Pass 2 source-side cleanup these pollers may already be dormant — verify before running stop/disable.
+3. **Then Pass 6 — docs sweep + insurance-folder delete + infra/index.html hero refresh.**
+4. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
    - SignWell webhook status (COO call — empirically dead but determines delete-vs-dormant)
    - `/directory/` historical intent (informs Phase 5 build approach; preserve regardless)
    - Upstream-template-sync (`infra/` directory — track or fork-and-forget?)
-4. **Manual Bitwarden Vapi cleanup** still pending (see Critical → Open for CTO).
-5. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 5 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
-6. **Branch state:** `miceli` is up to date with origin/miceli. 35+ commits ahead of `origin/main`; stay on `miceli` per branching model.
-7. **Pillar tags ready** for Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-8. **OrbStack** installed at `/Applications/OrbStack.app` — launch once before Pass 5 to start Docker daemon.
-9. **Supabase CLI** v2.95.4 linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` work well; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
-10. **Pass 6 doc-sweep targets** (deferred from Pass 4): CLAUDE.md done; CUSTOMIZATION.md, docs/{ECOSYSTEM-MAP,INTEGRATIONS,KEY-FILES,SCHEMA,SECRETS-BITWARDEN}.md still reference deleted PAI/Vapi/AlpaClaw surfaces; `infra/index.html` hero references `property-ai-banner.png` storage URL.
+5. **Manual Bitwarden Vapi cleanup** still pending (see Critical → Open for CTO).
+6. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 6 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
+7. **Branch state:** `miceli` is up to date with origin/miceli. 38+ commits ahead of `origin/main`; stay on `miceli` per branching model.
+8. **Pillar tags ready** for Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
+9. **OrbStack running** (launched this session). Supabase CLI v2.95.4 linked to project `lnqxarwqckpmirpmixcw`. Read-only queries via `supabase db query --linked` work; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
+10. **Pass 6 doc-sweep targets:** CUSTOMIZATION.md, docs/{ECOSYSTEM-MAP,INTEGRATIONS,KEY-FILES,SCHEMA,SECRETS-BITWARDEN}.md still reference deleted PAI/Vapi/AlpaClaw surfaces; `infra/index.html` hero references `property-ai-banner.png` storage URL.
 
 The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is scheduled for deletion in Phase 1 Pass 6.
