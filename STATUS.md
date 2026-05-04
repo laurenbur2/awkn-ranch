@@ -21,7 +21,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 - Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
 - Phase 1 plan: `docs/superpowers/plans/2026-05-03-phase-1-alpaca-purge.md`
 
-**Phase 0** ✅ complete. **Phase 1 Pass 1** ✅ complete. **Phase 1 Pass 2** ✅ functionally complete: Tier 1 deletions ✅, Tier 2 surgery ✅, `mobile/` ✅, `feature-manifest.json` + setup wizard skill ✅, `spaces/admin/inventory.{html,js}` ✅. The third Pass 2 hot spot `property-ai/index.ts` (4019 lines) is reclassified to Pass 4 wholesale delete — PAI is moot per CTO 2026-05-03, the whole edge function dies with Vapi decommission, so surgical IoT-stripping in Pass 2 would be wasted effort. Prod undeploy (Task 2.11) deferred to end-of-program cutover per prod-discipline rule.
+**Phase 0** ✅ complete. **Phase 1 Pass 1** ✅ complete. **Phase 1 Pass 2** ✅ functionally complete (property-ai reclassified to Pass 4; Task 2.11 deferred to cutover). **Phase 1 Pass 3** ✅ complete: 41 admin BOS pages audited across 7 chunks. 1 deletion (broken `lifeofpaiadmin.html` redirect), 5 intentional legacy redirects preserved (Justin's design), 4 pages tagged for Pass 4 disposition (PAI/Vapi cluster). Pillar tags: 4 Ranch / 2 Within / 1 Retreat / 1 Memberships / 1 Master / 28 Cross-cutting. Tech-debt + branding-inconsistency findings flagged for separate cleanup. Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
 
 **Branching model:** `miceli` is the long-lived workspace where the entire transformation lives. Work commits directly to `miceli` — no per-phase sub-branches (overrides program spec §4 Decision 8). Periodic `git pull origin main` ingests teammate work; do NOT push `miceli` → `main` during the program.
 
@@ -53,6 +53,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-03 | Pass 3 chunk 7 (Pillar landings + misc — 9 pages: venue-{clients,events,spaces}, within-schedule, retreat-house, dashboard, index, media, sms-messages) audited: zero deletions. **Pass 3 complete:** 41 admin pages audited, 1 deletion total, 5 intentional legacy redirects identified, all pages pillar-tagged. | Miceli |
 | 2026-05-03 | Pass 3 chunk 6 (People + Settings cluster — 10 pages: staff/users/job-titles/worktracking/settings/accounting/brand/templates/passwords/releases) audited: zero deletions, zero IoT residue. `brand.html` confirmed as 5th intentional legacy redirect (joins testdev/devcontrol/manage/spaces). Minor branding inconsistency flagged in worktracking + accounting titles. | Miceli |
 | 2026-05-03 | Pass 3 chunk 5 (Schedule cluster — `events`, `scheduling`, `planlist`, `reservations`) audited: zero deletions, zero IoT residue. All mainline AWKN. 3 of 5 pages flagged for Phase 6 Pillar IA consolidation (events vs venue-events, scheduling, reservations). | Miceli |
 | 2026-05-03 | Pass 3 chunk 4 (CRM/sales cluster — `crm`, `clients`, `packages`, `purchases`, `memberships`) audited: zero deletions. All 5 mainline AWKN. Tech-debt flagged for separate cleanup: 6 hardcoded SUPABASE_ANON_KEY JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`. | Miceli |

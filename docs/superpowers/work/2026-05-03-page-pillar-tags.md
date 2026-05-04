@@ -102,3 +102,43 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 **Minor branding inconsistency noted (not in Pass 3 scope):** `worktracking.js` and `accounting.js` use "AWKN Ranch Admin" in their titles while sibling admin pages use "AWKN Dashboard". Branding sweep belongs in Pass 6 docs work or its own consistency pass.
 
 **No same-commit code changes** — chunk 6 is audit-only.
+
+## Chunk 7 — Pillar landings + misc (audited 2026-05-03)
+
+**Outcome: zero deletions, zero IoT residue.** All 9 pages are mainline AWKN. This chunk includes the four pillar-anchor landing pages (venue-* for Ranch, within-schedule for Within, retreat-house for Retreat) plus the canonical entry-point redirect.
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `venue-clients.html` + `.js` | `spaces/admin/` | **Ranch** | Keep. 648 LOC. Clients deduped from `crm_leads` where `business_line='awkn_ranch'` and event_date set. Pillar declared `['ranch']` in admin-shell.js:88. |
+| `venue-events.html` + `.js` | `spaces/admin/` | **Ranch** | Keep. 1370 LOC. The canonical AWKN Ranch events page — supersedes the hidden `events.html`. Pulls from `crm_leads` joined with space catalog and pipeline stage. Pillar `['ranch']`. |
+| `venue-spaces.html` + `.js` | `spaces/admin/` | **Ranch** | Keep. 761 LOC. Resource calendar (14-day rolling window). Pulls bookings from `crm_leads` + rate/capacity from `spaces` and `crm_venue_catalog`. Pillar `['ranch']`. |
+| `within-schedule.html` + `.js` | `spaces/admin/` | **Within** | Keep. 1715 LOC. Week view 8am-10pm showing recurring meals + Within client sessions from `scheduling_bookings` where `business_line='within'`. Pillar `['within']`. |
+| `retreat-house.html` + `.js` | `spaces/admin/` | **Retreat** | Keep. 491 LOC. Calendar grid + stay creation/editing on `client_stays`. Booking modal shared with the Lodging tab in `clients.js`. Tab id `retreat-overview`, pillar `['retreat']`. |
+| `dashboard.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 392 LOC. Permission-aware staff portal landing (widgets: Quick Actions, Today's Schedule, Staff on Shift). `feature: '_hidden'` per Justin's "Dashboard / Staff / Sales used to live under the 'shared' (Today) pillar, which has been removed" comment — page still serves direct URLs. |
+| `index.html` | `spaces/admin/` | Cross-cutting | Keep — **canonical /spaces/admin/ entry redirect** to `./dashboard.html`, preserving query params. Critical infrastructure. 20 LOC. |
+| `media.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 1474 LOC. Media library (browse/filter/manage). `feature: '_hidden'`. |
+| `sms-messages.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 588 LOC. Full SMS message list and filtering. Imports `SUPABASE_URL`/`SUPABASE_ANON_KEY` from shared (proper pattern, not the hardcoded-JWT issue from crm.js/clients.js). |
+
+**No same-commit code changes** — chunk 7 is audit-only.
+
+---
+
+## Pass 3 summary
+
+**41 pages audited across 7 chunks, 1 deletion total** (`lifeofpaiadmin.html` in chunk 1 — broken redirect to a Pass-2-deleted page).
+
+**Pillar distribution:**
+- **Ranch:** venue-clients, venue-events, venue-spaces, phyprop (4)
+- **Within:** clients, within-schedule (2)
+- **Retreat:** retreat-house (1)
+- **Memberships:** memberships (1)
+- **Master Calendar:** reservations (1)
+- **Cross-cutting:** crm, packages, purchases, rentals, projects, scheduling, planlist, events, sms-messages, media, dashboard, index, staff, users, job-titles, worktracking, settings, accounting, templates, passwords, releases, brand, spaces, manage, testdev, devcontrol, appdev, highlights-order (28)
+- **→ Pass 4 wholesale:** ai-admin, pai-imagery, voice (3)
+- **→ Pass 4 surgery:** faq (1)
+
+**Patterns observed:**
+1. **5 intentional legacy redirects** (Justin's design): `testdev`, `devcontrol`, `manage`, `spaces`, `brand`. All preserve old URLs / permission rows; touching them would override deliberate work.
+2. **Phase 6 Pillar IA consolidation candidates:** `events` vs `venue-events` overlap; `scheduling` vs `reservations` vs the various `*-schedule` pages.
+3. **One tech-debt finding:** 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` (TODO.md cross-cutting).
+4. **One branding inconsistency:** `worktracking.js` and `accounting.js` use "AWKN Ranch Admin" titles vs "AWKN Dashboard" elsewhere (Pass 6 scope).

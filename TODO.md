@@ -48,14 +48,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] `spaces/admin/inventory.{html,js}` deleted entirely + admin-shell + dashboard refs cleaned (CTO chose delete over strip — page was zero-AWKN-content and already `_hidden`)
   - [→] `property-ai/index.ts` (4019 lines, 236 hits) **reclassified to Pass 4 wholesale delete.** PAI moot per CTO 2026-05-03; the entire edge function dies with Vapi decommission, so surgical IoT-stripping here would be wasted work.
   - [→] **Task 2.11** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant) — **deferred to end-of-program cutover.** Per prod-discipline rule, no prod-side mutation (DB writes, edge function deploy/undeploy) during refactor. Bundled with the single end-of-program prod write.
-- [~] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~7 chunks). Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-  - [x] Chunk 1: PAI/Vapi cluster (5 pages — `lifeofpaiadmin` deleted, 4 others → Pass 4)
-  - [x] Chunk 2: Internal/dev cluster — 5 pages audited, zero deletions (all AWKN-legitimate or intentional legacy redirects per Justin's `0dfd75a4`)
-  - [x] Chunk 3: Operations — 4 pages audited, zero deletions (rentals/projects/highlights-order are real AWKN; spaces.html is another legacy redirect)
-  - [x] Chunk 4: CRM/sales — 5 pages audited, zero deletions (all mainline AWKN: crm, clients, packages, purchases, memberships). Tech-debt flagged: 6 hardcoded anon keys in crm.js + clients.js.
-  - [x] Chunk 5: Schedule — 4 pages audited, zero deletions (events/scheduling/planlist/reservations all mainline AWKN). 3 flagged for Phase 6 Pillar IA consolidation.
-  - [x] Chunk 6: People + Settings — 10 pages audited, zero deletions. `brand.html` confirmed as 5th intentional legacy redirect (joins testdev/devcontrol/manage/spaces). Minor branding inconsistency noted in worktracking/accounting titles for Pass 6.
-  - [ ] Chunk 7: Pillar landings + misc (`venue-*`, `within-schedule`, `retreat-house`, `dashboard`, `index`, `media`, `sms-messages`)
+- [x] **Pass 3** — Page Audit: 41 admin pages audited across 7 chunks. 1 deletion total (`lifeofpaiadmin.html` broken redirect). 5 intentional legacy redirects preserved (Justin's design). 4 pages tagged for Pass 4 (PAI/Vapi cluster). Pillar tags: 4 Ranch / 2 Within / 1 Retreat / 1 Memberships / 1 Master / 28 Cross-cutting. Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
 - [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed). **Includes wholesale delete of `supabase/functions/property-ai/index.ts`** (4019 lines, was Pass 2 hot spot until reclassified).
 - [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)
 - [ ] **Pass 6** — Docs sweep + delete `awkn-pre-reset-2026-05-01/` insurance folder
