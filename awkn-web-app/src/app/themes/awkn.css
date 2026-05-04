@@ -1,0 +1,96 @@
+/**
+ * AWKN Ranch theme — ported from legacy `styles/tokens.css`.
+ *
+ * Maps the warm cream + amber + DM Sans palette onto shadcn/ui's structural
+ * variables so all shadcn components inherit AWKN's brand automatically.
+ *
+ * Apply via `<div className="theme-awkn">` on a domain layout. Currently used
+ * by awknranch (the canonical brand), bos (admin inherits AWKN), and within
+ * + portal (both temporarily — Within gets its own palette in Phase 4,
+ * portal switches dynamically per logged-in client in Phase 5).
+ */
+
+.theme-awkn {
+  --radius: 0.5rem;
+
+  /* Surfaces */
+  --background: #faf9f6;
+  --foreground: #2a1f23;
+  --card: #f2f0e8;
+  --card-foreground: #2a1f23;
+  --popover: #faf9f6;
+  --popover-foreground: #2a1f23;
+
+  /* Brand actions — amber primary */
+  --primary: #d4883a;
+  --primary-foreground: #faf9f6;
+  --accent: #d4883a;
+  --accent-foreground: #faf9f6;
+
+  /* Secondary surfaces */
+  --secondary: #f2f0e8;
+  --secondary-foreground: #2a1f23;
+  --muted: #f2f0e8;
+  --muted-foreground: #7d6f74;
+
+  /* Lines + focus */
+  --border: #e6e2d9;
+  --input: #e6e2d9;
+  --ring: #be7830;
+
+  /* Status */
+  --destructive: #c53030;
+
+  /* Charts (placeholder gradient — refine when first chart lands) */
+  --chart-1: #d4883a;
+  --chart-2: #be7830;
+  --chart-3: #7d6f74;
+  --chart-4: #2d8a4e;
+  --chart-5: #3182ce;
+
+  /* Sidebar (BOS) */
+  --sidebar: #f2f0e8;
+  --sidebar-foreground: #2a1f23;
+  --sidebar-primary: #d4883a;
+  --sidebar-primary-foreground: #faf9f6;
+  --sidebar-accent: #faf9f6;
+  --sidebar-accent-foreground: #2a1f23;
+  --sidebar-border: #e6e2d9;
+  --sidebar-ring: #be7830;
+}
+
+.theme-awkn.dark,
+.dark .theme-awkn {
+  /* Dark variant of AWKN — flip cream/dark, keep amber accent */
+  --background: #1c1618;
+  --foreground: #faf9f6;
+  --card: #2a1f23;
+  --card-foreground: #faf9f6;
+  --popover: #2a1f23;
+  --popover-foreground: #faf9f6;
+
+  --primary: #d4883a;
+  --primary-foreground: #1c1618;
+  --accent: #d4883a;
+  --accent-foreground: #1c1618;
+
+  --secondary: #2a1f23;
+  --secondary-foreground: #faf9f6;
+  --muted: #2a1f23;
+  --muted-foreground: #a89ba0;
+
+  --border: rgba(250, 249, 246, 0.1);
+  --input: rgba(250, 249, 246, 0.15);
+  --ring: #d4883a;
+
+  --destructive: #e85a5a;
+
+  --sidebar: #2a1f23;
+  --sidebar-foreground: #faf9f6;
+  --sidebar-primary: #d4883a;
+  --sidebar-primary-foreground: #1c1618;
+  --sidebar-accent: #1c1618;
+  --sidebar-accent-foreground: #faf9f6;
+  --sidebar-border: rgba(250, 249, 246, 0.1);
+  --sidebar-ring: #d4883a;
+}

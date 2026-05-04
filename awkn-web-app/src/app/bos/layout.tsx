@@ -6,9 +6,9 @@ export default function BosLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="theme-awkn min-h-screen bg-background text-foreground">
       <DomainNav domain="bos" />
-      <main className="min-h-screen">{children}</main>
-    </>
+      <main>{children}</main>
+    </div>
   );
 }

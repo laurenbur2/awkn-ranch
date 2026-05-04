@@ -4,7 +4,7 @@ import { resolveDomain } from "~/lib/domains";
 import { updateSession } from "~/lib/supabase/middleware";
 
 /**
- * Multi-domain + auth middleware.
+ * Multi-domain + auth proxy (Next 16 successor to `middleware.ts`).
  *
  * 1. Reads `host` header → maps to a domain (awknranch / within / portal / bos)
  *    via `resolveDomain`. Rewrites incoming path to `/<key>{pathname}` so the
@@ -14,7 +14,7 @@ import { updateSession } from "~/lib/supabase/middleware";
  * 3. `NEXT_PUBLIC_DISABLE_AUTH=true` short-circuits the auth check — useful
  *    during dev/testing before real auth is wired.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const host = request.headers.get("host");
   const domain = resolveDomain(host);
   const authDisabled = process.env.NEXT_PUBLIC_DISABLE_AUTH === "true";

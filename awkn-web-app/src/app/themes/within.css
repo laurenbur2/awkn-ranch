@@ -1,0 +1,82 @@
+/**
+ * Within Center theme — PLACEHOLDER (Phase 2.2).
+ *
+ * Within Center has its own brand identity (clinical/medical) on the live
+ * within.center WordPress site, but the legacy AWKN repo never defined CSS
+ * tokens for it. Until Phase 4 (`within.center` rebuild), this file
+ * intentionally mirrors the AWKN theme so within stub pages have *some*
+ * coherent styling. Real Within tokens land alongside the Phase 4 SEO
+ * triage + rebuild.
+ *
+ * TODO(phase-4): Replace these values with the actual Within Center palette
+ * + typography. Source the colors from the live within.center WordPress
+ * theme or a fresh Within design pass.
+ */
+
+.theme-within {
+  --radius: 0.5rem;
+
+  --background: #faf9f6;
+  --foreground: #2a1f23;
+  --card: #f2f0e8;
+  --card-foreground: #2a1f23;
+  --popover: #faf9f6;
+  --popover-foreground: #2a1f23;
+
+  --primary: #d4883a;
+  --primary-foreground: #faf9f6;
+  --accent: #d4883a;
+  --accent-foreground: #faf9f6;
+
+  --secondary: #f2f0e8;
+  --secondary-foreground: #2a1f23;
+  --muted: #f2f0e8;
+  --muted-foreground: #7d6f74;
+
+  --border: #e6e2d9;
+  --input: #e6e2d9;
+  --ring: #be7830;
+
+  --destructive: #c53030;
+
+  --chart-1: #d4883a;
+  --chart-2: #be7830;
+  --chart-3: #7d6f74;
+  --chart-4: #2d8a4e;
+  --chart-5: #3182ce;
+
+  --sidebar: #f2f0e8;
+  --sidebar-foreground: #2a1f23;
+  --sidebar-primary: #d4883a;
+  --sidebar-primary-foreground: #faf9f6;
+  --sidebar-accent: #faf9f6;
+  --sidebar-accent-foreground: #2a1f23;
+  --sidebar-border: #e6e2d9;
+  --sidebar-ring: #be7830;
+}
+
+.theme-within.dark,
+.dark .theme-within {
+  --background: #1c1618;
+  --foreground: #faf9f6;
+  --card: #2a1f23;
+  --card-foreground: #faf9f6;
+  --popover: #2a1f23;
+  --popover-foreground: #faf9f6;
+
+  --primary: #d4883a;
+  --primary-foreground: #1c1618;
+  --accent: #d4883a;
+  --accent-foreground: #1c1618;
+
+  --secondary: #2a1f23;
+  --secondary-foreground: #faf9f6;
+  --muted: #2a1f23;
+  --muted-foreground: #a89ba0;
+
+  --border: rgba(250, 249, 246, 0.1);
+  --input: rgba(250, 249, 246, 0.15);
+  --ring: #d4883a;
+
+  --destructive: #e85a5a;
+}
