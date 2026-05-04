@@ -32,7 +32,7 @@ _(none flagged this session)_
 Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
 
 - [x] **Pass 1** — Inventory: 531-line manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md` + gitignore (`154a1f59`)
-- [~] **Pass 2** — Triage & Delete: ~85% done (17 commits, `6267b816` → `a2cce3cd`)
+- [x] **Pass 2** — Triage & Delete: functionally complete (20 commits, `6267b816` → `<latest>`). `property-ai/index.ts` reclassified to Pass 4. Task 2.11 prod-side undeploy deferred to end-of-program cutover.
   - [x] Tier 1 bulk deletes: build artifacts, `/residents/`, pollers, IoT edge functions, macOS dupes
   - [x] Open Question #1 resolved (post-login redirect)
   - [x] Open Question #2 resolved for live surfaces (Stripe + dropdown + directory edit-link)
@@ -46,10 +46,10 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] 4 manifest reclassifications (`/directory/`, `infra/`, `resident-shell.js`, `mobile/`)
   - [x] `feature-manifest.json` deleted entirely + `setup-alpacapps-infra` skill deleted (CTO chose delete over strip)
   - [x] `spaces/admin/inventory.{html,js}` deleted entirely + admin-shell + dashboard refs cleaned (CTO chose delete over strip — page was zero-AWKN-content and already `_hidden`)
-  - [ ] **Hot spot remaining:** `property-ai/index.ts` IoT loaders (124 hits — voice deferred to Pass 4)
-  - [ ] **Task 2.11:** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant)
+  - [→] `property-ai/index.ts` (4019 lines, 236 hits) **reclassified to Pass 4 wholesale delete.** PAI moot per CTO 2026-05-03; the entire edge function dies with Vapi decommission, so surgical IoT-stripping here would be wasted work.
+  - [→] **Task 2.11** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant) — **deferred to end-of-program cutover.** Per prod-discipline rule, no prod-side mutation (DB writes, edge function deploy/undeploy) during refactor. Bundled with the single end-of-program prod write.
 - [ ] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~5-7 commits)
-- [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed)
+- [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed). **Includes wholesale delete of `supabase/functions/property-ai/index.ts`** (4019 lines, was Pass 2 hot spot until reclassified).
 - [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)
 - [ ] **Pass 6** — Docs sweep + delete `awkn-pre-reset-2026-05-01/` insurance folder
 

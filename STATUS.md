@@ -21,7 +21,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 - Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
 - Phase 1 plan: `docs/superpowers/plans/2026-05-03-phase-1-alpaca-purge.md`
 
-**Phase 0** ✅ complete. **Phase 1 Pass 1** ✅ complete. **Pass 2** in progress (~92% done): Tier 1 deletions ✅, Tier 2 surgery mostly ✅, `mobile/` ✅, `feature-manifest.json` + setup wizard skill ✅, `spaces/admin/inventory.{html,js}` ✅. Hot spot remaining: `property-ai/index.ts` (124 hits, voice deferred to Pass 4). Prod undeploy (Task 2.11) pending.
+**Phase 0** ✅ complete. **Phase 1 Pass 1** ✅ complete. **Phase 1 Pass 2** ✅ functionally complete: Tier 1 deletions ✅, Tier 2 surgery ✅, `mobile/` ✅, `feature-manifest.json` + setup wizard skill ✅, `spaces/admin/inventory.{html,js}` ✅. The third Pass 2 hot spot `property-ai/index.ts` (4019 lines) is reclassified to Pass 4 wholesale delete — PAI is moot per CTO 2026-05-03, the whole edge function dies with Vapi decommission, so surgical IoT-stripping in Pass 2 would be wasted effort. Prod undeploy (Task 2.11) deferred to end-of-program cutover per prod-discipline rule.
 
 **Branching model:** `miceli` is the long-lived workspace where the entire transformation lives. Work commits directly to `miceli` — no per-phase sub-branches (overrides program spec §4 Decision 8). Periodic `git pull origin main` ingests teammate work; do NOT push `miceli` → `main` during the program.
 
@@ -53,6 +53,7 @@ Architecture, surface inventory, Next.js migration plan, and deletion manifest l
 
 | Date | Change | Author |
 |---|---|---|
+| 2026-05-03 | Pass 2 declared functionally complete. `property-ai/index.ts` (4019 lines) reclassified from Pass 2 hot spot to Pass 4 wholesale delete (PAI moot, dies with Vapi). Task 2.11 (prod IoT undeploy) deferred to end-of-program cutover per prod-discipline rule. | Miceli |
 | 2026-05-03 | `spaces/admin/inventory.{html,js}` deleted (523-line page documenting Alpuca Mac, AlpacaPlayhouse infra, Rahul's GDrive/Tesla dashcam — zero AWKN content). Already `_hidden`. Companion edits: removed `view_inventory` perm + icon + tab in `shared/admin-shell.js`, removed Inventory quick-action in `spaces/admin/dashboard.js`. | Miceli |
 | 2026-05-03 | `feature-manifest.json` (515-line alpaca setup-wizard manifest) deleted along with the `setup-alpacapps-infra` skill (`.claude/skills/setup-alpacapps-infra/`). CTO decision: delete entirely vs. strip IoT/Vapi — the manifest had no AWKN runtime consumer. Reference cleanup in `CUSTOMIZATION.md` §4 + checklist, `supabase/functions/_shared/api-permissions.ts` comment, `docs/ECOSYSTEM-MAP.md`. | Miceli |
 | 2026-05-03 | `mobile/` directory deleted (1.1MB Capacitor 8 + iOS + Android, 100% IoT, never shipped). Companion alpaca-skill `mobile-setup.md` reference removed. Doc references stripped from README, CUSTOMIZATION, PATTERNS, KEY-FILES, ECOSYSTEM-MAP. Resolves CTO question #4. | Miceli |

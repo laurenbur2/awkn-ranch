@@ -127,8 +127,11 @@ Sorted roughly by hit-count (most coupled first). Lines cited are exact `command
 
 ### Hot spots (heavy coupling — schedule first)
 
-#### supabase/functions/property-ai/index.ts (124 hits)
-Deep coupling — this is the PAI assistant brain. Hits are everywhere. Representative:
+#### supabase/functions/property-ai/index.ts — ➡️ RECLASSIFIED 2026-05-03 to Pass 4 wholesale delete
+
+**CTO decision (2026-05-03):** PAI is moot per the project_phase1-decisions memory ("with Vapi decommissioned wholesale, this question disappears"). The entire 4019-line edge function dies in Pass 4 alongside Vapi, so any surgical IoT-stripping in Pass 2 is wasted effort. The file structurally is one PAI assistant brain split across chat (`handleChatRequest`) and voice (`handleVapi*Request`) — both go.
+
+Original (pre-reclassification) hot-spot notes for historical reference:
 - Line 24: `goveeGroups: Array<{`
 - Line 43: `teslaVehicles: Array<{`
 - Line 62: `anovaOvens: Array<{`
@@ -136,7 +139,6 @@ Deep coupling — this is the PAI assistant brain. Hits are everywhere. Represen
 - Lines 390, 468–474, 566, 2324: hardcoded `https://laurenbur2.github.io/awkn-ranch/residents/...` URLs
 - Lines 1391–1392: tool whitelist references `govee_devices`, `nest_devices`, `vehicles`, `camera_streams`, `lg_appliances`, `anova_ovens`, `voice_calls`
 - Lines 3241–3473: vapi tool wrapper logic, `vapi_config` table reads, `voice_provider` defaults
-- **Pass 4 territory** for the vapi/voice references; **Pass 2 surgery** for the IoT data loaders + URL strings.
 
 #### docs/INTEGRATIONS.md (64 hits)
 Documentation of every integration. Half the file is IoT-specific (Govee, Nest, Tesla, Anova, Glowforge, Sonos sections at lines 36–411). Pass 2 should rip out the IoT sections; keep AWKN-relevant integrations (Stripe, Square, PayPal, Resend, etc.).
@@ -450,7 +452,7 @@ Voice / PAI / Vapi files. Pass 4 will run a separate cost-of-ownership review ag
 
 ### Files that reference Vapi/PAI but aren't pure-residue (Pass 4 surgical edits)
 
-- supabase/functions/property-ai/index.ts (above) — vapi tool wrappers from line 3241+; surgery, not deletion.
+- supabase/functions/property-ai/index.ts (above) — reclassified to Pass 4 wholesale delete (was: surgery for IoT loaders + Pass 4 for vapi).
 - shared/admin-shell.js (above) — `lifeofpai` and `voice.html` nav entries.
 - shared/resident-shell.js — `askpai` nav entries (lines 78, 85), `view_voice` perm (line 280), `admin_pai_settings` (line 291).
 - spaces/admin/accounting.html / accounting.js / faq.html / faq.js — vapi vendor categories.
@@ -549,7 +551,7 @@ For Pass 2 sequencing, suggest:
 4. Tier 1 Category 4 (IoT edge functions) — independent. After this, `shared/services/{govee,sonos,nest,tesla,anova,glowforge,printer,camera}-data.js` become unimported and can be deleted (Tier ? promotion).
 5. Tier 1 Category 6 (macOS dupes) — trivial cleanup.
 6. Tier 2 boilerplate sweep (24 admin pages × 1 line each).
-7. Tier 2 hot spots (property-ai, inventory.js, feature-manifest.json) — surgical edits.
+7. Tier 2 hot spots — `feature-manifest.json` ✅ deleted whole, `inventory.js` ✅ deleted whole. `property-ai/index.ts` reclassified to Pass 4 wholesale delete (PAI moot, dies with Vapi).
 8. **Pause: user decisions on Open Questions #1 and #2.** Apply login/app.js:95, login/update-password.html:365, mobile/scripts/copy-web.js:207–213, signwell-webhook lines 638/669/941, create-payment-link:128 once decisions are made.
 9. Tier 2 docs (KEY-FILES.md, INTEGRATIONS.md, SCHEMA.md) — Pass 6 territory but can ride along.
 10. Vapi-specific: defer to Pass 4 entirely.
