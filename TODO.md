@@ -82,16 +82,21 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 When picking this back up:
 
 1. **Run `/resume`** to load this state.
-2. **Read the updated inventory manifest** (`docs/superpowers/work/2026-05-03-alpaca-inventory.md`) — see the 4 reclassifications added during Pass 2 audits.
-3. **Pass 2 hot spots are next** (heavier decision content per file):
-   - `supabase/functions/home-assistant-control/` ✅ deleted (`1387cc3e`)
-   - `feature-manifest.json` ✅ deleted entirely + `setup-alpacapps-infra` skill (CTO chose delete over strip)
-   - `spaces/admin/inventory.{html,js}` ✅ deleted entirely + admin-shell/dashboard cleanup (CTO chose delete over strip)
-   - `supabase/functions/property-ai/index.ts` (124 hits) — IoT data loaders (lines ~207-262, 1391-1392, 390/468-474/566/2324 URLs); voice/Vapi parts at 3241+ deferred to Pass 4
-4. **Then Task 2.11 — prod undeploy** of 11 IoT edge functions (CLI is already linked: `supabase functions delete <name> --project-ref lnqxarwqckpmirpmixcw`). Destructive against prod — explicit gate.
-5. **4 CTO/COO questions accumulated** during Pass 2 audits — see "Open for COO" and "Open for CTO" sections above. SignWell, `/directory/` historical intent, upstream-template-sync, mobile/ status.
-6. **18 unpushed commits** on `miceli` (since `f1556fdb` handoff). Push when convenient.
-7. **OrbStack is installed** at `/Applications/OrbStack.app` — launch it once before Pass 5 to start the Docker daemon.
-8. **Supabase CLI is now installed** (v2.95.4) and linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` worked well during Pass 2 audits and informed several decisions empirically.
+2. **Pass 4 is next — Vapi/PAI decommission.** Larger than originally scoped because Pass 2 reclassifications added to it:
+   - `supabase/functions/property-ai/index.ts` (4019 lines, 236 IoT/voice/PAI hits) — wholesale delete
+   - Admin pages tagged in Pass 3 chunk 1: `ai-admin.{html,js}` (AlpaClaw/OpenClaw chat gateway), `pai-imagery.{html,js}`, `voice.{html,js}` — wholesale delete
+   - `faq.{html,js}` — surgery (rip PAI/Vapi guts; FAQ data may be AWKN-relevant — decide in-pass)
+   - All `feature: 'pai'` and `feature: 'voice'` gated tab entries in `shared/admin-shell.js` (faq, voice, openclaw)
+   - Vapi env vars + Bitwarden secrets cleanup
+   - Edge function source removal under `supabase/functions/vapi-*` (code-side only — prod undeploy is Task 2.11, deferred)
+3. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
+   - SignWell webhook status (COO call — empirically dead but determines delete-vs-dormant)
+   - `/directory/` historical intent (informs Phase 5 build approach; preserve regardless)
+   - Upstream-template-sync (`infra/` directory — track or fork-and-forget?)
+4. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 4 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
+5. **Branch state:** `miceli` is up to date with origin/miceli (last push `218ecbae`). 30+ commits ahead of `origin/main`; stay on `miceli` per branching model.
+6. **Pillar tags ready** for both Pass 4 disposition and Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
+7. **OrbStack** installed at `/Applications/OrbStack.app` — launch once before Pass 5 to start Docker daemon.
+8. **Supabase CLI** v2.95.4 linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` work well; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
 
-The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is now scheduled for deletion in Phase 1 Pass 6 (was end-of-Phase-2 in the original recommendation).
+The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is scheduled for deletion in Phase 1 Pass 6.
