@@ -1,0 +1,73 @@
+# Within Center — 301 redirect map (Cloudflare Pages / Netlify format)
+# Migrating from WordPress (within.center) to static site
+# Order matters: most specific first, wildcard catch-all last
+
+# ── Direct equivalents (path changes) ──────────────────────────
+/about-us/                          /about/                            301
+/about-us                           /about/                            301
+/the-team/                          /our-team/                         301
+/team/                              /our-team/                         301
+/our-services/                      /ceremonial-ketamine/              301
+
+# ── High-traffic pages → closest new equivalents ────────────────
+/psychedelic-therapy-retreat/       /immersive-retreat/                301
+/psychedelic-therapy-retreat        /immersive-retreat/                301
+/retreat-center/                    /immersive-retreat/                301
+/retreat-center                     /immersive-retreat/                301
+
+# ── Service pages ──────────────────────────────────────────────
+/ketamine-therapy/                  /ceremonial-ketamine/              301
+/ketamine-therapy-austin/           /ceremonial-ketamine/              301
+/ketamine-assisted-therapy/         /ceremonial-ketamine/              301
+/ketamine-assisted-psychotherapy/   /ceremonial-ketamine/              301
+/mdma-therapy/                      /ceremonial-ketamine/              301
+/psilocybin-therapy/                /ceremonial-ketamine/              301
+/dmt-therapy/                       /ceremonial-ketamine/              301
+/guide-training-program/            /about/                            301
+
+# ── Content/blog/category pages ────────────────────────────────
+/category/ketamine-retreat/         /ceremonial-ketamine/              301
+/category/ketamine-retreat          /ceremonial-ketamine/              301
+/category/wellness-retreat/         /immersive-retreat/                301
+/category/wellness-retreat          /immersive-retreat/                301
+/category/psychedelic-therapy-retreat/ /ceremonial-ketamine/           301
+/category/mental-health-retreat/    /immersive-retreat/                301
+/category/*                         /resources/                        301
+/going-within-podcast/              /resources/                        301
+/going-within-podcast               /resources/                        301
+
+# ── Location landing pages → immersive retreat (people travel for it) ──
+/luxury-wellness-retreat-*          /immersive-retreat/                301
+/wellness-retreat-*                 /immersive-retreat/                301
+/mental-health-retreat-*            /immersive-retreat/                301
+/healing-retreat-*                  /immersive-retreat/                301
+/meditation-retreat-*               /immersive-retreat/                301
+/spiritual-retreat-*                /immersive-retreat/                301
+/couples-retreat-*                  /ceremonial-ketamine/twin-flame/   301
+/psychedelic-therapy-retreat-*      /immersive-retreat/                301
+/ketamine-retreat-*                 /immersive-retreat/                301
+/texas-retreats-*                   /immersive-retreat/                301
+/depression-anxiety-retreats-*      /immersive-retreat/                301
+/the-best-retreats-*                /immersive-retreat/                301
+/beyond-the-battlefield-*           /immersive-retreat/                301
+/beyond-the-ordinary-*              /immersive-retreat/                301
+/holistic-healing-*                 /immersive-retreat/                301
+/nourish-your-whole-self-*          /immersive-retreat/                301
+
+# ── Article-style URLs → resources ─────────────────────────────
+/ketamine-for-*                     /resources/                        301
+/how-many-ketamine-*                /resources/                        301
+/ketamine-therapy-experiences-*     /resources/                        301
+/a-message-from-*                   /about/                            301
+
+# ── Misc ───────────────────────────────────────────────────────
+/contact/                           /contact/                          301!
+/?ref=gmb                           /                                  301
+/feed/                              /                                  301
+/feed                               /                                  301
+/wp-admin/*                         /                                  301
+/wp-content/*                       /                                  301
+/wp-includes/*                      /                                  301
+
+# ── Catch-all: any remaining old URL → homepage (no 404s) ──────
+/*                                  /                                  301
