@@ -353,8 +353,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script>
     // ═══════════════════════════════════════════════════════════════════
-    // CONFIGURATION — Set these after deploying Cloudflare D1 session
-    // logging. See: /infra/updates.html → "Session Logging to D1"
+    // CONFIGURATION — Set these after deploying Cloudflare D1 session logging.
     // ═══════════════════════════════════════════════════════════════════
     const CLAUDED_SESSIONS_API = 'https://claude-sessions.YOUR_WORKER_DOMAIN.workers.dev'; // YOUR_SESSIONS_WORKER_URL
     const CLAUDED_SESSIONS_TOKEN = 'property-sessions-2026'; // YOUR_SESSIONS_AUTH_TOKEN
@@ -381,8 +380,7 @@
       document.getElementById('sessions-app').innerHTML = `
         <div class="setup-prompt">
           <h2>Session Logging Not Configured</h2>
-          <p>To browse Claude Code session history, set up Cloudflare D1 session logging first. The setup guide walks you through it in about 10 minutes.</p>
-          <a href="/infra/updates.html" style="color:#b8a88a;font-size:0.9rem;">View setup instructions &rarr;</a>
+          <p>To browse Claude Code session history, set up Cloudflare D1 session logging first.</p>
           <p style="margin-top:1.5rem;font-size:0.8rem;color:#aaa;">After setup, update the config at the top of <code>clauded/sessions.html</code></p>
         </div>`;
     }

@@ -1,7 +1,7 @@
 /**
  * Associate Shell - Shared module for all associate pages
  * Provides: auth flow, tab navigation, context switcher, toast notifications
- * Cloned from resident-shell.js with associate-specific tab config
+ * Associate-specific page shell with tab config
  */
 
 import { supabase } from './supabase.js';

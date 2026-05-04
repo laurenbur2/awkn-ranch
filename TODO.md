@@ -9,18 +9,18 @@
 
 ### Phase 1 — Open questions
 
-**Resolved (2026-05-03):** Vapi decommission GO, vehicles table DROP, PAI moot, Mac LaunchAgents irrelevant. Open Question #1 (post-login redirect) resolved in `8d5ebd02` — empirical prod check found zero users with role=resident/associate. `mobile/` delete confirmed and executed (whole 1.1MB directory removed in same-day commit).
+**Resolved Pass 6 (2026-05-04):** Upstream-template-sync (negative — `infra/` deleted, AWKN doesn't track upstream).
+**Resolved earlier:** Vapi decommission GO, vehicles table DROP, PAI moot, Mac LaunchAgents irrelevant, post-login redirect, mobile/ delete.
 
-**Open for COO:**
-- [ ] **SignWell webhook status** — Is SignWell actively used (Within inpatient agreements? AWKN Ranch retreat housing?) or fully retired? Empirically can't fire in prod (missing tables `signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests`; 0 rows in `crm_proposals` + `within_retreat_agreements`). User's hunch: not in use. Determines deletion vs dormant-but-keep.
+**Still open for COO:**
+- [ ] **SignWell webhook status** — Is SignWell actively used (Within inpatient agreements? AWKN Ranch retreat housing?) or fully retired? Empirically can't fire in prod (tables `signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests` confirmed missing per Pass 5.1 audit; 0 rows in `crm_proposals` + `within_retreat_agreements`). User's hunch: not in use. Determines deletion vs dormant-but-keep.
 
-**Open for CTO:**
-- [ ] **Open Question #2 — SignWell email CTA** (`signwell-webhook/index.ts:638, 669, 941`) — depends on SignWell decision above. Live surfaces (Stripe success, header dropdown, directory edit-link) already resolved in `3d0c8a7f`.
-- [ ] **Bitwarden Vapi cleanup (manual)** — Search "vapi" in Bitwarden vault, delete or archive entries (VAPI_API_KEY, VAPI_WEBHOOK_SECRET, VAPI assistant IDs, etc.). Repo and CI are clean. Supabase Functions env vars on the deleted edge functions ride along with Task 2.11 prod-side undeploy at end-of-program cutover.
+**Still open for CTO:**
+- [ ] **Open Question #2 — SignWell email CTA** (`signwell-webhook/index.ts:638, 669, 941`) — depends on SignWell decision above.
+- [ ] **Bitwarden Vapi cleanup (manual)** — Search "vapi" in Bitwarden vault, delete or archive entries. Repo + CI are clean; only manual vault hygiene remains.
 - [ ] **`/directory/` historical intent** — intentional AWKN scaffolding for client profiles, or partially-rebranded residue? User theory: scaffolding. Preserve regardless; answer informs Phase 5 build approach.
-- [ ] **Upstream-template-sync** — `infra/updates.json`, `infra/infra-upgrade-guide.md`, `infra/infra-upgrade-prompt.md` (+ poll in `shared/update-checker.js:6`). AWKN forked per program spec — still want to track upstream features?
 
-**Process directives:** bit-by-bit review (tier-B granularity), commits direct to `miceli`, zero prod DB writes (read-only OK).
+**Process directives:** bit-by-bit review (tier-B granularity), commits direct to `miceli`, zero prod DB writes (read-only OK), no parallel local DB during refactor (CTO call Pass 6).
 
 ## Bugs (broken functionality)
 
@@ -28,48 +28,51 @@ _(none flagged this session)_
 
 ## Tech Debt (code quality)
 
-### Phase 1 — Alpaca purge + repo hygiene (in progress)
+### Phase 1 — Alpaca purge + repo hygiene ✅ functionally complete (2026-05-04)
 
-Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
+All 6 passes done; ~50k+ LOC removed across the program.
 
-- [x] **Pass 1** — Inventory: 531-line manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md` + gitignore (`154a1f59`)
-- [x] **Pass 2** — Triage & Delete: functionally complete (20 commits, `6267b816` → `<latest>`). `property-ai/index.ts` reclassified to Pass 4. Task 2.11 prod-side undeploy deferred to end-of-program cutover.
-  - [x] Tier 1 bulk deletes: build artifacts, `/residents/`, pollers, IoT edge functions, macOS dupes
-  - [x] Open Question #1 resolved (post-login redirect)
-  - [x] Open Question #2 resolved for live surfaces (Stripe + dropdown + directory edit-link)
-  - [x] 24 admin context-switcher boilerplate sweep
-  - [x] Shared shell surgery (admin-shell, associate-shell, personal-page-shell)
-  - [x] 404 routing + tailwind sources + mobile copy-web cleanup
-  - [x] 3 confirmed-residue file deletes (sonos-data, lighting-data, docs/alpacappsinfra.html)
-  - [x] Branding rename (`package.json`, fastlane, deleted-doc link repointing)
-  - [x] Proprietary licensing + AWKN-specific README rewrite
-  - [x] `home-assistant-control` IoT edge function delete
-  - [x] 4 manifest reclassifications (`/directory/`, `infra/`, `resident-shell.js`, `mobile/`)
-  - [x] `feature-manifest.json` deleted entirely + `setup-alpacapps-infra` skill deleted (CTO chose delete over strip)
-  - [x] `spaces/admin/inventory.{html,js}` deleted entirely + admin-shell + dashboard refs cleaned (CTO chose delete over strip — page was zero-AWKN-content and already `_hidden`)
-  - [→] `property-ai/index.ts` (4019 lines, 236 hits) **reclassified to Pass 4 wholesale delete.** PAI moot per CTO 2026-05-03; the entire edge function dies with Vapi decommission, so surgical IoT-stripping here would be wasted work.
-  - [→] **Task 2.11** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant) — **deferred to end-of-program cutover.** Per prod-discipline rule, no prod-side mutation (DB writes, edge function deploy/undeploy) during refactor. Bundled with the single end-of-program prod write.
-- [x] **Pass 3** — Page Audit: 41 admin pages audited across 7 chunks. 1 deletion total (`lifeofpaiadmin.html` broken redirect). 5 intentional legacy redirects preserved (Justin's design). 4 pages tagged for Pass 4 (PAI/Vapi cluster). Pillar tags: 4 Ranch / 2 Within / 1 Retreat / 1 Memberships / 1 Master / 28 Cross-cutting. Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-- [x] **Pass 4** — Vapi/PAI/AlpaClaw wholesale decommission: 4 batches, 22 files, ~9,500 LOC removed (`e4ea7abb` → `acc506fe`).
-  - [x] Batch A: 13 wholesale deletes (5 edge funcs incl. property-ai 4019 lines, 6 admin pages, 2 shared modules) — 7,867 LOC
-  - [x] Batch B: shell + feature-registry surgery (admin-shell, resident-shell, feature-registry)
-  - [x] Batch C: page surgery (faq.{html,js} -615 LOC, accounting.{html,js}, contact/index.html)
-  - [x] Batch D: webhook surgery (resend-inbound-webhook 3563→2580, all 13 PAI/AlpaClaw functions removed; herd/payments/guestbook/claudero preserved)
-  - [→] Batch E: env vars + Bitwarden — repo had no Vapi env files / CI secrets. Bitwarden cleanup is a manual user action (search "vapi", delete/archive). Supabase Functions env vars on the deleted edge functions are deferred to Task 2.11 cutover per prod-discipline rule.
-- [→] **Pass 5** — partial. ✅ 5.1 prod audit (`docs/superpowers/work/2026-05-04-prod-db-audit.md` — prod schema already clean, only 5 edge functions need undeploy at cutover). ✅ 5.3 BOS local toggle (`shared/supabase.js` — `?local=1` / localStorage / `window.AWKN_LOCAL_DB`). ✅ 5.5 Cutover runbook (`docs/migrations/2026-05-04-prod-cleanup-runbook.md` — DDL replaced by undeploy script, no migration needed). ✅ 5.6 `docs/LOCAL-DEV.md`. Deferred: **5.2** (full local clone — `supabase start` was kicked off but Docker pull still in flight at session end; pick up next session by running `supabase status` and the dump/restore steps from LOCAL-DEV.md), **5.4** (droplet pollers — needs SSH config for the droplet, not currently in `~/.ssh/config`; user to set up alias before next attempt).
-- [ ] **Pass 6** — Docs sweep (CUSTOMIZATION, ECOSYSTEM-MAP, INTEGRATIONS, KEY-FILES, SCHEMA, SECRETS-BITWARDEN — all still reference deleted PAI/Vapi surfaces) + delete `awkn-pre-reset-2026-05-01/` insurance folder + `infra/index.html` hero refresh (currently references `property-ai-banner.png`)
+- [x] **Pass 1** — Inventory manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md`
+- [x] **Pass 2** — Triage & delete (20 commits): bulk deletes, shell surgery, branding rename, license + README rewrite. ~46k LOC.
+- [x] **Pass 3** — 41 admin pages audited across 7 chunks. Pillar tags at `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
+- [x] **Pass 4** — Vapi/PAI/AlpaClaw wholesale decommission. 4 batches, 22 files, ~9,500 LOC.
+- [x] **Pass 5** (partial → finalized): 5.1 prod audit ✅, 5.3 BOS local toggle ✅, 5.5 cutover runbook ✅, 5.6 LOCAL-DEV.md ✅. **5.2 abandoned** (no parallel local DB during refactor — CTO call Pass 6). **5.4 deferred** to end-of-program cutover (droplet poller stop bundles with `Task 2.11`).
+- [x] **Pass 6** — Aggressive close-out: insurance folder + CUSTOMIZATION.md + 9 orphan IoT services + `shared/resident-shell.js` + entire `infra/` directory + `update-checker.js` + `mobile/android/` cache. Surgery: feature-registry (-11 IoT features), shell lineage comments, /infra/ inbound link cleanup. Doc rewrites: KEY-FILES, SCHEMA (with drift warning), INTEGRATIONS (added Square + WhatsApp + Google Calendar), ECOSYSTEM-MAP (full rewrite reflecting program spec). CLAUDE.md vestigial-scope updated.
 
-### Phase 2-7 (deferred to their own brainstorms)
+### End-of-program cutover (Task 2.11 — deferred from Pass 5.4 + Pass 4 Batch E)
 
-See program spec §8-13 for scope. Not actionable until Phase 1 lands.
+Single prod-write event after Phase 6. See `docs/migrations/2026-05-04-prod-cleanup-runbook.md`.
+
+- [ ] Undeploy 5 prod edge functions: `vapi-server`, `property-ai`, `generate-whispers`, `nest-control`, `tesla-command`
+- [ ] Stop droplet IoT pollers (`tesla-poller`, `lg-poller`) — needs SSH config first
+- [ ] Drop dormant Supabase Functions env vars on those undeployed functions
+
+### Phase 2 — Next.js monorepo scaffold (next)
+
+See program spec §8. Estimated 1 sprint. Brainstorm before execute.
+
+- [ ] **Phase 2 brainstorm** — answer: Vercel team account ownership, CI/CD specifics
+- [ ] Init Turborepo + pnpm workspaces at repo root
+- [ ] `packages/{ui,db,auth,api,config}` skeletons
+- [ ] `packages/db`: `drizzle-kit pull` against live Supabase (read-only) → `schema.ts`
+- [ ] First `apps/awknranch/` Next.js scaffold (validates toolchain end-to-end)
+- [ ] CI: GitHub Actions for monorepo
+- [ ] Vercel project + preview deploys for `apps/awknranch/`
+- [ ] `docs/MONOREPO.md` — structure, commands, conventions
+
+### Phase 3-7 (deferred to their own brainstorms)
+
+See program spec §9-13.
 
 ### Cross-cutting
 
 - [ ] No tests / no TypeScript / no CI gates on money handlers (Stripe, Square, PayPal). Addressed incrementally as each phase touches the relevant code.
-- [ ] **Hardcoded SUPABASE_ANON_KEY JWTs** at 6 sites: `spaces/admin/crm.js` (lines 1349, 1619, 1652, 1679, 2078, 3510) + `spaces/admin/clients.js:2259`. Should import from `shared/supabase.js` instead. Hygiene/key-rotation issue, not security (anon key is public). Surface for separate tech-debt sweep.
-- [ ] Audit auto-merge agentic systems (Bug Scout, Feature Builder) — they push to `main` without visible governance. Critical to pause/repoint before Phase 6.
+- [ ] **Hardcoded SUPABASE_ANON_KEY JWTs** at 6 sites: `spaces/admin/crm.js` (lines 1349, 1619, 1652, 1679, 2078, 3510) + `spaces/admin/clients.js:2259`. Should import from `shared/supabase.js` instead.
+- [ ] **R2 bucket name `your-app`** — template residue hardcoded in `shared/config-loader.js`, `supabase/functions/_shared/api-helpers.ts`, `supabase/functions/_shared/property-config.ts`. Rename Cloudflare bucket + update code together.
+- [ ] Audit auto-merge agentic systems (Bug Scout, Feature Builder) — they push to `main` without visible governance. **Critical to pause/repoint before Phase 6.**
 - [ ] Migrate Resend, Cloudflare R2, DigitalOcean droplet from founder's personal Google account (`wingsiebird@gmail.com`) to a business workspace.
-- [ ] Lock in Pillar model (Ranch / Within / Retreat / Venue) **before Phase 6**. Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`. Pass 3 produces page-pillar tags as input.
+- [ ] Lock in Pillar model (Ranch / Within / Retreat / Venue) **before Phase 6**. Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`. Pass 3 page-pillar tags at `docs/superpowers/work/2026-05-03-page-pillar-tags.md` are input.
+- [ ] Bitwarden vault hygiene — split AWKN-specific secrets out of shared `DevOps-alpacapps` collection into a dedicated AWKN collection. SECRETS-BITWARDEN.md left as-is for now.
 - [ ] Kill stale branches: `claude/romantic-maxwell`, `fix/remove-external-service-ci`, `founder-ideas`, `hero-update`.
 
 ## Enhancements (nice to have)
@@ -83,38 +86,9 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 - [ ] **Subdomain shape** — unified `app.*` vs separate apps per brand. Phase 5.
 - [ ] **within.center blog authorship post-migration** — MDX (engineers) vs headless CMS (clinicians). Phase 4.
 
-## Resumption Pointers (for next session)
-
-When picking this back up:
+## Next session
 
 1. **Run `/resume`** to load this state.
-2. **Finish Pass 5 (Tasks 5.2 + 5.4):**
-   - **5.2 — Resume local clone.** Tried 3 times across two sessions with up to 7.7GB host free — all failed at the "Starting database from backup..." step when image extraction inflated host disk back to 100%, crashing the OrbStack daemon. **Realistic disk requirement: 15-20GB host free** (Supabase total extracted footprint is ~6-8GB; need that headroom on top of normal usage). libpq + psql 18.3 already installed and linked. To unblock:
-     ```bash
-     df -h /                              # target: 15-20GB free before retrying
-     # Aggressively free host disk: Trash, Downloads, ~/Library/Caches,
-     # ~/Library/Developer (Xcode), old node_modules, Application Support
-     docker system prune -af --volumes    # clean any leftover partials
-     supabase start -x studio,mailpit,logflare,vector,edge-runtime
-     # Schema-only restore (preferred — skip row data, much faster, much smaller):
-     supabase db dump --linked --schema public,auth,storage --data-only=false -f /tmp/awkn-schema.sql
-     psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f /tmp/awkn-schema.sql
-     # OR full data dump (only if you need real rows for UI work):
-     # supabase db dump --linked -f /tmp/awkn-full.sql
-     # Smoke test: open http://localhost:8080/spaces/admin/dashboard.html?local=1
-     ```
-     **Note:** the 5GB+ disk usage is the Docker images for Supabase services (Postgres, Kong, GoTrue, etc.) — NOT prod data. Switching to schema-only doesn't reduce the image footprint, only the dump/restore time. The only path to a smaller image footprint is excluding more services or running bare Postgres without Supabase (which would require BOS rewiring — not worth it).
-   - **5.4 — Droplet pollers.** Need SSH access set up first. The droplet IP/key path lives in `docs/CREDENTIALS.md` (gitignored). Add a host alias to `~/.ssh/config` (e.g. `Host awkn-droplet`), then SSH in and check `pm2 list` / `systemctl list-units --type=service --state=running | grep -iE 'tesla|lg|nest|govee|sonos'`. After Pass 2 source-side cleanup these pollers may already be dormant — verify before running stop/disable.
-3. **Then Pass 6 — docs sweep + insurance-folder delete + infra/index.html hero refresh.**
-4. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
-   - SignWell webhook status (COO call — empirically dead but determines delete-vs-dormant)
-   - `/directory/` historical intent (informs Phase 5 build approach; preserve regardless)
-   - Upstream-template-sync (`infra/` directory — track or fork-and-forget?)
-5. **Manual Bitwarden Vapi cleanup** still pending (see Critical → Open for CTO).
-6. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 6 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
-7. **Branch state:** `miceli` is up to date with origin/miceli. 38+ commits ahead of `origin/main`; stay on `miceli` per branching model.
-8. **Pillar tags ready** for Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-9. **OrbStack running** (launched this session). Supabase CLI v2.95.4 linked to project `lnqxarwqckpmirpmixcw`. Read-only queries via `supabase db query --linked` work; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
-10. **Pass 6 doc-sweep targets:** CUSTOMIZATION.md, docs/{ECOSYSTEM-MAP,INTEGRATIONS,KEY-FILES,SCHEMA,SECRETS-BITWARDEN}.md still reference deleted PAI/Vapi/AlpaClaw surfaces; `infra/index.html` hero references `property-ai-banner.png` storage URL.
-
-The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is scheduled for deletion in Phase 1 Pass 6.
+2. **Phase 2 brainstorm** — Next.js monorepo scaffold. Pre-questions: Vercel team account ownership, CI/CD specifics. Stack confirmed: pnpm workspaces + Turborepo + Next.js 16 (App Router) + tRPC + Drizzle + Supabase Auth + Tailwind v4 + shadcn/ui per `~/.claude/FRAMEWORK.md`.
+3. **Branch state:** `miceli` is up to date with origin/miceli. ~50+ commits ahead of `origin/main`; stay on `miceli` per branching model.
+4. **DB rule for the rest of the program:** read-only `supabase db query --linked` only (Pass 5.2 abandoned). Zero prod writes until end-of-program cutover. Drizzle introspection in Phase 2 is read-only.

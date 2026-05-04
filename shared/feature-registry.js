@@ -33,30 +33,11 @@ export const FEATURES = {
   esignatures:{ label: 'E-Signatures',core: false, description: 'SignWell e-signature integration' },
   documents:  { label: 'Documents',  core: false, description: 'Lease & event agreement templates' },
 
-  // Smart home
-  lighting:   { label: 'Lighting',   core: false, description: 'Govee / smart light control' },
-  cameras:    { label: 'Cameras',    core: false, description: 'Security camera feeds & PTZ' },
-  music:      { label: 'Music',      core: false, description: 'Sonos / Music Assistant control' },
-  climate:    { label: 'Climate',    core: false, description: 'Nest thermostat control' },
-  laundry:    { label: 'Laundry',    core: false, description: 'LG ThinQ washer/dryer monitoring' },
-  oven:       { label: 'Oven',       core: false, description: 'Anova precision oven control' },
-
-  // Maker tools
-  printer_3d: { label: '3D Printer', core: false, description: 'FlashForge 3D printer control' },
-  glowforge:  { label: 'Glowforge',  core: false, description: 'Glowforge laser cutter status' },
-
-  // Vehicles
-  vehicles:   { label: 'Vehicles',   core: false, description: 'Tesla Fleet API integration' },
-
   // Property operations
   rentals:    { label: 'Rentals',    core: false, description: 'Rental application pipeline' },
   events:     { label: 'Events',     core: false, description: 'Event hosting pipeline' },
   associates: { label: 'Associates', core: false, description: 'Associate/staff hour tracking' },
-  residents:  { label: 'Residents',  core: false, description: 'Resident portal & orientation' },
   airbnb:     { label: 'Airbnb',     core: false, description: 'Airbnb iCal calendar sync' },
-
-  // AI
-  alexa:      { label: 'Alexa',      core: false, description: 'Alexa skill integration' },
 };
 
 let _enabledCache = null;

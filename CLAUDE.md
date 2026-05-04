@@ -23,17 +23,19 @@ Single integrated business. The admin BOS at `/spaces/admin/` is the source of t
 
 This is a multi-developer project. Each dev commits to their **own named branch** (e.g. `miceli`), pushes to remote, opens a PR into `main` for review. Never commit directly to `main`. Branches in flight are personal workspaces — only the owner pushes to them.
 
-## Vestigial scope — DO NOT EXTEND
+## Vestigial scope (Phase 1 purge — complete)
 
-The codebase was forked from `rsonnad/alpacapps-infra` (originally an AlpacaPlayhouse tenant-IoT seed). Roughly 30% of the code is leftover from that and **is not in AWKN scope**. Scheduled for deletion. Do not add features, fix bugs, or extend anything in:
+Codebase was forked from `rsonnad/alpacapps-infra` (originally an AlpacaPlayhouse tenant-IoT seed). Phase 1 removed ~46k LOC of residue across 6 passes. **If you encounter remaining references, surface them — they are leftovers, not active scope.** Decommissioned categories:
 
-- `/residents/` — tenant IoT control surfaces
-- Anything named `govee_*`, `nest_*`, `tesla_*`, `lg_*`, `anova_*`, `glowforge_*`, `flashforge_*`, `printer_*`, `sonos_*`, `camera_streams_*`, `go2rtc_*`
+- `/residents/` tenant IoT control surfaces (deleted Pass 2)
+- All IoT integrations: Govee, Nest, Tesla, Sonos, LG ThinQ, Anova, Glowforge, FlashForge, UniFi cameras, go2rtc, Spotify (deleted Pass 2 + Pass 6)
 - Home-server LAN bridge (Tailscale)
-- IoT workers on the DigitalOcean droplet (`tesla-poller`, `lg-poller`)
-- `.next/` or `/out/` directories at repo root (ghost of an abandoned Next.js attempt; will be purged)
-
-If a task touches one of these, stop and surface the question before proceeding.
+- DigitalOcean droplet IoT pollers (`tesla-poller`, `lg-poller`) — deferred to end-of-program cutover
+- Vapi voice AI + PAI Discord bot + `property-ai` edge function (deleted Pass 4)
+- Hostinger OpenClaw multi-channel chatbot (deleted Pass 6)
+- Mobile app (Capacitor) — deleted Pass 2
+- Template-system scaffolding (`infra/`, `setup-alpacapps-infra` skill, `update-checker.js`, `CUSTOMIZATION.md`) — deleted Pass 6
+- 5 deployed edge functions still need undeployment from prod at end-of-program cutover (`vapi-server`, `property-ai`, `generate-whispers`, `nest-control`, `tesla-command`)
 
 ## Pillar model (mid-refactor — be aware)
 

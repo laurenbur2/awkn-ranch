@@ -1,7 +1,7 @@
 /**
  * Personal Page Shell — Auth gate + header + privacy controls for personal pages
  *
- * Sits between public-shell.js (no auth) and resident-shell.js (heavy auth + tabs).
+ * Sits above public-shell.js (no auth) — adds light auth + member-only sections.
  * Default: requires authentication, any registered user can view.
  * Owners (admin/oracle) see a floating settings FAB to manage visibility + grants.
  */
