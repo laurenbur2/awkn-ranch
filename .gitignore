@@ -56,3 +56,15 @@ pai-discord/node_modules/
 # Gmail OAuth credentials (secret)
 scripts/gmail-credentials.json
 .gstack/
+
+# Tooling artifacts (Phase 1 Pass 1)
+.claude-flow/
+.swarm/
+
+# Stale Next.js build artifacts (deleted in Phase 1 Pass 2)
+.next/
+out/
+
+# Local Supabase stack (Phase 1 Pass 5)
+supabase/.branches/
+supabase/.temp/
