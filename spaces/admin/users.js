@@ -1285,8 +1285,6 @@ const PERM_GROUPS = [
     keys: ['view_cars', 'control_cars'], adminKey: 'admin_cars_settings' },
   { id: 'profile',  icon: '👤', label: 'Profile',  bg: '#f5f5f5', headerBg: '#e8e8e8', headerColor: '#555',
     keys: ['view_profile', 'edit_profile'], adminKey: null },
-  { id: 'pai',      icon: '🦙', label: 'PAI',      bg: '#fdf1e0', headerBg: '#f9dfb8', headerColor: '#92400e',
-    keys: ['use_pai'], adminKey: 'admin_pai_settings' },
   // -- Staff admin tabs --
   { id: 'spaces',   icon: '🏠', label: 'Spaces',   bg: '#fdf1e0', headerBg: '#f9dfb8', headerColor: '#92400e',
     keys: ['view_spaces', 'manage_spaces'], adminKey: null },

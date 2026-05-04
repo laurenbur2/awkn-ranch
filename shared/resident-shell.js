@@ -23,7 +23,7 @@ const STAFF_PERMISSION_KEYS = [
   'view_hours', 'view_faq', 'view_voice', 'view_todo', 'view_appdev',
 ];
 const ADMIN_PERMISSION_KEYS = [
-  'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev', 'admin_pai_settings',
+  'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev',
 ];
 
 const DEVICE_PERMISSION_KEYS = ['view_lighting', 'view_music', 'view_cameras', 'view_climate', 'view_laundry', 'view_cars', 'view_oven', 'view_glowforge', 'view_printer'];
@@ -288,7 +288,6 @@ function renderContextSwitcher(authState) {
     { perm: 'view_templates', href: 'templates.html' },
     { perm: 'view_accounting', href: 'accounting.html' },
     { perm: 'view_testdev', href: 'testdev.html' },
-    { perm: 'admin_pai_settings', href: '/residents/lifeofpaiadmin.html' },
   ];
   const firstStaff = STAFF_TAB_MAP.find(t => hasAnyPermission(t.perm));
   const firstAdmin = ADMIN_TAB_MAP.find(t => hasAnyPermission(t.perm));
