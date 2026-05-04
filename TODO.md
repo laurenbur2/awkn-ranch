@@ -50,7 +50,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [→] **Task 2.11** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant) — **deferred to end-of-program cutover.** Per prod-discipline rule, no prod-side mutation (DB writes, edge function deploy/undeploy) during refactor. Bundled with the single end-of-program prod write.
 - [~] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~7 chunks). Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
   - [x] Chunk 1: PAI/Vapi cluster (5 pages — `lifeofpaiadmin` deleted, 4 others → Pass 4)
-  - [ ] Chunk 2: Internal/dev cluster (`appdev`, `testdev`, `devcontrol`, `phyprop`, `manage`)
+  - [x] Chunk 2: Internal/dev cluster — 5 pages audited, zero deletions (all AWKN-legitimate or intentional legacy redirects per Justin's `0dfd75a4`)
   - [ ] Chunk 3: Operations (`rentals`, `spaces`, `projects`, `highlights-order`)
   - [ ] Chunk 4: CRM/sales (`crm`, `clients`, `packages`, `purchases`, `memberships`)
   - [ ] Chunk 5: Schedule (`events`, `scheduling`, `planlist`, `reservations`)

@@ -21,3 +21,19 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 - `spaces/admin/users.js` — removed PAI tab entry from user-permissions UI
 
 **Deferred to Pass 4:** all `feature: 'pai'`-gated and `feature: 'voice'`-gated tab entries in `shared/admin-shell.js` (faq, voice, openclaw) — bundled with PAI/Vapi wholesale decommission.
+
+## Chunk 2 — Internal/dev cluster (audited 2026-05-03)
+
+**Outcome: zero deletions.** All 5 pages are AWKN-legitimate or intentionally-preserved per prior developer work (Justin's `0dfd75a4` "Retire DevControl page and pillar" + adjacent retirements).
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `appdev.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. "Claudero AI Developer Console" — submits feature requests to the Feature Builder agent on the DigitalOcean droplet. Tab `appdev` in admin-shell with `feature: '_hidden'`. Audit deferred to the agentic-systems pause (TODO.md cross-cutting item: "audit auto-merge agentic systems before Phase 6"). |
+| `testdev.html` | `spaces/admin/` | Cross-cutting | Keep — intentional legacy redirect to `./dashboard.html`. Per `shared/admin-shell.js:126-129`: "Removed from Admin nav per request: Brand, Notifications, Test Dev, DevControl. Their pages now redirect to the dashboard for any cached link. Permission keys (view_devcontrol, view_testdev) intentionally kept in STAFF_PERMISSION_KEYS so existing user/permission rows still validate." Touching would override Justin's deliberate design. |
+| `devcontrol.html` | `spaces/admin/` | Cross-cutting | Keep — same deliberate-redirect pattern. See also `shared/admin-shell.js:410-412` for explicit comment. |
+| `phyprop.html` + `.js` | `spaces/admin/` | Ranch | Keep. "PhyProp - Physical Property data dashboard" — 527 lines of legitimate AWKN Ranch property data (parcels, edges, structures, utilities, impervious, zoning, renderings, spaces overview). Tab `phyprop` with `feature: '_hidden'`. |
+| `manage.html` | `spaces/admin/` | Cross-cutting | Keep — legacy redirect to `./spaces.html` preserving query params. Inline comment: "manage.html has been split into individual pages." Bookmark preservation. |
+
+**No same-commit code changes** — chunk 2 is audit-only.
+
+**Pattern noted:** the recency-of-edits memory caveat applies in reverse here. Justin's substantive retirement comments (`admin-shell.js:126-129, 410-412`) are the deciding signal that these "redirect-only" pages are intentional and should be preserved.
