@@ -826,10 +826,9 @@
       // Load SMS number from Supabase (dynamic import so it can't break the page)
       try {
         const { supabase } = await import('/shared/supabase.js');
-        // Load Vapi voice number from business entity
         const { data: biz } = await supabase
           .from('people')
-          .select('phone, phone2')
+          .select('phone')
           .eq('company_name', 'AWKN Ranch')
           .single();
         if (biz?.phone) {

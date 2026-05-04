@@ -977,19 +977,9 @@ const API_VENDORS = {
     color: '#4285f4',
     metrics: [
       { key: 'image_gen', label: 'Image Gen' },
-      { key: 'pai_chat', label: 'PAI Chat' },
       { key: 'other', label: 'Other' },
     ],
     costUnit: 'request',
-  },
-  vapi: {
-    label: 'Vapi',
-    color: '#5b21b6',
-    metrics: [
-      { key: 'calls', label: 'Voice Calls' },
-      { key: 'minutes', label: 'Minutes', isFloat: true },
-    ],
-    costUnit: 'call',
   },
   anthropic: {
     label: 'Anthropic',
@@ -1042,7 +1032,6 @@ async function loadApiUsage() {
       smsResult,
       inboundEmailResult,
       imageGenResult,
-      voiceCallResult,
       signwellDocsResult,
     ] = await Promise.all([
       // api_usage_log (new table — may have data going forward)
@@ -1066,11 +1055,6 @@ async function loadApiUsage() {
         .eq('status', 'completed')
         .gte('created_at', monthStart)
         .lt('created_at', monthEnd),
-      // Voice calls (existing data)
-      supabase.from('voice_calls')
-        .select('duration_seconds, cost_usd, created_at')
-        .gte('created_at', monthStart)
-        .lt('created_at', monthEnd),
       // SignWell documents (from rental_applications — source of truth)
       supabase.from('rental_applications')
         .select('signwell_document_id, created_at')
@@ -1083,7 +1067,6 @@ async function loadApiUsage() {
     const smsMessages = smsResult.data || [];
     const inboundEmails = inboundEmailResult.data || [];
     const imageGenJobs = imageGenResult.data || [];
-    const voiceCalls = voiceCallResult.data || [];
     const signwellDocs = signwellDocsResult.data || [];
 
     // Count outbound emails from api_usage_log (new logging)
@@ -1113,16 +1096,10 @@ async function loadApiUsage() {
     const imageGenCount = imageGenJobs.length;
     const imageGenCost = imageGenJobs.reduce((s, j) => s + (parseFloat(j.estimated_cost_usd) || 0), 0);
 
-    // Gemini from api_usage_log (PAI chat, payment matching, etc.)
+    // Gemini from api_usage_log (image gen, payment matching, etc.)
     const geminiFromLog = apiLog.filter(r => r.vendor === 'gemini');
-    const geminiPaiCount = geminiFromLog.filter(r => r.category?.includes('pai')).length;
-    const geminiOtherCount = geminiFromLog.filter(r => !r.category?.includes('pai') && !r.category?.includes('image')).length;
+    const geminiOtherCount = geminiFromLog.filter(r => !r.category?.includes('image')).length;
     const geminiCost = geminiFromLog.reduce((s, r) => s + (parseFloat(r.estimated_cost_usd) || 0), 0);
-
-    // Voice calls
-    const voiceCallCount = voiceCalls.length;
-    const voiceMinutes = voiceCalls.reduce((s, c) => s + ((c.duration_seconds || 0) / 60), 0);
-    const voiceCost = voiceCalls.reduce((s, c) => s + (parseFloat(c.cost_usd) || 0), 0);
 
     // Anthropic from api_usage_log
     const anthropicFromLog = apiLog.filter(r => r.vendor === 'anthropic');
@@ -1170,18 +1147,7 @@ async function loadApiUsage() {
         totalCost: imageGenCost + geminiCost,
         rows: [
           { label: 'Image Gen', count: imageGenCount },
-          { label: 'PAI Chat', count: geminiPaiCount },
           ...(geminiOtherCount > 0 ? [{ label: 'Other', count: geminiOtherCount }] : []),
-        ],
-      },
-      {
-        id: 'vapi',
-        label: 'Vapi',
-        color: '#5b21b6',
-        totalCost: voiceCost,
-        rows: [
-          { label: 'Calls', count: voiceCallCount },
-          { label: 'Minutes', count: voiceMinutes, isFloat: true },
         ],
       },
       {
@@ -1296,7 +1262,6 @@ const SERVICE_LABELS = {
   telnyx: 'Telnyx',
   resend: 'Resend',
   signwell: 'SignWell',
-  vapi: 'Vapi',
   other: 'Other',
 };
 
@@ -1309,7 +1274,6 @@ const SERVICE_COLORS = {
   telnyx: '#00c08b',
   resend: '#000',
   signwell: '#6366f1',
-  vapi: '#5b21b6',
   other: '#6b7280',
 };
 

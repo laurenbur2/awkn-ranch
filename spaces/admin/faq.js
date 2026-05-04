@@ -1,8 +1,7 @@
 // FAQ Management Page
-import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '../../shared/supabase.js';
+import { supabase, SUPABASE_URL } from '../../shared/supabase.js';
 import { initAdminPage, showToast } from '../../shared/admin-shell.js';
-import { getAuthState, hasPermission } from '../../shared/auth.js';
-import { isDemoUser, redactString } from '../../shared/demo-redact.js';
+import { getAuthState } from '../../shared/auth.js';
 import { askQuestion } from '../../shared/chat-widget.js';
 
 // State
@@ -10,14 +9,6 @@ let faqEntries = [];
 let contextLinks = [];
 let contextMeta = null;
 let contextEntries = [];
-let voiceAssistant = null;
-let voiceCallStats = null;
-
-// Impersonation state
-let appUsersList = [];
-let impersonateTarget = null; // { id, display_name, email, role }
-let impersonateFiltered = [];
-let impersonateIndex = -1;
 
 // Check if running in embed mode (inside iframe)
 const isEmbed = new URLSearchParams(window.location.search).has('embed');
@@ -56,19 +47,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadData() {
-  const loads = [
+  await Promise.all([
     loadFaqEntries(),
     loadContextLinks(),
     loadContextMeta(),
     loadContextEntries(),
-    loadVoiceAssistant()
-  ];
-  if (hasPermission('impersonate_user')) {
-    loads.push(loadAppUsers());
-  }
-  await Promise.all(loads);
+  ]);
   renderAll();
-  setupImpersonation();
 }
 
 async function loadFaqEntries() {
@@ -124,148 +109,6 @@ async function loadContextEntries() {
   contextEntries = data || [];
 }
 
-async function loadAppUsers() {
-  const { data, error } = await supabase
-    .from('app_users')
-    .select('id, email, display_name, role')
-    .order('display_name');
-  if (error) {
-    console.error('Error loading app users:', error);
-    return;
-  }
-  appUsersList = data || [];
-}
-
-function setupImpersonation() {
-  if (!hasPermission('impersonate_user') || !appUsersList.length) return;
-
-  const row = document.getElementById('impersonationRow');
-  if (!row) return;
-  row.classList.remove('hidden');
-
-  const input = document.getElementById('impersonateInput');
-  const dropdown = document.getElementById('impersonateDropdown');
-  const clearBtn = document.getElementById('impersonateClearBtn');
-
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
-    impersonateIndex = -1;
-    if (q.length < 1) { dropdown.classList.add('hidden'); return; }
-    impersonateFiltered = appUsersList.filter(u => {
-      const full = `${u.display_name || ''} ${u.email || ''}`.toLowerCase();
-      return full.includes(q);
-    }).slice(0, 8);
-    if (!impersonateFiltered.length) { dropdown.classList.add('hidden'); return; }
-    renderImpersonateDropdown();
-    dropdown.classList.remove('hidden');
-  });
-
-  input.addEventListener('keydown', (e) => {
-    if (dropdown.classList.contains('hidden')) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      impersonateIndex = Math.min(impersonateIndex + 1, impersonateFiltered.length - 1);
-      renderImpersonateDropdown();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      impersonateIndex = Math.max(impersonateIndex - 1, -1);
-      renderImpersonateDropdown();
-    } else if (e.key === 'Enter' && impersonateIndex >= 0) {
-      e.preventDefault();
-      selectImpersonateUser(impersonateFiltered[impersonateIndex]);
-    } else if (e.key === 'Escape') {
-      dropdown.classList.add('hidden');
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.impersonation-input-wrap')) dropdown.classList.add('hidden');
-  });
-
-  input.addEventListener('focus', () => {
-    if (input.value.trim().length >= 1 && impersonateFiltered.length) dropdown.classList.remove('hidden');
-  });
-
-  clearBtn.addEventListener('click', clearImpersonation);
-}
-
-function renderImpersonateDropdown() {
-  const dropdown = document.getElementById('impersonateDropdown');
-  dropdown.innerHTML = impersonateFiltered.map((u, i) => `
-    <div class="impersonation-dropdown-item ${i === impersonateIndex ? 'active' : ''}" data-index="${i}">
-      <span>
-        <span class="imp-name">${isDemoUser() ? `<span class="demo-redacted">${redactString(u.display_name || u.email, 'name')}</span>` : escapeHtml(u.display_name || u.email)}</span>
-        <span class="imp-email">${u.display_name ? (isDemoUser() ? `<span class="demo-redacted">${redactString(u.email, 'email')}</span>` : escapeHtml(u.email)) : ''}</span>
-      </span>
-      <span class="imp-role">${u.role}</span>
-    </div>
-  `).join('');
-  dropdown.querySelectorAll('.impersonation-dropdown-item').forEach(item => {
-    item.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      selectImpersonateUser(impersonateFiltered[parseInt(item.dataset.index)]);
-    });
-  });
-}
-
-function selectImpersonateUser(user) {
-  impersonateTarget = user;
-  const input = document.getElementById('impersonateInput');
-  const dropdown = document.getElementById('impersonateDropdown');
-  const clearBtn = document.getElementById('impersonateClearBtn');
-  const chip = document.getElementById('impersonateChip');
-  const chipName = document.getElementById('impersonateChipName');
-  const chipRole = document.getElementById('impersonateChipRole');
-  const modeLabel = document.getElementById('testModeLabel');
-
-  input.value = '';
-  input.placeholder = user.display_name || user.email;
-  dropdown.classList.add('hidden');
-  clearBtn.classList.remove('hidden');
-  chip.classList.remove('hidden');
-  chipName.textContent = isDemoUser() ? redactString(user.display_name || user.email, 'name') : (user.display_name || user.email);
-  chipRole.textContent = user.role;
-  modeLabel.textContent = `Testing as ${user.role}`;
-  impersonateFiltered = [];
-  impersonateIndex = -1;
-}
-
-function clearImpersonation() {
-  impersonateTarget = null;
-  const input = document.getElementById('impersonateInput');
-  const clearBtn = document.getElementById('impersonateClearBtn');
-  const chip = document.getElementById('impersonateChip');
-  const modeLabel = document.getElementById('testModeLabel');
-
-  input.value = '';
-  input.placeholder = 'Anonymous (contact page)';
-  clearBtn.classList.add('hidden');
-  chip.classList.add('hidden');
-  modeLabel.textContent = 'Same as contact page';
-}
-
-async function askViaPai(question, impersonateUserId) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) throw new Error('Not authenticated');
-
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/property-ai`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.access_token}`,
-      'apikey': SUPABASE_ANON_KEY,
-    },
-    body: JSON.stringify({
-      message: question,
-      impersonate_user_id: impersonateUserId,
-    }),
-  });
-
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'PAI request failed');
-  return { answer: data.reply || data.answer || data.text || JSON.stringify(data), confident: true };
-}
-
 function setupEventListeners() {
   document.getElementById('recompileBtn').addEventListener('click', recompileContext);
   document.getElementById('addFaqBtn').addEventListener('click', () => openFaqModal());
@@ -306,38 +149,24 @@ async function handleTestQuestion() {
   confidenceMeta.classList.remove('visible');
 
   try {
-    let result;
-    if (impersonateTarget) {
-      // Route through PAI with impersonation
-      result = await askViaPai(question, impersonateTarget.id);
-    } else {
-      // Anonymous: use public ask-question endpoint
-      result = await askQuestion(question);
-    }
+    const result = await askQuestion(question);
 
     answerText.textContent = result.answer;
     answerContainer.classList.add('visible');
 
-    // Show confidence indicator
     confidenceMeta.classList.add('visible');
-    if (impersonateTarget) {
-      // PAI doesn't have confidence scoring — show the impersonated user context
-      confidenceLabel.innerHTML = `<span class="confidence-badge confidence-badge--high">PAI</span> <span style="font-size:0.75rem;color:var(--text-muted)">as ${escapeHtml(impersonateTarget.display_name || impersonateTarget.email)} (${impersonateTarget.role})</span>`;
-    } else if (result.confident) {
+    if (result.confident) {
       confidenceLabel.innerHTML = '<span class="confidence-badge confidence-badge--high">HIGH CONFIDENCE</span>';
     } else {
       confidenceLabel.innerHTML = '<span class="confidence-badge confidence-badge--low">LOW CONFIDENCE</span>';
       lowConfidence.classList.add('visible');
     }
 
-    // Refresh question log since the edge function logs the question (only for anonymous)
-    if (!impersonateTarget) {
-      await loadFaqEntries();
-      renderQuestionLog();
-      renderPendingQuestions();
-      const countBadge = document.getElementById('questionLogCount');
-      if (countBadge) countBadge.textContent = faqEntries.filter(e => e.source === 'auto').length;
-    }
+    await loadFaqEntries();
+    renderQuestionLog();
+    renderPendingQuestions();
+    const countBadge = document.getElementById('questionLogCount');
+    if (countBadge) countBadge.textContent = faqEntries.filter(e => e.source === 'auto').length;
   } catch (error) {
     answerText.textContent = 'Error: ' + (error.message || 'Failed to get a response. Check console for details.');
     answerContainer.classList.add('visible');
@@ -356,7 +185,6 @@ function renderAll() {
   renderFaqEntries();
   renderContextEntries();
   renderContextLinks();
-  renderVoiceConfig();
 }
 
 function renderContextMeta() {
@@ -381,7 +209,7 @@ function renderQuestionLog() {
   const container = document.getElementById('questionLogSection');
   if (!container) return; // Not on page yet
 
-  const autoEntries = faqEntries.filter(e => e.source === 'auto' || e.source === 'pai_email');
+  const autoEntries = faqEntries.filter(e => e.source === 'auto');
   const countBadge = document.getElementById('questionLogCount');
   if (countBadge) countBadge.textContent = autoEntries.length;
 
@@ -393,15 +221,12 @@ function renderQuestionLog() {
   container.innerHTML = `
     <div class="faq-list">
       ${autoEntries.map(entry => {
-        const sourceBadge = entry.source === 'pai_email'
-          ? '<span class="confidence-badge" style="background: #3d8b7a; color: #fff;">Email</span>'
-          : '<span class="confidence-badge" style="background: #555; color: #fff;">Web</span>';
         return `
         <div class="faq-card">
           <div class="faq-card__header">
             <div class="faq-card__question">${escapeHtml(entry.question)}</div>
             <div class="faq-card__actions">
-              ${sourceBadge}
+              <span class="confidence-badge" style="background: #555; color: #fff;">Web</span>
               <span class="confidence-badge confidence-badge--${(entry.confidence || 'LOW').toLowerCase()}">${entry.confidence || '?'}</span>
               <button class="btn-secondary btn-small" onclick="editAutoEntry('${entry.id}')">Edit</button>
               <button class="btn-danger btn-small" onclick="deleteFaq('${entry.id}')">×</button>
@@ -1142,302 +967,3 @@ function truncateUrl(url) {
   return url.substring(0, 57) + '...';
 }
 
-// =============================================
-// VOICE ASSISTANT CONFIG
-// =============================================
-
-async function loadVoiceAssistant() {
-  try {
-    // Load default voice assistant
-    const { data: assistant, error } = await supabase
-      .from('voice_assistants')
-      .select('*')
-      .eq('is_active', true)
-      .eq('is_default', true)
-      .limit(1)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error loading voice assistant:', error);
-      return;
-    }
-    voiceAssistant = assistant;
-
-    // Load call stats
-    const { data: calls, error: callsError } = await supabase
-      .from('voice_calls')
-      .select('duration_seconds, cost_cents, created_at, status')
-      .order('created_at', { ascending: false });
-
-    if (!callsError && calls) {
-      const ended = calls.filter(c => c.status === 'ended');
-      voiceCallStats = {
-        totalCalls: ended.length,
-        totalMinutes: Math.round(ended.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) / 60 * 10) / 10,
-        totalCost: ended.reduce((sum, c) => sum + (parseFloat(c.cost_cents) || 0), 0) / 100,
-        lastCall: calls.length > 0 ? calls[0].created_at : null
-      };
-    }
-  } catch (err) {
-    console.error('Failed to load voice assistant:', err);
-  }
-}
-
-function renderVoiceConfig() {
-  const container = document.getElementById('voiceConfigSection');
-  if (!container) return;
-
-  if (!voiceAssistant) {
-    container.innerHTML = '<div class="empty-state">No voice assistant configured</div>';
-    return;
-  }
-
-  const a = voiceAssistant;
-  const stats = voiceCallStats || { totalCalls: 0, totalMinutes: 0, totalCost: 0, lastCall: null };
-  const maxDurationMin = Math.round((a.max_duration_seconds || 600) / 60);
-
-  container.innerHTML = `
-    <div class="voice-config-display">
-      <div class="voice-config-grid">
-        <div class="voice-config-item">
-          <span class="voice-config-label">Name</span>
-          <span class="voice-config-value">${escapeHtml(a.name)}${a.is_default ? ' <span class="published-badge">Default</span>' : ''}${a.is_active ? '' : ' <span style="color:#999;">Inactive</span>'}</span>
-        </div>
-        <div class="voice-config-item">
-          <span class="voice-config-label">Model</span>
-          <span class="voice-config-value">${escapeHtml((a.model_provider || 'google').charAt(0).toUpperCase() + (a.model_provider || 'google').slice(1))} · ${escapeHtml(a.model_name || 'unknown')}</span>
-        </div>
-        <div class="voice-config-item">
-          <span class="voice-config-label">Voice</span>
-          <span class="voice-config-value">${escapeHtml((a.voice_provider || 'vapi').charAt(0).toUpperCase() + (a.voice_provider || 'vapi').slice(1))} · ${escapeHtml(a.voice_id || 'default')}</span>
-        </div>
-        <div class="voice-config-item">
-          <span class="voice-config-label">Transcriber</span>
-          <span class="voice-config-value">${escapeHtml((a.transcriber_provider || 'deepgram').charAt(0).toUpperCase() + (a.transcriber_provider || 'deepgram').slice(1))} · ${escapeHtml(a.transcriber_model || 'nova-2')} (${escapeHtml(a.transcriber_language || 'en')})</span>
-        </div>
-        <div class="voice-config-item">
-          <span class="voice-config-label">Temperature</span>
-          <span class="voice-config-value">${a.temperature || 0.7}</span>
-        </div>
-        <div class="voice-config-item">
-          <span class="voice-config-label">Max Duration</span>
-          <span class="voice-config-value">${maxDurationMin} min</span>
-        </div>
-      </div>
-
-      <div class="voice-config-stats">
-        <div class="stat">
-          <span class="stat-value">${stats.totalCalls}</span>
-          <span class="stat-label">Calls</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">${stats.totalMinutes}</span>
-          <span class="stat-label">Minutes</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">$${stats.totalCost.toFixed(2)}</span>
-          <span class="stat-label">Cost</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">${stats.lastCall ? formatDate(stats.lastCall) : 'Never'}</span>
-          <span class="stat-label">Last Call</span>
-        </div>
-      </div>
-
-      <div class="voice-config-prompt-section">
-        <div class="voice-config-label">First Message</div>
-        <div class="voice-config-prompt-box">${escapeHtml(a.first_message || '(none)')}</div>
-      </div>
-
-      <div class="voice-config-prompt-section">
-        <div class="voice-config-label">System Prompt</div>
-        <div class="voice-config-prompt-box voice-config-prompt-box--long">${escapeHtml(a.system_prompt || '(none)')}</div>
-      </div>
-
-    </div>
-  `;
-
-  // Show edit button
-  const editBtn = document.getElementById('editVoiceBtn');
-  if (editBtn) editBtn.classList.remove('hidden');
-}
-
-// Voice Assistant Modal — Vapi provider option maps
-
-const VAPI_MODEL_OPTIONS = {
-  google: [
-    'gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash',
-    'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-1.5-pro'
-  ],
-  openai: [
-    'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'
-  ],
-  anthropic: [
-    'claude-sonnet-4-20250514', 'claude-3-7-sonnet-20250219',
-    'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022',
-    'claude-3-haiku-20240307'
-  ],
-  groq: [
-    'llama-3.3-70b-versatile', 'llama-3.1-8b-instant',
-    'llama-3.1-70b-versatile', 'mixtral-8x7b-32768'
-  ],
-  deepinfra: ['meta-llama/Meta-Llama-3.1-70B-Instruct', 'meta-llama/Meta-Llama-3.1-8B-Instruct'],
-  'together-ai': ['meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo'],
-  openrouter: ['openai/gpt-4o', 'anthropic/claude-sonnet-4-20250514', 'google/gemini-2.5-flash'],
-  'perplexity-ai': ['llama-3.1-sonar-large-128k-online', 'llama-3.1-sonar-small-128k-online'],
-  'azure-openai': ['gpt-4o', 'gpt-4-turbo']
-};
-
-const VAPI_VOICE_OPTIONS = {
-  vapi: ['Elliot', 'Savannah', 'Mia'],
-  '11labs': ['sarah', 'rachel', 'adam', 'clyde', 'domi', 'elli', 'josh', 'arnold', 'sam'],
-  playht: ['s3://peregrine-voices/donna_parenting_saad/manifest.json', 's3://peregrine-voices/oliver_narrative/manifest.json'],
-  cartesia: ['a0e99841-438c-4a64-b679-ae501e7d6091', '79a125e8-cd45-4c13-8a67-188112f4dd22'],
-  openai: ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'],
-  azure: ['en-US-JennyNeural', 'en-US-GuyNeural', 'en-US-AriaNeural'],
-  deepgram: ['aura-asteria-en', 'aura-luna-en', 'aura-stella-en', 'aura-athena-en', 'aura-hera-en', 'aura-orion-en', 'aura-arcas-en', 'aura-perseus-en', 'aura-angus-en', 'aura-orpheus-en', 'aura-helios-en', 'aura-zeus-en'],
-  lmnt: ['lily', 'daniel'],
-  'rime-ai': ['mist', 'bayou']
-};
-
-const VAPI_TRANSCRIBER_MODELS = {
-  deepgram: ['nova-3', 'nova-3-general', 'nova-3-medical', 'nova-2', 'nova-2-phonecall', 'nova-2-meeting', 'nova-2-voicemail', 'nova-2-medical'],
-  google: ['default', 'latest_long', 'latest_short', 'telephony'],
-  gladia: ['default'],
-  speechmatics: ['default'],
-  talkscriber: ['default'],
-  'assembly-ai': ['nano', 'default']
-};
-
-const VAPI_LANGUAGES = [
-  'en', 'en-US', 'en-GB', 'en-AU', 'en-IN', 'en-NZ',
-  'es', 'es-419', 'es-LATAM',
-  'fr', 'fr-CA',
-  'de', 'de-CH',
-  'pt', 'pt-BR',
-  'it', 'ja', 'ko', 'ko-KR', 'zh', 'zh-CN', 'zh-TW',
-  'ru', 'nl', 'nl-BE', 'pl', 'sv', 'sv-SE', 'da', 'da-DK',
-  'fi', 'no', 'tr', 'hi', 'th', 'th-TH', 'vi', 'id', 'ms',
-  'cs', 'sk', 'ro', 'hu', 'bg', 'ca', 'el', 'et', 'lt', 'lv',
-  'uk', 'ta', 'ar', 'he', 'ur'
-];
-
-function populateSelect(selectId, options, currentValue) {
-  const sel = document.getElementById(selectId);
-  if (!sel) return;
-  sel.innerHTML = '';
-  let found = false;
-  options.forEach(opt => {
-    const o = document.createElement('option');
-    o.value = opt;
-    o.textContent = opt;
-    if (opt === currentValue) { o.selected = true; found = true; }
-    sel.appendChild(o);
-  });
-  // If current value isn't in the list, add it at top so nothing is lost
-  if (currentValue && !found) {
-    const o = document.createElement('option');
-    o.value = currentValue;
-    o.textContent = currentValue;
-    o.selected = true;
-    sel.insertBefore(o, sel.firstChild);
-  }
-}
-
-function onModelProviderChange() {
-  const provider = document.getElementById('voiceModelProvider').value;
-  populateSelect('voiceModelName', VAPI_MODEL_OPTIONS[provider] || [], '');
-}
-window.onModelProviderChange = onModelProviderChange;
-
-function onVoiceProviderChange() {
-  const provider = document.getElementById('voiceVoiceProvider').value;
-  populateSelect('voiceVoiceId', VAPI_VOICE_OPTIONS[provider] || [], '');
-}
-window.onVoiceProviderChange = onVoiceProviderChange;
-
-function onTranscriberProviderChange() {
-  const provider = document.getElementById('voiceTranscriberProvider').value;
-  populateSelect('voiceTranscriberModel', VAPI_TRANSCRIBER_MODELS[provider] || [], '');
-}
-window.onTranscriberProviderChange = onTranscriberProviderChange;
-
-function openVoiceModal() {
-  if (!voiceAssistant) return;
-  const a = voiceAssistant;
-
-  document.getElementById('voiceAssistantId').value = a.id;
-  document.getElementById('voiceName').value = a.name || '';
-  document.getElementById('voiceTemperature').value = a.temperature || 0.7;
-  document.getElementById('voiceMaxDuration').value = Math.round((a.max_duration_seconds || 600) / 60);
-  document.getElementById('voiceFirstMessage').value = a.first_message || '';
-  document.getElementById('voiceSystemPrompt').value = a.system_prompt || '';
-
-  // Set provider selects first, then populate dependent dropdowns with current values
-  document.getElementById('voiceModelProvider').value = a.model_provider || 'google';
-  populateSelect('voiceModelName', VAPI_MODEL_OPTIONS[a.model_provider || 'google'] || [], a.model_name || '');
-
-  document.getElementById('voiceVoiceProvider').value = a.voice_provider || 'vapi';
-  populateSelect('voiceVoiceId', VAPI_VOICE_OPTIONS[a.voice_provider || 'vapi'] || [], a.voice_id || '');
-
-  document.getElementById('voiceTranscriberProvider').value = a.transcriber_provider || 'deepgram';
-  populateSelect('voiceTranscriberModel', VAPI_TRANSCRIBER_MODELS[a.transcriber_provider || 'deepgram'] || [], a.transcriber_model || 'nova-2');
-  populateSelect('voiceTranscriberLanguage', VAPI_LANGUAGES, a.transcriber_language || 'en');
-
-  document.getElementById('voiceModal').classList.remove('hidden');
-}
-window.openVoiceModal = openVoiceModal;
-
-function closeVoiceModal() {
-  document.getElementById('voiceModal').classList.add('hidden');
-}
-window.closeVoiceModal = closeVoiceModal;
-
-async function saveVoiceAssistant() {
-  const id = document.getElementById('voiceAssistantId').value;
-  if (!id) return;
-
-  const btn = document.getElementById('saveVoiceBtn');
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
-
-  try {
-    const updates = {
-      name: document.getElementById('voiceName').value.trim(),
-      model_provider: document.getElementById('voiceModelProvider').value,
-      model_name: document.getElementById('voiceModelName').value,
-      voice_provider: document.getElementById('voiceVoiceProvider').value,
-      voice_id: document.getElementById('voiceVoiceId').value,
-      transcriber_provider: document.getElementById('voiceTranscriberProvider').value,
-      transcriber_model: document.getElementById('voiceTranscriberModel').value,
-      transcriber_language: document.getElementById('voiceTranscriberLanguage').value,
-      temperature: parseFloat(document.getElementById('voiceTemperature').value) || 0.7,
-      max_duration_seconds: (parseInt(document.getElementById('voiceMaxDuration').value) || 10) * 60,
-      first_message: document.getElementById('voiceFirstMessage').value.trim(),
-      system_prompt: document.getElementById('voiceSystemPrompt').value.trim(),
-      updated_at: new Date().toISOString()
-    };
-
-    const { error } = await supabase
-      .from('voice_assistants')
-      .update(updates)
-      .eq('id', id);
-
-    if (error) throw error;
-
-    // Refresh data
-    await loadVoiceAssistant();
-    renderVoiceConfig();
-    closeVoiceModal();
-    showToast('Voice assistant updated', 'success');
-  } catch (err) {
-    console.error('Error saving voice assistant:', err);
-    showToast('Failed to save: ' + err.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Save';
-  }
-}
-window.saveVoiceAssistant = saveVoiceAssistant;
-
-// showToast is now imported from admin-shell.js

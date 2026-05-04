@@ -50,24 +50,9 @@
       <div class="section test-ai-section">
         <div class="section-header">
           <h2>Test AI Assistant</h2>
-          <span id="testModeLabel" class="test-ai-label">Same as contact page</span>
         </div>
         <div class="section-body">
           <p class="context-description">Ask a question to test the AI assistant exactly as visitors would experience it on the contact page.</p>
-
-          <!-- User Impersonation (admin only) -->
-          <div id="impersonationRow" class="impersonation-row hidden">
-            <label class="impersonation-label">Test as:</label>
-            <div class="impersonation-input-wrap">
-              <input type="text" id="impersonateInput" class="impersonation-input" placeholder="Anonymous (contact page)" autocomplete="off">
-              <div id="impersonateDropdown" class="impersonation-dropdown hidden"></div>
-            </div>
-            <button id="impersonateClearBtn" class="btn-small btn-secondary impersonation-clear hidden">Clear</button>
-          </div>
-          <div id="impersonateChip" class="impersonate-chip hidden">
-            <span id="impersonateChipName"></span>
-            <span id="impersonateChipRole" class="impersonate-chip-role"></span>
-          </div>
 
           <div class="test-question-wrapper">
             <input type="text" id="testQuestionInput" class="test-question-input" placeholder="What would you like to know?" autocomplete="off">
@@ -177,17 +162,6 @@
         </div>
       </div>
 
-      <!-- Voice Assistant Config Section -->
-      <div class="section">
-        <div class="section-header">
-          <h2>Voice Assistant</h2>
-          <span class="test-ai-label">Vapi · Inbound Calls</span>
-          <button id="editVoiceBtn" class="btn-secondary btn-small hidden" style="margin-left: auto;" onclick="openVoiceModal()">Edit</button>
-        </div>
-        <div id="voiceConfigSection" class="section-body">
-          <div class="empty-state">Loading voice config...</div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -325,108 +299,6 @@
           </div>
         </div>
         <div id="recompileError" class="error-message hidden"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Voice Assistant Edit Modal -->
-  <div id="voiceModal" class="modal hidden">
-    <div class="modal-content" style="max-width: 700px;">
-      <div class="modal-header">
-        <h2>Edit Voice Assistant</h2>
-        <button class="modal-close" onclick="closeVoiceModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="voiceForm">
-          <input type="hidden" id="voiceAssistantId">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="voiceName">Name</label>
-              <input type="text" id="voiceName" placeholder="AI Concierge" required>
-            </div>
-            <div class="form-group form-group--narrow">
-              <label for="voiceTemperature">Temperature</label>
-              <input type="number" id="voiceTemperature" min="0" max="2" step="0.1" value="0.7">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="voiceModelProvider">Model Provider</label>
-              <select id="voiceModelProvider" onchange="onModelProviderChange()">
-                <option value="google">Google</option>
-                <option value="openai">OpenAI</option>
-                <option value="anthropic">Anthropic</option>
-                <option value="groq">Groq</option>
-                <option value="deepinfra">DeepInfra</option>
-                <option value="together-ai">TogetherAI</option>
-                <option value="openrouter">OpenRouter</option>
-                <option value="perplexity-ai">Perplexity</option>
-                <option value="azure-openai">Azure OpenAI</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="voiceModelName">Model Name</label>
-              <select id="voiceModelName"></select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="voiceVoiceProvider">Voice Provider</label>
-              <select id="voiceVoiceProvider" onchange="onVoiceProviderChange()">
-                <option value="vapi">Vapi</option>
-                <option value="11labs">ElevenLabs</option>
-                <option value="playht">PlayHT</option>
-                <option value="cartesia">Cartesia</option>
-                <option value="openai">OpenAI</option>
-                <option value="azure">Azure</option>
-                <option value="deepgram">Deepgram</option>
-                <option value="lmnt">LMNT</option>
-                <option value="rime-ai">RimeAI</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="voiceVoiceId">Voice ID</label>
-              <select id="voiceVoiceId"></select>
-            </div>
-          </div>
-          <div class="form-row form-row--three">
-            <div class="form-group">
-              <label for="voiceTranscriberProvider">Transcriber</label>
-              <select id="voiceTranscriberProvider" onchange="onTranscriberProviderChange()">
-                <option value="deepgram">Deepgram</option>
-                <option value="google">Google</option>
-                <option value="gladia">Gladia</option>
-                <option value="speechmatics">Speechmatics</option>
-                <option value="talkscriber">Talkscriber</option>
-                <option value="assembly-ai">AssemblyAI</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="voiceTranscriberModel">Model</label>
-              <select id="voiceTranscriberModel"></select>
-            </div>
-            <div class="form-group form-group--narrow">
-              <label for="voiceTranscriberLanguage">Language</label>
-              <select id="voiceTranscriberLanguage"></select>
-            </div>
-          </div>
-          <div class="form-group form-group--narrow">
-            <label for="voiceMaxDuration">Max Duration (min)</label>
-            <input type="number" id="voiceMaxDuration" min="1" max="60" value="10">
-          </div>
-          <div class="form-group">
-            <label for="voiceFirstMessage">First Message</label>
-            <textarea id="voiceFirstMessage" rows="2" placeholder="Hello! Thanks for calling..."></textarea>
-          </div>
-          <div class="form-group">
-            <label for="voiceSystemPrompt">System Prompt</label>
-            <textarea id="voiceSystemPrompt" rows="10" placeholder="You are..." class="mono-textarea"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeVoiceModal()">Cancel</button>
-        <button class="btn-primary" id="saveVoiceBtn" onclick="saveVoiceAssistant()">Save</button>
       </div>
     </div>
   </div>
