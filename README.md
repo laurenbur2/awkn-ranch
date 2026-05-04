@@ -1,122 +1,55 @@
-# AlpacApps Infra
+# AWKN
 
-A complete property management platform template. Clone it, run the setup wizard, and get a full-featured system for managing rentals, events, smart home devices, payments, and more — all on free or near-free infrastructure.
+Bespoke Business Operating System (BOS) backing two consumer brands:
 
-## What you get
+- **AWKN Ranch** — Austin wellness retreat property (`awknranch.com`)
+- **Within Center** — clinical brand for ketamine/inpatient retreats (`within.center`)
 
-### Core Platform
-- **Database + Auth + Storage** — Supabase (free tier)
-- **Website + Hosting** — GitHub Pages (free)
-- **Login + Admin Dashboard** — Role-based auth, 15+ admin pages
-- **Resident Portal** — Smart home controls, profile, bookkeeping
-
-### Communication
-- **Email** — Resend (free: 3,000/month)
-- **SMS** — Telnyx (~$0.004/message)
-- **WhatsApp** — Meta Business API
-
-### Payments & Documents
-- **Payments** — Stripe, Square, or PayPal
-- **E-Signatures** — SignWell (free: 3 docs/month)
-- **PDF Generation** — Lease agreements, contracts, receipts
-
-### Smart Home & IoT
-- **Lighting** — Govee, Home Assistant, WiZ
-- **Climate** — Google Nest thermostats
-- **Music** — Sonos multi-room audio
-- **Cameras** — UniFi Protect / RTSP via go2rtc
-- **Laundry** — LG ThinQ washer/dryer monitoring
-- **Vehicles** — Tesla Fleet API
-- **Appliances** — Anova Precision Oven, 3D printers, laser cutters
-
-### AI & Voice
-- **AI Assistant** — Gemini-powered property assistant
-- **Voice Calling** — Vapi voice agent
-- **Alexa Skill** — Room control via Alexa
-
-### Property Operations
-- **Rental Pipeline** — Inquiry → apply → review → sign → move-in
-- **Event Hosting** — Full event management workflow
-- **Associate Management** — Clock in/out, timesheets, payouts
-- **Airbnb Sync** — iCal calendar integration
-- **Mobile App** — iOS/Android via Capacitor 8
-
-## Prerequisites
-
-| Tool | Install |
-|------|---------|
-| **Git** | [git-scm.com/downloads](https://git-scm.com/downloads) |
-| **Claude Code** | [docs.anthropic.com/claude-code](https://docs.anthropic.com/en/docs/claude-code/overview) |
-| **GitHub account** | [github.com/signup](https://github.com/signup) |
-
-## Quick start
-
-```bash
-# 1. Clone this repo
-git clone https://github.com/rsonnad/alpacapps-infra.git my-project
-cd my-project
-
-# 2. Open Claude Code
-claude
-
-# 3. Run the setup wizard
-/setup-alpacapps-infra
-```
-
-The wizard will:
-1. Ask what you're building (7 persona templates available)
-2. Create a new GitHub repo under your account
-3. Set up Supabase (database, auth, storage, edge functions)
-4. Customize branding, domain, and credentials
-5. Deploy your site live on GitHub Pages
+The admin BOS at `/spaces/admin/` is the source of truth for both. Long-term plan and Next.js migration scope: see [`docs/ECOSYSTEM-MAP.md`](docs/ECOSYSTEM-MAP.md).
 
 ## Architecture
 
 ```
 Browser → GitHub Pages (static HTML/JS/CSS)
-                ↓
-         Supabase (PostgreSQL + Edge Functions + Auth + Storage)
+              ↓
+       Supabase (Postgres + Auth + Storage + Edge Functions)
 ```
 
 - **Frontend:** Vanilla HTML/JS + Tailwind CSS v4
-- **Backend:** Supabase (75+ edge functions, RLS, JWT auth)
-- **Hosting:** GitHub Pages (no build step, push to deploy)
+- **Backend:** Supabase (edge functions, RLS, JWT auth)
+- **Hosting:** GitHub Pages — no build step, push to deploy
 - **Mobile:** Capacitor 8 (iOS + Android wrapper)
 
 ## Project structure
 
 ```
-shared/           — 47 JS modules (auth, services, shells, widgets)
-styles/           — Tailwind v4 design tokens + CSS
-login/            — Authentication pages
-spaces/           — Rental listing + admin dashboard (65+ pages)
-residents/        — Resident portal (device control, profile)
-associates/       — Staff hours tracking + work photos
-events/           — Event hosting pipeline
-pay/              — Self-service payment page
+spaces/        Public spaces + admin BOS (CRM, Master Schedule, Venue, Proposals)
+associates/    Staff hours tracking + work photos
+login/         Authentication pages
+shared/        JS modules (auth, services, shells, widgets)
+styles/        Tailwind v4 design tokens
 supabase/
-  functions/      — 63 edge functions
-  migrations/     — 33 database migrations
-mobile/           — Capacitor iOS/Android app
+  functions/   Edge functions
+  migrations/  Database migrations
+mobile/        Capacitor iOS/Android app
+infra/         AWKN Ranch infra setup wizard
+docs/          Project documentation (load on demand per CLAUDE.md)
 ```
 
-## Persona templates
+## Documentation
 
-| Template | Best for |
-|----------|----------|
-| Vacation Rental | Short-term rentals with Airbnb sync + smart home |
-| Long-term Landlord | Lease management + rent collection |
-| Event Venue | Event pipeline with contracts + payments |
-| Hostel / Co-living | Mixed rooms + work-trade + shared amenities |
-| Personal AI Hub | Smart home + AI assistant (no property mgmt) |
-| Small Business | CRM + invoicing + communication |
-| Developer Portfolio | Auth + payments starter kit |
+- [`CLAUDE.md`](CLAUDE.md) — project directives + on-demand doc routing for Claude Code
+- [`STATUS.md`](STATUS.md) — current feature status + recent changes
+- [`TODO.md`](TODO.md) — tracked work items (Critical / Bugs / Tech Debt / Enhancements)
+- [`docs/ECOSYSTEM-MAP.md`](docs/ECOSYSTEM-MAP.md) — architecture, surface inventory, Next.js migration plan
+- `docs/SCHEMA.md`, `docs/PATTERNS.md`, `docs/INTEGRATIONS.md`, `docs/KEY-FILES.md`, `docs/DEPLOY.md` — feature-specific docs, load when relevant
 
-## Customization
+## Workflow
 
-See [CUSTOMIZATION.md](CUSTOMIZATION.md) for details on branding, features, and configuration.
+Multi-developer project. Each dev commits to their **own named branch** (e.g. `miceli`), pushes to remote, opens a PR into `main` for review. Never commit directly to `main`.
+
+CI bumps the version on push to `main` — never bump locally.
 
 ## License
 
-AGPL-3.0 — see [LICENSE](LICENSE).
-
+Proprietary — see [LICENSE](LICENSE). All rights reserved.

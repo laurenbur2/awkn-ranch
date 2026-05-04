@@ -1,6 +1,7 @@
 {
   "name": "awkn-ranch",
   "version": "1.0.0",
+  "private": true,
   "description": "Bespoke Business Operating System backing AWKN Ranch (Austin wellness retreat) and Within Center (clinical brand for ketamine/inpatient retreats). Static HTML/JS + Tailwind v4 on GitHub Pages, Supabase backend.",
   "main": "app.js",
   "directories": {
@@ -12,7 +13,7 @@
   },
   "keywords": ["awkn-ranch", "within-center", "business-operating-system", "wellness-retreat", "supabase", "tailwind", "github-pages"],
   "author": "",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.18",
     "tailwindcss": "^4.1.18"
