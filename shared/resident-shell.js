@@ -8,7 +8,6 @@ import { supabase } from './supabase.js';
 import { initAuth, getAuthState, signOut, onAuthStateChange, hasAnyPermission } from './auth.js';
 import { errorLogger } from './error-logger.js';
 import { supabaseHealth } from './supabase-health.js';
-import { initPaiWidget } from './pai-widget.js';
 import { setupVersionInfo } from './version-info.js';
 import { renderHeader, initSiteComponents } from './site-components.js';
 import { initNavTabList, scrollActiveIntoView } from './tab-utils.js';
@@ -20,7 +19,7 @@ import { getEnabledFeatures } from './feature-registry.js';
 // Permission keys for staff/admin section detection (context switcher)
 const STAFF_PERMISSION_KEYS = [
   'view_spaces', 'view_rentals', 'view_events', 'view_media', 'view_sms',
-  'view_hours', 'view_faq', 'view_voice', 'view_todo', 'view_appdev',
+  'view_hours', 'view_faq', 'view_todo', 'view_appdev',
 ];
 const ADMIN_PERMISSION_KEYS = [
   'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev',
@@ -56,7 +55,6 @@ const TAB_ICONS = {
   profile:    _i('<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
   bookkeeping:_i('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),
   media:      _i('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'),
-  askpai:     _i('<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'),
 };
 
 const DEVICE_SUBTABS = [
@@ -75,14 +73,12 @@ const RESIDENT_CORE_TABS = [
   { id: 'profile', label: 'Profile', href: 'profile.html', permission: 'view_profile' },
   { id: 'bookkeeping', label: 'Bookkeeping', href: 'bookkeeping.html', permission: 'view_profile' },
   { id: 'media', label: 'Imagery', href: 'media.html', permission: 'view_profile' },
-  { id: 'askpai', label: 'Ask PAI', href: 'ask-pai.html', permission: 'view_profile', feature: 'pai' },
 ];
 
 const RESIDENT_STAFF_TABS = [
   { id: 'profile', label: 'Profile', href: 'profile.html', permission: 'view_profile' },
   { id: 'bookkeeping', label: 'Bookkeeping', href: 'bookkeeping.html', permission: 'view_profile' },
   { id: 'media', label: 'Imagery', href: 'media.html', permission: 'view_profile' },
-  { id: 'askpai', label: 'Ask PAI', href: 'ask-pai.html', permission: 'view_profile', feature: 'pai' },
 ];
 
 // =============================================
@@ -277,7 +273,6 @@ function renderContextSwitcher(authState) {
     { perm: 'view_purchases', href: 'purchases.html' },
     { perm: 'view_hours', href: 'worktracking.html' },
     { perm: 'view_faq', href: 'faq.html' },
-    { perm: 'view_voice', href: 'voice.html' },
     // PlanList lived under DevControl, which has been retired.
     { perm: 'view_appdev', href: 'appdev.html' },
   ];
@@ -648,7 +643,7 @@ export async function initResidentPage({ activeTab, requiredRole = 'resident', r
       // Render tab navigation (pass full auth state for permission checks)
       await renderResidentTabNav(activeTab, state);
 
-      // Sign out handlers + PAI widget + version info (only bind once). Use delegation on userInfo so header dropdown Sign Out is reliable.
+      // Sign out handlers + version info (only bind once). Use delegation on userInfo so header dropdown Sign Out is reliable.
       if (!pageContentShown) {
         const handleSignOut = async () => {
           await signOut();
@@ -663,7 +658,6 @@ export async function initResidentPage({ activeTab, requiredRole = 'resident', r
             handleSignOut();
           }
         });
-        initPaiWidget();
         setupVersionInfo();
       }
 

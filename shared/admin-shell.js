@@ -19,11 +19,11 @@ import { getEnabledFeatures } from './feature-registry.js';
 const STAFF_PERMISSION_KEYS = [
   'view_dashboard', 'view_staff_directory',
   'view_spaces', 'view_rentals', 'view_events', 'view_media', 'view_sms',
-  'view_purchases', 'view_hours', 'view_faq', 'view_voice', 'view_todo', 'view_appdev',
+  'view_purchases', 'view_hours', 'view_faq', 'view_todo', 'view_appdev',
   'view_crm', 'view_memberships', 'view_scheduler', 'view_calendar',
 ];
 const ADMIN_PERMISSION_KEYS = [
-  'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev', 'view_openclaw', 'view_devcontrol',
+  'view_users', 'view_passwords', 'view_settings', 'view_templates', 'view_accounting', 'view_testdev', 'view_devcontrol',
   'manage_users', 'manage_job_titles',
 ];
 
@@ -40,7 +40,6 @@ const TAB_ICONS = {
   purchases:  _i('<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>'),
   hours:      _i('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
   faq:        _i('<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>'),
-  voice:      _i('<path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'),
   todo:       _i('<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>'),
   phyprop:    _i('<path d="M2 22V8l10-6 10 6v14"/><path d="M6 12v10"/><path d="M18 12v10"/><path d="M2 22h20"/><rect x="9" y="14" width="6" height="8"/>'),
   appdev:     _i('<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'),
@@ -52,7 +51,6 @@ const TAB_ICONS = {
   brand:      _i('<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>'),
   accounting: _i('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),
   testdev:    _i('<path d="M9 3h6v4H9z"/><path d="M10 7v5l-4 8h12l-4-8V7"/>'),
-  openclaw:   _i('<path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/>'),
   devcontrol: _i('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'),
   crm:        _i('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'),
   clients:    _i('<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>'),
@@ -109,8 +107,7 @@ export const ALL_ADMIN_TABS = [
   { id: 'media', label: 'Media', href: 'media.html', permission: 'view_media', section: 'staff', feature: '_hidden' },
   { id: 'sms', label: 'SMS', href: 'sms-messages.html', permission: 'view_sms', section: 'staff', feature: 'sms' },
   { id: 'hours', label: 'Workstuff', href: 'worktracking.html', permission: 'view_hours', section: 'staff', feature: 'associates' },
-  { id: 'faq', label: 'FAQ/AI', href: 'faq.html', permission: 'view_faq', section: 'staff', feature: 'pai' },
-  { id: 'voice', label: 'Concierge', href: 'voice.html', permission: 'view_voice', section: 'staff', feature: 'voice' },
+  { id: 'faq', label: 'FAQ', href: 'faq.html', permission: 'view_faq', section: 'staff' },
   { id: 'todo', label: 'Todo', href: 'planlist.html', section: 'staff', feature: '_hidden' },
   { id: 'phyprop', label: 'PhyProp', href: 'phyprop.html', permission: 'view_spaces', section: 'staff', feature: '_hidden' },
   { id: 'appdev', label: 'App Dev', href: 'appdev.html', permission: 'view_appdev', section: 'staff', feature: '_hidden' },
@@ -122,7 +119,6 @@ export const ALL_ADMIN_TABS = [
   { id: 'releases', label: 'Releases', href: 'releases.html', permission: 'view_settings', section: 'admin' },
   { id: 'templates', label: 'Templates', href: 'templates.html', permission: 'view_templates', section: 'admin', feature: 'documents' },
   { id: 'accounting', label: 'Accounting', href: 'accounting.html', permission: 'view_accounting', section: 'admin' },
-  { id: 'openclaw', label: 'AlpaClaw', href: 'alpaclaw.html', permission: 'view_openclaw', section: 'admin', feature: 'pai' },
   // Removed from Admin nav per request: Brand, Notifications, Test Dev, DevControl.
   // Their pages now redirect to the dashboard for any cached link. Permission
   // keys (view_devcontrol, view_testdev) intentionally kept in

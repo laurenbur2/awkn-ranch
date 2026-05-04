@@ -23,7 +23,6 @@ export const FEATURES = {
   email:      { label: 'Email',      core: false, description: 'Email notifications (Resend)' },
   sms:        { label: 'SMS',        core: false, description: 'SMS notifications (Telnyx)' },
   whatsapp:   { label: 'WhatsApp',   core: false, description: 'WhatsApp messaging' },
-  voice:      { label: 'Voice',      core: false, description: 'Vapi voice calling' },
 
   // Payments
   payments_stripe: { label: 'Stripe',    core: false, description: 'Stripe payments + ACH' },
@@ -57,7 +56,6 @@ export const FEATURES = {
   airbnb:     { label: 'Airbnb',     core: false, description: 'Airbnb iCal calendar sync' },
 
   // AI
-  pai:        { label: 'PAI',        core: false, description: 'AI assistant (chat, voice, email)' },
   alexa:      { label: 'Alexa',      core: false, description: 'Alexa skill integration' },
 };
 
