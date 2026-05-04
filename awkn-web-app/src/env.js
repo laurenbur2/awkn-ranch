@@ -3,13 +3,19 @@ import { z } from "zod";
 
 export const env = createEnv({
   /**
-   * Server-side env. DATABASE_URL + SUPABASE_SERVICE_ROLE_KEY are required at
-   * type-check time but only actually called during Phases 2.3+ (Drizzle pull
-   * + server-side admin operations). For Phase 2.1 a placeholder DATABASE_URL
-   * is fine — `db` is created lazily and never accessed by the stub pages.
+   * Server-side env.
+   *
+   * Either set `SUPABASE_DB_PASSWORD` and let us compose the URL, OR set
+   * `DATABASE_URL` directly (overrides the composed URL). The composed URL
+   * targets the session pooler so it works for both `drizzle-kit pull`
+   * introspection and runtime queries.
+   *
+   * `SUPABASE_SERVICE_ROLE_KEY` becomes required from Phase 2.4 onward
+   * (server-side admin operations); optional during scaffold.
    */
   server: {
-    DATABASE_URL: z.string().min(1),
+    SUPABASE_DB_PASSWORD: z.string().min(1).optional(),
+    DATABASE_URL: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -28,6 +34,7 @@ export const env = createEnv({
   },
 
   runtimeEnv: {
+    SUPABASE_DB_PASSWORD: process.env.SUPABASE_DB_PASSWORD,
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     NODE_ENV: process.env.NODE_ENV,

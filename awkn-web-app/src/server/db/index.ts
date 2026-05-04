@@ -1,57 +1,51 @@
 import "server-only";
 
-// PostgreSQL imports
 import { drizzle as drizzlePg } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-// SQLite imports
-import { drizzle as drizzleSqlite } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
-
 import { env } from "~/env";
+import { resolveDbUrlFromEnv } from "~/lib/db-url";
 import * as schema from "./schema";
 
 /**
- * Database client configuration
+ * Database client (Postgres / Supabase via Drizzle).
  *
- * Automatically detects and uses the appropriate database driver based on DATABASE_URL:
- * - PostgreSQL/Supabase: URLs starting with "postgresql://"
- * - SQLite/LibSQL: URLs starting with "file:" or "libsql://"
+ * Created lazily — the connection isn't opened until the first query, so
+ * pages that don't touch the DB (Phase 2.1/2.2 stubs) don't pay the cost
+ * and don't crash if the password isn't set yet.
  */
 
-// Detect database type from URL
-const isPostgres = env.DATABASE_URL.startsWith("postgresql://");
+type PgClient = ReturnType<typeof postgres>;
+type DrizzleClient = ReturnType<typeof drizzlePg<typeof schema>>;
 
-function createDatabase() {
-  if (isPostgres) {
-    // PostgreSQL/Supabase configuration
-    const globalForDb = globalThis as unknown as {
-      conn: ReturnType<typeof postgres> | undefined;
-    };
+const globalForDb = globalThis as unknown as {
+  conn: PgClient | undefined;
+  drizzleClient: DrizzleClient | undefined;
+};
 
-    const conn =
-      globalForDb.conn ??
-      postgres(env.DATABASE_URL, {
-        prepare: false,
-      });
-    if (env.NODE_ENV !== "production") globalForDb.conn = conn;
-
-    return drizzlePg(conn, { schema });
-  } else {
-    // SQLite/LibSQL configuration
-    const globalForDb = globalThis as unknown as {
-      conn: ReturnType<typeof createClient> | undefined;
-    };
-
-    const conn =
-      globalForDb.conn ??
-      createClient({
-        url: env.DATABASE_URL,
-      });
-    if (env.NODE_ENV !== "production") globalForDb.conn = conn;
-
-    return drizzleSqlite(conn, { schema });
-  }
+function createDrizzleClient(): DrizzleClient {
+  const url = resolveDbUrlFromEnv({
+    DATABASE_URL: env.DATABASE_URL,
+    SUPABASE_DB_PASSWORD: env.SUPABASE_DB_PASSWORD,
+  });
+  const conn =
+    globalForDb.conn ??
+    postgres(url, {
+      prepare: false,
+    });
+  if (env.NODE_ENV !== "production") globalForDb.conn = conn;
+  return drizzlePg(conn, { schema });
 }
 
-export const db = createDatabase() as any;
+/**
+ * Lazy proxy — first property access on `db` triggers the connection.
+ * Stub pages that never touch `db` won't open a Postgres connection.
+ */
+export const db = new Proxy({} as DrizzleClient, {
+  get(_target, prop, receiver) {
+    if (!globalForDb.drizzleClient) {
+      globalForDb.drizzleClient = createDrizzleClient();
+    }
+    return Reflect.get(globalForDb.drizzleClient, prop, receiver);
+  },
+});
