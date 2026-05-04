@@ -7,32 +7,20 @@
 
 ## Critical (blocks production)
 
-### Phase 1 prerequisites — CTO answers (@miceli)
+### Phase 1 — Open questions
 
-**Resolved 2026-05-03:**
-- [x] **Vapi decommission** — GO. Approved wholesale (Pass 4 unblocked).
-- [x] **Vehicles table** — DROP. Deferred to end-of-program cutover (no Phase 1 prod write).
-- [x] **PAI's new identity** — moot (Vapi decommissioned wholesale).
-- [x] **Mac LaunchAgents** — all irrelevant. No Mac running background processes for AWKN.
+**Resolved (2026-05-03):** Vapi decommission GO, vehicles table DROP, PAI moot, Mac LaunchAgents irrelevant. Open Question #1 (post-login redirect) resolved in `8d5ebd02` — empirical prod check found zero users with role=resident/associate.
 
-**Resolved 2026-05-03 (Pass 2 Tier 2):**
-- [x] **New default landing page** (Open Question #1) — Resolved by dropping the dead resident/associate redirect branch from `login/app.js` and `login/update-password.html`. Empirical check: zero users in prod with role=resident or role=associate. Roles preserved in DB enum for Phase 5 client portal. (8d5ebd02)
+**Open for COO:**
+- [ ] **SignWell webhook status** — Is SignWell actively used (Within inpatient agreements? AWKN Ranch retreat housing?) or fully retired? Empirically can't fire in prod (missing tables `signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests`; 0 rows in `crm_proposals` + `within_retreat_agreements`). User's hunch: not in use. Determines deletion vs dormant-but-keep.
 
-**Still open (Pass 2 Tier 2):**
-- [ ] **profile.html destination** (Open Question #2) — `create-payment-link/index.ts:128` (Stripe success URL), `signwell-webhook/index.ts:638, 669, 941` (rental email CTA), `shared/site-components.js:442, 470` (header dropdown). SignWell empirically broken in prod (missing tables: `signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests`; `crm_proposals` + `within_retreat_agreements` exist with 0 rows).
+**Open for CTO:**
+- [ ] **Open Question #2 — SignWell email CTA** (`signwell-webhook/index.ts:638, 669, 941`) — depends on SignWell decision above. Live surfaces (Stripe success, header dropdown, directory edit-link) already resolved in `3d0c8a7f`.
+- [ ] **`/directory/` historical intent** — intentional AWKN scaffolding for client profiles, or partially-rebranded residue? User theory: scaffolding. Preserve regardless; answer informs Phase 5 build approach.
+- [ ] **Upstream-template-sync** — `infra/updates.json`, `infra/infra-upgrade-guide.md`, `infra/infra-upgrade-prompt.md` (+ poll in `shared/update-checker.js:6`). AWKN forked per program spec — still want to track upstream features?
+- [ ] **`mobile/` status** — 1.1MB Capacitor 8 + iOS + Android, but 100% IoT control (all 5 tabs are IoT). Never shipped. Options: delete entirely vs preserve as future client-mobile scaffolding (caveat: Next.js future may use RN/PWA, Capacitor may not transfer). Currently has broken import after sonos-data.js delete.
 
-**Open for COO (@matthew → COO):**
-- [ ] **SignWell webhook status** — Is SignWell actively used for any AWKN/Within flow (e.g. Within inpatient stay agreements, AWKN Ranch retreat housing), or fully retired? Empirically the webhook can't fire in prod today (missing tables, zero rows in the two that exist). User's hunch: not in use. Determines whether `signwell-webhook/index.ts` is deletion candidate or dormant-but-keep.
-
-**Open for CTO (@matthew → CTO):**
-- [ ] **`/directory/` historical intent** — Was the `/directory/` page (`directory/index.html`, `directory/app.js`) intentional AWKN scaffolding for a planned client profile feature, or unfinished Alpaca residue that got partially rebranded? User theory: intentional scaffolding. Preservation decision stands either way (AWKN wants client profiles eventually) — answer informs whether the eventual Next.js client portal builds on `/directory/`'s shape or starts fresh.
-- [ ] **Upstream-template-sync mechanism** — `infra/updates.json` (still points at `rsonnad/alpacapps-infra` + `alpacaplayhouse.com`), `infra/infra-upgrade-guide.md` (still titled "AlpacApps Infra"), `infra/infra-upgrade-prompt.md`. The polled feed (`shared/update-checker.js:6`) checks the upstream template for new features. AWKN forked away per program spec, so this is dormant — but is the team still interested in tracking upstream changes? Determines whether these three files are deletion candidates.
-- [ ] **Mobile app status** — entire `mobile/` dir (1.1MB, Capacitor 8 + iOS + Android + web shell) is **100% IoT control** today. All 5 tabs are IoT surfaces (cameras, music, lights, climate, cars). Apple Developer enrollment + Match cert repo never set up — **app has never shipped**. With IoT being decommissioned, the entire app is dormant scaffolding. Options: (a) delete `mobile/` entirely (cleanest, ~1.1MB + tab-related shell code), (b) preserve as scaffolding for an eventual AWKN client mobile app (similar logic to `/directory/` and `resident-shell.js`). Note: if AWKN goes Next.js per program spec, future mobile probably uses RN or a PWA — Capacitor scaffolding may not transfer. Flagged because `mobile/app/tabs/music-tab.js` has a broken import (sonos-data.js was deleted in `f373917d`), so the mobile app no longer parses cleanly.
-
-**Process directives:**
-- Bit-by-bit review — files reviewed in chunks before deletion, tier-B granularity (bulk for obvious residue, per-file for AWKN-touching surgery).
-- Direct commits to `miceli`, no sub-branch.
-- Zero prod DB writes during Phase 1.
+**Process directives:** bit-by-bit review (tier-B granularity), commits direct to `miceli`, zero prod DB writes (read-only OK).
 
 ## Bugs (broken functionality)
 
@@ -42,10 +30,23 @@ _(none flagged this session)_
 
 ### Phase 1 — Alpaca purge + repo hygiene (in progress)
 
-Six passes per Phase 1 spec §6. ~37k LOC slated for removal across Pass 2-4.
+Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
 
-- [x] **Pass 1** — Inventory: 531-line manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md` + gitignore (154a1f59)
-- [ ] **Pass 2** — Triage & Delete: Tier 1 categories + Tier 2 surgery + IoT edge function undeploy (~10-15 commits)
+- [x] **Pass 1** — Inventory: 531-line manifest at `docs/superpowers/work/2026-05-03-alpaca-inventory.md` + gitignore (`154a1f59`)
+- [~] **Pass 2** — Triage & Delete: ~85% done (17 commits, `6267b816` → `a2cce3cd`)
+  - [x] Tier 1 bulk deletes: build artifacts, `/residents/`, pollers, IoT edge functions, macOS dupes
+  - [x] Open Question #1 resolved (post-login redirect)
+  - [x] Open Question #2 resolved for live surfaces (Stripe + dropdown + directory edit-link)
+  - [x] 24 admin context-switcher boilerplate sweep
+  - [x] Shared shell surgery (admin-shell, associate-shell, personal-page-shell)
+  - [x] 404 routing + tailwind sources + mobile copy-web cleanup
+  - [x] 3 confirmed-residue file deletes (sonos-data, lighting-data, docs/alpacappsinfra.html)
+  - [x] Branding rename (`package.json`, fastlane, deleted-doc link repointing)
+  - [x] Proprietary licensing + AWKN-specific README rewrite
+  - [x] `home-assistant-control` IoT edge function delete
+  - [x] 4 manifest reclassifications (`/directory/`, `infra/`, `resident-shell.js`, `mobile/`)
+  - [ ] **Hot spots remaining:** `feature-manifest.json` (37 hits), `spaces/admin/inventory.js` (28 hits), `property-ai/index.ts` IoT loaders (124 hits — voice deferred to Pass 4)
+  - [ ] **Task 2.11:** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant)
 - [ ] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~5-7 commits)
 - [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed)
 - [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)
@@ -79,10 +80,16 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 When picking this back up:
 
 1. **Run `/resume`** to load this state.
-2. **Read the Phase 1 plan** (`docs/superpowers/plans/2026-05-03-phase-1-alpaca-purge.md`) — bite-sized executable plan.
-3. **Read the Pass 1 inventory** (`docs/superpowers/work/2026-05-03-alpaca-inventory.md`) — what's about to be deleted.
-4. **Pass 2 starts at Task 2.5** (build artifacts `.next/` + `out/`) per the manifest's advisory ordering — biggest LOC win, zero risk. Then `/residents/` (Task 2.1), top-level pollers (2.2), IoT edge functions (2.4), etc.
-5. **Surface Open Questions #1 and #2** when `login/app.js:95` and `signwell-webhook/index.ts:638-941` come up in Pass 2 Tier 2 (Tasks 2.8 and 2.9).
-6. **OrbStack is installed** at `/Applications/OrbStack.app` — launch it once before Pass 5 to start the Docker daemon.
+2. **Read the updated inventory manifest** (`docs/superpowers/work/2026-05-03-alpaca-inventory.md`) — see the 4 reclassifications added during Pass 2 audits.
+3. **Pass 2 hot spots are next** (heavier decision content per file):
+   - `supabase/functions/home-assistant-control/` ✅ deleted (`1387cc3e`)
+   - `feature-manifest.json` (37 hits) — strip IoT/Vapi feature flags, keep AWKN-only
+   - `spaces/admin/inventory.js` (28 hits) — strip Mac LaunchDaemon + IoT inventory blobs
+   - `supabase/functions/property-ai/index.ts` (124 hits) — IoT data loaders (lines ~207-262, 1391-1392, 390/468-474/566/2324 URLs); voice/Vapi parts at 3241+ deferred to Pass 4
+4. **Then Task 2.11 — prod undeploy** of 11 IoT edge functions (CLI is already linked: `supabase functions delete <name> --project-ref lnqxarwqckpmirpmixcw`). Destructive against prod — explicit gate.
+5. **4 CTO/COO questions accumulated** during Pass 2 audits — see "Open for COO" and "Open for CTO" sections above. SignWell, `/directory/` historical intent, upstream-template-sync, mobile/ status.
+6. **18 unpushed commits** on `miceli` (since `f1556fdb` handoff). Push when convenient.
+7. **OrbStack is installed** at `/Applications/OrbStack.app` — launch it once before Pass 5 to start the Docker daemon.
+8. **Supabase CLI is now installed** (v2.95.4) and linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` worked well during Pass 2 audits and informed several decisions empirically.
 
 The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is now scheduled for deletion in Phase 1 Pass 6 (was end-of-Phase-2 in the original recommendation).
