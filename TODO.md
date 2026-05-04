@@ -16,6 +16,7 @@
 
 **Open for CTO:**
 - [ ] **Open Question #2 — SignWell email CTA** (`signwell-webhook/index.ts:638, 669, 941`) — depends on SignWell decision above. Live surfaces (Stripe success, header dropdown, directory edit-link) already resolved in `3d0c8a7f`.
+- [ ] **Bitwarden Vapi cleanup (manual)** — Search "vapi" in Bitwarden vault, delete or archive entries (VAPI_API_KEY, VAPI_WEBHOOK_SECRET, VAPI assistant IDs, etc.). Repo and CI are clean. Supabase Functions env vars on the deleted edge functions ride along with Task 2.11 prod-side undeploy at end-of-program cutover.
 - [ ] **`/directory/` historical intent** — intentional AWKN scaffolding for client profiles, or partially-rebranded residue? User theory: scaffolding. Preserve regardless; answer informs Phase 5 build approach.
 - [ ] **Upstream-template-sync** — `infra/updates.json`, `infra/infra-upgrade-guide.md`, `infra/infra-upgrade-prompt.md` (+ poll in `shared/update-checker.js:6`). AWKN forked per program spec — still want to track upstream features?
 
@@ -49,9 +50,14 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [→] `property-ai/index.ts` (4019 lines, 236 hits) **reclassified to Pass 4 wholesale delete.** PAI moot per CTO 2026-05-03; the entire edge function dies with Vapi decommission, so surgical IoT-stripping here would be wasted work.
   - [→] **Task 2.11** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant) — **deferred to end-of-program cutover.** Per prod-discipline rule, no prod-side mutation (DB writes, edge function deploy/undeploy) during refactor. Bundled with the single end-of-program prod write.
 - [x] **Pass 3** — Page Audit: 41 admin pages audited across 7 chunks. 1 deletion total (`lifeofpaiadmin.html` broken redirect). 5 intentional legacy redirects preserved (Justin's design). 4 pages tagged for Pass 4 (PAI/Vapi cluster). Pillar tags: 4 Ranch / 2 Within / 1 Retreat / 1 Memberships / 1 Master / 28 Cross-cutting. Output: `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-- [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed). **Includes wholesale delete of `supabase/functions/property-ai/index.ts`** (4019 lines, was Pass 2 hot spot until reclassified).
+- [x] **Pass 4** — Vapi/PAI/AlpaClaw wholesale decommission: 4 batches, 22 files, ~9,500 LOC removed (`e4ea7abb` → `acc506fe`).
+  - [x] Batch A: 13 wholesale deletes (5 edge funcs incl. property-ai 4019 lines, 6 admin pages, 2 shared modules) — 7,867 LOC
+  - [x] Batch B: shell + feature-registry surgery (admin-shell, resident-shell, feature-registry)
+  - [x] Batch C: page surgery (faq.{html,js} -615 LOC, accounting.{html,js}, contact/index.html)
+  - [x] Batch D: webhook surgery (resend-inbound-webhook 3563→2580, all 13 PAI/AlpaClaw functions removed; herd/payments/guestbook/claudero preserved)
+  - [→] Batch E: env vars + Bitwarden — repo had no Vapi env files / CI secrets. Bitwarden cleanup is a manual user action (search "vapi", delete/archive). Supabase Functions env vars on the deleted edge functions are deferred to Task 2.11 cutover per prod-discipline rule.
 - [ ] **Pass 5** — Audit (read-only on prod) + local Supabase clone via `supabase start` + droplet poller stop + LOCAL-DEV.md (zero prod writes)
-- [ ] **Pass 6** — Docs sweep + delete `awkn-pre-reset-2026-05-01/` insurance folder
+- [ ] **Pass 6** — Docs sweep (CUSTOMIZATION, ECOSYSTEM-MAP, INTEGRATIONS, KEY-FILES, SCHEMA, SECRETS-BITWARDEN — all still reference deleted PAI/Vapi surfaces) + delete `awkn-pre-reset-2026-05-01/` insurance folder + `infra/index.html` hero refresh (currently references `property-ai-banner.png`)
 
 ### Phase 2-7 (deferred to their own brainstorms)
 
@@ -82,21 +88,22 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 When picking this back up:
 
 1. **Run `/resume`** to load this state.
-2. **Pass 4 is next — Vapi/PAI decommission.** Larger than originally scoped because Pass 2 reclassifications added to it:
-   - `supabase/functions/property-ai/index.ts` (4019 lines, 236 IoT/voice/PAI hits) — wholesale delete
-   - Admin pages tagged in Pass 3 chunk 1: `ai-admin.{html,js}` (AlpaClaw/OpenClaw chat gateway), `pai-imagery.{html,js}`, `voice.{html,js}` — wholesale delete
-   - `faq.{html,js}` — surgery (rip PAI/Vapi guts; FAQ data may be AWKN-relevant — decide in-pass)
-   - All `feature: 'pai'` and `feature: 'voice'` gated tab entries in `shared/admin-shell.js` (faq, voice, openclaw)
-   - Vapi env vars + Bitwarden secrets cleanup
-   - Edge function source removal under `supabase/functions/vapi-*` (code-side only — prod undeploy is Task 2.11, deferred)
+2. **Pass 5 is next — local Supabase clone.** Steps:
+   - Launch OrbStack (Docker daemon) once before starting
+   - `supabase start` to spin up local Postgres clone
+   - Stop droplet IoT pollers (`tesla-poller`, `lg-poller` — should already be dormant after Pass 2)
+   - Write `LOCAL-DEV.md` documenting the local→prod workflow
+   - Read-only prod audit allowed; **zero prod writes** per prod-discipline rule
 3. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
    - SignWell webhook status (COO call — empirically dead but determines delete-vs-dormant)
    - `/directory/` historical intent (informs Phase 5 build approach; preserve regardless)
    - Upstream-template-sync (`infra/` directory — track or fork-and-forget?)
-4. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 4 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
-5. **Branch state:** `miceli` is up to date with origin/miceli (last push `218ecbae`). 30+ commits ahead of `origin/main`; stay on `miceli` per branching model.
-6. **Pillar tags ready** for both Pass 4 disposition and Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
-7. **OrbStack** installed at `/Applications/OrbStack.app` — launch once before Pass 5 to start Docker daemon.
-8. **Supabase CLI** v2.95.4 linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` work well; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
+4. **Manual Bitwarden Vapi cleanup** still pending (see Critical → Open for CTO).
+5. **Tech-debt flagged for separate sweep** (cross-cutting, not Pass 5 scope): 6 hardcoded `SUPABASE_ANON_KEY` JWTs in `crm.js` + `clients.js` should import from `shared/supabase.js`.
+6. **Branch state:** `miceli` is up to date with origin/miceli. 35+ commits ahead of `origin/main`; stay on `miceli` per branching model.
+7. **Pillar tags ready** for Phase 6 IA work — see `docs/superpowers/work/2026-05-03-page-pillar-tags.md`.
+8. **OrbStack** installed at `/Applications/OrbStack.app` — launch once before Pass 5 to start Docker daemon.
+9. **Supabase CLI** v2.95.4 linked to project `lnqxarwqckpmirpmixcw` (AWKNRanch). Read-only queries via `supabase db query --linked --output table "..."` work well; **zero prod-side mutations** (DB writes, edge function deploy/undeploy) per prod-discipline rule.
+10. **Pass 6 doc-sweep targets** (deferred from Pass 4): CLAUDE.md done; CUSTOMIZATION.md, docs/{ECOSYSTEM-MAP,INTEGRATIONS,KEY-FILES,SCHEMA,SECRETS-BITWARDEN}.md still reference deleted PAI/Vapi/AlpaClaw surfaces; `infra/index.html` hero references `property-ai-banner.png` storage URL.
 
 The save directory at `/Volumes/LIVE/Projects/MiracleMind/Clients/awkn-pre-reset-2026-05-01/` is scheduled for deletion in Phase 1 Pass 6.

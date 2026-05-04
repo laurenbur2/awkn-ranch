@@ -60,4 +60,4 @@ The IA is being reorganized around four business pillars: **Ranch / Within / Ret
 - **Live:** https://laurenbur2.github.io/awkn-ranch/
 - **Architecture:** Browser → GitHub Pages → Supabase (no server-side framework code; integrations run on Supabase edge functions and a DigitalOcean droplet)
 - **Public sites:** awknranch.com (Squarespace, planned Next.js migration), within.center (WordPress, planned Next.js migration)
-- **External services in scope:** Stripe, Square, PayPal, Resend, Telnyx, Meta WhatsApp, SignWell, Vapi, Gemini, Brave Search, Tellescope (Within HIPAA portal)
+- **External services in scope:** Stripe, Square, PayPal, Resend, Telnyx, Meta WhatsApp, SignWell, Gemini, Brave Search, Tellescope (Within HIPAA portal)
