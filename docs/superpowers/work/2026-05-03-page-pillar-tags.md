@@ -50,3 +50,19 @@ Running tag of every admin BOS page surveyed during Pass 3 folder-by-folder audi
 | `highlights-order.html` | `spaces/admin/` | Cross-cutting | Keep. 464 LOC, no separate .js (logic inline). Admin tool that reads `media_tag_assignments` filtered by 'highlights' tag and reorders display for consumer-facing pages. |
 
 **No same-commit code changes** — chunk 3 is audit-only.
+
+## Chunk 4 — CRM/sales cluster (audited 2026-05-03)
+
+**Outcome: zero deletions.** All 5 pages are mainline AWKN CRM/sales surfaces. One tech-debt finding flagged for separate cleanup.
+
+| Page | Folder | Pillar | Disposition / Notes |
+|---|---|---|---|
+| `crm.html` + `.js` | `spaces/admin/` | Cross-cutting (Within / Ranch / Retreat) | Keep. 4208 LOC. Leads / pipeline / invoices / proposals / analytics. Pillars already declared in admin-shell.js (`['within', 'ranch', 'retreat']`). |
+| `clients.html` + `.js` | `spaces/admin/` | Within | Keep. 5559 LOC. JS header: "AWKN Within ketamine clients. Sub-tabs: Clients / Schedule / House / Services." Pillar declared `['within']`. |
+| `packages.html` + `.js` | `spaces/admin/` | Cross-cutting (Within / Ranch / Retreat) | Keep. 326 LOC. Read-only service-package catalog. Pillars `['within', 'ranch', 'retreat']`. |
+| `purchases.html` + `.js` | `spaces/admin/` | Cross-cutting | Keep. 551 LOC. Purchase tracking + vendor management. Tab `purchases` with `feature: '_hidden'`. |
+| `memberships.html` + `.js` | `spaces/admin/` | Memberships | Keep. 711 LOC. Mindbody-style member/plan management. Pillar `['memberships']`. |
+
+**Tech-debt flagged (not in chunk 4 scope, deferred to TODO.md):** 6 hardcoded `SUPABASE_ANON_KEY` JWT literals across `crm.js` (lines 1349, 1619, 1652, 1679, 2078, 3510) and `clients.js` (line 2259). Should import from `shared/supabase.js`. Anon keys are public (RLS-protected) so this is hygiene, not security — but it's a key-rotation footgun (6 places to update vs 1). Cross-cutting tech-debt cleanup, not Phase 1 scope.
+
+**No same-commit code changes** — chunk 4 is audit-only.

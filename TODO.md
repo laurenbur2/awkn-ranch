@@ -52,7 +52,7 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] Chunk 1: PAI/Vapi cluster (5 pages — `lifeofpaiadmin` deleted, 4 others → Pass 4)
   - [x] Chunk 2: Internal/dev cluster — 5 pages audited, zero deletions (all AWKN-legitimate or intentional legacy redirects per Justin's `0dfd75a4`)
   - [x] Chunk 3: Operations — 4 pages audited, zero deletions (rentals/projects/highlights-order are real AWKN; spaces.html is another legacy redirect)
-  - [ ] Chunk 4: CRM/sales (`crm`, `clients`, `packages`, `purchases`, `memberships`)
+  - [x] Chunk 4: CRM/sales — 5 pages audited, zero deletions (all mainline AWKN: crm, clients, packages, purchases, memberships). Tech-debt flagged: 6 hardcoded anon keys in crm.js + clients.js.
   - [ ] Chunk 5: Schedule (`events`, `scheduling`, `planlist`, `reservations`)
   - [ ] Chunk 6: People + Settings (`staff`, `users`, `job-titles`, `worktracking`, `settings`, `accounting`, `brand`, `templates`, `passwords`, `releases`)
   - [ ] Chunk 7: Pillar landings + misc (`venue-*`, `within-schedule`, `retreat-house`, `dashboard`, `index`, `media`, `sms-messages`)
@@ -67,6 +67,7 @@ See program spec §8-13 for scope. Not actionable until Phase 1 lands.
 ### Cross-cutting
 
 - [ ] No tests / no TypeScript / no CI gates on money handlers (Stripe, Square, PayPal). Addressed incrementally as each phase touches the relevant code.
+- [ ] **Hardcoded SUPABASE_ANON_KEY JWTs** at 6 sites: `spaces/admin/crm.js` (lines 1349, 1619, 1652, 1679, 2078, 3510) + `spaces/admin/clients.js:2259`. Should import from `shared/supabase.js` instead. Hygiene/key-rotation issue, not security (anon key is public). Surface for separate tech-debt sweep.
 - [ ] Audit auto-merge agentic systems (Bug Scout, Feature Builder) — they push to `main` without visible governance. Critical to pause/repoint before Phase 6.
 - [ ] Migrate Resend, Cloudflare R2, DigitalOcean droplet from founder's personal Google account (`wingsiebird@gmail.com`) to a business workspace.
 - [ ] Lock in Pillar model (Ranch / Within / Retreat / Venue) **before Phase 6**. Consolidate overlapping pages: `events`, `schedule`, `scheduling`, `within-schedule`, `retreat-house`. Pass 3 produces page-pillar tags as input.
