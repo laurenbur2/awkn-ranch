@@ -1,3 +1,0 @@
-module.exports=[76176,a=>{"use strict";var b=a.i(87924),c=a.i(50944),d=a.i(93681);function e(){(0,c.useParams)().lang;let{getVisibleTabs:a,loading:e}=(0,d.usePageDisplayConfig)();return e?null:a("devices").length>0?(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-2xl font-bold text-slate-900 mb-4",children:"Devices"}),(0,b.jsx)("p",{className:"text-slate-600",children:"Select a tab above to manage devices."})]}):(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-2xl font-bold text-slate-900 mb-4",children:"Devices"}),(0,b.jsx)("p",{className:"text-slate-600",children:"No tabs are currently enabled for this section."})]})}a.s(["default",()=>e])}];
-
-//# sourceMappingURL=src_app_%5Blang%5D_intranet_devices_page_tsx_07b7a0f5._.js.map

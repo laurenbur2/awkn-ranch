@@ -1,3 +1,0 @@
-module.exports=[1257,a=>{"use strict";var b=a.i(87924),c=a.i(93681);function d(){let{getVisibleTabs:a,loading:d}=(0,c.usePageDisplayConfig)();if(d)return null;let e=a("staff");return(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-2xl font-bold text-slate-900 mb-4",children:"Staff"}),(0,b.jsx)("p",{className:"text-slate-600",children:e.length>0?"Select a tab above to manage staff.":"No tabs are currently enabled for this section."})]})}a.s(["default",()=>d])}];
-
-//# sourceMappingURL=src_app_%5Blang%5D_intranet_staff_page_tsx_275739ea._.js.map

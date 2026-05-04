@@ -1,1 +1,0 @@
-(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,72117,e=>{"use strict";var t=e.i(18566),u=e.i(71645);function n(){let e=(0,t.useRouter)(),n=(0,t.useParams)().lang||"en";return(0,u.useEffect)(()=>{e.replace(`/${n}/intranet/admin`)},[e,n]),null}e.s(["default",()=>n])}]);

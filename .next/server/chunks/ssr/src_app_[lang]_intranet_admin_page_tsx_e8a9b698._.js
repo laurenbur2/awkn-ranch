@@ -1,3 +1,0 @@
-module.exports=[10049,a=>{"use strict";var b=a.i(87924),c=a.i(93681);function d(){let{getVisibleTabs:a,loading:d}=(0,c.usePageDisplayConfig)();if(d)return null;let e=a("admin");return(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-2xl font-bold text-slate-900 mb-4",children:"Admin"}),(0,b.jsx)("p",{className:"text-slate-600",children:e.length>0?"Select a tab above to manage admin settings.":"Use the Page Display tab to configure which tabs are shown."})]})}a.s(["default",()=>d])}];
-
-//# sourceMappingURL=src_app_%5Blang%5D_intranet_admin_page_tsx_e8a9b698._.js.map

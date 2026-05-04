@@ -1,5 +1,0 @@
-1:"$Sreact.fragment"
-2:I[97367,["/awknwithin/_next/static/chunks/ff1a16fafef87110.js","/awknwithin/_next/static/chunks/d2be314c3ece3fbe.js"],"OutletBoundary"]
-3:"$Sreact.suspense"
-0:{"buildId":"fVkUMjkWB-9QZAbreWCQ8","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"py-20 px-6","children":["$","div",null,{"className":"max-w-3xl mx-auto","children":[["$","h1",null,{"className":"text-4xl font-bold mb-4","children":"About Us"}],["$","p",null,{"className":"text-lg text-slate-600 mb-12","children":"Learn about our history, mission, and the community we serve."}],["$","section",null,{"children":[["$","h2",null,{"className":"text-2xl font-semibold mb-4","children":"Our History"}],["$","p",null,{"className":"text-slate-600 leading-relaxed","children":"Our organization has a rich history of community service. We work to maintain traditions while embracing the future."}]]}]]}]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"loading":null,"isPartial":false}
-4:null

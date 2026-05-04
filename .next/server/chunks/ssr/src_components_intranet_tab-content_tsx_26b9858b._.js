@@ -1,3 +1,0 @@
-module.exports=[63162,a=>{"use strict";var b=a.i(87924),c=a.i(50944),d=a.i(90325);function e({section:a}){let e=(0,c.useParams)().tab,f=d.DEFAULT_TABS[a]?.find(a=>a.key===e),g=f?.label||e;return(0,b.jsxs)("div",{children:[(0,b.jsx)("h1",{className:"text-2xl font-bold text-slate-900 mb-4",children:g}),(0,b.jsx)("div",{className:"rounded-xl border border-slate-200 p-8 text-center text-slate-500",children:(0,b.jsxs)("p",{children:[g," content will be displayed here."]})})]})}a.s(["TabContent",()=>e])}];
-
-//# sourceMappingURL=src_components_intranet_tab-content_tsx_26b9858b._.js.map

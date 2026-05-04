@@ -1,3 +1,0 @@
-module.exports=[69771,a=>{a.v({className:"geist_9c6cb61b-module__8NX9hq__className",variable:"geist_9c6cb61b-module__8NX9hq__variable"})},27572,a=>{"use strict";var b=a.i(7997),c=a.i(69771);let d={className:c.default.className,style:{fontFamily:"'Geist', 'Geist Fallback'",fontStyle:"normal"}};function e({children:a}){return(0,b.jsxs)("html",{lang:"en",className:d.variable,children:[(0,b.jsx)("head",{}),(0,b.jsx)("body",{className:"min-h-screen flex flex-col antialiased bg-background text-foreground",children:a})]})}null!=c.default.variable&&(d.variable=c.default.variable),a.s(["default",()=>e,"metadata",0,{title:"AlpacApps",description:"Community management platform"}],27572)}];
-
-//# sourceMappingURL=%5Broot-of-the-server%5D__add2774c._.js.map
