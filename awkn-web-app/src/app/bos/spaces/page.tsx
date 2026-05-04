@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { spaces } from "~/server/db/schema";
+import { getCurrentUser } from "~/lib/auth";
+import { Button } from "~/components/ui/button";
 
 /**
  * First real DB-backed page in the new app. Fetches live AWKN spaces from
@@ -12,6 +14,7 @@ import { spaces } from "~/server/db/schema";
 export default async function BosSpacesPage() {
   const h = await headers();
   const path = h.get("x-matched-path") ?? "/bos/spaces";
+  const user = await getCurrentUser();
 
   let rows: Array<typeof spaces.$inferSelect> = [];
   let error: string | null = null;
@@ -41,6 +44,35 @@ export default async function BosSpacesPage() {
       <p className="text-muted-foreground">
         First real DB-backed page. Reads from prod Supabase via Drizzle.
       </p>
+
+      <div className="flex items-center justify-between rounded-md border border-border bg-card/30 px-4 py-3 text-sm">
+        {user ? (
+          <>
+            <span>
+              Signed in as <strong>{user.email}</strong> · role{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                {user.role}
+              </code>
+              {user.appUser?.firstName && (
+                <span className="text-muted-foreground">
+                  {" "}
+                  ({user.appUser.firstName} {user.appUser.lastName ?? ""})
+                </span>
+              )}
+            </span>
+            <form action="/auth/sign-out" method="post">
+              <input type="hidden" name="next" value="/login" />
+              <Button type="submit" variant="outline" size="sm">
+                Sign out
+              </Button>
+            </form>
+          </>
+        ) : (
+          <span className="text-muted-foreground">
+            Not signed in (NEXT_PUBLIC_DISABLE_AUTH bypass active).
+          </span>
+        )}
+      </div>
 
       {error ? (
         <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">

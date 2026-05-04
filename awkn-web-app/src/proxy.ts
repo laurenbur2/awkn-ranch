@@ -32,8 +32,11 @@ export async function proxy(request: NextRequest) {
   // Auth gate (skipped when NEXT_PUBLIC_DISABLE_AUTH=true)
   if (domain.authRequired && !authDisabled) {
     const session = await updateSession(request);
-    if (!session.user) {
-      const loginUrl = new URL(`${prefix}/login`, request.url);
+    if (!session.user && pathname !== "/login") {
+      // Redirect to the clean public `/login` URL — proxy will rewrite it
+      // to `/${prefix}/login` on the way in. Stay on the same hostname so
+      // the URL bar shows e.g. `bos.awknranch.com/login`, not `/bos/login`.
+      const loginUrl = new URL("/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
