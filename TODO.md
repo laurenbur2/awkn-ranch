@@ -15,9 +15,18 @@
 - [x] **PAI's new identity** — moot (Vapi decommissioned wholesale).
 - [x] **Mac LaunchAgents** — all irrelevant. No Mac running background processes for AWKN.
 
-**Still open (will surface during Pass 2 Tier 2 review):**
-- [ ] **New default landing page** — Replaces `/residents/cameras.html` in `login/app.js:95`. Options: `/spaces/admin/dashboard.html`, role-aware, `/portal/`, master-schedule.
-- [ ] **profile.html destination** — Stripe (`create-payment-link/index.ts:128`) and SignWell (`signwell-webhook/index.ts:638, 669, 941`) email URLs depend on this.
+**Resolved 2026-05-03 (Pass 2 Tier 2):**
+- [x] **New default landing page** (Open Question #1) — Resolved by dropping the dead resident/associate redirect branch from `login/app.js` and `login/update-password.html`. Empirical check: zero users in prod with role=resident or role=associate. Roles preserved in DB enum for Phase 5 client portal. (8d5ebd02)
+
+**Still open (Pass 2 Tier 2):**
+- [ ] **profile.html destination** (Open Question #2) — `create-payment-link/index.ts:128` (Stripe success URL), `signwell-webhook/index.ts:638, 669, 941` (rental email CTA), `shared/site-components.js:442, 470` (header dropdown). SignWell empirically broken in prod (missing tables: `signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests`; `crm_proposals` + `within_retreat_agreements` exist with 0 rows).
+
+**Open for COO (@matthew → COO):**
+- [ ] **SignWell webhook status** — Is SignWell actively used for any AWKN/Within flow (e.g. Within inpatient stay agreements, AWKN Ranch retreat housing), or fully retired? Empirically the webhook can't fire in prod today (missing tables, zero rows in the two that exist). User's hunch: not in use. Determines whether `signwell-webhook/index.ts` is deletion candidate or dormant-but-keep.
+
+**Open for CTO (@matthew → CTO):**
+- [ ] **`/directory/` historical intent** — Was the `/directory/` page (`directory/index.html`, `directory/app.js`) intentional AWKN scaffolding for a planned client profile feature, or unfinished Alpaca residue that got partially rebranded? User theory: intentional scaffolding. Preservation decision stands either way (AWKN wants client profiles eventually) — answer informs whether the eventual Next.js client portal builds on `/directory/`'s shape or starts fresh.
+- [ ] **Upstream-template-sync mechanism** — `infra/updates.json` (still points at `rsonnad/alpacapps-infra` + `alpacaplayhouse.com`), `infra/infra-upgrade-guide.md` (still titled "AlpacApps Infra"), `infra/infra-upgrade-prompt.md`. The polled feed (`shared/update-checker.js:6`) checks the upstream template for new features. AWKN forked away per program spec, so this is dormant — but is the team still interested in tracking upstream changes? Determines whether these three files are deletion candidates.
 
 **Process directives:**
 - Bit-by-bit review — files reviewed in chunks before deletion, tier-B granularity (bulk for obvious residue, per-file for AWKN-touching surgery).

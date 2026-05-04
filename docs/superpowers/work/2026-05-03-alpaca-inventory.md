@@ -168,8 +168,15 @@ Lines 118–497. Loops back into govee-control (lines 118, 135, 146, 162) and `w
 #### shared/services/lighting-data.js (13 hits)
 Whole file is govee client. Same deletion-candidate posture as sonos-data.js.
 
-#### shared/resident-shell.js (12 hits)
-Lines 29, 35, 65, 71, 78, 85, 199, 200, 280, 291, 300, 301. Resident portal nav shell — entire file is for `/residents/` routes. **Whole-file delete candidate** (Tier 1 in spirit; left here because path doesn't match Tier 1 rule).
+#### shared/resident-shell.js (12 hits) — ⚠️ RECLASSIFIED 2026-05-03: Phase 5 scaffolding, NOT residue
+Lines 29, 35, 65, 71, 78, 85, 199, 200, 280, 291, 300, 301. Resident portal nav shell — entire file is for `/residents/` routes. **Originally tagged whole-file delete candidate; reclassified after audit.**
+
+Audit findings:
+- Zero actual `import` statements in the repo (only comment-references in `shared/associate-shell.js:4` and `shared/personal-page-shell.js:4`).
+- Justin's `0dfd75a4` "Retire DevControl page and pillar" (Apr 30) included a substantive surgical edit to this file (removing the orphan PlanList link from its tab map). File is being *tended*, not abandoned.
+- By the same logic the user applied to `/directory/` (preserve client-profile scaffolding regardless of historical intent — AWKN plans to expand into client profiles in the eventual Next.js refactor), `resident-shell.js` is the eventual client-portal nav shell.
+
+Phase 1 action: **do not delete.** Phase 5 brainstorm input.
 
 ### Boilerplate hits (admin pages with single context-switcher link)
 
@@ -314,22 +321,27 @@ Self-referential — these docs describe the alpaca-purge plan or list residue. 
 - Line 7: test email `testuser@alpacaplayhouse.com`
 - Line 29: test instruction with same email
 
-### Infra (template residue — Pass 6 territory)
+### Infra — ⚠️ RECLASSIFIED 2026-05-03: mixed-status, NOT bulk-delete
 
-#### infra/index.html
-- Lines 1297, 1403, 1448, 1525, 1544: template marketing page describing `/residents/`, go2rtc, `/docs/your-appinfra.html`. Recommend whole-file delete in Pass 2 — same posture as `docs/alpacappsinfra.html`.
+The `infra/` directory was originally tagged as "template residue — Pass 6 territory" with whole-file delete recommendations. Audit found a mix of AWKN-rebranded files and upstream-template-sync residue.
 
-#### infra/infra-upgrade-guide.md and `infra/infra-upgrade-guide 2.md`
-- Lines 13, 14, 15, 23, 26, 103, 171, 217, 224: template upgrade instructions. Whole-file delete (we're not pulling from upstream anymore).
+**AWKN-rebranded — KEEP:**
+- `infra/index.html` — `<title>AWKN Ranch Infra — Set Up Your AI-Powered Platform</title>`. Linked from `clauded/architecture.html:84,220` and `clauded/sessions.html:357,385`. Real AWKN-side infra setup wizard.
+- `infra/setup-guide.html` — `<title>AWKN Ranch Setup Guide — Instructions for Claude Chat</title>`.
+- `infra/updates.html` — `<title>AWKN Ranch Updates — Sync New Features</title>`.
+- `infra/llm-setup-instructions.md` — "AWKN Ranch Setup Instructions (Machine-Readable)" — canonical LLM-facing reference for setting up AWKN Ranch.
+- `infra/og-infra.jpg` — companion OG image.
 
-#### infra/infra-upgrade-prompt.md and `infra/infra-upgrade-prompt 2.md`
-- Lines 8, 13, 45, 48, 62: same. Whole-file delete.
+The earlier line-number citations (1297, 1403, 1448, 1525, 1544 in `index.html`; 375, 382 in `setup-guide.html`) call for in-place rewrites of `/residents/`, `your-app`, etc. references — Pass 2 surgery, not file deletion. **Pass 2 line-level surgery still needed but file stays.**
 
-#### infra/setup-guide.html
-- Lines 375, 382: `/setup-your-app-infra` slash command + skill reference. Whole-file delete.
+**Upstream-template-sync mechanism — defer to CTO call:**
+- `infra/updates.json` — `templateRepo` field still points at `rsonnad/alpacapps-infra` upstream; `updatesPage` points at `alpacaplayhouse.com`. This is the feed that `shared/update-checker.js` polls.
+- `infra/infra-upgrade-guide.md` — still titled "AlpacApps Infra — Upgrade Guide". For syncing new features from upstream template.
+- `infra/infra-upgrade-prompt.md` — still titled "AlpacApps Infra — Upgrade Prompt". Same purpose.
 
-#### infra/updates.json
-- Lines 4, 5, 6: template repo URLs. Whole-file delete.
+These are dormant residue IF AWKN has truly forked away from the upstream template (which the program spec states). But that decision should be confirmed with the CTO before deletion — the team may still want to track upstream features.
+
+Phase 1 action: **do not delete the `infra/` dir.** Surface the upstream-sync question to CTO. Apply line-level Pass 2 surgery to `infra/index.html` and `infra/setup-guide.html` for the deleted-path references.
 
 ### Other admin / app surfaces
 
