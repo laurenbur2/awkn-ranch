@@ -96,10 +96,14 @@ When picking this back up:
      # ~/Library/Developer (Xcode), old node_modules, Application Support
      docker system prune -af --volumes    # clean any leftover partials
      supabase start -x studio,mailpit,logflare,vector,edge-runtime
-     supabase db dump --linked -f /tmp/awkn-prod-dump.sql
-     psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f /tmp/awkn-prod-dump.sql
+     # Schema-only restore (preferred — skip row data, much faster, much smaller):
+     supabase db dump --linked --schema public,auth,storage --data-only=false -f /tmp/awkn-schema.sql
+     psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f /tmp/awkn-schema.sql
+     # OR full data dump (only if you need real rows for UI work):
+     # supabase db dump --linked -f /tmp/awkn-full.sql
      # Smoke test: open http://localhost:8080/spaces/admin/dashboard.html?local=1
      ```
+     **Note:** the 5GB+ disk usage is the Docker images for Supabase services (Postgres, Kong, GoTrue, etc.) — NOT prod data. Switching to schema-only doesn't reduce the image footprint, only the dump/restore time. The only path to a smaller image footprint is excluding more services or running bare Postgres without Supabase (which would require BOS rewiring — not worth it).
    - **5.4 — Droplet pollers.** Need SSH access set up first. The droplet IP/key path lives in `docs/CREDENTIALS.md` (gitignored). Add a host alias to `~/.ssh/config` (e.g. `Host awkn-droplet`), then SSH in and check `pm2 list` / `systemctl list-units --type=service --state=running | grep -iE 'tesla|lg|nest|govee|sonos'`. After Pass 2 source-side cleanup these pollers may already be dormant — verify before running stop/disable.
 3. **Then Pass 6 — docs sweep + insurance-folder delete + infra/index.html hero refresh.**
 4. **3 still-open CTO/COO questions** (see "Open for COO" / "Open for CTO" above):
