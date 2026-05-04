@@ -89,15 +89,14 @@ When picking this back up:
 
 1. **Run `/resume`** to load this state.
 2. **Finish Pass 5 (Tasks 5.2 + 5.4):**
-   - **5.2 — Resume local clone.** OrbStack launched but `supabase start` failed mid-pull with **"no space left on device"**. Root cause: **host disk at 99%** (only 126MB free of 228GB). OrbStack uses host disk for the Docker VM, so it can't expand. To unblock:
+   - **5.2 — Resume local clone.** Tried 3 times across two sessions with up to 7.7GB host free — all failed at the "Starting database from backup..." step when image extraction inflated host disk back to 100%, crashing the OrbStack daemon. **Realistic disk requirement: 15-20GB host free** (Supabase total extracted footprint is ~6-8GB; need that headroom on top of normal usage). libpq + psql 18.3 already installed and linked. To unblock:
      ```bash
-     df -h /                              # confirm — should show >5GB free before retry
-     # Free space on the Mac: clear Trash, Downloads, ~/Library/Caches, old Xcode/Docker caches, etc.
-     # Then:
-     docker system prune -a               # remove any partial pulls
-     supabase start
+     df -h /                              # target: 15-20GB free before retrying
+     # Aggressively free host disk: Trash, Downloads, ~/Library/Caches,
+     # ~/Library/Developer (Xcode), old node_modules, Application Support
+     docker system prune -af --volumes    # clean any leftover partials
+     supabase start -x studio,mailpit,logflare,vector,edge-runtime
      supabase db dump --linked -f /tmp/awkn-prod-dump.sql
-     # Need libpq for psql: brew install libpq && brew link --force libpq
      psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f /tmp/awkn-prod-dump.sql
      # Smoke test: open http://localhost:8080/spaces/admin/dashboard.html?local=1
      ```
