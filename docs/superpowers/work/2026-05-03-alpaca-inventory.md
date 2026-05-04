@@ -148,8 +148,15 @@ Documentation of every integration. Half the file is IoT-specific (Govee, Nest, 
 Original (pre-delete) hot-spot notes follow for historical reference:
 Lines 247–511: feature-flag definitions for govee/cameras/sonos/tesla/anova/printer/glowforge/vapi. Pass 2 rewrites this to AWKN-only features.
 
-#### spaces/admin/inventory.js (28 hits)
-Lines 39, 59, 137, 172–186, 193, 249–253, 266, 291, 298–310, 447–448: hardcoded inventory of "your-app" services, IoT plists, smart-home tables, and edge-function categories. This is the `/spaces/admin/inventory.html` page content — Pass 2 cleans these inventory blobs.
+#### spaces/admin/inventory.js — ✅ DELETED 2026-05-03 (whole file + page)
+
+**CTO decision (2026-05-03):** delete the page entirely instead of stripping. The 523-line file documented Alpuca Mac mini at 192.168.1.200, AlpacaPlayhouse's UDM Pro / HAOS / RVAULT20, Rahul's Google Drive + Tesla dashcam, TesLoop GDrive, 91 lights / 9 Sonos / 5 Teslas / 11 cameras at AlpacaPlayhouse, plus `finleg` and `sponic-garden` repos. Zero AWKN content. Companion `inventory.html` also deleted. Already `feature: '_hidden'` in admin-shell, so user-facing impact is zero.
+
+Same-commit reference cleanup:
+- `shared/admin-shell.js`: removed `view_inventory` perm from STAFF_PERMISSION_KEYS, inventory icon entry, tab registration, and updated comment block.
+- `spaces/admin/dashboard.js`: removed `Inventory` quick-action tile.
+
+If AWKN wants an internal IT-inventory page later (Phase 5/6), build fresh against AWKN's actual infra.
 
 #### docs/KEY-FILES.md (25 hits)
 Lines 38–45 (shared services), 80 (voice.html), 90–93 (Resident View), 117–173 (IoT edge functions list). Pass 2 rewrites whole sections.

@@ -45,7 +45,8 @@ Six passes per Phase 1 spec §6. ~38k LOC removed across Pass 2 already.
   - [x] `home-assistant-control` IoT edge function delete
   - [x] 4 manifest reclassifications (`/directory/`, `infra/`, `resident-shell.js`, `mobile/`)
   - [x] `feature-manifest.json` deleted entirely + `setup-alpacapps-infra` skill deleted (CTO chose delete over strip)
-  - [ ] **Hot spots remaining:** `spaces/admin/inventory.js` (28 hits), `property-ai/index.ts` IoT loaders (124 hits — voice deferred to Pass 4)
+  - [x] `spaces/admin/inventory.{html,js}` deleted entirely + admin-shell + dashboard refs cleaned (CTO chose delete over strip — page was zero-AWKN-content and already `_hidden`)
+  - [ ] **Hot spot remaining:** `property-ai/index.ts` IoT loaders (124 hits — voice deferred to Pass 4)
   - [ ] **Task 2.11:** undeploy 11 IoT edge functions from prod Supabase (alexa, anova, glowforge, govee, lg, nest×2, printer, sonos, tesla, home-assistant)
 - [ ] **Pass 3** — Page Audit: folder-by-folder admin BOS sweep + pillar tagging (~5-7 commits)
 - [ ] **Pass 4** — Vapi decommission: code, edge functions, env vars, Bitwarden (CTO confirmed)
@@ -84,7 +85,7 @@ When picking this back up:
 3. **Pass 2 hot spots are next** (heavier decision content per file):
    - `supabase/functions/home-assistant-control/` ✅ deleted (`1387cc3e`)
    - `feature-manifest.json` ✅ deleted entirely + `setup-alpacapps-infra` skill (CTO chose delete over strip)
-   - `spaces/admin/inventory.js` (28 hits) — strip Mac LaunchDaemon + IoT inventory blobs
+   - `spaces/admin/inventory.{html,js}` ✅ deleted entirely + admin-shell/dashboard cleanup (CTO chose delete over strip)
    - `supabase/functions/property-ai/index.ts` (124 hits) — IoT data loaders (lines ~207-262, 1391-1392, 390/468-474/566/2324 URLs); voice/Vapi parts at 3241+ deferred to Pass 4
 4. **Then Task 2.11 — prod undeploy** of 11 IoT edge functions (CLI is already linked: `supabase functions delete <name> --project-ref lnqxarwqckpmirpmixcw`). Destructive against prod — explicit gate.
 5. **4 CTO/COO questions accumulated** during Pass 2 audits — see "Open for COO" and "Open for CTO" sections above. SignWell, `/directory/` historical intent, upstream-template-sync, mobile/ status.

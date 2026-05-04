@@ -50,7 +50,6 @@ const QUICK_ACTIONS = [
   { perm: 'view_calendar',        label: 'Calendar',      sub: 'Day view',     href: 'reservations.html',      icon: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>' },
   { perm: 'view_scheduler',       label: 'Scheduler',     sub: 'Staff shifts', href: 'scheduling.html',        icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
   { perm: 'view_purchases',       label: 'New Sale',      sub: 'Sales',        href: 'purchases.html',         icon: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>' },
-  { perm: 'view_inventory',       label: 'Inventory',     sub: 'Stock',        href: 'inventory.html',         icon: '<path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>' },
   { perm: 'view_events',          label: 'Events',        sub: 'Upcoming',     href: 'events.html',            icon: '<rect x="3" y="4" width="18" height="18" rx="2"/>' },
   { perm: 'view_staff_directory', label: 'Staff',         sub: 'Directory',    href: 'staff.html',             icon: '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>' },
   { perm: 'manage_users',         label: 'Invite User',   sub: 'Admin',        href: 'users.html',             icon: '<circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>' },
