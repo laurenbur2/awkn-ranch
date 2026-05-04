@@ -123,9 +123,11 @@ serve(async (req) => {
       }
     }
 
-    // After payment, redirect to a thank-you or property page
+    // After payment, redirect to the consumer spaces view with a success flag.
+    // Phase 5 will build a real payment-confirmation page; until then, ?payment=success
+    // is preserved so the landing page can show a banner if desired.
     params.append("after_completion[type]", "redirect");
-    params.append("after_completion[redirect][url]", "https://laurenbur2.github.io/awkn-ranch/residents/profile.html?payment=success");
+    params.append("after_completion[redirect][url]", "https://laurenbur2.github.io/awkn-ranch/spaces/?payment=success");
 
     // Create Payment Link via Stripe API
     const stripeResponse = await fetch(`${STRIPE_API_BASE}/payment_links`, {

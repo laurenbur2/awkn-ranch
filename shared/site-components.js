@@ -403,8 +403,12 @@ function escapeHtml(s) {
 /**
  * Render user menu HTML (avatar + name + dropdown) for public header.
  * Caller must attach to DOM and bind dropdown/sign-out in initPublicHeaderAuth.
+ *
+ * Profile link omitted: AWKN has no working profile page today; /directory/
+ * is Phase 5 client-portal scaffolding (schema gap on app_users). Re-add the
+ * Profile menu item when the client portal lands.
  */
-function renderUserMenuHTML(appUser, profileHref) {
+function renderUserMenuHTML(appUser) {
   const name = appUser.display_name || appUser.email;
   const initials = getInitials(name);
   const avatarUrl = appUser.avatar_url;
@@ -426,7 +430,6 @@ function renderUserMenuHTML(appUser, profileHref) {
       ${avatarHtml}<span class="user-profile-name">${escapeHtml(name)}</span>
     </button>
     <div class="user-menu-dropdown hidden">
-      <a href="${profileHref}" class="user-menu-item">Profile</a>
       ${navLinks}
       <button class="user-menu-item user-menu-signout" id="publicHeaderSignOutBtn">Sign Out</button>
     </div>`;
@@ -437,9 +440,8 @@ function renderUserMenuHTML(appUser, profileHref) {
  * @param {Object} options
  * @param {string} options.authContainerId - ID of element to fill with user menu when signed in
  * @param {string} options.signInLinkId - ID of Sign In link to hide when signed in
- * @param {string} [options.profileHref='/residents/profile.html'] - Profile link for dropdown
  */
-export async function initPublicHeaderAuth({ authContainerId, signInLinkId, profileHref = '/residents/profile.html' }) {
+export async function initPublicHeaderAuth({ authContainerId, signInLinkId }) {
   const authEl = document.getElementById(authContainerId);
   const signInEl = document.getElementById(signInLinkId);
   if (!authEl) return;
@@ -451,7 +453,7 @@ export async function initPublicHeaderAuth({ authContainerId, signInLinkId, prof
   const mobileSignInEl = document.getElementById('aapMobileSignInLink');
 
   if (state.appUser) {
-    authEl.innerHTML = renderUserMenuHTML(state.appUser, profileHref);
+    authEl.innerHTML = renderUserMenuHTML(state.appUser);
     authEl.classList.add('user-info');
     if (signInEl) signInEl.style.display = 'none';
 
@@ -467,7 +469,6 @@ export async function initPublicHeaderAuth({ authContainerId, signInLinkId, prof
         if (isResident) {
           mobileItems.push(`<li class="aap-mobile-nav__item"><a href="/spaces/admin/rentals.html" class="aap-mobile-nav__link">Intranet</a></li>`);
         }
-        mobileItems.push(`<li class="aap-mobile-nav__item"><a href="/residents/profile.html" class="aap-mobile-nav__link">Profile</a></li>`);
         mobileItems.push(`<li class="aap-mobile-nav__item"><button class="aap-mobile-nav__link aap-mobile-nav__signout" id="mobileSignOutBtn" style="background:none;border:none;color:#c0392b;cursor:pointer;font:inherit;padding:inherit;width:100%;text-align:left;">Sign Out</button></li>`);
 
         mobileLi.outerHTML = mobileItems.join('');

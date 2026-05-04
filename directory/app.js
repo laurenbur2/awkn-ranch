@@ -159,10 +159,11 @@ function renderProfile(user, ctx) {
   let html = '';
 
   // Self banner
+  // TODO(Phase 5): Re-add Edit Profile link once the client portal lands and
+  // app_users gets the slug/bio/pronouns/etc. columns this page already queries.
   if (isSelf) {
     html += `<div class="dir-self-banner">
       <span>This is your personal page</span>
-      <a href="/residents/profile.html">Edit Profile</a>
     </div>`;
   }
 
