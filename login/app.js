@@ -87,13 +87,9 @@ function getRedirectTarget(role) {
   if (['public'].includes(role)) {
     target = '/awkn-ranch/spaces/';
   }
-  // Resident/associate users go to resident area by default (not admin)
-  else if ((target === '/awkn-ranch/spaces/admin/'
-            || target === '/awkn-ranch/spaces/admin/dashboard.html'
-            || target === '/awkn-ranch/spaces/admin/reservations.html?pillar=master')
-           && ['resident', 'associate'].includes(role)) {
-    target = '/awkn-ranch/residents/cameras.html';
-  }
+  // resident + associate roles: no users assigned today. Phase 5 client portal
+  // will define post-login destinations when those roles get populated.
+  // Until then, fall through to redirectUrl (the page they were trying to reach).
   // Team-portal users (oracle/admin/staff) always land on the Master Calendar,
   // ignoring any stale redirect (bookmarks, sessionStorage from the old
   // spaces.html / dashboard.html defaults).
