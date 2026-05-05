@@ -17,7 +17,6 @@
 | `clauded/` | Internal dev dashboard (architecture diagram, config overview, Claude Code session viewer) |
 | `admin/` | Email approval handler pages (`email-approved.html`, `email-confirm.html`) — paired with `approve-email/` edge function |
 | `associates/` | Associate clock-in / project-inquiry / worktracking pages |
-| `bug-reporter-extension/`, `bug-reporter-firefox/` | Browser extensions for Bug Scout intake |
 | `assets/branding/` | AWKN + Within wordmarks, logos, brand previews |
 | `styles/` | Tailwind v4 source + design tokens (`tokens.css`) |
 | `scripts/` | Build + ops scripts |
