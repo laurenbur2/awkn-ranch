@@ -29,9 +29,9 @@ const config = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // Next.js requires unsafe-inline and unsafe-eval
-              "style-src 'self' 'unsafe-inline'", // Allow inline styles for styled-components, Tailwind, etc.
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Allow inline styles + Google Fonts stylesheets
               "img-src 'self' data: blob: https:", // Allow images from HTTPS sources and data URIs
-              "font-src 'self' data:",
+              "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts woff2 files
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co", // Supabase API and realtime
               "frame-src 'self'",
               "object-src 'none'",
