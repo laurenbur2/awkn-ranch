@@ -28,7 +28,7 @@ const config = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // Next.js requires unsafe-inline and unsafe-eval
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net", // Next.js requires unsafe-inline + unsafe-eval; jsdelivr serves Supabase JS bundle on legacy ported pages (e.g. /team)
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Allow inline styles + Google Fonts stylesheets
               "img-src 'self' data: blob: https:", // Allow images from HTTPS sources and data URIs
               "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts woff2 files
