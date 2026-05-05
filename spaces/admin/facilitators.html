@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Facilitators - AWKN</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=5">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .fc-wrap { max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .fc-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .fc-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .fc-head p  { margin: 0; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+    .fc-head-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+    .fc-controls {
+      display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 12px;
+      padding: 0.7rem 0.85rem; margin-bottom: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .fc-search { flex: 1 1 240px; position: relative; }
+    .fc-search input {
+      width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+      border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.92rem;
+    }
+    .fc-search input:focus { outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a; }
+    .fc-search svg {
+      position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: #9ca3af; pointer-events: none;
+    }
+    .fc-toggle {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.78rem; color: #6b7280; cursor: pointer;
+    }
+
+    .fc-table-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .fc-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .fc-table thead th {
+      text-align: left; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;
+      padding: 0.65rem 0.8rem; border-bottom: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+    .fc-table tbody tr { border-top: 1px solid #f3f4f6; }
+    .fc-table tbody tr.is-archived { opacity: 0.55; }
+    .fc-table td { padding: 0.7rem 0.8rem; vertical-align: middle; }
+    .fc-cell-name { font-weight: 600; color: #111827; }
+    .fc-cell-contact { color: #4b5563; font-size: 0.84rem; }
+    .fc-cell-contact .fc-line + .fc-line { display: block; margin-top: 0.1rem; color: #6b7280; }
+    .fc-pill {
+      display: inline-block; font-size: 0.66rem; font-weight: 700;
+      padding: 0.18rem 0.5rem; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .fc-pill.active { background: #ecfdf5; color: #065f46; }
+    .fc-pill.archived { background: #f3f4f6; color: #6b7280; }
+
+    .fc-row-actions { display: flex; gap: 0.4rem; justify-content: flex-end; }
+    .fc-btn {
+      padding: 0.45rem 0.8rem; border-radius: 8px;
+      border: 1px solid #d1d5db; background: #fff;
+      font: inherit; font-size: 0.8rem; font-weight: 600; color: #374151; cursor: pointer;
+    }
+    .fc-btn:hover { background: #f9fafb; }
+    .fc-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .fc-btn-primary:hover { background: #b87625; }
+    .fc-btn-danger { color: #991b1b; border-color: #fecaca; }
+    .fc-btn-danger:hover { background: #fef2f2; }
+
+    .fc-empty {
+      padding: 3rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.92rem;
+    }
+    .fc-empty strong { color: #2a1f23; display: block; margin-bottom: 0.4rem; }
+
+    /* Modal */
+    .fc-modal-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(20, 20, 20, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .fc-modal-overlay.hidden { display: none; }
+    .fc-modal {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      width: 100%; max-width: 480px; max-height: calc(100vh - 2rem);
+      display: flex; flex-direction: column;
+    }
+    .fc-modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;
+    }
+    .fc-modal-title { font-size: 1.05rem; font-weight: 700; color: #111827; }
+    .fc-modal-x { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; }
+    .fc-modal-body { padding: 1rem 1.25rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .fc-modal-foot { display: flex; gap: 0.5rem; justify-content: space-between; padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6; }
+    .fc-modal-foot-right { display: flex; gap: 0.5rem; }
+
+    .fc-row { display: flex; flex-direction: column; gap: 0.2rem; }
+    .fc-row.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .fc-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .fc-row input, .fc-row textarea {
+      width: 100%; padding: 0.55rem 0.7rem;
+      border: 1px solid #d1d5db; border-radius: 8px;
+      font: inherit; font-size: 0.9rem; background: #fff;
+      box-sizing: border-box;
+    }
+    .fc-row textarea { resize: vertical; min-height: 60px; }
+    .fc-row input:focus, .fc-row textarea:focus {
+      outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a;
+    }
+    .fc-modal-error {
+      background: #fef2f2; color: #991b1b; padding: 0.5rem 0.7rem;
+      border-radius: 6px; font-size: 0.82rem; border: 1px solid #fecaca;
+    }
+    .fc-modal-error.hidden { display: none; }
+    .fc-active-toggle {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; color: #374151; cursor: pointer;
+    }
+
+    @media (max-width: 720px) {
+      .fc-row.row-2 { grid-template-columns: 1fr; }
+      .fc-table .col-phone { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-overlay__logo">
+      <img src="/awkn-ranch/assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" width="28" height="40">
+      <img src="/awkn-ranch/assets/branding/wordmark-black-transparent.png" alt="AWKN Ranch" class="loading-overlay__wordmark" width="28" height="28">
+    </div>
+    <div class="spinner spinner--sm"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="loading-overlay hidden"></div>
+
+  <div id="appContent" class="hidden">
+    <div id="siteHeader"></div>
+    <span data-site-version style="display:none"></span>
+
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="fc-wrap">
+      <div class="fc-head">
+        <div>
+          <h1>Facilitators</h1>
+          <p>Practitioners and guides who run Within sessions. Used by the Schedule page when assigning a session.</p>
+        </div>
+        <div class="fc-head-actions">
+          <button class="fc-btn fc-btn-primary" id="btnNew">+ New Facilitator</button>
+        </div>
+      </div>
+
+      <div class="fc-controls">
+        <div class="fc-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="searchInput" placeholder="Search by name or email…" autocomplete="off">
+        </div>
+        <label class="fc-toggle">
+          <input type="checkbox" id="showArchived"> Show archived
+        </label>
+      </div>
+
+      <div class="fc-table-wrap">
+        <table class="fc-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th class="col-phone">Phone</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="facilitatorsBody">
+            <tr><td colspan="5" class="fc-empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/edit modal -->
+  <div class="fc-modal-overlay hidden" id="editModal">
+    <div class="fc-modal">
+      <div class="fc-modal-head">
+        <span class="fc-modal-title" id="modalTitle">New Facilitator</span>
+        <button class="fc-modal-x" id="modalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="fc-modal-body">
+        <div class="fc-modal-error hidden" id="modalError"></div>
+        <div class="fc-row row-2">
+          <div>
+            <label class="fc-label" for="fldFirstName">First name</label>
+            <input id="fldFirstName" type="text" autocomplete="given-name" placeholder="First">
+          </div>
+          <div>
+            <label class="fc-label" for="fldLastName">Last name</label>
+            <input id="fldLastName" type="text" autocomplete="family-name" placeholder="Last">
+          </div>
+        </div>
+        <div class="fc-row">
+          <label class="fc-label" for="fldEmail">Email</label>
+          <input id="fldEmail" type="email" autocomplete="email" placeholder="email@example.com">
+        </div>
+        <div class="fc-row">
+          <label class="fc-label" for="fldPhone">Phone</label>
+          <input id="fldPhone" type="tel" autocomplete="tel" placeholder="(512) 555-0100">
+        </div>
+        <div class="fc-row">
+          <label class="fc-label" for="fldNotes">Notes</label>
+          <textarea id="fldNotes" rows="2" placeholder="Specialties, certifications, scheduling preferences…"></textarea>
+        </div>
+        <label class="fc-active-toggle">
+          <input type="checkbox" id="fldActive" checked>
+          Active (available to assign on the Schedule)
+        </label>
+      </div>
+      <div class="fc-modal-foot">
+        <button class="fc-btn fc-btn-danger hidden" id="btnDelete">Delete</button>
+        <div class="fc-modal-foot-right" style="margin-left:auto;">
+          <button class="fc-btn" id="btnCancel">Cancel</button>
+          <button class="fc-btn fc-btn-primary" id="btnSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/instant-chrome.js"></script>
+  <script type="module" src="../../shared/version-info.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="facilitators.js?v=20260505a"></script>
+</body>
+</html>
