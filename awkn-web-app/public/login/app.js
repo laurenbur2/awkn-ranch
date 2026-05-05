@@ -291,11 +291,14 @@ googleSignInBtn.addEventListener('click', async () => {
     // We store the intended destination in sessionStorage so it survives the OAuth round-trip
     // (but not beyond the browser session — prevents stale destinations winning future logins).
     sessionStorage.setItem('awkn-ranch-login-redirect', redirectUrl);
-    // In Capacitor (native app), use the custom URL scheme for OAuth redirect
+    // NEW-APP PATCH: was `${origin}/awkn-ranch/login/` — the legacy GH-Pages
+    // path prefix doesn't exist in the new app. Capacitor branch retained
+    // (no-op here since the mobile app was decommissioned in Phase 1) but
+    // the web path now points at the new app's /login.
     const isCapacitor = window.Capacitor?.isNativePlatform?.() ?? false;
     const loginRedirect = isCapacitor
       ? 'com.awknranch.app://login/'
-      : window.location.origin + '/awkn-ranch/login/';
+      : window.location.origin + '/login';
     console.log('[LOGIN]', 'Calling signInWithGoogle()', { loginRedirect, storedRedirect: redirectUrl, isCapacitor });
     await signInWithGoogle(loginRedirect);
     // Note: signInWithGoogle redirects to Google, so this line won't execute
