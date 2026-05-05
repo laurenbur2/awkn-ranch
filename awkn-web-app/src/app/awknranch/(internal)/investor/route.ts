@@ -1,5 +1,5 @@
 import { serveLegacyHtml } from "~/lib/serve-legacy-html";
 
 export function GET() {
-  return serveLegacyHtml("investor/index.html");
+  return serveLegacyHtml("investor/index.html", { imageBase: "/investor" });
 }

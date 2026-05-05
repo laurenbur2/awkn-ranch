@@ -4,5 +4,7 @@ import { serveLegacyHtml } from "~/lib/serve-legacy-html";
 // pricing widget designed to be iframed into WordPress (within.center
 // historically). Kept as reference; unsure if currently embedded anywhere.
 export function GET() {
-  return serveLegacyHtml("pricing/wordpress-embed.html");
+  return serveLegacyHtml("pricing/wordpress-embed.html", {
+    imageBase: "/pricing",
+  });
 }
