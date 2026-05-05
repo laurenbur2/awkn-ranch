@@ -111,12 +111,4 @@ export const PORTED_PAGES: PortedPage[] = [
     legacyPath: "/retreat/",
     group: "Reference",
   },
-  {
-    label: "Tricky lockout numbers",
-    domain: "awknranch",
-    path: "/lost",
-    legacyPath: "/lost.html",
-    group: "Reference",
-    notes: "Not a 404 page — member/staff lockout reference. Linked from BOS venue admin.",
-  },
 ];
