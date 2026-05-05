@@ -3,91 +3,178 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <title>Confirm Email Approval — AWKN Ranch</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Montserrat', sans-serif;
+      --brown-dark: #3a2a1a;
+      --brown: #6b4c2a;
+      --brown-light: #a67c52;
+      --cream: #f5f0e8;
+      --offwhite: #faf8f4;
+      --white: #ffffff;
+      --success: #2d8659;
+      --warning: #d97706;
+      --border: rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
     body {
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f2f0e8;
+      font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px 16px;
-      color: #2a1f23;
+      position: relative;
+      padding: 2rem 1rem;
+      -webkit-font-smoothing: antialiased;
+      color: var(--brown-dark);
     }
-    .card {
-      max-width: 520px;
+
+    .bg { position: fixed; inset: 0; z-index: 0; }
+    .bg img { width: 100%; height: 100%; object-fit: cover; }
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(26,20,13,0.75) 0%, rgba(26,20,13,0.55) 50%, rgba(26,20,13,0.70) 100%);
+      z-index: 1;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 10;
       width: 100%;
-      background: #faf9f6;
-      border-radius: 16px;
-      padding: 40px 32px;
-      text-align: center;
-      box-shadow: 0 2px 16px rgba(42,31,35,0.08);
+      max-width: 520px;
     }
-    .logo { margin-bottom: 24px; }
-    .logo img { height: 32px; vertical-align: middle; }
-    .logo img + img { margin-left: 8px; }
-    h1 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+
+    .login-card {
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 2.5rem 2.25rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+      text-align: center;
+    }
+
+    .logo { margin-bottom: 1rem; }
+    .logo img { display: block; width: 140px; height: auto; margin: 0 auto; }
+
+    .subtitle {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--brown-dark);
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+
     .details {
       text-align: left;
-      background: #f2f0e8;
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      font-size: 14px;
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 13px;
       line-height: 1.8;
     }
-    .details .label { color: #7d6f74; font-weight: 600; display: inline-block; width: 70px; }
-    .details .value { color: #2a1f23; }
+    .details .label {
+      color: var(--brown-light);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-size: 11px;
+      display: inline-block;
+      width: 70px;
+    }
+    .details .value { color: var(--brown-dark); font-weight: 500; }
+
     .btn {
       display: inline-block;
-      padding: 14px 36px;
+      padding: 12px 28px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 15px;
+      border-radius: 10px;
       cursor: pointer;
       text-decoration: none;
       margin: 0 6px 8px;
-      transition: opacity 0.15s;
+      transition: background 0.2s ease, transform 0.1s, box-shadow 0.2s;
     }
-    .btn:hover { opacity: 0.85; }
-    .btn-approve { background: #54a326; color: #fff; }
-    .btn-approve-all { background: #d4883a; color: #fff; }
-    .approve-all-note {
-      font-size: 12px;
-      color: #7d6f74;
-      margin-top: 8px;
-    }
+    .btn:active { transform: scale(0.99); }
+    .btn-approve { background: var(--success); color: var(--white); }
+    .btn-approve:hover { background: #25734b; box-shadow: 0 4px 12px rgba(45,134,89,0.3); }
+    .btn-approve-all { background: var(--brown); color: var(--white); }
+    .btn-approve-all:hover { background: var(--brown-dark); box-shadow: 0 4px 12px rgba(58,42,26,0.25); }
+
+    .approve-all-note { font-size: 11px; color: var(--brown-light); margin-top: 0.5rem; }
+
     .footer {
-      margin-top: 24px;
-      font-size: 12px;
-      color: #7d6f74;
+      margin-top: 1.5rem;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--brown-light);
     }
-    .loading { display: none; font-size: 14px; color: #7d6f74; margin-top: 16px; }
+    .loading {
+      display: none;
+      font-size: 13px;
+      color: var(--brown-light);
+      margin-top: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 2rem 1.5rem 1.75rem; }
+      body { padding: 1.5rem 0.75rem 4rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">
-      <img src="/awkn-ranch/assets/branding/logo-black-transparent.png" alt="" style="height:32px;">
-      <img src="/awkn-ranch/assets/branding/wordmark-black-transparent.png" alt="AWKN Ranch" style="height:20px;">
+  <div class="bg">
+    <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="">
+  </div>
+  <div class="bg-overlay"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo"><img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/e7642ed2-f2d9-40e4-94b8-bbf5eb1ab229/Transparent+Brown_black.jpg" alt="AWKN Ranch logo"></div>
+      <div class="subtitle">Email Approval</div>
+
+      <h1>Confirm Email Approval</h1>
+      <div class="details">
+        <div><span class="label">Type</span> <span class="value" id="type"></span></div>
+        <div><span class="label">To</span> <span class="value" id="to"></span></div>
+        <div><span class="label">Subject</span> <span class="value" id="subject"></span></div>
+      </div>
+      <div id="buttons">
+        <a id="approve-btn" class="btn btn-approve" href="#">Approve &amp; Send</a>
+        <br>
+        <a id="approve-all-btn" class="btn btn-approve-all" href="#" style="display:none;">Approve All of This Type</a>
+        <p class="approve-all-note" id="approve-all-note" style="display:none;">This permanently disables approval for this email type.</p>
+      </div>
+      <div class="loading" id="loading">Sending email…</div>
+      <p class="footer">AWKN Ranch Email Approval System</p>
     </div>
-    <h1>Confirm Email Approval</h1>
-    <div class="details">
-      <div><span class="label">Type:</span> <span class="value" id="type"></span></div>
-      <div><span class="label">To:</span> <span class="value" id="to"></span></div>
-      <div><span class="label">Subject:</span> <span class="value" id="subject"></span></div>
-    </div>
-    <div id="buttons">
-      <a id="approve-btn" class="btn btn-approve" href="#">Approve & Send</a>
-      <br>
-      <a id="approve-all-btn" class="btn btn-approve-all" href="#" style="display:none;">Approve All of This Type</a>
-      <p class="approve-all-note" id="approve-all-note" style="display:none;">This permanently disables approval for this email type.</p>
-    </div>
-    <div class="loading" id="loading">Sending email…</div>
-    <p class="footer">AWKN Ranch Email Approval System</p>
   </div>
 
   <script>

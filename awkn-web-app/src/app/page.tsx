@@ -83,7 +83,6 @@ export default function DevLandingPage() {
                       {Array.from(groups).map(([groupLabel, pages]) => (
                         <details
                           key={groupLabel}
-                          open
                           className="group border-b border-border last:border-b-0"
                         >
                           <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-2 text-sm font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
