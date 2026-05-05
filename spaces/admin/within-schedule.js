@@ -1054,6 +1054,7 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
   document.getElementById('nsSelectedClient').style.display = 'none';
   document.getElementById('nsClientResults').style.display = 'none';
   document.getElementById('nsService').value = '';
+  populateAssigneeOptions();
   document.getElementById('nsEnd').value = '';
   document.getElementById('nsSpace').value = '';
   document.getElementById('nsOtherWrap').style.display = 'none';
@@ -1081,6 +1082,31 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
 }
 function closeNewSessionModal() {
   document.getElementById('nsModal').classList.add('hidden');
+}
+
+// Populate the New Session modal's assignee dropdown with two optgroups:
+// Facilitators (mapped to facilitator_id) and Staff (mapped to staff_user_id).
+// The selected value is prefixed so the save handler can route it to the
+// right column on scheduling_bookings.
+function populateAssigneeOptions() {
+  const sel = document.getElementById('nsAssignee');
+  if (!sel) return;
+  const facOptions = facilitators
+    .map(f => {
+      const name = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || 'Facilitator';
+      return `<option value="fac:${esc(f.id)}">${esc(name)}</option>`;
+    })
+    .join('');
+  const staffOptions = staffList
+    .map(u => {
+      const name = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Staff';
+      return `<option value="staff:${esc(u.id)}">${esc(name)}</option>`;
+    })
+    .join('');
+  sel.innerHTML = '<option value="">— Select who\'s running this session —</option>'
+    + (facOptions   ? `<optgroup label="Facilitators">${facOptions}</optgroup>`   : '')
+    + (staffOptions ? `<optgroup label="Staff">${staffOptions}</optgroup>` : '');
+  sel.value = '';
 }
 function showNsError(msg) {
   const el = document.getElementById('nsError');
@@ -1242,6 +1268,11 @@ async function saveNewSession() {
     showNsError('Type a location for "Other".');
     return;
   }
+  const assigneeVal = document.getElementById('nsAssignee').value;
+  if (!assigneeVal) {
+    showNsError('Select a facilitator or staff member running this session.');
+    return;
+  }
   // Re-run the conflict check so we never insert against a stale flag, then
   // refuse if there's a real overlap.
   await runConflictCheck();
@@ -1265,15 +1296,21 @@ async function saveNewSession() {
   // were originally for the public booking flow). For admin-created sessions
   // we stamp them from the selected Within client so the not-null constraint
   // passes; they'll match the lead row anyway.
+  // assignee_chk requires one of profile_id / staff_user_id / facilitator_id
+  // to be set; the assignee dropdown produces a "fac:..." or "staff:..."
+  // value that we route to the matching column.
+  const [assigneeKind, assigneeId] = assigneeVal.split(':');
   const payload = {
     lead_id: nsSelectedLeadId,
     booker_name:  nsSelectedLeadName  || 'Within client',
     booker_email: nsSelectedLeadEmail || 'unknown@within.center',
     service_id: serviceId,
     space_id: spaceId,
+    facilitator_id: assigneeKind === 'fac'   ? assigneeId : null,
+    staff_user_id:  assigneeKind === 'staff' ? assigneeId : null,
     start_datetime: startDt.toISOString(),
     end_datetime:   endDt.toISOString(),
-    status: 'scheduled',
+    status: 'confirmed',
     notes: finalNotes,
   };
 
