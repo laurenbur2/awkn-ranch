@@ -24,10 +24,15 @@ export async function proxy(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl;
 
-  // Already-rewritten paths shouldn't be rewritten again. Pass through if
-  // the URL already starts with the domain prefix.
+  // Already-rewritten paths shouldn't be rewritten again. We mark internal
+  // rewrites with `x-proxy-rewritten` so we can distinguish between a
+  // user-supplied path like `/within` (which legitimately exists as a route
+  // under the within domain) and a path we already rewrote in a prior pass.
+  // Path-prefix detection breaks for the legitimate-collision case.
   const prefix = `/${domain.key}`;
-  if (pathname.startsWith(prefix)) return NextResponse.next({ request });
+  if (request.headers.get("x-proxy-rewritten")) {
+    return NextResponse.next({ request });
+  }
 
   // Auth gate (skipped when NEXT_PUBLIC_DISABLE_AUTH=true)
   if (domain.authRequired && !authDisabled) {
@@ -41,9 +46,15 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Rewrite `awknranch.com/about` → `/awknranch/about` internally
+  // Rewrite `awknranch.com/about` → `/awknranch/about` internally.
+  // Mark with `x-proxy-rewritten` so a subsequent middleware pass (if any)
+  // skips re-rewriting.
   const rewriteUrl = new URL(`${prefix}${pathname}${search}`, request.url);
-  return NextResponse.rewrite(rewriteUrl);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-proxy-rewritten", "1");
+  return NextResponse.rewrite(rewriteUrl, {
+    request: { headers: requestHeaders },
+  });
 }
 
 export const config = {

@@ -391,4 +391,26 @@ export const PORTED_PAGES: PortedPage[] = [
     legacyPath: "/within-center/emails/ketamine-prep.html",
     group: "Email Templates",
   },
+
+  // Within (clinical) — concept seeds for the future EMR / clinical portal.
+  // Preserved verbatim from legacy /within/ at repo root. NOT a marketing site
+  // — these are the early stub of an Electronic Medical Records app that
+  // will be built out from inside the new system. The login page is
+  // non-functional. Phase 5 / portal scope.
+  {
+    label: "Within — sign-in (concept stub)",
+    domain: "within",
+    path: "/within",
+    legacyPath: "/within/",
+    group: "Clinical (future scope)",
+    notes: "Future-scope sign-in concept page. Non-functional. Built out in new system per Phase 5.",
+  },
+  {
+    label: "Within EMR (concept stub)",
+    domain: "within",
+    path: "/within/emr",
+    legacyPath: "/within/emr/",
+    group: "Clinical (future scope)",
+    notes: "Future-scope EMR concept page. Non-functional. Built out in new system per Phase 5.",
+  },
 ];

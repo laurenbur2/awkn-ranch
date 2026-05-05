@@ -23,6 +23,18 @@ interface ServeOptions {
    * intra-within `<a href="../X/">` links resolve to the right ported page.
    */
   withinPort?: boolean;
+  /**
+   * Apply Within (clinical) port rewrites for the EMR/sign-in concept pages
+   * at `/within/index.html` and `/within/emr/index.html`:
+   *  - Rewrite `../`-traversed favicon and apple-touch-icon refs to root.
+   *  - Rewrite `../assets/branding/X` (any depth) → `/branding/X`.
+   *  - Rewrite bare-relative `src="app.js"` and `href="emr.css"` to
+   *    `${assetBase}/app.js` etc., so each page resolves its own JS/CSS
+   *    regardless of the URL's trailing-slash behavior.
+   * `assetBase` is required and identifies the public/ subpath where this
+   * page's bundled JS/CSS live.
+   */
+  clinicalPort?: { assetBase: string };
 }
 
 /**
@@ -90,6 +102,22 @@ export function serveLegacyHtml(
         /(["'])(?:\.\.\/)*js\/packages\.js/g,
         "$1/within-center/book/js/packages.js",
       );
+  }
+
+  if (options.clinicalPort) {
+    const base = options.clinicalPort.assetBase.replace(/\/$/, "");
+    html = html
+      .replaceAll(/(["'])(?:\.\.\/)+favicon\.png/g, "$1/favicon.png")
+      .replaceAll(
+        /(["'])(?:\.\.\/)+apple-touch-icon\.png/g,
+        "$1/apple-touch-icon.png",
+      )
+      .replaceAll(
+        /(["'])(?:\.\.\/)+assets\/branding\//g,
+        "$1/branding/",
+      )
+      .replaceAll(/src="app\.js"/g, `src="${base}/app.js"`)
+      .replaceAll(/href="emr\.css"/g, `href="${base}/emr.css"`);
   }
 
   return new Response(html, {
