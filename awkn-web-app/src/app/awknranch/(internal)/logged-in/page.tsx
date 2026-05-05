@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 /**
  * Post-login landing for the legacy /login flow. Mirrors the legacy
  * login aesthetic — temple-room background, branded card, Cormorant +
@@ -46,18 +44,13 @@ export default function LoggedInPage() {
           <div className="check">✓</div>
           <h1>Signed in</h1>
           <p className="lede">
-            You're signed in. Try clicking through to <code>/team</code> —
-            you'll see the live org chart with edit capability instead of
-            the read-only banner.
+            You're signed in. Your session is now active across the new app.
           </p>
 
           <div className="actions">
-            <Link href="/team" className="btn btn-primary">
-              Continue to /team
-            </Link>
-            <Link href="/" className="btn btn-secondary">
+            <a href="http://localhost:3000/" className="btn btn-secondary">
               Back to dev landing
-            </Link>
+            </a>
           </div>
         </div>
       </div>
