@@ -1144,6 +1144,20 @@ function combineDateTimeLocal(dateStr, timeStr) {
   const [h, mn] = timeStr.split(':').map(Number);
   return new Date(y, m - 1, d, h, mn, 0, 0);
 }
+// Parse "HH:MM" or "HH:MM:SS" (and forgiving variants) into minutes-of-day,
+// or return null if it doesn't look like a time string. Used by the conflict
+// checker so we can compare CRM event times to the buffered window without
+// running into "14:00" vs "14:00:00" string-comparison bugs.
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr) return null;
+  const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const mn = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(mn)) return null;
+  return h * 60 + mn;
+}
+
 function addMinutesToTime(timeStr, minutes) {
   if (!timeStr) return '';
   const [h, m] = timeStr.split(':').map(Number);
@@ -1159,6 +1173,13 @@ function addMinutesToTime(timeStr, minutes) {
 // sets nsHasHardConflict=true if a real overlap exists, which blocks the
 // save. Soft-only signals (CRM events without confirmed times) keep their
 // yellow warning style without blocking.
+//
+// A 30-minute buffer is applied around every booking — back-to-back is
+// only allowed if at least 30 minutes separate the two windows. This is
+// implemented by expanding the user's [start, end] by 30 min on each side
+// before checking for any overlap with existing bookings.
+const BOOKING_BUFFER_MIN = 30;
+
 async function runConflictCheck() {
   hideNsConflict();
   nsHasHardConflict = false;
@@ -1175,11 +1196,14 @@ async function runConflictCheck() {
   const endDt   = combineDateTimeLocal(date, end);
   if (!startDt || !endDt || endDt <= startDt) return;
 
-  const startISO = startDt.toISOString();
-  const endISO   = endDt.toISOString();
+  // Expanded window includes the 30-minute buffer on each side
+  const bufferedStart = new Date(startDt.getTime() - BOOKING_BUFFER_MIN * 60_000);
+  const bufferedEnd   = new Date(endDt.getTime()   + BOOKING_BUFFER_MIN * 60_000);
+  const startISO = bufferedStart.toISOString();
+  const endISO   = bufferedEnd.toISOString();
 
   const [sessRes, venueRes, leadRes] = await Promise.all([
-    // Other Within sessions on the same space, overlapping window
+    // Other Within sessions on the same space, overlapping the buffered window
     supabase
       .from('scheduling_bookings')
       .select('id, start_datetime, end_datetime, status, lead:crm_leads(first_name, last_name)')
@@ -1196,7 +1220,10 @@ async function runConflictCheck() {
       .neq('status', 'cancelled')
       .lt('start_datetime', endISO)
       .gt('end_datetime',   startISO),
-    // CRM-stage venue events on this space — confirmed stages block too
+    // CRM-stage venue events on this space — confirmed stages block too.
+    // We pull all rows for this date and filter time client-side because
+    // the CRM stores HH:MM(:SS) text, not timestamptz, and we need the
+    // 2-hour fallback for events with no end_time recorded.
     supabase
       .from('crm_leads')
       .select('id, first_name, last_name, event_date, event_start_time, event_end_time, stage:crm_pipeline_stages(slug)')
@@ -1205,13 +1232,29 @@ async function runConflictCheck() {
       .eq('event_date', date),
   ]);
 
+  // Convert the buffered window to local minutes-of-day so we can compare
+  // against the CRM lead's HH:MM(:SS) start/end strings consistently.
+  const winStartMin = bufferedStart.getHours() * 60 + bufferedStart.getMinutes();
+  const winEndMin   = bufferedEnd.getHours()   * 60 + bufferedEnd.getMinutes();
+
   const sessConflicts = sessRes.data || [];
   const venueRentalConflicts = venueRes.data || [];
   const venueConflicts = (leadRes.data || []).filter(lead => {
     const slug = (lead.stage?.slug || '').toLowerCase();
     if (!['invoice_paid', 'event_scheduled', 'event_complete', 'feedback_form_sent'].includes(slug)) return false;
-    if (!lead.event_start_time || !lead.event_end_time) return true; // unknown times → assume conflict
-    return lead.event_start_time < end && lead.event_end_time > start;
+    if (!lead.event_start_time) return true; // unknown start → can't reason about it, treat as conflict
+    const eventStartMin = parseTimeToMinutes(lead.event_start_time);
+    // If end time isn't set, assume a 2-hour block. Most ranch events are
+    // multi-hour and a missing end_time used to be treated as an automatic
+    // conflict, which made unrelated daytime sessions impossible to book.
+    const eventEndMin = lead.event_end_time
+      ? parseTimeToMinutes(lead.event_end_time)
+      : eventStartMin + 120;
+    if (eventStartMin == null || eventEndMin == null) return true;
+    // Standard half-open overlap: two windows overlap iff a.start < b.end
+    // AND a.end > b.start. The user's window is already buffered, so this
+    // enforces the 30-minute gap rule without per-event work.
+    return eventStartMin < winEndMin && eventEndMin > winStartMin;
   });
 
   const total = sessConflicts.length + venueRentalConflicts.length + venueConflicts.length;
@@ -1221,7 +1264,7 @@ async function runConflictCheck() {
   nsHasHardConflict = true;
   refreshNsSaveButtonState();
 
-  const lines = ['<strong>This space is already booked at this time. Pick a different space or time.</strong>'];
+  const lines = ['<strong>This space is already booked too close to this time (30-minute buffer required between bookings). Pick a different space or time.</strong>'];
   if (sessConflicts.length > 0) {
     const names = sessConflicts.map(s => ((s.lead?.first_name || '') + ' ' + (s.lead?.last_name || '')).trim() || 'Within client');
     lines.push(`• Within session${sessConflicts.length === 1 ? '' : 's'}: ${esc(names.join(', '))}`);
