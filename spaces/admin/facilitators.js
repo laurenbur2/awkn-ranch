@@ -7,6 +7,7 @@ import { initAdminPage, showToast } from '../../shared/admin-shell.js';
 
 let allFacilitators = [];
 let editingId = null;
+let userSearchDebounce = null;
 let filterState = {
   search: '',
   showArchived: false,
@@ -108,6 +109,12 @@ function openModal(id) {
   const isNew = !id;
   document.getElementById('modalTitle').textContent = isNew ? 'New Facilitator' : 'Edit Facilitator';
   document.getElementById('btnDelete').classList.toggle('hidden', isNew);
+  // The team-member search is only useful when adding someone new — when
+  // editing, the form is already populated with the existing record.
+  document.getElementById('userSearchWrap').classList.toggle('hidden', !isNew);
+  document.getElementById('userSearch').value = '';
+  document.getElementById('userSearchResults').style.display = 'none';
+  document.getElementById('userSearchResults').innerHTML = '';
 
   let f = { first_name: '', last_name: '', email: '', phone: '', notes: '', is_active: true };
   if (id) {
@@ -122,7 +129,10 @@ function openModal(id) {
   document.getElementById('fldActive').checked  = f.is_active !== false;
 
   document.getElementById('editModal').classList.remove('hidden');
-  setTimeout(() => document.getElementById('fldFirstName').focus(), 30);
+  setTimeout(() => {
+    if (isNew) document.getElementById('userSearch').focus();
+    else document.getElementById('fldFirstName').focus();
+  }, 30);
 }
 
 function closeModal() {
@@ -142,6 +152,68 @@ function bindModal() {
     if (e.key === 'Escape' && !document.getElementById('editModal').classList.contains('hidden')) {
       closeModal();
     }
+  });
+
+  // Existing-team-member search: debounced query against app_users, filtered
+  // to active members. Picking a result pre-fills the manual fields below.
+  const searchEl = document.getElementById('userSearch');
+  const resultsEl = document.getElementById('userSearchResults');
+  searchEl?.addEventListener('input', () => {
+    const q = (searchEl.value || '').trim();
+    clearTimeout(userSearchDebounce);
+    if (q.length < 2) {
+      resultsEl.style.display = 'none';
+      resultsEl.innerHTML = '';
+      return;
+    }
+    userSearchDebounce = setTimeout(async () => {
+      const { data } = await supabase
+        .from('app_users')
+        .select('id, first_name, last_name, display_name, email, phone')
+        .eq('is_archived', false)
+        .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%,display_name.ilike.%${q}%,email.ilike.%${q}%`)
+        .limit(8);
+      const rows = data || [];
+      // Hide anyone who's already in the facilitators table (matched by email
+      // since that's the only durable link we have right now).
+      const existingEmails = new Set(allFacilitators.map(f => (f.email || '').toLowerCase()).filter(Boolean));
+      const fresh = rows.filter(r => !existingEmails.has((r.email || '').toLowerCase()));
+      if (fresh.length === 0) {
+        resultsEl.innerHTML = `<div style="padding:0.55rem 0.7rem;color:#9ca3af;font-size:0.84rem;font-style:italic;">${rows.length === 0 ? 'No team members match.' : 'All matches are already facilitators.'}</div>`;
+      } else {
+        resultsEl.innerHTML = fresh.map(r => {
+          const name = r.display_name || ((r.first_name || '') + ' ' + (r.last_name || '')).trim() || r.email || 'Team member';
+          return `<button class="fc-user-row" type="button" data-first="${esc(r.first_name || '')}" data-last="${esc(r.last_name || '')}" data-email="${esc(r.email || '')}" data-phone="${esc(r.phone || '')}" data-display="${esc(name)}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
+            <span style="font-weight:600;color:#111827;font-size:0.88rem;">${esc(name)}</span>
+            ${r.email ? `<span style="font-size:0.74rem;color:#6b7280;">${esc(r.email)}</span>` : ''}
+          </button>`;
+        }).join('');
+      }
+      resultsEl.style.display = '';
+    }, 200);
+  });
+
+  resultsEl?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.fc-user-row');
+    if (!btn) return;
+    // Pre-fill the form. Fall back to display name if first/last weren't set
+    // separately on the app_user record.
+    let first = btn.dataset.first || '';
+    let last  = btn.dataset.last  || '';
+    if (!first && !last && btn.dataset.display) {
+      const parts = btn.dataset.display.trim().split(/\s+/);
+      first = parts[0] || '';
+      last  = parts.slice(1).join(' ');
+    }
+    document.getElementById('fldFirstName').value = first;
+    document.getElementById('fldLastName').value  = last;
+    document.getElementById('fldEmail').value     = btn.dataset.email || '';
+    document.getElementById('fldPhone').value     = btn.dataset.phone || '';
+    document.getElementById('fldActive').checked  = true;
+    searchEl.value = '';
+    resultsEl.style.display = 'none';
+    resultsEl.innerHTML = '';
+    document.getElementById('fldFirstName').focus();
   });
 }
 

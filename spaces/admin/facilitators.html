@@ -208,6 +208,17 @@
       </div>
       <div class="fc-modal-body">
         <div class="fc-modal-error hidden" id="modalError"></div>
+
+        <!-- Quick-add: search existing team members and pre-fill the form -->
+        <div class="fc-row" id="userSearchWrap">
+          <label class="fc-label" for="userSearch">Add from team <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(search someone with portal access)</span></label>
+          <div style="position:relative;">
+            <input id="userSearch" type="text" autocomplete="off" placeholder="Search by name or email…">
+            <div id="userSearchResults" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:5;display:none;box-shadow:0 8px 20px rgba(0,0,0,0.08);"></div>
+          </div>
+        </div>
+        <div style="height:1px;background:#f3f4f6;margin:0.25rem 0;"></div>
+
         <div class="fc-row row-2">
           <div>
             <label class="fc-label" for="fldFirstName">First name</label>
@@ -248,6 +259,6 @@
   <script src="../../shared/instant-chrome.js"></script>
   <script type="module" src="../../shared/version-info.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-  <script type="module" src="facilitators.js?v=20260505a"></script>
+  <script type="module" src="facilitators.js?v=20260505b"></script>
 </body>
 </html>
