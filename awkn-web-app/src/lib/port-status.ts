@@ -62,4 +62,53 @@ export const PORTED_PAGES: PortedPage[] = [
     group: "Investor / Operations",
     notes: "Slugified from a Finder-dupe-shaped filename.",
   },
+
+  // Reference: pages reviewed in the ecosystem audit and chosen to keep as
+  // assets rather than delete. Most are public-facing legacy surfaces that
+  // may inform future ports (e.g. canonical-pricing decision, team listing,
+  // schedule UX). Served verbatim — no functional re-implementation.
+  {
+    label: "Pricing",
+    domain: "awknranch",
+    path: "/pricing",
+    legacyPath: "/pricing/",
+    group: "Reference",
+    notes: "One of three pages with disagreeing AWKN prices — closest to canonical.",
+  },
+  {
+    label: "Pricing — WordPress embed widget",
+    domain: "awknranch",
+    path: "/pricing/wordpress-embed",
+    legacyPath: "/pricing/wordpress-embed.html",
+    group: "Reference",
+    notes: "Iframe-able pricing widget for WP. Possible Within bridge before WP→Next rebuild.",
+  },
+  {
+    label: "Team",
+    domain: "awknranch",
+    path: "/team",
+    legacyPath: "/team/",
+    group: "Reference",
+  },
+  {
+    label: "Schedule (public)",
+    domain: "awknranch",
+    path: "/schedule",
+    legacyPath: "/schedule/",
+    group: "Reference",
+  },
+  {
+    label: "Schedule — manage",
+    domain: "awknranch",
+    path: "/schedule/manage",
+    legacyPath: "/schedule/manage.html",
+    group: "Reference",
+  },
+  {
+    label: "Retreat house",
+    domain: "awknranch",
+    path: "/retreat",
+    legacyPath: "/retreat/",
+    group: "Reference",
+  },
 ];
