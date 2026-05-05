@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 280" fill="none">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&amp;display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&amp;display=swap');
+    .awkn { font-family: 'Cinzel', 'Times New Roman', Georgia, serif; font-weight: 700; font-size: 180px; fill: #b8784e; letter-spacing: 0.05em; }
+    .subtitle { font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 22px; fill: #a09080; letter-spacing: 0.35em; }
+  </style>
+  <text class="awkn" x="300" y="185" text-anchor="middle">AWKN</text>
+  <text class="subtitle" x="300" y="225" text-anchor="middle">ANCIENT WISDOM KNOWN NOW</text>
+</svg>
