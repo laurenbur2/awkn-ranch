@@ -111,4 +111,12 @@ export const PORTED_PAGES: PortedPage[] = [
     legacyPath: "/retreat/",
     group: "Reference",
   },
+  {
+    label: "Sign-in (legacy reference)",
+    domain: "awknranch",
+    path: "/login",
+    legacyPath: "/login/",
+    group: "Reference",
+    notes: "Verbatim port of legacy AWKN team-portal sign-in. Visual reference only — form submission won't auth (deps not ported).",
+  },
 ];
