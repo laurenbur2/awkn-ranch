@@ -79,24 +79,18 @@ function showState(state, message = '') {
 }
 
 /**
- * Get the appropriate redirect target based on user role
+ * Get the appropriate redirect target based on user role.
+ *
+ * NEW-APP PATCH: legacy hardcoded URLs (`/awkn-ranch/spaces/`,
+ * `/awkn-ranch/spaces/admin/reservations.html?pillar=master`) don't
+ * exist in the new app and would 404. Routed through `/logged-in`
+ * instead — a tiny landing page in the new app that confirms sign-in
+ * and links to /team etc. for testing the legacy session bridge.
+ * Once real per-role destinations exist in the new app, restore
+ * role-based routing here.
  */
 function getRedirectTarget(role) {
-  let target = redirectUrl;
-  // Public users always go to consumer spaces view
-  if (['public'].includes(role)) {
-    target = '/awkn-ranch/spaces/';
-  }
-  // resident + associate roles: no users assigned today. Phase 5 client portal
-  // will define post-login destinations when those roles get populated.
-  // Until then, fall through to redirectUrl (the page they were trying to reach).
-  // Team-portal users (oracle/admin/staff) always land on the Master Calendar,
-  // ignoring any stale redirect (bookmarks, sessionStorage from the old
-  // spaces.html / dashboard.html defaults).
-  else if (['oracle', 'admin', 'staff'].includes(role) && target.startsWith('/awkn-ranch/spaces/admin/')) {
-    target = '/awkn-ranch/spaces/admin/reservations.html?pillar=master';
-  }
-  return target;
+  return redirectUrl;
 }
 
 /**
