@@ -41,31 +41,28 @@ Single prod-write event after Phase 6. Runbook: `docs/migrations/2026-05-04-prod
 - [ ] Stop droplet IoT pollers (`tesla-poller`, `lg-poller`) — needs SSH config first
 - [ ] Drop dormant Supabase Functions env vars on those undeployed functions
 
-### Phase 3 — `awknranch.com` Next.js rebuild (next)
+### Phase 3 — Audit-driven port of legacy → `awkn-web-app/` (in flight)
 
-See program spec §9. Estimated 3-4 sprints. Brainstorm before execute.
+**Reframed mid-session 2026-05-05** — original spec §9 framed Phase 3 as "awknranch.com → Next.js rebuild" (Squarespace migration). Actual current goal: **port the existing repo's pages and surfaces** (legacy public pages, BOS, edge functions) into `awkn-web-app/`. Public-site rebuilds are downstream. See `project_refactor-program-scope` memory.
 
-**Pre-Phase-3 gates:**
-- [ ] Lock canonical pricing — current site disagrees: `/membership` $199, `/offerings2` $119/$149/$349, `/membership-1` $144/$199/$444 (content audit, not dev decision)
-- [ ] Decide event platform consolidation: Eventbrite / Partiful / Luma / direct Stripe / Recess. Pick one or two.
+**Established this session:**
+- Verbatim Route Handler port pattern (`serveLegacyHtml()` helper)
+- `(internal)` route group bypassing public chrome
+- Dev landing as live port-progress index (`port-status.ts` manifest)
+- Functional `/login` legacy bridge — sessions in `localStorage[awkn-ranch-auth]` flow into other ported pages that read the same key
 
-**Phase 3 brainstorm questions:**
-- [ ] Vercel team account ownership (was Phase 2 question, deferred — comes due here)
-- [ ] Squarespace asset migration approach (image hosting, content export)
-- [ ] Visual parity workflow: how do we screenshot baseline + diff vs Squarespace during port?
+**Ported (12):** `/operations`, `/investor`, `/investor-presentation`, `/investor/projections`, `/investor/projections-10y`, `/pricing`, `/pricing/wordpress-embed`, `/team`, `/schedule`, `/schedule/manage`, `/retreat`, `/login`. Plus `/logged-in` (custom).
 
-**Phase 3 deliverables:**
-- ~15 marketing pages (de-duped from 68 Squarespace pages)
-- Typed Event detail template (SSG + ISR)
-- MDX blog scaffold (empty initially)
-- B2B inquiry forms (`/privatevents`, `/collaborations`) → tRPC → `crm_leads` (the funnel-fix)
-- Stripe `/offerings2` cart equivalent
-- SEO: Event/LocalBusiness JSON-LD, `next-sitemap`, 301 redirects from old slugs
-- DNS swap from Squarespace → Vercel at cutover
+**Continuing through ecosystem audit** — root pages remaining (events/, community/, photos/, contact/, etc.), Within Center marketing site (15 pages in `within-center/`), BOS admin (38 pages in `spaces/admin/`), associates pages, and ~63 Supabase edge functions. Per-port methodology in `project_port-methodology` memory.
+
+**Cross-cutting follow-ups picked up this session:**
+- [ ] **Cleanup of legacy `app.js` patches in public/login/app.js.** The patched copy bypasses role-based redirects; eventually want real per-role landing pages in the new app (BOS dashboard for team, portal home for members) and restore role-based routing.
+- [ ] **`cloudflare/` orphan.** Worker existed primarily to feed deleted `clauded/` session dashboard. Decide delete vs keep.
+- [ ] **Consolidate per-domain logins.** Phase 2.4 stubs at `portal/login` + `bos/login` use `@supabase/ssr` cookies; ported `/login` uses legacy localStorage. Bridge or pick-one post-deploy.
 
 ### Phase 4-7 (deferred to their own brainstorms)
 
-See program spec §10-13.
+See program spec §10-13. Phase 4 (within.center) and Phase 6 (BOS hardening) likely re-shape similarly to Phase 3's reframe.
 
 ### Cross-cutting
 
@@ -90,6 +87,8 @@ See program spec §10-13.
 ## Next session
 
 1. **Run `/resume`** to load this state.
-2. **Phase 3 brainstorm** — `awknranch.com` Next.js rebuild. Pre-questions: canonical pricing, event platform consolidation, Vercel team account, asset migration approach, screenshot-baseline workflow for visual parity.
-3. **Branch state:** `miceli` is 5 commits ahead of `origin/miceli` (this session not yet pushed) and 53 commits ahead of `origin/main`. Stay on `miceli` per branching model.
-4. **Where the new app lives:** `awkn-web-app/` subfolder. Run `cd awkn-web-app && npm run dev` then visit `localhost:3000`, `awknranch.localhost:3000`, `within.localhost:3000`, `portal.localhost:3000`, `bos.localhost:3000`. Toggle `NEXT_PUBLIC_DISABLE_AUTH` in `.env.local` to test auth flow.
+2. **Continue audit-driven port.** User is directing batch-by-batch through the ecosystem audit list. Last completed: Investor / Operations + Reference (login + pricing/team/schedule/retreat). Next likely: remaining root public pages (events/, community/, photos/, contact/, waiver/, orientation/, worktrade/, planlist/, directory/, groundskeeper/, image-studio/) per the original audit list, then within-center/, then spaces/admin/.
+3. **Operating mode:** loose cadence — see `feedback_audit-port-cadence` memory. User says delete/port → just do it; don't audit every inbound link before each delete; commit at natural breakpoints.
+4. **Branch state:** `miceli` is N commits ahead of `origin/miceli` (this session not yet pushed) and many commits ahead of `origin/main`. Stay on `miceli`. End-of-program one big merge to `main`.
+5. **Dev:** `cd awkn-web-app && npm run dev`. Visit `localhost:3000` for port-progress index. Toggle `NEXT_PUBLIC_DISABLE_AUTH` in `.env.local` to bypass auth gates on bos/portal during dev.
+6. **Auth testing surface:** `awknranch.localhost:3000/login` is the legacy-styled functional sign-in. After Google or email/password, lands at `/logged-in`. Then `/team` shows live edit-capable session bridged in via `localStorage[awkn-ranch-auth]`.
