@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CompareButton } from "~/components/compare-button";
 import { DOMAINS } from "~/lib/domains";
 import { PORTED_PAGES, type PortedPage, type PortDomain } from "~/lib/port-status";
 
@@ -105,12 +106,20 @@ export default function DevLandingPage() {
                                   key={`${p.domain}${p.path}`}
                                   className="rounded-md border border-border/60 bg-background p-3"
                                 >
-                                  <div className="font-medium">{p.label}</div>
-                                  {p.notes && (
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                      {p.notes}
-                                    </p>
-                                  )}
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0 flex-1">
+                                      <div className="font-medium">{p.label}</div>
+                                      {p.notes && (
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                          {p.notes}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <CompareButton
+                                      newUrl={newUrl}
+                                      legacyUrl={legacyUrl}
+                                    />
+                                  </div>
                                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
                                     <Link
                                       href={newUrl}

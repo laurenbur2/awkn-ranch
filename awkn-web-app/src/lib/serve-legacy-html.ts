@@ -52,15 +52,43 @@ export function serveLegacyHtml(
   if (options.withinPort) {
     html = html
       .replaceAll(/(["'(=])\/awkn-ranch\//g, "$1/")
+      .replaceAll(/href="\/within-center\/"/g, 'href="/"')
       .replaceAll(
         /(["'])(?:\.\.\/)+css\/within\.css/g,
         "$1/within-center/css/within.css",
       )
-      .replaceAll(/(["'])(?:\.\.\/)+favicon\.png/g, "$1/favicon.png")
-      .replaceAll(/(["'])(?:\.\.\/)+favicon\.ico/g, "$1/favicon.ico")
+      .replaceAll(
+        /(["'])(?:\.\.\/)+favicon\.png/g,
+        "$1/within-center/favicon.png",
+      )
+      .replaceAll(
+        /(["'])(?:\.\.\/)+favicon\.ico/g,
+        "$1/within-center/favicon.ico",
+      )
       .replaceAll(
         /(["'])(?:\.\.\/)+apple-touch-icon\.png/g,
-        "$1/apple-touch-icon.png",
+        "$1/within-center/apple-touch-icon.png",
+      )
+      .replaceAll(/href="\/favicon\.png"/g, 'href="/within-center/favicon.png"')
+      .replaceAll(/href="\/favicon\.ico"/g, 'href="/within-center/favicon.ico"')
+      .replaceAll(
+        /href="\/apple-touch-icon\.png"/g,
+        'href="/within-center/apple-touch-icon.png"',
+      )
+      .replaceAll(/url\('images\//g, "url('/within-center/images/")
+      .replaceAll(/url\("images\//g, 'url("/within-center/images/')
+      .replaceAll(/url\(images\//g, "url(/within-center/images/")
+      .replaceAll(
+        /(["'])(?:\.\.\/)+images\//g,
+        "$1/within-center/images/",
+      )
+      .replaceAll(
+        /url\(((?:\.\.\/)+)images\//g,
+        "url(/within-center/images/",
+      )
+      .replaceAll(
+        /(["'])(?:\.\.\/)*js\/packages\.js/g,
+        "$1/within-center/book/js/packages.js",
       );
   }
 
