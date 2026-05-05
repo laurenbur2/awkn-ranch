@@ -168,9 +168,15 @@ function getFacilitatorName(facilitatorId) {
   return `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || null;
 }
 function getAssigneeName(b) {
-  if (b.facilitator_id) return getFacilitatorName(b.facilitator_id);
-  if (b.staff_user_id) return getStaffName(b.staff_user_id);
-  return null;
+  const primary = b.facilitator_id ? getFacilitatorName(b.facilitator_id)
+                : b.staff_user_id  ? getStaffName(b.staff_user_id)
+                : null;
+  if (!primary) return null;
+  if (b.additional_facilitator_id) {
+    const co = getFacilitatorName(b.additional_facilitator_id);
+    if (co) return `${primary} + ${co}`;
+  }
+  return primary;
 }
 
 async function loadAndRender() {
@@ -187,7 +193,7 @@ async function loadAndRender() {
     .from('scheduling_bookings')
     .select(`
       id, lead_id, service_id, space_id, status, notes,
-      start_datetime, end_datetime, staff_user_id, facilitator_id,
+      start_datetime, end_datetime, staff_user_id, facilitator_id, additional_facilitator_id,
       booker_name, booker_email, booker_phone, cancelled_at, profile_id,
       package_session_id,
       lead:crm_leads!inner(id, first_name, last_name, email, phone, business_line),
@@ -1055,6 +1061,8 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
   document.getElementById('nsClientResults').style.display = 'none';
   document.getElementById('nsService').value = '';
   populateAssigneeOptions();
+  const addFac = document.getElementById('nsAdditionalFacilitator');
+  if (addFac) addFac.value = '';
   document.getElementById('nsEnd').value = '';
   document.getElementById('nsSpace').value = '';
   document.getElementById('nsOtherWrap').style.display = 'none';
@@ -1107,6 +1115,18 @@ function populateAssigneeOptions() {
     + (facOptions   ? `<optgroup label="Facilitators">${facOptions}</optgroup>`   : '')
     + (staffOptions ? `<optgroup label="Staff">${staffOptions}</optgroup>` : '');
   sel.value = '';
+
+  // Additional facilitator (optional) — facilitators only since the concept
+  // is a co-guide for ceremonies/ketamine sessions, not generic staff.
+  const addSel = document.getElementById('nsAdditionalFacilitator');
+  if (addSel) {
+    addSel.innerHTML = '<option value="">— None —</option>'
+      + facilitators.map(f => {
+          const name = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || 'Facilitator';
+          return `<option value="${esc(f.id)}">${esc(name)}</option>`;
+        }).join('');
+    addSel.value = '';
+  }
 }
 function showNsError(msg) {
   const el = document.getElementById('nsError');
@@ -1316,6 +1336,15 @@ async function saveNewSession() {
     showNsError('Select a facilitator or staff member running this session.');
     return;
   }
+  const additionalFacilitatorId = document.getElementById('nsAdditionalFacilitator').value || null;
+  // Don't let the same person be picked as both primary and additional —
+  // confusing on the schedule and would double-book them under the unique
+  // (facilitator_id, start_datetime) index if extended.
+  const [primaryKind, primaryId] = assigneeVal.split(':');
+  if (additionalFacilitatorId && primaryKind === 'fac' && primaryId === additionalFacilitatorId) {
+    showNsError('Additional facilitator must be different from the primary.');
+    return;
+  }
   // Re-run the conflict check so we never insert against a stale flag, then
   // refuse if there's a real overlap.
   await runConflictCheck();
@@ -1342,15 +1371,15 @@ async function saveNewSession() {
   // assignee_chk requires one of profile_id / staff_user_id / facilitator_id
   // to be set; the assignee dropdown produces a "fac:..." or "staff:..."
   // value that we route to the matching column.
-  const [assigneeKind, assigneeId] = assigneeVal.split(':');
   const payload = {
     lead_id: nsSelectedLeadId,
     booker_name:  nsSelectedLeadName  || 'Within client',
     booker_email: nsSelectedLeadEmail || 'unknown@within.center',
     service_id: serviceId,
     space_id: spaceId,
-    facilitator_id: assigneeKind === 'fac'   ? assigneeId : null,
-    staff_user_id:  assigneeKind === 'staff' ? assigneeId : null,
+    facilitator_id: primaryKind === 'fac'   ? primaryId : null,
+    staff_user_id:  primaryKind === 'staff' ? primaryId : null,
+    additional_facilitator_id: additionalFacilitatorId,
     start_datetime: startDt.toISOString(),
     end_datetime:   endDt.toISOString(),
     status: 'confirmed',
