@@ -119,6 +119,8 @@
       text-transform: uppercase; letter-spacing: 0.04em;
     }
     .ve-pill.type     { background: #f3e8ff; color: #5b21b6; }
+    .ve-pill.visibility.public  { background: #ecfdf5; color: #065f46; }
+    .ve-pill.visibility.private { background: #f3f4f6; color: #4b5563; }
     .ve-pill.stage    { background: #f3f4f6; color: #4b5563; }
     .ve-pill.stage.confirmed { background: #ecfdf5; color: #065f46; }
     .ve-pill.stage.deposit   { background: #fef3c7; color: #78350f; }
@@ -269,7 +271,7 @@
       .ve-modal-row.row-2 { grid-template-columns: 1fr; }
     }
     @media (max-width: 540px) {
-      .ve-table .col-time { display: none; }
+      .ve-table .col-time, .ve-table .col-visibility { display: none; }
       .ve-cal-day { min-height: 48px; padding: 0.2rem 0.3rem; }
       .ve-cal-dow { font-size: 0.6rem; padding: 0.4rem 0.3rem; }
     }
@@ -341,6 +343,14 @@
             <option value="all">All spaces</option>
           </select>
         </div>
+        <div class="ve-control-group">
+          <label for="visibilityFilter">Visibility</label>
+          <select id="visibilityFilter">
+            <option value="all">All</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
       </div>
 
       <div class="ve-cal-wrap">
@@ -366,12 +376,13 @@
               <th>Client</th>
               <th>Space</th>
               <th class="col-type">Event Type</th>
+              <th class="col-visibility">Visibility</th>
               <th>Stage</th>
               <th class="col-amount" style="text-align:right;">Amount</th>
             </tr>
           </thead>
           <tbody id="eventsBody">
-            <tr><td colspan="7" class="ve-empty">Loading…</td></tr>
+            <tr><td colspan="8" class="ve-empty">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -419,17 +430,26 @@
             <input id="nePhone" type="tel" autocomplete="tel" placeholder="(512) 555-0100">
           </div>
         </div>
-        <div class="ve-modal-row">
-          <label class="ve-modal-label" for="neEventType">Event type</label>
-          <select id="neEventType">
-            <option value="">— Select an event type —</option>
-            <option value="Workshop">Workshop</option>
-            <option value="Retreat">Retreat</option>
-            <option value="Birthday">Birthday</option>
-            <option value="Wedding">Wedding</option>
-            <option value="Private Party">Private Party</option>
-            <option value="Other">Other</option>
-          </select>
+        <div class="ve-modal-row row-2">
+          <div>
+            <label class="ve-modal-label" for="neEventType">Event type</label>
+            <select id="neEventType">
+              <option value="">— Select an event type —</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Retreat">Retreat</option>
+              <option value="Birthday">Birthday</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Private Party">Private Party</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="ve-modal-label" for="neVisibility">Visibility</label>
+            <select id="neVisibility">
+              <option value="private" selected>Private</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
         </div>
         <div class="ve-modal-row row-2">
           <div>

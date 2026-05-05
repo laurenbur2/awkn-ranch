@@ -33,6 +33,8 @@ let editingMealId = null;                  // set when the meal modal is in edit
 let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
 let facilitators = [];                     // facilitator directory — for STAFF row when facilitator_id is set
 let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
+let nsSelectedLeadName = null;             // captured at selection so we can stamp booker_name on insert
+let nsSelectedLeadEmail = null;
 let nsSearchDebounce  = null;
 // Set true by runConflictCheck when the chosen space is already booked at
 // the chosen window (another Within session or a confirmed venue rental).
@@ -166,9 +168,15 @@ function getFacilitatorName(facilitatorId) {
   return `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || null;
 }
 function getAssigneeName(b) {
-  if (b.facilitator_id) return getFacilitatorName(b.facilitator_id);
-  if (b.staff_user_id) return getStaffName(b.staff_user_id);
-  return null;
+  const primary = b.facilitator_id ? getFacilitatorName(b.facilitator_id)
+                : b.staff_user_id  ? getStaffName(b.staff_user_id)
+                : null;
+  if (!primary) return null;
+  if (b.additional_facilitator_id) {
+    const co = getFacilitatorName(b.additional_facilitator_id);
+    if (co) return `${primary} + ${co}`;
+  }
+  return primary;
 }
 
 async function loadAndRender() {
@@ -185,7 +193,7 @@ async function loadAndRender() {
     .from('scheduling_bookings')
     .select(`
       id, lead_id, service_id, space_id, status, notes,
-      start_datetime, end_datetime, staff_user_id, facilitator_id,
+      start_datetime, end_datetime, staff_user_id, facilitator_id, additional_facilitator_id,
       booker_name, booker_email, booker_phone, cancelled_at, profile_id,
       package_session_id,
       lead:crm_leads!inner(id, first_name, last_name, email, phone, business_line),
@@ -1001,7 +1009,7 @@ function bindNewSessionModal() {
       } else {
         resultsEl.innerHTML = rows.map(r => {
           const name = ((r.first_name || '') + ' ' + (r.last_name || '')).trim() || r.email || 'Client';
-          return `<button class="ns-client-row" data-id="${esc(r.id)}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
+          return `<button class="ns-client-row" data-id="${esc(r.id)}" data-name="${esc(name)}" data-email="${esc(r.email || '')}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
             <span style="font-weight:600;color:#111827;font-size:0.88rem;">${esc(name)}</span>
             ${r.email ? `<span style="font-size:0.74rem;color:#6b7280;">${esc(r.email)}</span>` : ''}
           </button>`;
@@ -1015,12 +1023,16 @@ function bindNewSessionModal() {
     const btn = e.target.closest('.ns-client-row');
     if (!btn) return;
     nsSelectedLeadId = btn.dataset.id;
+    nsSelectedLeadName = btn.dataset.name || null;
+    nsSelectedLeadEmail = btn.dataset.email || null;
     const nameEl = btn.querySelector('span');
     const selectedEl = document.getElementById('nsSelectedClient');
     selectedEl.style.display = '';
     selectedEl.innerHTML = `<strong>Selected:</strong> ${nameEl.innerHTML} <button id="nsClearClient" style="background:none;border:none;color:#d4883a;font-size:0.78rem;font-weight:600;cursor:pointer;margin-left:0.5rem;">change</button>`;
     document.getElementById('nsClearClient').addEventListener('click', () => {
       nsSelectedLeadId = null;
+      nsSelectedLeadName = null;
+      nsSelectedLeadEmail = null;
       selectedEl.style.display = 'none';
       selectedEl.innerHTML = '';
       searchEl.value = '';
@@ -1042,10 +1054,15 @@ function bindNewSessionModal() {
 function openNewSessionModal({ prefilledStart = null } = {}) {
   // Reset state
   nsSelectedLeadId = null;
+  nsSelectedLeadName = null;
+  nsSelectedLeadEmail = null;
   document.getElementById('nsClientSearch').value = '';
   document.getElementById('nsSelectedClient').style.display = 'none';
   document.getElementById('nsClientResults').style.display = 'none';
   document.getElementById('nsService').value = '';
+  populateAssigneeOptions();
+  const addFac = document.getElementById('nsAdditionalFacilitator');
+  if (addFac) addFac.value = '';
   document.getElementById('nsEnd').value = '';
   document.getElementById('nsSpace').value = '';
   document.getElementById('nsOtherWrap').style.display = 'none';
@@ -1073,6 +1090,43 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
 }
 function closeNewSessionModal() {
   document.getElementById('nsModal').classList.add('hidden');
+}
+
+// Populate the New Session modal's assignee dropdown with two optgroups:
+// Facilitators (mapped to facilitator_id) and Staff (mapped to staff_user_id).
+// The selected value is prefixed so the save handler can route it to the
+// right column on scheduling_bookings.
+function populateAssigneeOptions() {
+  const sel = document.getElementById('nsAssignee');
+  if (!sel) return;
+  const facOptions = facilitators
+    .map(f => {
+      const name = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || 'Facilitator';
+      return `<option value="fac:${esc(f.id)}">${esc(name)}</option>`;
+    })
+    .join('');
+  const staffOptions = staffList
+    .map(u => {
+      const name = u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Staff';
+      return `<option value="staff:${esc(u.id)}">${esc(name)}</option>`;
+    })
+    .join('');
+  sel.innerHTML = '<option value="">— Select who\'s running this session —</option>'
+    + (facOptions   ? `<optgroup label="Facilitators">${facOptions}</optgroup>`   : '')
+    + (staffOptions ? `<optgroup label="Staff">${staffOptions}</optgroup>` : '');
+  sel.value = '';
+
+  // Additional facilitator (optional) — facilitators only since the concept
+  // is a co-guide for ceremonies/ketamine sessions, not generic staff.
+  const addSel = document.getElementById('nsAdditionalFacilitator');
+  if (addSel) {
+    addSel.innerHTML = '<option value="">— None —</option>'
+      + facilitators.map(f => {
+          const name = `${f.first_name || ''} ${f.last_name || ''}`.trim() || f.email || 'Facilitator';
+          return `<option value="${esc(f.id)}">${esc(name)}</option>`;
+        }).join('');
+    addSel.value = '';
+  }
 }
 function showNsError(msg) {
   const el = document.getElementById('nsError');
@@ -1110,6 +1164,20 @@ function combineDateTimeLocal(dateStr, timeStr) {
   const [h, mn] = timeStr.split(':').map(Number);
   return new Date(y, m - 1, d, h, mn, 0, 0);
 }
+// Parse "HH:MM" or "HH:MM:SS" (and forgiving variants) into minutes-of-day,
+// or return null if it doesn't look like a time string. Used by the conflict
+// checker so we can compare CRM event times to the buffered window without
+// running into "14:00" vs "14:00:00" string-comparison bugs.
+function parseTimeToMinutes(timeStr) {
+  if (!timeStr) return null;
+  const m = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const mn = Number(m[2]);
+  if (!Number.isFinite(h) || !Number.isFinite(mn)) return null;
+  return h * 60 + mn;
+}
+
 function addMinutesToTime(timeStr, minutes) {
   if (!timeStr) return '';
   const [h, m] = timeStr.split(':').map(Number);
@@ -1125,6 +1193,13 @@ function addMinutesToTime(timeStr, minutes) {
 // sets nsHasHardConflict=true if a real overlap exists, which blocks the
 // save. Soft-only signals (CRM events without confirmed times) keep their
 // yellow warning style without blocking.
+//
+// A 30-minute buffer is applied around every booking — back-to-back is
+// only allowed if at least 30 minutes separate the two windows. This is
+// implemented by expanding the user's [start, end] by 30 min on each side
+// before checking for any overlap with existing bookings.
+const BOOKING_BUFFER_MIN = 30;
+
 async function runConflictCheck() {
   hideNsConflict();
   nsHasHardConflict = false;
@@ -1141,11 +1216,14 @@ async function runConflictCheck() {
   const endDt   = combineDateTimeLocal(date, end);
   if (!startDt || !endDt || endDt <= startDt) return;
 
-  const startISO = startDt.toISOString();
-  const endISO   = endDt.toISOString();
+  // Expanded window includes the 30-minute buffer on each side
+  const bufferedStart = new Date(startDt.getTime() - BOOKING_BUFFER_MIN * 60_000);
+  const bufferedEnd   = new Date(endDt.getTime()   + BOOKING_BUFFER_MIN * 60_000);
+  const startISO = bufferedStart.toISOString();
+  const endISO   = bufferedEnd.toISOString();
 
   const [sessRes, venueRes, leadRes] = await Promise.all([
-    // Other Within sessions on the same space, overlapping window
+    // Other Within sessions on the same space, overlapping the buffered window
     supabase
       .from('scheduling_bookings')
       .select('id, start_datetime, end_datetime, status, lead:crm_leads(first_name, last_name)')
@@ -1162,7 +1240,10 @@ async function runConflictCheck() {
       .neq('status', 'cancelled')
       .lt('start_datetime', endISO)
       .gt('end_datetime',   startISO),
-    // CRM-stage venue events on this space — confirmed stages block too
+    // CRM-stage venue events on this space — confirmed stages block too.
+    // We pull all rows for this date and filter time client-side because
+    // the CRM stores HH:MM(:SS) text, not timestamptz, and we need the
+    // 2-hour fallback for events with no end_time recorded.
     supabase
       .from('crm_leads')
       .select('id, first_name, last_name, event_date, event_start_time, event_end_time, stage:crm_pipeline_stages(slug)')
@@ -1171,13 +1252,29 @@ async function runConflictCheck() {
       .eq('event_date', date),
   ]);
 
+  // Convert the buffered window to local minutes-of-day so we can compare
+  // against the CRM lead's HH:MM(:SS) start/end strings consistently.
+  const winStartMin = bufferedStart.getHours() * 60 + bufferedStart.getMinutes();
+  const winEndMin   = bufferedEnd.getHours()   * 60 + bufferedEnd.getMinutes();
+
   const sessConflicts = sessRes.data || [];
   const venueRentalConflicts = venueRes.data || [];
   const venueConflicts = (leadRes.data || []).filter(lead => {
     const slug = (lead.stage?.slug || '').toLowerCase();
     if (!['invoice_paid', 'event_scheduled', 'event_complete', 'feedback_form_sent'].includes(slug)) return false;
-    if (!lead.event_start_time || !lead.event_end_time) return true; // unknown times → assume conflict
-    return lead.event_start_time < end && lead.event_end_time > start;
+    if (!lead.event_start_time) return true; // unknown start → can't reason about it, treat as conflict
+    const eventStartMin = parseTimeToMinutes(lead.event_start_time);
+    // If end time isn't set, assume a 2-hour block. Most ranch events are
+    // multi-hour and a missing end_time used to be treated as an automatic
+    // conflict, which made unrelated daytime sessions impossible to book.
+    const eventEndMin = lead.event_end_time
+      ? parseTimeToMinutes(lead.event_end_time)
+      : eventStartMin + 120;
+    if (eventStartMin == null || eventEndMin == null) return true;
+    // Standard half-open overlap: two windows overlap iff a.start < b.end
+    // AND a.end > b.start. The user's window is already buffered, so this
+    // enforces the 30-minute gap rule without per-event work.
+    return eventStartMin < winEndMin && eventEndMin > winStartMin;
   });
 
   const total = sessConflicts.length + venueRentalConflicts.length + venueConflicts.length;
@@ -1187,7 +1284,7 @@ async function runConflictCheck() {
   nsHasHardConflict = true;
   refreshNsSaveButtonState();
 
-  const lines = ['<strong>This space is already booked at this time. Pick a different space or time.</strong>'];
+  const lines = ['<strong>This space is already booked too close to this time (30-minute buffer required between bookings). Pick a different space or time.</strong>'];
   if (sessConflicts.length > 0) {
     const names = sessConflicts.map(s => ((s.lead?.first_name || '') + ' ' + (s.lead?.last_name || '')).trim() || 'Within client');
     lines.push(`• Within session${sessConflicts.length === 1 ? '' : 's'}: ${esc(names.join(', '))}`);
@@ -1234,6 +1331,20 @@ async function saveNewSession() {
     showNsError('Type a location for "Other".');
     return;
   }
+  const assigneeVal = document.getElementById('nsAssignee').value;
+  if (!assigneeVal) {
+    showNsError('Select a facilitator or staff member running this session.');
+    return;
+  }
+  const additionalFacilitatorId = document.getElementById('nsAdditionalFacilitator').value || null;
+  // Don't let the same person be picked as both primary and additional —
+  // confusing on the schedule and would double-book them under the unique
+  // (facilitator_id, start_datetime) index if extended.
+  const [primaryKind, primaryId] = assigneeVal.split(':');
+  if (additionalFacilitatorId && primaryKind === 'fac' && primaryId === additionalFacilitatorId) {
+    showNsError('Additional facilitator must be different from the primary.');
+    return;
+  }
   // Re-run the conflict check so we never insert against a stale flag, then
   // refuse if there's a real overlap.
   await runConflictCheck();
@@ -1253,13 +1364,25 @@ async function saveNewSession() {
     ? (baseNotes || null)
     : `Location: ${otherLocation}${baseNotes ? `\n\n${baseNotes}` : ''}`;
 
+  // booker_name / booker_email are NOT NULL on scheduling_bookings (they
+  // were originally for the public booking flow). For admin-created sessions
+  // we stamp them from the selected Within client so the not-null constraint
+  // passes; they'll match the lead row anyway.
+  // assignee_chk requires one of profile_id / staff_user_id / facilitator_id
+  // to be set; the assignee dropdown produces a "fac:..." or "staff:..."
+  // value that we route to the matching column.
   const payload = {
     lead_id: nsSelectedLeadId,
+    booker_name:  nsSelectedLeadName  || 'Within client',
+    booker_email: nsSelectedLeadEmail || 'unknown@within.center',
     service_id: serviceId,
     space_id: spaceId,
+    facilitator_id: primaryKind === 'fac'   ? primaryId : null,
+    staff_user_id:  primaryKind === 'staff' ? primaryId : null,
+    additional_facilitator_id: additionalFacilitatorId,
     start_datetime: startDt.toISOString(),
     end_datetime:   endDt.toISOString(),
-    status: 'scheduled',
+    status: 'confirmed',
     notes: finalNotes,
   };
 

@@ -256,6 +256,20 @@
           </select>
         </div>
 
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Facilitator / Staff</span>
+          <select id="nsAssignee" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select who's running this session —</option>
+          </select>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Additional Facilitator <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional, for ketamine sessions or co-facilitated work)</span></span>
+          <select id="nsAdditionalFacilitator" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— None —</option>
+          </select>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
           <div class="ws-modal-row">
             <span class="ws-modal-label">Date</span>
@@ -366,6 +380,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-  <script type="module" src="within-schedule.js"></script>
+  <script type="module" src="within-schedule.js?v=20260505d"></script>
 </body>
 </html>
