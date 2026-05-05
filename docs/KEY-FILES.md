@@ -14,7 +14,6 @@
 | `spaces/` | Public space listings + apply flow + verify (`spaces/`, `spaces/apply/`, `spaces/hostevent/`, `spaces/verify.html`, `spaces/w9.html`) |
 | `spaces/admin/` | **Admin BOS — primary operating system** |
 | `pay/` | Self-service payment page |
-| `clauded/` | Internal dev dashboard (architecture diagram, config overview, Claude Code session viewer) |
 | `admin/` | Email approval handler pages (`email-approved.html`, `email-confirm.html`) — paired with `approve-email/` edge function |
 | `associates/` | Associate clock-in / project-inquiry / worktracking pages |
 | `assets/branding/` | AWKN + Within wordmarks, logos, brand previews |
@@ -100,13 +99,6 @@ URL params: `?amount=`, `?description=`, `?person_id=`, `?person_name=`, `?email
 ## Consumer space view (`spaces/`)
 
 `spaces/app.js` powers public listings. Filters `is_listed=true AND is_secret=false`. Sorts: available first → highest price → name. Loads assignments for availability without exposing personal info.
-
-## Internal dev dashboards (`clauded/`)
-
-- `index.html` — landing
-- `architecture.html` — three-tier architecture diagram
-- `config-overview.html` — config inspector
-- `sessions.html` — Claude Code session browser (requires Cloudflare D1 logging — see `cloudflare/`)
 
 ## Supabase edge functions (`supabase/functions/`)
 
