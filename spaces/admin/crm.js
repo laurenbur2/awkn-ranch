@@ -2200,6 +2200,13 @@ function openLeadModal(lead = null) {
                 </select>
               </div>
               <div class="crm-form-field">
+                <label>Visibility</label>
+                <select class="crm-select" id="lead-is-public">
+                  <option value="private" ${lead?.is_public ? '' : 'selected'}>Private</option>
+                  <option value="public" ${lead?.is_public ? 'selected' : ''}>Public</option>
+                </select>
+              </div>
+              <div class="crm-form-field">
                 <label>Start Date</label>
                 <input type="date" class="crm-input" id="lead-event-date" value="${lead?.event_date || ''}">
               </div>
@@ -2295,6 +2302,7 @@ function openLeadModal(lead = null) {
     if (bizLine === 'awkn_ranch') {
       payload.space_id = document.getElementById('lead-space').value || null;
       payload.event_type = document.getElementById('lead-event-type').value || null;
+      payload.is_public = document.getElementById('lead-is-public').value === 'public';
       payload.event_date = document.getElementById('lead-event-date').value || null;
       payload.event_end_date = document.getElementById('lead-event-end-date').value || null;
       payload.guest_count = parseInt(document.getElementById('lead-guest-count').value) || null;

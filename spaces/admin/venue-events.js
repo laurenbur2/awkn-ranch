@@ -18,10 +18,11 @@ let allSpaces = [];
 // (venue events + Within sessions) at a glance and can spot conflicts.
 let withinSessions = [];
 let filterState = {
-  search: '',
-  month:  'all',
-  stage:  'all',
-  space:  'all',
+  search:     '',
+  month:      'all',
+  stage:      'all',
+  space:      'all',
+  visibility: 'all',
 };
 // View mode: 'list' (default — table of events) or 'calendar' (month grid).
 // Persisted to localStorage so the user's last preference sticks.
@@ -75,6 +76,7 @@ async function loadAll() {
       .select(`
         id, first_name, last_name, email, phone,
         event_date, event_end_date, event_start_time, event_end_time, event_type, guest_count,
+        is_public,
         space_id, additional_space_ids, stage_id, estimated_value, actual_revenue,
         deposit_amount, deposit_paid_at, balance_amount, balance_paid_at,
         notes, internal_staff_notes,
@@ -217,6 +219,10 @@ function bindControls() {
     filterState.space = e.target.value;
     render();
   });
+  document.getElementById('visibilityFilter')?.addEventListener('change', (e) => {
+    filterState.visibility = e.target.value;
+    render();
+  });
 
   // View toggle (List / Calendar)
   document.querySelectorAll('.ve-view-btn').forEach(btn => {
@@ -283,6 +289,10 @@ function applyFilters(events) {
 
     // Space filter
     if (filterState.space !== 'all' && e.space_id !== filterState.space) return false;
+
+    // Visibility filter
+    if (filterState.visibility === 'public'  && !e.is_public) return false;
+    if (filterState.visibility === 'private' &&  e.is_public) return false;
 
     // Text search across name, email, space, type, notes
     if (filterState.search) {
@@ -494,6 +504,9 @@ function openEventDetails(leadId) {
   rows.push(row('When', `${esc(dateStr)} · ${esc(timeStr)}`));
   rows.push(row(allSpaceNames.length > 1 ? 'Spaces' : 'Space', esc(spaceStr)));
   rows.push(row('Event type', esc(eventType)));
+  rows.push(row('Visibility', ev.is_public
+    ? '<span class="ve-pill visibility public">Public</span>'
+    : '<span class="ve-pill visibility private">Private</span>'));
   rows.push(row('Guest count', esc(guestCount)));
   rows.push(row('Stage', esc(stageName)));
   rows.push(row('Estimated value', esc(amount)));
@@ -527,6 +540,7 @@ function openNewEventModal(dateYmd) {
   document.getElementById('neEmail').value = '';
   document.getElementById('nePhone').value = '';
   document.getElementById('neEventType').value = '';
+  document.getElementById('neVisibility').value = 'private';
   document.getElementById('neDate').value = dateYmd || '';
   document.getElementById('neEndDate').value = '';
   document.getElementById('neGuestCount').value = '';
@@ -575,6 +589,7 @@ async function createNewEvent() {
   const email     = document.getElementById('neEmail').value.trim();
   const phone     = document.getElementById('nePhone').value.trim();
   const eventType = document.getElementById('neEventType').value;
+  const isPublic  = document.getElementById('neVisibility').value === 'public';
   const dateVal   = document.getElementById('neDate').value;
   const endDateVal = document.getElementById('neEndDate').value || null;
   const guestStr  = document.getElementById('neGuestCount').value;
@@ -615,6 +630,7 @@ async function createNewEvent() {
     email:      email || null,
     phone:      phone || null,
     event_type: eventType || null,
+    is_public: isPublic,
     event_date: dateVal,
     event_end_date: endDateVal,
     event_start_time: startTime,
@@ -637,6 +653,7 @@ async function createNewEvent() {
     .select(`
       id, first_name, last_name, email, phone,
       event_date, event_end_date, event_start_time, event_end_time, event_type, guest_count,
+      is_public,
       space_id, additional_space_ids, stage_id, estimated_value, actual_revenue,
       deposit_amount, deposit_paid_at, balance_amount, balance_paid_at,
       notes, internal_staff_notes,
@@ -760,7 +777,7 @@ function renderTable(events) {
     const empty = anyFilterActive()
       ? '<strong>No events match these filters.</strong>Try clearing the search or month filter.'
       : '<strong>No upcoming venue events.</strong>Add a lead in the CRM with an event date to see it here.';
-    body.innerHTML = `<tr><td colspan="7" class="ve-empty">${empty}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="8" class="ve-empty">${empty}</td></tr>`;
     return;
   }
 
@@ -788,6 +805,9 @@ function renderRow(e) {
   const email   = e.email ? esc(e.email) : '';
   const space   = e.space?.name || '—';
   const eventType = e.event_type ? `<span class="ve-pill type">${esc(e.event_type)}</span>` : '';
+  const visibilityPill = e.is_public
+    ? '<span class="ve-pill visibility public">Public</span>'
+    : '<span class="ve-pill visibility private">Private</span>';
   const stagePill = renderStagePill(e.stage);
   const amount  = formatMoney(Number(e.actual_revenue || e.estimated_value || 0));
   return `
@@ -797,6 +817,7 @@ function renderRow(e) {
       <td class="ve-cell-client">${esc(guest)}${email ? `<span class="ve-email">${email}</span>` : ''}</td>
       <td class="ve-cell-space">${esc(space)}</td>
       <td class="col-type">${eventType}</td>
+      <td class="col-visibility">${visibilityPill}</td>
       <td>${stagePill}</td>
       <td class="ve-cell-amount col-amount">${esc(amount)}</td>
     </tr>
@@ -815,7 +836,7 @@ function renderStagePill(stage) {
 }
 
 function anyFilterActive() {
-  return filterState.search || filterState.month !== 'all' || filterState.stage !== 'all' || filterState.space !== 'all';
+  return filterState.search || filterState.month !== 'all' || filterState.stage !== 'all' || filterState.space !== 'all' || filterState.visibility !== 'all';
 }
 
 // ============================================================================
