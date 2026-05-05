@@ -739,3 +739,11 @@ export function canEdit() {
 export function canViewAll() {
   return getAuthState().isStaff;
 }
+
+// Patch (port-only): legacy login/reset-password.html imports getBasePath
+// from auth.js but the function was never actually exported in source.
+// Adding here returning empty string so the auth-flow ports work — auth
+// lives at root in the new app, no /awkn-ranch/ prefix needed.
+export function getBasePath() {
+  return "";
+}

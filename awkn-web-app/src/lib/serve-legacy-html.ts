@@ -24,6 +24,22 @@ interface ServeOptions {
    */
   withinPort?: boolean;
   /**
+   * Apply rewrites for legacy auth-flow pages (login/reset-password,
+   * login/update-password, admin/email-approved, admin/email-confirm) so
+   * they serve under awknranch with AWKN branding and resolve their
+   * shared/* imports against the JS deps already copied to public/ for
+   * the /login port:
+   *  - Strip `/awkn-ranch/` GH-Pages prefix from absolute URLs.
+   *  - Strip parent-traversal from favicon/apple-touch-icon/shared/* refs.
+   *  - Rewrite `/assets/branding/X` → `/branding/X` (we mirror AWKN brand
+   *    PNGs/SVGs at public/branding/).
+   *  - Replace residual `AlpacAPPs` brand strings in <title> with `AWKN
+   *    Ranch` — the only Alpaca residue in the auth pages.
+   *  - Rewrite `/login/update-password.html` → `/login/update-password`
+   *    so the password-reset email link lands at our clean Route Handler.
+   */
+  legacyAuthPort?: boolean;
+  /**
    * Apply Within (clinical) port rewrites for the EMR/sign-in concept pages
    * at `/within/index.html` and `/within/emr/index.html`:
    *  - Rewrite `../`-traversed favicon and apple-touch-icon refs to root.
@@ -101,6 +117,23 @@ export function serveLegacyHtml(
       .replaceAll(
         /(["'])(?:\.\.\/)*js\/packages\.js/g,
         "$1/within-center/book/js/packages.js",
+      );
+  }
+
+  if (options.legacyAuthPort) {
+    html = html
+      .replaceAll(/(["'(=])\/awkn-ranch\//g, "$1/")
+      .replaceAll(/(["'])(?:\.\.\/)+favicon\.png/g, "$1/favicon.png")
+      .replaceAll(
+        /(["'])(?:\.\.\/)+apple-touch-icon\.png/g,
+        "$1/apple-touch-icon.png",
+      )
+      .replaceAll(/(["'])(?:\.\.\/)+shared\//g, "$1/shared/")
+      .replaceAll(/(["'])\/assets\/branding\//g, "$1/branding/")
+      .replaceAll(/AlpacAPPs/g, "AWKN Ranch")
+      .replaceAll(
+        /\/login\/update-password\.html/g,
+        "/login/update-password",
       );
   }
 
