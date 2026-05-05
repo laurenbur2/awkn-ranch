@@ -112,11 +112,11 @@ export const PORTED_PAGES: PortedPage[] = [
     group: "Reference",
   },
   {
-    label: "Sign-in (legacy reference)",
+    label: "Sign-in (legacy port, functional)",
     domain: "awknranch",
     path: "/login",
     legacyPath: "/login/",
     group: "Reference",
-    notes: "Verbatim port of legacy AWKN team-portal sign-in. Visual reference only — form submission won't auth (deps not ported).",
+    notes: "Legacy AWKN team-portal sign-in. JS deps copied to public/. After login, redirects to /logged-in. Session uses localStorage key awkn-ranch-auth — /team picks it up automatically.",
   },
 ];
