@@ -33,6 +33,8 @@ let editingMealId = null;                  // set when the meal modal is in edit
 let staffList = [];                        // app_users (admin/staff/oracle) — for STAFF row + cancel attribution
 let facilitators = [];                     // facilitator directory — for STAFF row when facilitator_id is set
 let nsSelectedLeadId = null;               // currently-selected client in the New Session modal
+let nsSelectedLeadName = null;             // captured at selection so we can stamp booker_name on insert
+let nsSelectedLeadEmail = null;
 let nsSearchDebounce  = null;
 // Set true by runConflictCheck when the chosen space is already booked at
 // the chosen window (another Within session or a confirmed venue rental).
@@ -1001,7 +1003,7 @@ function bindNewSessionModal() {
       } else {
         resultsEl.innerHTML = rows.map(r => {
           const name = ((r.first_name || '') + ' ' + (r.last_name || '')).trim() || r.email || 'Client';
-          return `<button class="ns-client-row" data-id="${esc(r.id)}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
+          return `<button class="ns-client-row" data-id="${esc(r.id)}" data-name="${esc(name)}" data-email="${esc(r.email || '')}" style="display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:0.5rem 0.7rem;background:none;border:none;border-bottom:1px solid #f3f4f6;font-family:inherit;cursor:pointer;">
             <span style="font-weight:600;color:#111827;font-size:0.88rem;">${esc(name)}</span>
             ${r.email ? `<span style="font-size:0.74rem;color:#6b7280;">${esc(r.email)}</span>` : ''}
           </button>`;
@@ -1015,12 +1017,16 @@ function bindNewSessionModal() {
     const btn = e.target.closest('.ns-client-row');
     if (!btn) return;
     nsSelectedLeadId = btn.dataset.id;
+    nsSelectedLeadName = btn.dataset.name || null;
+    nsSelectedLeadEmail = btn.dataset.email || null;
     const nameEl = btn.querySelector('span');
     const selectedEl = document.getElementById('nsSelectedClient');
     selectedEl.style.display = '';
     selectedEl.innerHTML = `<strong>Selected:</strong> ${nameEl.innerHTML} <button id="nsClearClient" style="background:none;border:none;color:#d4883a;font-size:0.78rem;font-weight:600;cursor:pointer;margin-left:0.5rem;">change</button>`;
     document.getElementById('nsClearClient').addEventListener('click', () => {
       nsSelectedLeadId = null;
+      nsSelectedLeadName = null;
+      nsSelectedLeadEmail = null;
       selectedEl.style.display = 'none';
       selectedEl.innerHTML = '';
       searchEl.value = '';
@@ -1042,6 +1048,8 @@ function bindNewSessionModal() {
 function openNewSessionModal({ prefilledStart = null } = {}) {
   // Reset state
   nsSelectedLeadId = null;
+  nsSelectedLeadName = null;
+  nsSelectedLeadEmail = null;
   document.getElementById('nsClientSearch').value = '';
   document.getElementById('nsSelectedClient').style.display = 'none';
   document.getElementById('nsClientResults').style.display = 'none';
@@ -1253,8 +1261,14 @@ async function saveNewSession() {
     ? (baseNotes || null)
     : `Location: ${otherLocation}${baseNotes ? `\n\n${baseNotes}` : ''}`;
 
+  // booker_name / booker_email are NOT NULL on scheduling_bookings (they
+  // were originally for the public booking flow). For admin-created sessions
+  // we stamp them from the selected Within client so the not-null constraint
+  // passes; they'll match the lead row anyway.
   const payload = {
     lead_id: nsSelectedLeadId,
+    booker_name:  nsSelectedLeadName  || 'Within client',
+    booker_email: nsSelectedLeadEmail || 'unknown@within.center',
     service_id: serviceId,
     space_id: spaceId,
     start_datetime: startDt.toISOString(),
