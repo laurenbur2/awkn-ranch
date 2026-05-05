@@ -524,61 +524,98 @@
     </ul>
   </aside>
 
-  <!-- ── HERO ── -->
-  <header class="page-hero" style="background-color:var(--dark); min-height: 60vh;">
+  <!-- ── HERO + CONDITIONS (integrated) ── -->
+  <header class="page-hero" style="background-color:var(--dark); padding-bottom:0; min-height:auto;">
     <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/lodge-interior.jpg');"></div>
-    <div class="page-hero-inner">
+    <div class="page-hero-inner" style="padding-bottom:2.5rem;">
       <span class="page-hero-eyebrow">Resources</span>
       <h1>Articles, guides, and stories.</h1>
       <p class="lead">A library of writing on ceremonial ketamine, integration, mental health, and the lived experience of inner work.</p>
     </div>
-  </header>
-
-  <!-- ── CONDITIONS WE TREAT ── -->
-  <section style="background:var(--cream); padding:4rem 2rem;">
-    <div style="max-width:1100px; margin:0 auto;">
-      <div style="text-align:center; margin-bottom:2.5rem;">
-        <div class="s-eyebrow">Conditions we work with</div>
-        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.6rem,3vw,2.2rem); font-weight:400; color:var(--dark); margin:0.5rem 0 0.75rem;">What brings people to this work</h2>
-        <p style="font-size:0.92rem; color:var(--grey); max-width:560px; margin:0 auto; line-height:1.8;">Ceremonial ketamine therapy supports a range of conditions. Each page below goes deeper into the specific approach, what to expect, and how to get started.</p>
+    <!-- Conditions integrated into hero bottom -->
+    <div style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:0 2rem;">
+      <div style="font-size:0.58rem; letter-spacing:0.32em; text-transform:uppercase; color:rgba(255,255,255,0.38); margin-bottom:1.25rem; text-align:center; font-weight:600;">Conditions We Work With</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.85rem; padding-bottom:0;">
+        <a href="../depression-treatment/" class="cond-hero-card">
+          <img src="../images/about.jpg" alt="Depression treatment at Within Center" loading="lazy">
+          <div class="cond-hero-body">
+            <div class="cond-hero-title">Depression</div>
+            <div class="cond-hero-desc">Treatment-resistant &amp; major depressive disorder</div>
+            <div class="cond-hero-link">Explore →</div>
+          </div>
+        </a>
+        <a href="../anxiety-treatment/" class="cond-hero-card">
+          <img src="https://images.pexels.com/photos/3807571/pexels-photo-3807571.jpeg?auto=compress&cs=tinysrgb&w=480" alt="Anxiety treatment at Within Center" loading="lazy">
+          <div class="cond-hero-body">
+            <div class="cond-hero-title">Anxiety</div>
+            <div class="cond-hero-desc">Generalized anxiety, panic &amp; trauma-driven fear</div>
+            <div class="cond-hero-link">Explore →</div>
+          </div>
+        </a>
+        <a href="../burnout-treatment/" class="cond-hero-card">
+          <img src="../images/ceremony-space.jpg" alt="Burnout treatment at Within Center" loading="lazy">
+          <div class="cond-hero-body">
+            <div class="cond-hero-title">Burnout</div>
+            <div class="cond-hero-desc">Chronic exhaustion &amp; existential depletion</div>
+            <div class="cond-hero-link">Explore →</div>
+          </div>
+        </a>
+        <a href="../grief-treatment/" class="cond-hero-card">
+          <img src="https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg?auto=compress&cs=tinysrgb&w=480" alt="Grief treatment at Within Center" loading="lazy">
+          <div class="cond-hero-body">
+            <div class="cond-hero-title">Grief</div>
+            <div class="cond-hero-desc">Loss that hasn't moved &amp; complicated grief</div>
+            <div class="cond-hero-link">Explore →</div>
+          </div>
+        </a>
+        <a href="../addiction-treatment/" class="cond-hero-card">
+          <img src="https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg?auto=compress&cs=tinysrgb&w=480" alt="Addiction treatment at Within Center" loading="lazy">
+          <div class="cond-hero-body">
+            <div class="cond-hero-title">Addiction</div>
+            <div class="cond-hero-desc">Substance use &amp; the pain underneath</div>
+            <div class="cond-hero-link">Explore →</div>
+          </div>
+        </a>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1rem;">
-        <a href="../depression-treatment/" style="display:block; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 1.25rem; text-align:center; text-decoration:none; transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';this.style.borderColor='rgba(201,148,62,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)'">
-          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.2rem; font-weight:500; color:var(--dark); margin-bottom:0.5rem;">Depression</div>
-          <div style="font-size:0.78rem; color:var(--grey); line-height:1.6;">Treatment-resistant &amp; major depressive disorder</div>
-          <div style="margin-top:1rem; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold);">Learn More →</div>
-        </a>
-        <a href="../anxiety-treatment/" style="display:block; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 1.25rem; text-align:center; text-decoration:none; transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';this.style.borderColor='rgba(201,148,62,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)'">
-          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.2rem; font-weight:500; color:var(--dark); margin-bottom:0.5rem;">Anxiety</div>
-          <div style="font-size:0.78rem; color:var(--grey); line-height:1.6;">Generalized anxiety, panic &amp; trauma-driven fear</div>
-          <div style="margin-top:1rem; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold);">Learn More →</div>
-        </a>
-        <a href="../burnout-treatment/" style="display:block; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 1.25rem; text-align:center; text-decoration:none; transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';this.style.borderColor='rgba(201,148,62,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)'">
-          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.2rem; font-weight:500; color:var(--dark); margin-bottom:0.5rem;">Burnout</div>
-          <div style="font-size:0.78rem; color:var(--grey); line-height:1.6;">Chronic exhaustion &amp; existential depletion</div>
-          <div style="margin-top:1rem; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold);">Learn More →</div>
-        </a>
-        <a href="../grief-treatment/" style="display:block; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 1.25rem; text-align:center; text-decoration:none; transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';this.style.borderColor='rgba(201,148,62,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)'">
-          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.2rem; font-weight:500; color:var(--dark); margin-bottom:0.5rem;">Grief</div>
-          <div style="font-size:0.78rem; color:var(--grey); line-height:1.6;">Loss that hasn't moved &amp; complicated grief</div>
-          <div style="margin-top:1rem; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold);">Learn More →</div>
-        </a>
-        <a href="../addiction-treatment/" style="display:block; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 1.25rem; text-align:center; text-decoration:none; transition:transform 0.25s,box-shadow 0.25s,border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';this.style.borderColor='rgba(201,148,62,0.4)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--border)'">
-          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:1.2rem; font-weight:500; color:var(--dark); margin-bottom:0.5rem;">Addiction</div>
-          <div style="font-size:0.78rem; color:var(--grey); line-height:1.6;">Substance use &amp; the pain underneath</div>
-          <div style="margin-top:1rem; font-size:0.65rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold);">Learn More →</div>
-        </a>
-      </div>
-      <style>
-        @media (max-width: 900px) {
-          .conditions-row { grid-template-columns: repeat(3,1fr) !important; }
-        }
-        @media (max-width: 600px) {
-          .conditions-row { grid-template-columns: 1fr 1fr !important; }
-        }
-      </style>
     </div>
-  </section>
+    <style>
+      .cond-hero-card {
+        display: block;
+        border-radius: 8px 8px 0 0;
+        overflow: hidden;
+        text-decoration: none;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-bottom: none;
+        transition: transform 0.25s, border-color 0.25s;
+      }
+      .cond-hero-card:hover { transform: translateY(-4px); border-color: rgba(201,148,62,0.5); }
+      .cond-hero-card img {
+        width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block;
+        filter: brightness(0.78) saturate(0.85);
+        transition: filter 0.3s;
+      }
+      .cond-hero-card:hover img { filter: brightness(0.9) saturate(0.95); }
+      .cond-hero-body { padding: 1rem 1.1rem 1.25rem; }
+      .cond-hero-title {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 1.15rem; font-weight: 500; color: #fff; margin-bottom: 0.35rem;
+      }
+      .cond-hero-desc { font-size: 0.73rem; color: rgba(255,255,255,0.55); line-height: 1.55; }
+      .cond-hero-link {
+        margin-top: 0.7rem; font-size: 0.6rem; letter-spacing: 0.22em;
+        text-transform: uppercase; color: var(--gold); font-weight: 600;
+      }
+      @media (max-width: 900px) {
+        .cond-hero-card { border-radius: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        header.page-hero > div:last-of-type > div:last-child { grid-template-columns: repeat(3,1fr) !important; }
+      }
+      @media (max-width: 600px) {
+        header.page-hero > div:last-of-type > div:last-child { grid-template-columns: repeat(2,1fr) !important; }
+        .cond-hero-card img { aspect-ratio: 4/3; }
+      }
+    </style>
+  </header>
 
   <!-- ── UNIFIED LIBRARY: filterable magazine grid (blog + research) ── -->
   <section class="res-section">
