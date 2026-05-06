@@ -38,18 +38,42 @@ export default function DevLandingPage() {
       <link
         rel="preconnect"
         href="https://fonts.googleapis.com"
+        precedence="default"
       />
       <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
         crossOrigin="anonymous"
+        precedence="default"
       />
       <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
+        precedence="default"
       />
-      <style>{`
-        :root {
+      <style precedence="default" href="dev-landing-styles">{`
+        .dev-page {
+          --awkn-brown-dark: #3a2a1a;
+          --awkn-brown: #6b4c2a;
+          --awkn-brown-light: #a67c52;
+          --awkn-cream: #f5f0e8;
+          --awkn-cream-deep: #ebe3d2;
+          --awkn-offwhite: #faf8f4;
+          --awkn-white: #ffffff;
+          --awkn-amber: #be7830;
+          --awkn-border: rgba(58,42,26,0.10);
+          --awkn-border-soft: rgba(58,42,26,0.06);
+          --font-heading: 'Cormorant Garamond', Georgia, serif;
+          --font-body: 'Montserrat', system-ui, sans-serif;
+          background: var(--awkn-cream);
+          font-family: var(--font-body);
+          color: var(--awkn-brown-dark);
+          min-height: 100vh;
+          padding: 3rem 1.5rem 5rem;
+        }
+        .dev-shell {
+          max-width: 56rem;
+          margin: 0 auto;
           --awkn-brown-dark: #3a2a1a;
           --awkn-brown: #6b4c2a;
           --awkn-brown-light: #a67c52;
@@ -63,14 +87,6 @@ export default function DevLandingPage() {
           --font-heading: 'Cormorant Garamond', Georgia, serif;
           --font-body: 'Montserrat', system-ui, sans-serif;
         }
-        body { background: var(--awkn-cream); }
-        .dev-page {
-          font-family: var(--font-body);
-          color: var(--awkn-brown-dark);
-          min-height: 100vh;
-          padding: 3rem 1.5rem 5rem;
-        }
-        .dev-shell { max-width: 56rem; margin: 0 auto; }
 
         .dev-header { text-align: center; margin-bottom: 3rem; }
         .dev-wordmark {
