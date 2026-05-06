@@ -1113,18 +1113,20 @@ ${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.t
       const fmtCurrency = (n: number) =>
         `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
-      const lineItemRows = lineItems.map((li: any) => {
+      const lineItemRows = lineItems.map((li: any, i: number) => {
         const qty = Number(li.quantity || 1);
         const desc = String(li.description || '');
         const qtyPrefix = qty > 1 ? `<strong style="color:#1c1618;">${qty} ×</strong> ` : '';
+        const isLast = i === lineItems.length - 1;
+        const border = isLast ? '' : 'border-bottom:1px solid rgba(201,148,62,0.18);';
         return `
         <tr>
-          <td style="padding:12px 0;border-bottom:1px solid rgba(201,148,62,0.18);font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;line-height:1.5;vertical-align:top;">${qtyPrefix}${desc}</td>
-          <td style="padding:12px 0;border-bottom:1px solid rgba(201,148,62,0.18);font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;text-align:right;white-space:nowrap;vertical-align:top;">${fmtCurrency(li.total)}</td>
+          <td style="padding:11px 12px 11px 0;${border}font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;line-height:1.55;vertical-align:top;">${qtyPrefix}${desc}</td>
+          <td style="padding:11px 0 11px 12px;${border}font-family:'Cormorant Garamond',Georgia,serif;color:#1c1618;font-size:17px;font-weight:500;text-align:right;white-space:nowrap;vertical-align:top;">${fmtCurrency(li.total)}</td>
         </tr>`;
       }).join('');
       const lineItemRowsText = lineItems.map((li: any) =>
-        `  ${li.description}  ×${li.quantity}  @ ${fmtCurrency(li.unit_price)}  = ${fmtCurrency(li.total)}`
+        `  ${Number(li.quantity || 1) > 1 ? Number(li.quantity) + ' × ' : ''}${li.description}  = ${fmtCurrency(li.total)}`
       ).join('\n');
       const invoiceDate = data.invoice_date
         ? new Date(data.invoice_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -1171,12 +1173,15 @@ ${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.t
   </div>
 
   ${lineItems.length > 0 ? `
-  <!-- Line items -->
+  <!-- Line items — cream callout with gold left rule (matches welcome
+       letter "Your Package Includes" block) -->
   <div style="padding:0 40px 8px 40px;">
-    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:14px;">Line Items</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-      <tbody>${lineItemRows}</tbody>
-    </table>
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Invoice Includes</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tbody>${lineItemRows}</tbody>
+      </table>
+    </div>
   </div>` : ''}
 
   <!-- Totals -->

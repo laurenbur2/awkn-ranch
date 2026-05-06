@@ -2725,14 +2725,22 @@ function openInvoicePreview(existingInvoice = null) {
     ${isPreviewOnly ? `<p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#a67a2e;text-align:center;margin:14px 40px 0;">Payment links activate when you send the invoice.</p>` : ''}
   `;
 
-  const lineItemRows = lineItems.map(li => `
-    <tr>
-      <td style="padding:16px 12px 16px 4px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:15px;color:#1c1618;white-space:pre-line;line-height:1.65;">${escapeHtml(li.description)}</td>
-      <td style="padding:16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:center;vertical-align:top;">${li.quantity}</td>
-      <td style="padding:16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:right;vertical-align:top;white-space:nowrap;">${formatCurrency(li.unit_price)}</td>
-      <td style="padding:16px 4px 16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:#1c1618;text-align:right;vertical-align:top;white-space:nowrap;">${formatCurrency(li.total)}</td>
-    </tr>
-  `).join('');
+  // Render line items the way the welcome letter / proposal email do:
+  // a "3 ×" qty prefix in front of the description, the line amount on
+  // the right, all wrapped below in a cream callout block with a gold
+  // left rule. Qty/Rate columns drop out — they're rarely useful for
+  // service-style invoices and the package-style layout reads better.
+  const lineItemRows = lineItems.map((li, i) => {
+    const qty = Number(li.quantity || 1);
+    const qtyPrefix = qty > 1 ? `<strong style="color:#1c1618;">${qty} ×</strong> ` : '';
+    const isLast = i === lineItems.length - 1;
+    const border = isLast ? '' : 'border-bottom:1px solid rgba(201,148,62,0.18);';
+    return `
+      <tr>
+        <td style="padding:11px 12px 11px 0;${border}font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.55;vertical-align:top;white-space:pre-line;">${qtyPrefix}${escapeHtml(li.description)}</td>
+        <td style="padding:11px 0 11px 12px;${border}font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:500;color:#1c1618;text-align:right;white-space:nowrap;vertical-align:top;">${formatCurrency(li.total)}</td>
+      </tr>`;
+  }).join('');
 
   const previewHtml = `
     <div id="invoice-preview-overlay" style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -2776,27 +2784,17 @@ function openInvoicePreview(existingInvoice = null) {
               </table>
             </div>
 
-            <!-- Line items -->
+            <!-- Line items — cream callout with gold left rule (matches the
+                 welcome-letter "Your Package Includes" block) -->
             <div style="padding:0 40px 28px 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;table-layout:fixed;">
-                <colgroup>
-                  <col style="width:auto;">
-                  <col style="width:48px;">
-                  <col style="width:90px;">
-                  <col style="width:100px;">
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th style="padding:10px 12px 10px 4px;text-align:left;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Description</th>
-                    <th style="padding:10px 8px;text-align:center;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Qty</th>
-                    <th style="padding:10px 8px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Rate</th>
-                    <th style="padding:10px 4px 10px 8px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${lineItemRows || '<tr><td colspan="4" style="padding:24px;text-align:center;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:#6b4c3b;font-size:15px;">No line items added yet</td></tr>'}
-                </tbody>
-              </table>
+              <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+                <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Invoice Includes</div>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                  <tbody>
+                    ${lineItemRows || '<tr><td style="padding:8px 0;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:#6b4c3b;font-size:14px;">No line items added yet</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <!-- Totals -->
