@@ -7,6 +7,15 @@ const INIT_TIMEOUT_MS = 10000; // 10 seconds for initial auth check
 const CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
 const CACHED_AUTH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+// Dev-only permissions bypass. The new app's serveLegacyHtml route handler
+// sets window.__AWKN_DEV_BYPASS_AUTH=true when NEXT_PUBLIC_DISABLE_AUTH=true,
+// which short-circuits hasPermission / hasAnyPermission so the legacy admin
+// chrome can render against accounts that lack prod permissions. Mirrors the
+// Next/proxy auth-disable knob. Never set in production builds.
+function devAuthBypass() {
+  return typeof window !== 'undefined' && window.__AWKN_DEV_BYPASS_AUTH === true;
+}
+
 /**
  * Split a display name into first_name and last_name.
  * Returns { first_name, last_name } or {} if name can't be parsed.
@@ -620,8 +629,8 @@ export function getAuthState() {
     isCurrentResident: currentAppUser?.is_current_resident === true,
     // Granular permissions
     permissions: currentPermissions,
-    hasPermission: (key) => currentPermissions.has(key),
-    hasAnyPermission: (...keys) => keys.some(k => currentPermissions.has(k)),
+    hasPermission: (key) => devAuthBypass() || currentPermissions.has(key),
+    hasAnyPermission: (...keys) => devAuthBypass() || keys.some(k => currentPermissions.has(k)),
   };
 }
 
@@ -631,7 +640,7 @@ export function getAuthState() {
  * @returns {boolean}
  */
 export function hasPermission(permKey) {
-  return currentPermissions.has(permKey);
+  return devAuthBypass() || currentPermissions.has(permKey);
 }
 
 /**
@@ -640,7 +649,7 @@ export function hasPermission(permKey) {
  * @returns {boolean}
  */
 export function hasAnyPermission(...permKeys) {
-  return permKeys.some(k => currentPermissions.has(k));
+  return devAuthBypass() || permKeys.some(k => currentPermissions.has(k));
 }
 
 /**

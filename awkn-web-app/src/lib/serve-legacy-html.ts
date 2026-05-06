@@ -153,6 +153,18 @@ export function serveLegacyHtml(
     html = html
       .replaceAll(/(["'(=])\/awkn-ranch\//g, "$1/")
       .replaceAll(/(["'(=])\/assets\/branding\//g, "$1/branding/");
+
+    // Dev-only auth bypass — set NEXT_PUBLIC_DISABLE_AUTH=true in .env.local
+    // to render legacy admin pages against accounts that lack prod
+    // permissions. Mirrors the Next/proxy auth-disable knob. The legacy
+    // auth.js's hasPermission / hasAnyPermission read this flag and short-
+    // circuit to true. Never injected in production (env var is unset).
+    if (process.env.NEXT_PUBLIC_DISABLE_AUTH === "true") {
+      html = html.replace(
+        "</head>",
+        `<script>window.__AWKN_DEV_BYPASS_AUTH=true;</script>\n</head>`,
+      );
+    }
   }
 
   if (options.clinicalPort) {

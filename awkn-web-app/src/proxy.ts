@@ -22,7 +22,8 @@ export async function proxy(request: NextRequest) {
   // No matched domain → bare `localhost`, IP access, etc. Show the dev landing.
   if (!domain) return NextResponse.next({ request });
 
-  const { pathname, search } = request.nextUrl;
+  let { pathname } = request.nextUrl;
+  const { search } = request.nextUrl;
 
   // Already-rewritten paths shouldn't be rewritten again. We mark internal
   // rewrites with `x-proxy-rewritten` so we can distinguish between a
@@ -32,6 +33,26 @@ export async function proxy(request: NextRequest) {
   const prefix = `/${domain.key}`;
   if (request.headers.get("x-proxy-rewritten")) {
     return NextResponse.next({ request });
+  }
+
+  // Normalize legacy URL shapes so verbatim-ported HTML/JS in `legacy-html/`
+  // and `public/shared/` keeps working without per-file source edits:
+  //  - `/awkn-ranch/X` (legacy GH-Pages base path) → `/X`. Hardcoded in
+  //    the legacy `auth.js`, `version-info.js`, `instant-chrome.js`, etc.
+  //    for fetches and `window.location.href` redirects.
+  //  - `/X.html` → `/X`. Legacy admin nav links to `dashboard.html` etc.;
+  //    new-app route handlers are extension-less.
+  //  - Trailing slash on non-root paths → stripped (`/login/` → `/login`).
+  // All three are Phase-6-throwaway — they disappear naturally as each
+  // admin page gets re-scaffolded in React and the legacy JS gets deleted.
+  if (pathname.startsWith("/awkn-ranch/")) {
+    pathname = pathname.slice("/awkn-ranch".length);
+  }
+  if (pathname.endsWith(".html")) {
+    pathname = pathname.slice(0, -".html".length);
+  }
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1);
   }
 
   // Auth gate (skipped when NEXT_PUBLIC_DISABLE_AUTH=true)

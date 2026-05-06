@@ -17,6 +17,18 @@ const config = {
   // postgres + @libsql/client transitively use node `tls`/`net`/`crypto`.
   serverExternalPackages: ["postgres", "@libsql/client"],
 
+  // Strip the legacy GH-Pages base path (`/awkn-ranch/*`) at the framework
+  // level so it works on every request, including static assets. The proxy's
+  // matcher excludes image/css extensions for perf, so its in-proxy strip
+  // doesn't fire for `/awkn-ranch/assets/branding/X.png` etc. — those need
+  // this framework-level rewrite to land in `public/`. Phase-6-throwaway:
+  // disappears as legacy JS gets deleted page-by-page.
+  async rewrites() {
+    return [
+      { source: "/awkn-ranch/:path*", destination: "/:path*" },
+    ];
+  },
+
   async headers() {
     return [
       {
