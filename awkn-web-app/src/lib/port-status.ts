@@ -25,6 +25,64 @@ export interface PortedPage {
 }
 
 export const PORTED_PAGES: PortedPage[] = [
+  // Public site — Lauren's net-new public AWKN Ranch marketing site
+  // (commits 8f463a41 + 2c20f2c2 on main, 2026-05-06). Replaced the old
+  // root index.html (which was the team portal — moved to /portal/).
+  // Shared chrome via /assets/awkn/site.css; bare-relative + parent-
+  // traversed asset refs resolve naturally — no serveLegacyHtml rewrites
+  // needed. Asset bundle mirrored at awkn-web-app/public/assets/awkn/.
+  {
+    label: "AWKN Ranch — home",
+    domain: "awknranch",
+    path: "/",
+    legacyPath: "/index.html",
+    group: "Public site",
+    notes: "Lauren's public marketing home. Replaced the old team portal at root (which moved to /portal/).",
+  },
+  {
+    label: "Property",
+    domain: "awknranch",
+    path: "/property",
+    legacyPath: "/property/",
+    group: "Public site",
+  },
+  {
+    label: "Book a Stay",
+    domain: "awknranch",
+    path: "/book",
+    legacyPath: "/book/",
+    group: "Public site",
+  },
+  {
+    label: "Host a Retreat",
+    domain: "awknranch",
+    path: "/host-a-retreat",
+    legacyPath: "/host-a-retreat/",
+    group: "Public site",
+  },
+  {
+    label: "Services",
+    domain: "awknranch",
+    path: "/services",
+    legacyPath: "/services/",
+    group: "Public site",
+    notes: "Within Center feature block + amenities + add-ons. Lauren's redesign 2026-05-06.",
+  },
+  {
+    label: "Events",
+    domain: "awknranch",
+    path: "/events",
+    legacyPath: "/events/",
+    group: "Public site",
+  },
+  {
+    label: "Contact",
+    domain: "awknranch",
+    path: "/contact",
+    legacyPath: "/contact/",
+    group: "Public site",
+  },
+
   {
     label: "Operations — retreat logistics",
     domain: "awknranch",
@@ -88,7 +146,8 @@ export const PORTED_PAGES: PortedPage[] = [
     domain: "awknranch",
     path: "/team",
     legacyPath: "/team/",
-    group: "Reference",
+    group: "Public site",
+    notes: "Flipped 2026-05-06 — was the internal team org chart, now the public AWKN Ranch team page (Lauren's commit 2c20f2c2). The internal org chart moved to /portal/team-chart/.",
   },
   {
     label: "Schedule (public)",
@@ -111,6 +170,27 @@ export const PORTED_PAGES: PortedPage[] = [
     legacyPath: "/retreat/",
     group: "Reference",
   },
+  // Team Portal — moved from root /index.html in Lauren's 2026-05-06
+  // restructure (commit 8f463a41). Sign-in landing for AWKN team. Uses
+  // Supabase JS via CDN; bosPort strips /awkn-ranch/ prefix from absolute
+  // refs. Eventually destined for team.awknranch.com per Phase 6 IA.
+  {
+    label: "Team Portal — sign-in landing",
+    domain: "awknranch",
+    path: "/portal",
+    legacyPath: "/portal/index.html",
+    group: "Team Portal",
+    notes: "Was at root /index.html before Lauren's 2026-05-06 split. Reads Supabase auth state, redirects signed-in users to /spaces/admin/dashboard.",
+  },
+  {
+    label: "Team Portal — Org Chart",
+    domain: "awknranch",
+    path: "/portal/team-chart",
+    legacyPath: "/portal/team-chart/index.html",
+    group: "Team Portal",
+    notes: "Was at /team/ before Lauren's 2026-05-06 split (when /team/ became the public team page).",
+  },
+
   {
     label: "Sign-in (legacy port, functional)",
     domain: "awknranch",
