@@ -2602,7 +2602,7 @@ async function openInvoiceModal(invoice = null, lead = null) {
   document.getElementById('btn-send-invoice').addEventListener('click', () => saveInvoice(invoice, 'sent'));
 
   // Preview invoice
-  document.getElementById('btn-preview-invoice').addEventListener('click', () => openInvoicePreview());
+  document.getElementById('btn-preview-invoice').addEventListener('click', () => openInvoicePreview(invoice));
 
   // Recalculate totals on discount/tax change
   document.getElementById('inv-discount')?.addEventListener('input', recalcInvoiceTotals);
@@ -2671,7 +2671,7 @@ function recalcInvoiceTotals() {
   if (totalEl) totalEl.textContent = formatCurrency(total);
 }
 
-function openInvoicePreview() {
+function openInvoicePreview(existingInvoice = null) {
   const lineItems = [];
   document.querySelectorAll('.crm-line-item').forEach(el => {
     const desc = el.querySelector('.crm-li-desc')?.value?.trim() || '';
@@ -2703,6 +2703,27 @@ function openInvoicePreview() {
   const brand = bizLine === 'within'
     ? { wordmark: 'WITHIN CENTER', tagline: 'at AWKN Ranch · Austin, Texas' }
     : { wordmark: 'AWKN RANCH', tagline: 'Austin, Texas' };
+
+  // Stripe payment buttons mirror the proposal email: ACH (no fee) on top,
+  // card (+3% surcharge) below. When viewing the preview from the form
+  // before the invoice has been sent, we don't have a real link yet — show
+  // disabled-style buttons with a small caption so the operator sees what
+  // the recipient will see.
+  const ach = existingInvoice?.stripe_payment_link_url || null;
+  const card = existingInvoice?.stripe_payment_link_card_url || null;
+  const cardTotal = Math.round(total * 1.03 * 100) / 100;
+  const isPreviewOnly = !ach && !card;
+  const payButtonsHtml = `
+    <div style="padding:0 40px 8px 40px;text-align:center;">
+      <a href="${ach || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;${isPreviewOnly ? 'opacity:0.7;pointer-events:none;' : ''}">Pay by Bank — ${formatCurrency(total)}</a>
+      <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure bank transfer (ACH) via Stripe · no processing fee</p>
+    </div>
+    <div style="padding:14px 40px 8px 40px;text-align:center;">
+      <a href="${card || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;${isPreviewOnly ? 'opacity:0.7;pointer-events:none;' : ''}">Pay by Card — ${formatCurrency(cardTotal)}</a>
+      <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Card payments include a 3% processing fee</p>
+    </div>
+    ${isPreviewOnly ? `<p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#a67a2e;text-align:center;margin:14px 40px 0;">Payment links activate when you send the invoice.</p>` : ''}
+  `;
 
   const lineItemRows = lineItems.map(li => `
     <tr>
@@ -2798,9 +2819,15 @@ function openInvoicePreview() {
               </table>
             </div>
 
+            <!-- Stripe pay buttons -->
+            <div style="padding:0 0 8px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+              <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:14px;">Pay your invoice</div>
+              ${payButtonsHtml}
+            </div>
+
             <!-- Notes -->
             ${notes ? `
-            <div style="padding:0 40px 32px 40px;">
+            <div style="padding:24px 40px 32px 40px;">
               <div style="border-top:1px solid rgba(28,22,24,0.08);padding-top:20px;">
                 <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Notes</div>
                 <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#1c1618;line-height:1.7;white-space:pre-line;">${escapeHtml(notes)}</div>
@@ -2890,6 +2917,61 @@ async function saveInvoice(existingInvoice, status) {
     lead_id: window._invoiceLeadId || null,
     created_by: authState?.user?.id || null,
   };
+
+  // When sending the invoice, generate Stripe payment links (ACH + card)
+  // — same pattern proposals use. Skip if links already exist (idempotent
+  // re-send) or if the email is missing (Stripe needs it for receipts).
+  if (status === 'sent'
+      && !existingInvoice?.stripe_payment_link_url
+      && payload.client_email
+      && total > 0) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (token) {
+        const cardTotal = Math.round(total * 1.03 * 100) / 100;
+        async function makeLink(amount, method, suffix) {
+          const r = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/create-payment-link', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token,
+            },
+            body: JSON.stringify({
+              amount,
+              description: `${payload.invoice_number} — Invoice for ${clientName}${suffix}`,
+              person_name: clientName,
+              person_email: payload.client_email,
+              category: 'crm_invoice',
+              payment_method: method,
+              metadata: {
+                source: 'crm-invoice',
+                invoice_number: payload.invoice_number,
+                lead_id: payload.lead_id,
+                payment_method: method,
+              },
+            }),
+          });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok || !d.url) {
+            throw new Error(`Stripe ${method} link failed: ${d.error || d.detail || r.status}`);
+          }
+          return d;
+        }
+        const ach  = await makeLink(total, 'ach', '');
+        const card = await makeLink(cardTotal, 'card', ' (card)');
+        payload.stripe_payment_link_id       = ach.payment_link_id;
+        payload.stripe_payment_link_url      = ach.url;
+        payload.stripe_payment_link_card_id  = card.payment_link_id;
+        payload.stripe_payment_link_card_url = card.url;
+      }
+    } catch (linkErr) {
+      // Don't block the send if Stripe is down — the invoice still gets
+      // saved as sent so the operator can resend / collect manually.
+      console.warn('Stripe payment link generation failed:', linkErr);
+      showToast('Saved, but Stripe payment link could not be generated. Resend after connecting Stripe.', 'warning');
+    }
+  }
 
   try {
     let invoiceId;
