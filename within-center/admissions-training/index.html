@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admissions Call Training | Within Center</title>
+  <meta name="description" content="Internal training for Within Center admissions calls. Read each module, then take the quiz to confirm.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9943e;
+      --gold-dark: #a67a2e;
+      --gold-glow: rgba(201,148,62,0.15);
+      --gold-soft: rgba(201,148,62,0.08);
+      --brown: #6b4c3b;
+      --grey: #6b6569;
+      --grey-soft: rgba(28,22,24,0.55);
+      --dark: #1c1618;
+      --cream: #faf8f5;
+      --cream-warm: #f5f1ea;
+      --white: #ffffff;
+      --border: rgba(28,22,24,0.08);
+      --border-soft: rgba(28,22,24,0.05);
+      --green: #5a7d5e;
+      --green-soft: rgba(90,125,94,0.12);
+      --red: #a8493e;
+      --red-soft: rgba(168,73,62,0.12);
+      --shadow-sm: 0 1px 3px rgba(28,22,24,0.04);
+      --shadow-md: 0 4px 20px rgba(28,22,24,0.06);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--dark);
+      background: var(--cream);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 300;
+    }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+    @media (max-width: 640px) { .page { padding: 3rem 1.25rem 4rem; } }
+
+    /* Header */
+    .doc-header {
+      text-align: center;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3.5rem;
+    }
+    .doc-eyebrow {
+      display: inline-block;
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      padding: 0.4rem 1.1rem;
+      border: 1px solid rgba(201,148,62,0.4);
+      border-radius: 999px;
+      margin-bottom: 1.6rem;
+    }
+    .doc-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--dark);
+      letter-spacing: -0.01em;
+    }
+    .doc-title em { font-style: italic; color: var(--gold-dark); }
+    .doc-subtitle {
+      margin-top: 1.3rem;
+      font-size: 0.95rem;
+      color: var(--grey-soft);
+      font-style: italic;
+      max-width: 580px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+    .doc-brand {
+      margin-top: 2rem;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+    .doc-brand .sep { display: inline-block; margin: 0 0.7rem; color: rgba(201,148,62,0.5); }
+    .doc-wordmark {
+      display: block;
+      margin: 0 auto 1.6rem;
+      max-width: 220px;
+      width: 60%;
+      height: auto;
+      opacity: 0.92;
+    }
+    .doc-foot-mark {
+      display: block;
+      margin: 0 auto 1rem;
+      max-width: 140px;
+      width: 50%;
+      height: auto;
+      opacity: 0.6;
+    }
+
+    /* Progress indicator */
+    .progress-bar {
+      position: sticky;
+      top: 0;
+      background: var(--cream);
+      padding: 1rem 0 0.5rem;
+      z-index: 10;
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 2.5rem;
+    }
+    .progress-track {
+      height: 3px;
+      background: var(--border-soft);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .progress-label {
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--grey-soft);
+      text-align: center;
+    }
+
+    /* Modules */
+    .module {
+      margin-bottom: 4rem;
+      scroll-margin-top: 6rem;
+    }
+    .module:last-of-type { margin-bottom: 0; }
+
+    .module-num {
+      display: inline-block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+      line-height: 1.2;
+      color: var(--dark);
+      margin-bottom: 0.7rem;
+      letter-spacing: -0.005em;
+    }
+    h2 em { font-style: italic; color: var(--gold-dark); }
+    .module-lede {
+      font-size: 1.02rem;
+      color: var(--grey-soft);
+      margin-bottom: 1.8rem;
+      max-width: 680px;
+      line-height: 1.7;
+    }
+    h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: 1.4rem;
+      color: var(--dark);
+      margin: 2rem 0 0.9rem;
+    }
+    h3 em { font-style: italic; color: var(--gold-dark); }
+    h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 1.6rem 0 0.8rem;
+    }
+
+    p { margin-bottom: 1.1rem; font-size: 1rem; color: var(--dark); }
+    p.subtle { color: var(--grey-soft); font-style: italic; font-size: 0.93rem; }
+
+    /* Key callout cards */
+    .key-card {
+      background: var(--cream-warm);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 10px 10px 0;
+      padding: 1.5rem 1.8rem;
+      margin: 1.4rem 0 1.6rem;
+    }
+    .key-card-label {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+    .key-card p:last-child { margin-bottom: 0; }
+
+    /* Numbered list */
+    ol.rules { list-style: none; counter-reset: rules; margin: 1.4rem 0; }
+    ol.rules li {
+      counter-increment: rules;
+      position: relative;
+      padding-left: 3.2rem;
+      margin-bottom: 1.3rem;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    ol.rules li::before {
+      content: counter(rules);
+      position: absolute;
+      left: 0;
+      top: -0.1rem;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      color: var(--gold-dark);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    ol.rules strong { color: var(--gold-dark); font-weight: 600; }
+
+    /* Never list */
+    ul.never-list { list-style: none; margin: 0.9rem 0 1.4rem; }
+    ul.never-list li {
+      padding-left: 1.6rem;
+      position: relative;
+      margin-bottom: 0.7rem;
+      font-size: 0.96rem;
+      color: var(--dark);
+    }
+    ul.never-list li::before {
+      content: "✕";
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    /* Do list */
+    ul.do-list { list-style: none; margin: 0.9rem 0 1.4rem; }
+    ul.do-list li {
+      padding-left: 1.6rem;
+      position: relative;
+      margin-bottom: 0.7rem;
+      font-size: 0.96rem;
+    }
+    ul.do-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Spoken / script lines */
+    .spoken {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      margin: 1rem 0;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: var(--dark);
+      box-shadow: var(--shadow-sm);
+    }
+    .spoken-stage {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+
+    /* Tag pills */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0 1.4rem; }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: var(--gold-soft);
+      color: var(--gold-dark);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* Two-column dialog */
+    .dialog {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 0;
+      margin: 1.2rem 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .dialog-row { display: contents; }
+    .dialog-row > div {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+    .dialog-row:last-child > div { border-bottom: none; }
+    .dialog-they {
+      color: var(--grey);
+      font-style: italic;
+      background: var(--cream-warm);
+      border-right: 1px solid var(--border-soft);
+    }
+    .dialog-you { color: var(--dark); }
+    @media (max-width: 640px) {
+      .dialog { grid-template-columns: 1fr; }
+      .dialog-row > div { border-right: none !important; }
+      .dialog-they { border-bottom: none; padding-bottom: 0.4rem; }
+      .dialog-you { padding-top: 0.6rem; }
+    }
+
+    /* Package summary card */
+    .pkg-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      margin: 0.9rem 0;
+      background: var(--white);
+    }
+    .pkg-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .pkg-price {
+      float: right;
+      color: var(--gold-dark);
+      font-weight: 500;
+      font-size: 0.92rem;
+    }
+    .pkg-frame {
+      display: block;
+      margin-top: 0.6rem;
+      font-size: 0.84rem;
+      color: var(--grey-soft);
+      font-style: italic;
+    }
+
+    /* Quiz */
+    .quiz-section {
+      margin-top: 5rem;
+      padding-top: 3rem;
+      border-top: 2px solid var(--gold);
+    }
+    .quiz-intro {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .quiz-q {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1.4rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .quiz-q-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .quiz-q-text {
+      font-size: 1.02rem;
+      font-weight: 500;
+      color: var(--dark);
+      margin-bottom: 1.1rem;
+      line-height: 1.5;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.55rem; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .quiz-option:hover { background: var(--cream-warm); border-color: var(--gold-soft); }
+    .quiz-option input { margin-top: 0.25rem; flex-shrink: 0; accent-color: var(--gold); }
+    .quiz-option.correct { background: var(--green-soft); border-color: var(--green); }
+    .quiz-option.wrong { background: var(--red-soft); border-color: var(--red); }
+    .quiz-option.disabled { cursor: default; }
+    .quiz-feedback {
+      margin-top: 0.9rem;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      display: none;
+    }
+    .quiz-feedback.correct { background: var(--green-soft); color: #2c4a31; display: block; }
+    .quiz-feedback.wrong { background: var(--red-soft); color: #6b2620; display: block; }
+    .quiz-feedback strong { font-weight: 600; }
+
+    .quiz-submit-row {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2rem;
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.92rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--gold-dark); }
+    .btn:disabled { background: var(--grey-soft); cursor: not-allowed; }
+    .btn.secondary {
+      background: transparent;
+      color: var(--gold-dark);
+      border: 1px solid var(--gold);
+    }
+    .btn.secondary:hover { background: var(--gold-soft); }
+
+    /* Score card */
+    .score-card {
+      margin-top: 2.5rem;
+      padding: 2.5rem 2rem;
+      background: var(--cream-warm);
+      border: 1px solid var(--gold-soft);
+      border-radius: 14px;
+      text-align: center;
+      display: none;
+    }
+    .score-card.shown { display: block; }
+    .score-headline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.2rem;
+      color: var(--gold-dark);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+    .score-detail {
+      font-size: 1rem;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+    .score-message {
+      font-style: italic;
+      color: var(--grey);
+      margin-bottom: 1.5rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Footer link back to script */
+    .doc-foot {
+      margin-top: 5rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .doc-foot a {
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-size: 0.88rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--gold-soft);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .doc-foot a:hover { border-color: var(--gold-dark); }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="doc-header">
+      <img src="/assets/branding/within-wordmark-black-tight.png" alt="Within Center" class="doc-wordmark" onerror="this.style.display='none'">
+      <span class="doc-eyebrow">Internal · Admissions Training</span>
+      <h1 class="doc-title">Holding the <em>First</em> Call</h1>
+      <p class="doc-subtitle">A walk-through of how we hold admissions calls at Within Center, why each step matters, and a short quiz at the end so you know it landed.</p>
+      <div class="doc-brand">Within <span class="sep">·</span> Center</div>
+    </header>
+
+    <div class="progress-bar">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Module 1 of 8</div>
+    </div>
+
+    <!-- ── MODULE 1 — TONE ─────────────────────── -->
+    <section class="module" id="m1" data-module="1">
+      <span class="module-num">— 01 —</span>
+      <h2>Tone Before <em>Words</em></h2>
+      <p class="module-lede">The person calling is almost always in a tender place. Burnout, grief, depression, addiction, a relationship ending, a parent dying. They've thought about making this call for weeks. How you answer the phone matters more than what you say.</p>
+
+      <div class="key-card">
+        <div class="key-card-label">Core idea</div>
+        <p>The call <strong>is</strong> the first session. We're not closing a sale. We're holding a person who has finally reached out.</p>
+      </div>
+
+      <h4>Four rules, in order</h4>
+      <ol class="rules">
+        <li><strong>Slow down.</strong> Speak at about 70% of your normal pace. Let sentences land. A calm voice regulates their nervous system before the conversation even starts.</li>
+        <li><strong>Leave space.</strong> After you ask a question, count to three before saying anything else. Silence is not awkward. It's the container. Most callers will fill it with the real reason they called if you let them.</li>
+        <li><strong>Match, then lead.</strong> Start at their energy, then gently bring it down. If they're frantic, don't match frantic. Acknowledge it warmly, then soften your pace and they'll follow.</li>
+        <li><strong>See and acknowledge them.</strong> Receive whatever they share. A simple reflection ("that sounds heavy," "I hear you," "thank you for trusting me with that") tells them they're a person, not a caller.</li>
+      </ol>
+
+      <h4>Never</h4>
+      <ul class="never-list">
+        <li>Never interrupt, even when you know where the sentence is going.</li>
+        <li>Never use sales words: "awesome," "perfect," "absolutely," "no worries," "boom," "100%."</li>
+        <li>Never laugh at something that isn't funny just to fill space.</li>
+        <li>Never read the script.</li>
+      </ul>
+
+      <p class="subtle">Breath check: before you pick up, take one slow breath in, one slow breath out. Your body is the instrument.</p>
+    </section>
+
+    <!-- ── MODULE 2 — OPENING ──────────────────── -->
+    <section class="module" id="m2" data-module="2">
+      <span class="module-num">— 02 —</span>
+      <h2>The <em>Opening</em></h2>
+      <p class="module-lede">Warm and unhurried. Smile gently. They can hear it.</p>
+
+      <div class="spoken">
+        Hi, thank you for calling Within Center. This is [Name]… how can I support you today?
+      </div>
+
+      <p>Pause. Let them talk. Don't rush to answer.</p>
+
+      <p>If they're hesitant or apologetic ("sorry, I don't even know why I'm calling"), you say:</p>
+
+      <div class="spoken">
+        You don't have to have it figured out. A lot of people call us feeling exactly like that. Take your time.
+      </div>
+
+      <div class="key-card">
+        <div class="key-card-label">Why it matters</div>
+        <p>The first ten seconds set the tone for the whole call. If they feel rushed, they'll never share the real thing.</p>
+      </div>
+    </section>
+
+    <!-- ── MODULE 3 — DISCOVERY ────────────────── -->
+    <section class="module" id="m3" data-module="3">
+      <span class="module-num">— 03 —</span>
+      <h2>Discovery · <em>Listen Before You Offer</em></h2>
+      <p class="module-lede">Ask one question. Then silence. Don't stack questions. Don't pivot to packages until you've actually heard them.</p>
+
+      <h4>The eight questions, in soft order</h4>
+      <ol class="rules">
+        <li>What's been going on in your life that brought you to pick up the phone today?</li>
+        <li>After they answer: <em>"Thank you for sharing that with me."</em> This line, said simply, matters more than you think.</li>
+        <li>Have you done any ketamine or psychedelic work before?</li>
+        <li>Are you currently working with a therapist or coach?</li>
+        <li>When you imagine coming here, are you picturing a single visit to see what this is like, or something longer where you step out of your life for a few days?</li>
+        <li>Are you thinking of doing this on your own, or with a partner or friend?</li>
+        <li>Is there anything medically I should be aware of? Heart, blood pressure, medications, pregnancy?</li>
+        <li>What's your timeline? Looking for support in the next few weeks, or sometime in the next month or two?</li>
+      </ol>
+
+      <div class="key-card">
+        <div class="key-card-label">If they cry</div>
+        <p>Don't rush past it. Say: <em>"Take your time. I'm right here."</em></p>
+      </div>
+    </section>
+
+    <!-- ── MODULE 4 — MATCH ────────────────────── -->
+    <section class="module" id="m4" data-module="4">
+      <span class="module-num">— 04 —</span>
+      <h2>Match Them to <em>One</em> Path</h2>
+      <p class="module-lede">Lead with the single best fit. If they ask for options, offer a second. Never list all six packages at once. It's overwhelming and it breaks the softness.</p>
+
+      <h4>Always start with a soft bridge</h4>
+      <p>Don't dive straight into ceremonies and pricing. Acknowledge what they shared first, then offer the program as something shaped <em>for them</em>.</p>
+      <div class="spoken">
+        <span class="spoken-stage">soft · grounded</span>
+        Based on what you've shared with me today, let me tell you a little more about a path that I think might really meet you where you are…
+      </div>
+
+      <h4>Quick package map</h4>
+
+      <div class="pkg-card">
+        <span class="pkg-name">6 Days / 5 Nights</span>
+        <span class="pkg-price">$3,999 private · $3,499 shared</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> trauma, addiction recovery, deep burnout, major life transition, grief. Two ceremonies, two integrations, full ranch.</span>
+      </div>
+
+      <div class="pkg-card">
+        <span class="pkg-name">3 Days / 2 Nights</span>
+        <span class="pkg-price">$1,699 private · $1,499 shared</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> first-time immersion, can't take a full week, reset weekend.</span>
+      </div>
+
+      <div class="pkg-card">
+        <span class="pkg-name">Discover</span>
+        <span class="pkg-price">$1,250</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> curious, skeptical, first-timers, "I just want to try this." One ceremony, one integration, week of ranch access.</span>
+      </div>
+
+      <div class="pkg-card">
+        <span class="pkg-name">Heal · most popular</span>
+        <span class="pkg-price">$3,300</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> a specific hard season, breakup, loss, depression they want to move through. Three ceremonies, three integrations, a month of ranch access.</span>
+      </div>
+
+      <div class="pkg-card">
+        <span class="pkg-name">Awkn</span>
+        <span class="pkg-price">$5,500</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> long-standing depression, trauma, addiction, "I've tried everything." Six ceremonies, six integrations, two months on the land, weekly group therapy.</span>
+      </div>
+
+      <div class="pkg-card">
+        <span class="pkg-name">Journey for Two</span>
+        <span class="pkg-price">$1,650</span>
+        <span class="pkg-frame"><strong>Frame for:</strong> couples at a turning point, siblings processing loss, close friends doing parallel work. Shared ceremony, individual integration.</span>
+      </div>
+
+      <div class="key-card">
+        <div class="key-card-label">Heuristic</div>
+        <p>If they need to <em>step out of their life</em>, lead with a retreat. If they're <em>staying local and curious</em>, lead with Discover. If they have a <em>specific hard season</em>, lead with Heal. If they've <em>tried everything</em>, lead with Awkn. If they're calling <em>with someone</em>, lead with Journey for Two.</p>
+      </div>
+    </section>
+
+    <!-- ── MODULE 5 — DIFFERENCE ───────────────── -->
+    <section class="module" id="m5" data-module="5">
+      <span class="module-num">— 05 —</span>
+      <h2>What Makes Us <em>Different</em></h2>
+      <p class="module-lede">When they ask "what makes you different from [other clinic]," you say this slowly and let it land.</p>
+
+      <div class="spoken">
+        <span class="spoken-stage">soft · certain · unhurried</span>
+        A lot of places will give you the medicine. What we do is hold the container around it. You're on twelve acres in Austin. Yurts, a dome temple, pool, hot tub, two cold plunges, saunas, a garden. Our clinicians have held over fifteen hundred ketamine sessions with a perfect safety record. The medicine opens the door. The land and the integration are what change your life.
+      </div>
+
+      <p>Then pause. Don't fill the silence.</p>
+
+      <div class="key-card">
+        <div class="key-card-label">The five anchors</div>
+        <p>Twelve acres. Fifteen hundred sessions. Perfect safety record. Container, not just medicine. Integration as the actual work.</p>
+      </div>
+    </section>
+
+    <!-- ── MODULE 6 — TENDER ───────────────────── -->
+    <section class="module" id="m6" data-module="6">
+      <span class="module-num">— 06 —</span>
+      <h2>Handling <em>Tender Moments</em></h2>
+      <p class="module-lede">Said softly. Always.</p>
+
+      <div class="dialog">
+        <div class="dialog-row">
+          <div class="dialog-they">(crying)</div>
+          <div class="dialog-you">Take your time. There's no hurry here.</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-they">"That's more than I can afford."</div>
+          <div class="dialog-you">I hear that. Can I ask, do you want me to tell you what might fit, or would it be more helpful if I sent you a few options by email and you sit with them?</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-they">"Is ketamine safe?"</div>
+          <div class="dialog-you">That's a good question to ask. It's FDA-approved, we screen medically before anyone starts, and a clinician is present for every session. Fifteen hundred sessions, perfect safety record. I'll send you our medical intake so you can review it with your own doctor.</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-they">"I'm scared."</div>
+          <div class="dialog-you">Of course you are. Most people who call us are a little scared. That's usually a sign something real is ready to move. You don't have to decide anything today.</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-they">"I need to talk to my partner / therapist."</div>
+          <div class="dialog-you">Please do. I'll send you a one-pager you can share with them. And if they have questions, I'm happy to be on a call with both of you.</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-they">"I just want to stay at the ranch, not do a program."</div>
+          <div class="dialog-you">You can. Nightly lodging in the retreat house is 349 to 499. Yurts are 699. The HoneyComb Dome is 599. Within Center clients get ten percent off.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MODULE 7 — CLOSE ────────────────────── -->
+    <section class="module" id="m7" data-module="7">
+      <span class="module-num">— 07 —</span>
+      <h2>The Close · <em>Send the Intake</em></h2>
+      <p class="module-lede">Every call ends the same way: send the intake forms. That's the one clear next step. Everything else is optional.</p>
+
+      <div class="spoken">
+        <span class="spoken-stage">softly · unhurried</span>
+        The next step on my side is simple. I'll send you our intake forms by email. They take about 15 to 20 minutes. It's a medical history, a little bit about what you're looking for, and a consent form our clinician reviews before we confirm anything. You don't commit to a date or a package by filling them out. It just lets our clinical team make sure this is the right fit, and lets me hold a spot while you're deciding.
+      </div>
+
+      <h4>Reframe — never call it paperwork</h4>
+      <ul class="never-list">
+        <li><em>Not</em> "fill out these forms"</li>
+      </ul>
+      <ul class="do-list">
+        <li><strong>Instead:</strong> "share a little of your story with our clinical team so they can hold you well"</li>
+      </ul>
+
+      <h4>Three close variants, matched to warmth</h4>
+
+      <div class="key-card">
+        <div class="key-card-label">Warm · ready</div>
+        <p>"I'm going to send the intake over right now. Once you get it back to me, I'll book you a 15-minute call with one of our clinicians this week, and after that we can hold your retreat dates."</p>
+      </div>
+
+      <div class="key-card">
+        <div class="key-card-label">Lukewarm · still deciding</div>
+        <p>"Let me send you the intake forms along with our retreat overview. There's no pressure to finish them. A lot of people start, save it, and come back to it in a few days."</p>
+      </div>
+
+      <div class="key-card">
+        <div class="key-card-label">Very tender · not ready</div>
+        <p>"I'm not going to push anything today. I'll send you the intake and some information about the land. Sit with it. Open them tomorrow, next week, next month, whenever it feels right."</p>
+      </div>
+
+      <h4>Always close with this question</h4>
+      <div class="spoken">
+        Before we hang up, is there anything you didn't tell me that you want our clinical team to know when they read your intake?
+      </div>
+      <p class="subtle">Wait. This question often surfaces the real reason they called.</p>
+
+      <h4>End with gratitude</h4>
+      <div class="spoken">
+        <span class="spoken-stage">warm · sincere</span>
+        I'm so grateful you reached out to us today. Please let me know if I can support you further with next steps. I'm right here.
+      </div>
+    </section>
+
+    <!-- ── MODULE 8 — AFTER ────────────────────── -->
+    <section class="module" id="m8" data-module="8">
+      <span class="module-num">— 08 —</span>
+      <h2>After You <em>Hang Up</em></h2>
+      <p class="module-lede">The warmth of the call is a small window. Move with it.</p>
+
+      <ol class="rules">
+        <li><strong>Within 10 minutes:</strong> send the intake forms plus a short personal email. Use their name. Reference one thing they shared. Attach or link the retreat overview.</li>
+        <li><strong>Soft-hold</strong> the dates or package in the CRM with a 7-day expiration.</li>
+        <li><strong>CRM note in their words,</strong> not your interpretation. Example: <em>"running on fumes, mom passed in Feb, husband supportive, leaning 6-day private room, sent intake 2:14pm."</em></li>
+        <li><strong>Follow up at 48 hours</strong> if the intake hasn't been returned. No pressure: <em>"Just checking in, wanted to make sure the intake landed in your inbox and didn't end up in spam. No rush. I'm here when you're ready."</em></li>
+        <li><strong>When the intake returns,</strong> hand off to clinical the same day and email the caller to confirm receipt and what happens next.</li>
+      </ol>
+    </section>
+
+    <!-- ── QUIZ ───────────────────────────────────── -->
+    <section class="quiz-section" id="quiz">
+      <div class="quiz-intro">
+        <span class="module-num">— Quiz —</span>
+        <h2>Check Your <em>Understanding</em></h2>
+        <p class="module-lede" style="margin-left:auto;margin-right:auto;">Twelve questions covering the material. There's no time limit. Pick what you'd actually do.</p>
+      </div>
+
+      <div id="quizForm"></div>
+
+      <div class="quiz-submit-row">
+        <button class="btn" id="submitQuiz">Submit answers</button>
+      </div>
+
+      <div class="score-card" id="scoreCard">
+        <div class="score-headline" id="scoreHeadline"></div>
+        <div class="score-detail" id="scoreDetail"></div>
+        <div class="score-message" id="scoreMessage"></div>
+        <button class="btn secondary" id="retryQuiz">Try again</button>
+      </div>
+    </section>
+
+    <div class="doc-foot">
+      <img src="/assets/branding/within-wordmark-black-tight.png" alt="Within Center" class="doc-foot-mark" onerror="this.style.display='none'">
+      <a href="/within-center/admissions-script/">View the full admissions script →</a>
+    </div>
+
+  </div>
+
+  <script>
+  // Quiz data — 12 questions, each with a correct answer index and a short
+  // why-this-is-correct rationale tied back to the relevant module.
+  const QUESTIONS = [
+    {
+      q: "Someone has just picked up and started the call apologetically: \"Sorry, I don't even know why I'm calling.\" What's the best response?",
+      options: [
+        "\"No worries, lots of people call us. What package are you looking at?\"",
+        "\"You don't have to have it figured out. A lot of people call us feeling exactly like that. Take your time.\"",
+        "\"That's totally fine, let me tell you about our most popular retreat.\"",
+        "\"Why don't you start by telling me your budget?\"",
+      ],
+      correct: 1,
+      why: "Module 2. We meet hesitation with permission, not redirection. We never lead with packages or money before they've been heard.",
+    },
+    {
+      q: "After you ask a question, what's the right next move?",
+      options: [
+        "Restate the question another way so they don't get lost.",
+        "Offer them a couple of options to choose from while they think.",
+        "Stay silent for at least three seconds. Let them fill it.",
+        "Move to the next question to keep momentum.",
+      ],
+      correct: 2,
+      why: "Module 1. Silence is the container. Most callers will fill it with the real reason they called if you let them.",
+    },
+    {
+      q: "The caller says: \"I'm scared.\" What's the right reflection?",
+      options: [
+        "\"Don't worry, ketamine is FDA-approved and very safe.\"",
+        "\"Of course you are. Most people who call us are a little scared. That's usually a sign something real is ready to move. You don't have to decide anything today.\"",
+        "\"Most people get over that fear by the second day.\"",
+        "\"What specifically are you scared of?\"",
+      ],
+      correct: 1,
+      why: "Module 6. Receive the fear, normalize it, take pressure off. Don't fact-check the feeling, don't pivot to logistics.",
+    },
+    {
+      q: "Which of these phrases should you avoid on every call?",
+      options: [
+        "\"That sounds heavy.\"",
+        "\"Take your time.\"",
+        "\"Awesome\" / \"Perfect\" / \"100%\" / \"No worries\"",
+        "\"Thank you for trusting me with that.\"",
+      ],
+      correct: 2,
+      why: "Module 1. Sales words break the spell. They flatten a tender call into a transaction.",
+    },
+    {
+      q: "A caller has been going through a long divorce, has a flexible schedule, and wants to step away from her life for a deeper reset. Which path do you lead with?",
+      options: [
+        "Discover ($1,250) — let her start small.",
+        "Heal ($3,300) — most popular.",
+        "6 Days / 5 Nights retreat — she needs to step out of her life.",
+        "List all six options so she can decide.",
+      ],
+      correct: 2,
+      why: "Module 4. When someone needs to step out of their life, lead with a retreat. Never list all six options at once — it overwhelms and breaks the softness.",
+    },
+    {
+      q: "What's the right way to introduce a package after discovery?",
+      options: [
+        "Quote the price first so they can self-select.",
+        "Open with \"Based on what you've shared with me today, let me tell you a little more about a path that I think might really meet you where you are…\"",
+        "Read the brochure description verbatim.",
+        "Ask which package they're already considering.",
+      ],
+      correct: 1,
+      why: "Module 4. Always use a soft bridge that ties the program back to what they shared. Never dive into ceremonies and pricing without acknowledging them first.",
+    },
+    {
+      q: "The caller asks \"What makes you different from [other clinic]?\" What's the right anchor?",
+      options: [
+        "Lower prices and more session options.",
+        "We use higher doses than other places.",
+        "The container around the medicine: 12 acres, 1500 sessions, perfect safety record, integration as the real work.",
+        "We're the only legal psychedelic provider in Austin.",
+      ],
+      correct: 2,
+      why: "Module 5. The medicine opens the door. The land and the integration are what change your life. That's the differentiator.",
+    },
+    {
+      q: "How should you frame the intake forms?",
+      options: [
+        "\"Fill out these forms before we can do anything.\"",
+        "\"Share a little of your story with our clinical team so they can hold you well.\"",
+        "\"You'll need to complete the medical paperwork to qualify.\"",
+        "\"Just standard intake, won't take long.\"",
+      ],
+      correct: 1,
+      why: "Module 7. \"Paperwork\" lands badly when someone is tender. Reframe it as sharing their story so the clinical team can hold them.",
+    },
+    {
+      q: "What's the question to always ask just before hanging up?",
+      options: [
+        "\"Is there anything else you'd like to know about pricing?\"",
+        "\"Before we hang up, is there anything you didn't tell me that you want our clinical team to know when they read your intake?\"",
+        "\"When can we expect to hear back from you?\"",
+        "\"Do you want me to call you tomorrow to follow up?\"",
+      ],
+      correct: 1,
+      why: "Module 7. This question often surfaces the real reason the person called. Wait for the answer.",
+    },
+    {
+      q: "Within how long after the call should you send the intake forms and personal note?",
+      options: [
+        "Within 24 hours.",
+        "By end of day.",
+        "Within 10 minutes.",
+        "Whenever you have a moment, no rush.",
+      ],
+      correct: 2,
+      why: "Module 8. The warmth of the call is a small window. Move with it.",
+    },
+    {
+      q: "When you log a CRM note after the call, what should you write?",
+      options: [
+        "Your interpretation of what they need.",
+        "A summary of which package you recommended and why.",
+        "Their own words and concrete details. Example: \"running on fumes, mom passed in Feb, leaning 6-day private room, sent intake 2:14pm.\"",
+        "Just the package name and price quoted.",
+      ],
+      correct: 2,
+      why: "Module 8. Clinical reads these. Their words, not your interpretation, gives the team the real shape of who's coming.",
+    },
+    {
+      q: "The caller says \"That's more than I can afford.\" What's the right response?",
+      options: [
+        "Offer them a discount on the spot.",
+        "Push the most-popular package because it's a better value.",
+        "\"I hear that. Can I ask, do you want me to tell you what might fit, or would it be more helpful if I sent you a few options by email and you sit with them?\"",
+        "Tell them payment plans are available.",
+      ],
+      correct: 2,
+      why: "Module 6. Acknowledge first, then offer agency: now or later, voice or email. Never sell harder against price resistance in a tender moment.",
+    },
+  ];
+
+  // Render quiz
+  const formEl = document.getElementById('quizForm');
+  formEl.innerHTML = QUESTIONS.map((q, i) => `
+    <div class="quiz-q" data-q="${i}">
+      <div class="quiz-q-num">— Question ${i + 1} of ${QUESTIONS.length} —</div>
+      <div class="quiz-q-text">${escape(q.q)}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, j) => `
+          <label class="quiz-option" data-opt="${j}">
+            <input type="radio" name="q${i}" value="${j}">
+            <span>${escape(opt)}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+  `).join('');
+
+  function escape(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Submit handler
+  document.getElementById('submitQuiz').addEventListener('click', () => {
+    let correct = 0;
+    QUESTIONS.forEach((q, i) => {
+      const block = document.querySelector(`.quiz-q[data-q="${i}"]`);
+      const selected = block.querySelector('input[type="radio"]:checked');
+      const feedback = block.querySelector('.quiz-feedback');
+      const options = block.querySelectorAll('.quiz-option');
+      const pickedIdx = selected ? Number(selected.value) : -1;
+      const isCorrect = pickedIdx === q.correct;
+      if (isCorrect) correct++;
+      options.forEach((el, j) => {
+        el.classList.add('disabled');
+        const input = el.querySelector('input');
+        input.disabled = true;
+        if (j === q.correct) el.classList.add('correct');
+        if (j === pickedIdx && !isCorrect) el.classList.add('wrong');
+      });
+      feedback.classList.remove('correct', 'wrong');
+      if (selected === null || selected === undefined) {
+        feedback.classList.add('wrong');
+        feedback.innerHTML = `<strong>Skipped.</strong> The right answer is highlighted. ${escape(q.why)}`;
+      } else if (isCorrect) {
+        feedback.classList.add('correct');
+        feedback.innerHTML = `<strong>Yes.</strong> ${escape(q.why)}`;
+      } else {
+        feedback.classList.add('wrong');
+        feedback.innerHTML = `<strong>Not quite.</strong> ${escape(q.why)}`;
+      }
+    });
+
+    const card = document.getElementById('scoreCard');
+    const headline = document.getElementById('scoreHeadline');
+    const detail = document.getElementById('scoreDetail');
+    const message = document.getElementById('scoreMessage');
+    const pct = Math.round((correct / QUESTIONS.length) * 100);
+    headline.textContent = `${correct} of ${QUESTIONS.length} · ${pct}%`;
+    detail.textContent = pct >= 90 ? 'You know it. Now put it down.'
+                       : pct >= 75 ? 'Solid foundation. Re-read the modules you missed.'
+                       : pct >= 50 ? 'Good start. Walk through the modules once more before your next call.'
+                                   : 'Worth another pass. The script is doing real work — sit with it.';
+    message.textContent = 'The point of the script isn\'t recall. It\'s rhythm. Get it in your body, then put it down and answer the phone.';
+    card.classList.add('shown');
+    document.getElementById('submitQuiz').disabled = true;
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Retry
+  document.getElementById('retryQuiz').addEventListener('click', () => {
+    location.reload();
+  });
+
+  // Progress indicator: track which module is most visible.
+  const modules = Array.from(document.querySelectorAll('.module'));
+  const totalModules = modules.length;
+  const fillEl = document.getElementById('progressFill');
+  const labelEl = document.getElementById('progressLabel');
+  function updateProgress() {
+    let active = 1;
+    const yMid = window.scrollY + window.innerHeight * 0.4;
+    modules.forEach(m => {
+      const top = m.offsetTop;
+      if (top <= yMid) active = Number(m.dataset.module) || active;
+    });
+    const pct = Math.min(100, Math.round((active / totalModules) * 100));
+    fillEl.style.width = pct + '%';
+    labelEl.textContent = `Module ${active} of ${totalModules}`;
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+  </script>
+</body>
+</html>
