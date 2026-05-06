@@ -4,7 +4,7 @@
 // time slot render side-by-side; clicking one opens a details modal.
 
 import { supabase } from '../../shared/supabase.js';
-import { initAdminPage } from '../../shared/admin-shell.js';
+import { initAdminPage, showToast } from '../../shared/admin-shell.js';
 
 // ============================================================================
 // Schedule constants
@@ -36,6 +36,7 @@ let nsSelectedLeadId = null;               // currently-selected client in the N
 let nsSelectedLeadName = null;             // captured at selection so we can stamp booker_name on insert
 let nsSelectedLeadEmail = null;
 let nsSearchDebounce  = null;
+let nsEditingSessionId = null;             // when set, the New Session modal is in edit mode (UPDATE not INSERT)
 // Set true by runConflictCheck when the chosen space is already booked at
 // the chosen window (another Within session or a confirmed venue rental).
 // saveNewSession refuses to insert while this is true.
@@ -703,6 +704,7 @@ function openModal(s) {
     buttons.push(`<a id="wsBtnOpenClient" href="clients.html?lead=${encodeURIComponent(s.lead_id)}" style="${btnBase}">Open client</a>`);
   }
   if (isActive) {
+    buttons.push(`<button id="wsBtnEdit" data-edit-session-id="${esc(s.id)}" style="${btnBase}">Edit</button>`);
     buttons.push(`<button id="wsBtnCancel" data-cancel-session-id="${esc(s.id)}" style="${btnDanger}">Cancel session</button>`);
     if (hasPackageSession && s.lead_id) {
       // Reschedule mirrors the Clients › Schedule flow: cancel this booking
@@ -716,6 +718,10 @@ function openModal(s) {
   foot.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons.join('')}</div>`;
 
   document.getElementById('wsBtnClose')?.addEventListener('click', closeModal);
+  foot.querySelector('[data-edit-session-id]')?.addEventListener('click', () => {
+    closeModal();
+    openNewSessionModal({ editSession: s });
+  });
   foot.querySelector('[data-reschedule-session-id]')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const id = btn.dataset.rescheduleSessionId;
@@ -1051,7 +1057,8 @@ function bindNewSessionModal() {
   });
 }
 
-function openNewSessionModal({ prefilledStart = null } = {}) {
+function openNewSessionModal({ prefilledStart = null, editSession = null } = {}) {
+  nsEditingSessionId = editSession?.id || null;
   // Reset state
   nsSelectedLeadId = null;
   nsSelectedLeadName = null;
@@ -1073,20 +1080,69 @@ function openNewSessionModal({ prefilledStart = null } = {}) {
   nsHasHardConflict = false;
   refreshNsSaveButtonState();
 
-  // Pre-fill date + start time when launched by a grid click; default to
-  // today + empty otherwise.
-  if (prefilledStart) {
-    document.getElementById('nsDate').value = ymd(prefilledStart);
-    const hh = String(prefilledStart.getHours()).padStart(2, '0');
-    const mm = String(prefilledStart.getMinutes()).padStart(2, '0');
-    document.getElementById('nsStart').value = `${hh}:${mm}`;
+  if (editSession) {
+    // Pre-fill from the existing booking. Title + save-button labels switch
+    // to edit phrasing so it's clear we're updating, not creating.
+    setText('nsModalTitle', 'Edit Session');
+    document.getElementById('nsSave').textContent = 'Save Changes';
+
+    nsSelectedLeadId = editSession.lead_id;
+    const lead = editSession.lead || {};
+    const fullName = ((lead.first_name || '') + ' ' + (lead.last_name || '')).trim()
+      || editSession.booker_name || lead.email || 'Client';
+    nsSelectedLeadName = fullName;
+    nsSelectedLeadEmail = lead.email || editSession.booker_email || null;
+    const selectedEl = document.getElementById('nsSelectedClient');
+    selectedEl.style.display = '';
+    selectedEl.innerHTML = `<strong>Selected:</strong> ${esc(fullName)} <button id="nsClearClient" style="background:none;border:none;color:#d4883a;font-size:0.78rem;font-weight:600;cursor:pointer;margin-left:0.5rem;">change</button>`;
+    document.getElementById('nsClearClient').addEventListener('click', () => {
+      nsSelectedLeadId = null;
+      nsSelectedLeadName = null;
+      nsSelectedLeadEmail = null;
+      selectedEl.style.display = 'none';
+      selectedEl.innerHTML = '';
+      document.getElementById('nsClientSearch').focus();
+    });
+
+    document.getElementById('nsService').value = editSession.service_id || '';
+
+    // Map facilitator_id / staff_user_id back to the prefixed assignee value
+    const assigneeSel = document.getElementById('nsAssignee');
+    if (editSession.facilitator_id) assigneeSel.value = `fac:${editSession.facilitator_id}`;
+    else if (editSession.staff_user_id) assigneeSel.value = `staff:${editSession.staff_user_id}`;
+    else assigneeSel.value = '';
+
+    if (addFac) addFac.value = editSession.additional_facilitator_id || '';
+
+    const startD = new Date(editSession.start_datetime);
+    const endD   = new Date(editSession.end_datetime);
+    document.getElementById('nsDate').value = ymd(startD);
+    document.getElementById('nsStart').value = `${String(startD.getHours()).padStart(2,'0')}:${String(startD.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('nsEnd').value   = `${String(endD.getHours()).padStart(2,'0')}:${String(endD.getMinutes()).padStart(2,'0')}`;
+
+    document.getElementById('nsSpace').value = editSession.space_id || '';
+    document.getElementById('nsNotes').value = editSession.notes || '';
   } else {
-    document.getElementById('nsDate').value = ymd(new Date());
-    document.getElementById('nsStart').value = '';
+    setText('nsModalTitle', 'New Session');
+    document.getElementById('nsSave').textContent = 'Create Session';
+    // Pre-fill date + start time when launched by a grid click; default to
+    // today + empty otherwise.
+    if (prefilledStart) {
+      document.getElementById('nsDate').value = ymd(prefilledStart);
+      const hh = String(prefilledStart.getHours()).padStart(2, '0');
+      const mm = String(prefilledStart.getMinutes()).padStart(2, '0');
+      document.getElementById('nsStart').value = `${hh}:${mm}`;
+    } else {
+      document.getElementById('nsDate').value = ymd(new Date());
+      document.getElementById('nsStart').value = '';
+    }
   }
 
   document.getElementById('nsModal').classList.remove('hidden');
-  setTimeout(() => document.getElementById('nsClientSearch').focus(), 30);
+  setTimeout(() => {
+    if (editSession) document.getElementById('nsService').focus();
+    else document.getElementById('nsClientSearch').focus();
+  }, 30);
 }
 function closeNewSessionModal() {
   document.getElementById('nsModal').classList.add('hidden');
@@ -1387,22 +1443,35 @@ async function saveNewSession() {
   };
 
   const btn = document.getElementById('nsSave');
-  btn.disabled = true; btn.textContent = 'Creating…';
+  const isEdit = !!nsEditingSessionId;
+  btn.disabled = true; btn.textContent = isEdit ? 'Saving…' : 'Creating…';
 
-  const { data, error } = await supabase
-    .from('scheduling_bookings')
-    .insert([payload])
-    .select()
-    .single();
+  const { error } = isEdit
+    ? await supabase.from('scheduling_bookings').update(payload).eq('id', nsEditingSessionId)
+    : await supabase.from('scheduling_bookings').insert([payload]);
 
-  btn.disabled = false; btn.textContent = 'Create Session';
+  btn.disabled = false; btn.textContent = isEdit ? 'Save Changes' : 'Create Session';
 
   if (error) {
-    showNsError('Could not create: ' + error.message);
+    showNsError(`Could not ${isEdit ? 'save' : 'create'}: ` + error.message);
     return;
   }
 
   closeNewSessionModal();
+  // After an edit, prompt about resending invites. The actual notification
+  // delivery (email + Google Calendar update) for admin-driven session
+  // changes isn't wired yet, so we capture intent and surface a clear
+  // toast — the operator should still notify the client/facilitators
+  // manually for now.
+  if (isEdit) {
+    const send = confirm('Send the updated session details to the client and facilitator(s)?');
+    if (send) {
+      showToast(
+        'Notifications for admin-edited sessions aren\'t wired yet. Please notify the client and facilitator(s) manually for now.',
+        'warning'
+      );
+    }
+  }
   await loadAndRender();
 }
 
