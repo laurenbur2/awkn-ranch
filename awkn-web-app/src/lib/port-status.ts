@@ -231,50 +231,18 @@ export const PORTED_PAGES: PortedPage[] = [
     notes: "Admin email-confirmation flow. Reads URL params; no Supabase calls.",
   },
 
-  // BOS / Spaces — admin surface for the AWKN business operating system.
-  // 39 admin pages + 4 spaces public/external pages + 4 associates pages,
-  // all served verbatim via Route Handlers under awknranch/(internal)/.
-  // Shared infrastructure mirrored at awkn-web-app/public/{shared,styles,
-  // spaces,associates,branding}/ so legacy ../-relative imports resolve
-  // naturally — same depth pattern as legacy GH-Pages structure.
-  // bosPort option strips /awkn-ranch/ prefix and rewrites
-  // /assets/branding/X → /branding/X.
-  {
-    label: "Spaces — Public Index",
-    domain: "awknranch",
-    path: "/spaces",
-    legacyPath: "/spaces/",
-    group: "Spaces (public)",
-  },
-  {
-    label: "Spaces — Apply",
-    domain: "awknranch",
-    path: "/spaces/apply",
-    legacyPath: "/spaces/apply/",
-    group: "Spaces (public)",
-  },
-  {
-    label: "Spaces — Host an Event",
-    domain: "awknranch",
-    path: "/spaces/hostevent",
-    legacyPath: "/spaces/hostevent/",
-    group: "Spaces (public)",
-  },
-  {
-    label: "Spaces — Identity Verification",
-    domain: "awknranch",
-    path: "/spaces/verify",
-    legacyPath: "/spaces/verify.html",
-    group: "Spaces (public)",
-  },
-  {
-    label: "Spaces — W-9",
-    domain: "awknranch",
-    path: "/spaces/w9",
-    legacyPath: "/spaces/w9.html",
-    group: "Spaces (public)",
-  },
-
+  // BOS / Spaces Admin — internal surface for the AWKN business operating
+  // system. 39 admin pages + 4 associates pages, all served verbatim via
+  // Route Handlers under awknranch/(internal)/. Shared infrastructure
+  // mirrored at awkn-web-app/public/{shared,styles,spaces,associates,
+  // branding}/ so legacy ../-relative imports resolve naturally — same
+  // depth pattern as legacy GH-Pages structure. bosPort option strips
+  // /awkn-ranch/ prefix and rewrites /assets/branding/X → /branding/X.
+  //
+  // The 4 public Spaces pages (/spaces, /spaces/apply, /spaces/hostevent,
+  // /spaces/verify, /spaces/w9) were retired 2026-05-06 per IA review —
+  // venue rentals will be handled directly through CRM, not a public-facing
+  // application form.
   {
     label: "BOS — Dashboard",
     domain: "awknranch",
