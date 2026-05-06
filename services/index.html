@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Services | AWKN Ranch</title>
-  <meta name="description" content="Wellness offerings at AWKN Ranch — sound baths, breathwork, sauna, cold plunge, bodywork, fire ceremony, and more. Add any to your stay or book a la carte.">
+  <meta name="description" content="Wellness amenities and add-ons at AWKN Ranch — sauna, cold plunge, pool, hammock garden, plus massage, sound, ceremony and more. Ceremonial ketamine therapy through our sister practice Within Center.">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="canonical" href="https://awknranch.com/services/">
@@ -14,77 +14,212 @@
   <link rel="stylesheet" href="../assets/awkn/site.css">
 
   <style>
-    /* category nav */
-    .cat-nav {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 2.5rem auto 0;
-    }
-    .cat-nav a {
-      padding: 0.55rem 1.2rem;
-      font-size: 0.6rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--brown);
-      font-weight: 600;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      transition: background 0.25s, color 0.25s, border-color 0.25s;
-    }
-    .cat-nav a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
-
-    .service-row {
+    /* ── WITHIN CENTER FEATURE BLOCK ── */
+    .within-feature {
+      position: relative;
+      min-height: 540px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-      max-width: 1100px;
-      margin: 0 auto;
+      overflow: hidden;
+      background: var(--dark);
+      color: #fff;
     }
-    .service-row + .service-row { margin-top: 5rem; }
-    .service-row.reverse { direction: rtl; }
-    .service-row.reverse > * { direction: ltr; }
-    .service-row img {
+    .within-feature-img {
+      position: relative;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    .within-feature-img img {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      height: 100%;
       object-fit: cover;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
+      transition: transform 1.4s ease;
     }
-    .service-row h3 {
+    .within-feature:hover .within-feature-img img { transform: scale(1.04); }
+    .within-feature-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(33,24,16,0) 60%, rgba(33,24,16,0.6) 100%);
+    }
+    .within-feature-body {
+      padding: 5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 600px;
+    }
+    .within-feature-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1.4rem;
+    }
+    .within-feature h2 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.6rem, 3vw, 2.1rem);
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
     }
-    .service-row h3 em { font-style: italic; color: var(--gold); font-weight: 400; }
-    .service-row p {
+    .within-feature h2 em { font-style: italic; color: var(--gold); font-weight: 300; }
+    .within-feature-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 1.75rem;
+      font-weight: 300;
+    }
+    .within-feature p {
       font-size: 0.95rem;
-      color: var(--grey);
+      color: rgba(255,255,255,0.78);
       line-height: 1.85;
       margin-bottom: 1rem;
     }
-    .service-meta {
+    .within-feature-cta {
       display: inline-flex;
-      gap: 1.5rem;
-      margin: 1rem 0 1.5rem;
+      align-items: center;
+      gap: 0.6rem;
+      align-self: flex-start;
+      margin-top: 1.75rem;
+      padding: 1rem 2.5rem;
       font-size: 0.62rem;
-      letter-spacing: 0.24em;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: var(--brown);
       font-weight: 600;
+      color: var(--dark);
+      background: var(--gold);
+      border-radius: 999px;
+      transition: background 0.3s, transform 0.3s, gap 0.3s;
     }
-    .service-meta span { color: var(--gold); }
-    @media (max-width: 800px) {
-      .service-row, .service-row.reverse { grid-template-columns: 1fr; gap: 1.5rem; direction: ltr; }
-      .service-row + .service-row { margin-top: 3.5rem; }
+    .within-feature-cta::after {
+      content: '›';
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      line-height: 0.8;
+    }
+    .within-feature-cta:hover { background: #e3aa50; transform: translateY(-2px); gap: 0.9rem; }
+    @media (max-width: 900px) {
+      .within-feature { grid-template-columns: 1fr; }
+      .within-feature-img { min-height: 320px; }
+      .within-feature-body { padding: 3rem 2rem; max-width: none; }
     }
 
-    .cat-anchor { padding-top: 6rem; margin-top: -2rem; }
+    /* ── AMENITIES GRID ── */
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-top: 3.5rem;
+    }
+    .amenity-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .amenity-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(201,148,62,0.3);
+    }
+    .amenity-card-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+    .amenity-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .amenity-card:hover .amenity-card-img img { transform: scale(1.05); }
+    .amenity-card-body {
+      padding: 1.6rem 1.75rem 1.75rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .amenity-card-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
+    }
+    .amenity-card-meta {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.85rem;
+    }
+    .amenity-card-desc {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+      flex-grow: 1;
+    }
+    @media (max-width: 1000px) { .amenities-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .amenities-grid { grid-template-columns: 1fr; } }
+
+    /* ── ADD-ONS ── */
+    .addons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 3.5rem;
+    }
+    .addon-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem 1.75rem;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .addon-card:hover {
+      border-color: rgba(201,148,62,0.35);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .addon-card-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+    .addon-card-meta {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .addon-card-desc {
+      font-size: 0.86rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-top: 0.4rem;
+    }
+    @media (max-width: 900px) { .addons-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .addons-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -122,165 +257,189 @@
   </aside>
 
   <header class="page-hero">
-    <div class="page-hero-bg" style="background-image: url('../assets/awkn/sound-bath.jpeg');"></div>
+    <div class="page-hero-bg" style="background-image: url('../pricing/images/ceremony-hero.jpeg');"></div>
     <div class="page-hero-content">
       <span class="page-hero-eyebrow">Our Services</span>
-      <h1>Offerings for the <em>body and spirit</em>.</h1>
-      <span class="page-hero-tagline">Layer your stay with the practices that meet you where you are. Each session is held by a practitioner, not booked through an app.</span>
+      <h1>Amenities, add-ons, <em>and ceremony</em>.</h1>
+      <span class="page-hero-tagline">Everything that's included with your stay, every offering you can layer on, and the medical practice held alongside us.</span>
     </div>
   </header>
 
-  <!-- CATEGORY NAV -->
-  <section class="bg-cream" style="padding-bottom: 2rem;">
+  <!-- INTRO -->
+  <section class="bg-cream" style="padding-bottom: 3rem;">
     <div class="intro-block">
-      <div class="s-eyebrow">A Living Menu</div>
-      <h2 class="s-title">Choose what <em>your stay needs</em>.</h2>
-      <p class="s-desc centered">All offerings are available a-la-carte to overnight guests, day visitors, and members. Practitioners rotate seasonally; this list reflects what's currently available.</p>
-      <nav class="cat-nav">
-        <a href="#movement">Movement</a>
-        <a href="#sound">Sound</a>
-        <a href="#contrast">Contrast</a>
-        <a href="#bodywork">Bodywork</a>
-        <a href="#ceremony">Ceremony</a>
-        <a href="#medical">Medical</a>
-      </nav>
+      <div class="s-eyebrow">Three Ways to Care for Yourself Here</div>
+      <h2 class="s-title">Always-on amenities, <em>by-appointment add-ons</em>, and a sister practice for the deepest work.</h2>
+      <p class="s-desc centered">Members and overnight guests have full use of the wellness facilities. Add-ons are booked through us and held by a practitioner. Ceremonial ketamine therapy is offered through our sister practice, Within Center, located on the ranch.</p>
     </div>
   </section>
 
-  <!-- MOVEMENT -->
-  <section class="bg-cream" id="movement">
-    <div style="text-align:center; margin-bottom: 3rem;">
-      <div class="s-eyebrow">Movement</div>
-      <h2 class="s-title">Yoga, breath, <em>somatics</em></h2>
-    </div>
-
-    <div class="service-row">
-      <img src="../assets/awkn/yoga.jpg" alt="Yoga at AWKN Ranch">
-      <div>
-        <h3>Yoga &amp; <em>Mindful Movement</em></h3>
-        <div class="service-meta"><span>60 min</span> <span>Group or 1:1</span> <span>From $35</span></div>
-        <p>Slow vinyasa, yin, and restorative classes held in the temple or under the oaks. Trained for trauma-informed practice; suitable for first-timers and longtime practitioners alike.</p>
-        <p>Daily group classes 7am &amp; 5pm. Private sessions by appointment.</p>
+  <!-- WITHIN CENTER FEATURE — prominent, important -->
+  <section style="padding: 0;">
+    <a href="../within-center/" class="within-feature" style="text-decoration: none;">
+      <div class="within-feature-img">
+        <img src="../pricing/images/ketamine-ceremony-6.jpg" alt="Ceremonial ketamine therapy at Within Center">
       </div>
-    </div>
-
-    <div class="service-row reverse">
-      <img src="../assets/awkn/meditation-awkn.png" alt="Meditation at AWKN Ranch">
-      <div>
-        <h3>Breathwork &amp; <em>Meditation</em></h3>
-        <div class="service-meta"><span>45&ndash;75 min</span> <span>Group or 1:1</span> <span>From $45</span></div>
-        <p>Pranayama, holotropic-style sessions, and silent sits. Held in the temple with cushions, blankets, and intentional pacing &mdash; designed to be safe to fall apart in.</p>
-        <p>Group breathwork ceremonies on Saturday evenings; private sessions on request.</p>
+      <div class="within-feature-body">
+        <div class="within-feature-eyebrow">Our Sister Practice</div>
+        <h2>Within <em>Center</em>.</h2>
+        <div class="within-feature-sub">Ceremonial ketamine therapy, held on the ranch.</div>
+        <p>Within Center is the medical practice that lives alongside AWKN. A licensed clinical team holds ceremonial ketamine therapy, medication management, and integration support &mdash; in the same temple, with the same care, on the same land.</p>
+        <p>For guests who want to layer the medicine work into a stay, we coordinate the two together. Most return to AWKN afterward to rest in it.</p>
+        <span class="within-feature-cta">Visit Within Center</span>
       </div>
-    </div>
+    </a>
   </section>
 
-  <!-- SOUND -->
-  <section class="bg-cream-deep" id="sound">
-    <div style="text-align:center; margin-bottom: 3rem;">
-      <div class="s-eyebrow">Sound</div>
-      <h2 class="s-title">Listening as <em>medicine</em></h2>
-    </div>
-
-    <div class="service-row">
-      <img src="../assets/awkn/sound-bath.jpeg" alt="Sound bath at AWKN Ranch">
-      <div>
-        <h3>Sound <em>Bath</em></h3>
-        <div class="service-meta"><span>60 min</span> <span>Group up to 16</span> <span>From $55</span></div>
-        <p>Quartz crystal bowls, gongs, voice. Lie down, cover up, and let the room become a single instrument. One of the most-requested sessions on the ranch.</p>
-        <p>Held weekly in the temple; private sessions for retreat groups.</p>
+  <!-- AMENITIES — included with every stay -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Amenities</div>
+        <h2 class="s-title">Open to <em>every guest</em>.</h2>
+        <p class="s-desc centered">The wellness facilities and lodging that come with any stay or membership. No appointment, no add-on charge &mdash; use them as much as you want.</p>
       </div>
-    </div>
-  </section>
+      <div class="amenities-grid">
 
-  <!-- CONTRAST -->
-  <section class="bg-cream" id="contrast">
-    <div style="text-align:center; margin-bottom: 3rem;">
-      <div class="s-eyebrow">Contrast Therapy</div>
-      <h2 class="s-title">Heat, cold, <em>and rest</em></h2>
-    </div>
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/sauna-interior.jpg" alt="Cedar sauna at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Heat Therapy</div>
+            <div class="amenity-card-name">Cedar Sauna</div>
+            <div class="amenity-card-desc">Traditional barrel sauna under the live oaks. Open daily, fits up to six. Pair with the cold plunge for a proper contrast cycle.</div>
+          </div>
+        </div>
 
-    <div class="service-row">
-      <img src="../assets/awkn/sauna.jpg" alt="Cedar sauna at AWKN Ranch">
-      <div>
-        <h3>Cedar <em>Sauna</em></h3>
-        <div class="service-meta"><span>Open daily</span> <span>Up to 6</span> <span>Included</span></div>
-        <p>A traditional barrel sauna under the live oaks. Authentic dry heat with the option to layer in essential oils or guided rounds.</p>
-        <p>Open to all overnight guests &amp; members; day-pass holders welcome.</p>
-      </div>
-    </div>
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/cold-plunge.jpg" alt="Cold plunge and hot tub at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Contrast</div>
+            <div class="amenity-card-name">Cold Plunge &amp; Hot Tub</div>
+            <div class="amenity-card-desc">A 38-45&deg;F plunge tub paired with a deep hot tub, framed by the wellness courtyard. The most-used space on the property.</div>
+          </div>
+        </div>
 
-    <div class="service-row reverse">
-      <img src="../assets/awkn/cold-plunge.jpeg" alt="Cold plunge at AWKN Ranch">
-      <div>
-        <h3>Cold <em>Plunge</em></h3>
-        <div class="service-meta"><span>Open daily</span> <span>Solo or group</span> <span>Included</span></div>
-        <p>A contrast cold tub kept between 38&ndash;45&deg;F year-round, paired with the sauna for proper hot-cold cycling. Guided plunge instruction available for first-timers.</p>
-      </div>
-    </div>
-  </section>
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/pool.jpg" alt="Pool at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Open Water</div>
+            <div class="amenity-card-name">Pool</div>
+            <div class="amenity-card-desc">A long swimming pool for laps in the morning, lounging in the afternoon. Heated through the cooler months.</div>
+          </div>
+        </div>
 
-  <!-- BODYWORK -->
-  <section class="bg-cream-deep" id="bodywork">
-    <div style="text-align:center; margin-bottom: 3rem;">
-      <div class="s-eyebrow">Bodywork</div>
-      <h2 class="s-title">Touch, presence, <em>release</em></h2>
-    </div>
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/hammock-garden.jpg" alt="Hammock garden at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Rest</div>
+            <div class="amenity-card-name">Hammock Garden</div>
+            <div class="amenity-card-desc">A grove of strung hammocks under the oaks &mdash; the quietest, most-claimed afternoon napping spot on the ranch.</div>
+          </div>
+        </div>
 
-    <div class="service-row">
-      <img src="../assets/awkn/body-work.jpeg" alt="Bodywork at AWKN Ranch">
-      <div>
-        <h3>Massage &amp; <em>Somatic Bodywork</em></h3>
-        <div class="service-meta"><span>60 / 90 / 120 min</span> <span>1:1</span> <span>From $145</span></div>
-        <p>Deep tissue, Swedish, and somatic-experiencing-informed bodywork with our resident practitioners. Held in a private room of the Retreat House.</p>
-        <p>Book in advance &mdash; sessions fill quickly during retreat weeks.</p>
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/retreat-house.jpg" alt="The Retreat House at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging</div>
+            <div class="amenity-card-name">Retreat House</div>
+            <div class="amenity-card-desc">The main residence. Private and shared rooms, a chef's kitchen, a wraparound porch, and the long farmhouse table where everyone eats.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/yurts.jpg" alt="Yurts at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging</div>
+            <div class="amenity-card-name">Yurts</div>
+            <div class="amenity-card-desc">Private circular cabins tucked into the trees. Wood floors, soft beds, windows full of sky. For guests who want quiet.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/dome-exterior.jpeg" alt="Geodesic dome at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging &amp; Studio</div>
+            <div class="amenity-card-name">Geodesic Dome</div>
+            <div class="amenity-card-desc">A geodesic shelter at the edge of the meadow. Doubles as overnight lodging and a movement studio for retreat groups.</div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- CEREMONY -->
-  <section class="bg-cream" id="ceremony">
-    <div style="text-align:center; margin-bottom: 3rem;">
-      <div class="s-eyebrow">Ceremony</div>
-      <h2 class="s-title">Ritual at the <em>edge of the woods</em></h2>
-    </div>
-
-    <div class="service-row">
-      <img src="../assets/awkn/frire-pit.jpg" alt="Fire circle at AWKN Ranch">
-      <div>
-        <h3>Fire <em>Circle</em></h3>
-        <div class="service-meta"><span>2 hours</span> <span>Group up to 30</span> <span>From $35</span></div>
-        <p>A held container around the fire pit. Songs, silence, and the structure of intention &mdash; for retreat closings, full moons, or simply because it's Saturday.</p>
+  <!-- ADD-ONS — by appointment -->
+  <section class="bg-cream-deep">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Add-Ons</div>
+        <h2 class="s-title">By <em>appointment</em>.</h2>
+        <p class="s-desc centered">Sessions held by a practitioner, layered into your stay. Book in advance &mdash; calendars fill quickly during retreat weeks.</p>
       </div>
-    </div>
+      <div class="addons-grid">
 
-    <div class="service-row reverse">
-      <img src="../assets/awkn/temple-inside-3.jpg" alt="Temple ceremony at AWKN Ranch">
-      <div>
-        <h3>Temple <em>Ceremony</em></h3>
-        <div class="service-meta"><span>2&ndash;4 hours</span> <span>Group or private</span> <span>By inquiry</span></div>
-        <p>Cacao, plant-medicine-aligned (no medicine), or simply a held silence in the temple. We work with visiting facilitators and our own resident guides.</p>
-      </div>
-    </div>
-  </section>
+        <div class="addon-card">
+          <div class="addon-card-meta">Bodywork</div>
+          <div class="addon-card-name">60-Minute Massage</div>
+          <div class="addon-card-desc">Deep tissue, Swedish, or somatic-experiencing-informed touch. Held in a private room of the Retreat House.</div>
+        </div>
 
-  <!-- MEDICAL / SISTER PRACTICE -->
-  <section class="bg-dark" id="medical" style="text-align:center;">
-    <div class="container">
-      <div class="s-eyebrow">Medical &amp; Therapeutic</div>
-      <h2 class="s-title">Sister Practice: <em>Within Center</em></h2>
-      <p class="s-desc centered" style="margin-top: 1rem;">For ceremonial ketamine therapy, medication management, and clinical psychiatric care, we partner with our sister practice Within Center, located at AWKN Ranch.</p>
-      <p class="s-desc centered" style="margin-top: 0.5rem;">Within is a fully licensed medical practice; the AWKN Ranch wellness offerings on this page are non-medical and complementary.</p>
-      <div style="margin-top: 2.5rem;">
-        <a href="../within-center/" class="btn btn-gold">Visit Within Center</a>
+        <div class="addon-card">
+          <div class="addon-card-meta">Coaching</div>
+          <div class="addon-card-name">Integration Coaching</div>
+          <div class="addon-card-desc">A 60-minute session with one of our integration coaches. Useful before or after a ceremony, or at the end of a retreat.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Reading</div>
+          <div class="addon-card-name">Human Design Reading</div>
+          <div class="addon-card-desc">A personalized reading of your Human Design chart. Useful for understanding your patterns of energy and decision-making.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Therapy</div>
+          <div class="addon-card-name">Licensed Therapy Session</div>
+          <div class="addon-card-desc">A one-hour session with a licensed therapist on staff. Talk therapy, IFS, or trauma-focused work depending on need.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Reading</div>
+          <div class="addon-card-name">Astrology Session</div>
+          <div class="addon-card-desc">A natal-chart reading and conversation about transits. For curiosity, decision-points, or the texture of a season.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Ceremony</div>
+          <div class="addon-card-name">Hap&eacute; Ceremony</div>
+          <div class="addon-card-desc">A held container for hap&eacute; (sacred Amazonian snuff), used for grounding, clearing, and intention-setting.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Therapy</div>
+          <div class="addon-card-name">Internal Family Systems Session</div>
+          <div class="addon-card-desc">An IFS-modality session for working with parts. Held by a trained therapist; particularly useful in retreat container.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Sound</div>
+          <div class="addon-card-name">Private Sound Journey</div>
+          <div class="addon-card-desc">A one-on-one or couples sound bath. Crystal bowls, gongs, voice &mdash; held in the temple, just for you.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Movement</div>
+          <div class="addon-card-name">Pickleball Lesson</div>
+          <div class="addon-card-desc">Yes, really. We have a court. Schedule a lesson with our resident teacher, or just play.</div>
+        </div>
+
       </div>
     </div>
   </section>
 
   <!-- BOOKING CTA -->
   <section class="cta-section">
-    <h2>Ready to <em>book a session</em>?</h2>
-    <p>Most offerings can be added to a stay or booked stand-alone. Tell us what calls and we'll find a time.</p>
+    <h2>Ready to <em>add something on</em>?</h2>
+    <p>Most add-ons can be paired with a stay or booked stand-alone. Tell us what's calling and we'll find a time.</p>
     <a href="../book/" class="btn btn-gold">Book Your Experience</a>
     <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
       <div class="contact-item">
