@@ -45,6 +45,8 @@ type EmailType =
   | "prospect_invitation"
   // CRM proposal sent (with Stripe payment link)
   | "proposal_sent"
+  // CRM invoice sent (with Stripe payment links — ACH + card)
+  | "invoice_sent"
   // CRM rental agreement e-sign request (AWKN Ranch only, separate from proposal email)
   | "agreement_to_sign"
   | "retreat_agreement_to_sign"
@@ -1098,6 +1100,153 @@ Pay & secure your date: ${data.payment_link_url || ''}
 ${validUntil ? `Valid until ${validUntil}` : ''}
 
 ${data.notes ? `Notes:\n${data.notes}\n\n` : ''}${data.terms ? `Terms:\n${data.terms}\n\n` : ''}Questions? Reply to this email or write ${brand.supportEmail}.
+
+— The ${brand.name} Team`
+      };
+    }
+
+    case "invoice_sent": {
+      // Branded invoice email mirroring the in-CRM preview. Two Stripe pay
+      // buttons (ACH no fee + card with 3% surcharge) generated upstream
+      // by saveInvoice. Markup is intentionally close to proposal_sent so
+      // recipients see a consistent visual language across the two flows.
+      const fmtCurrency = (n: number) =>
+        `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const lineItems = Array.isArray(data.line_items) ? data.line_items : [];
+      const lineItemRows = lineItems.map((li: any, i: number) => {
+        const qty = Number(li.quantity || 1);
+        const desc = String(li.description || '');
+        const qtyPrefix = qty > 1 ? `<strong style="color:#1c1618;">${qty} ×</strong> ` : '';
+        const isLast = i === lineItems.length - 1;
+        const border = isLast ? '' : 'border-bottom:1px solid rgba(201,148,62,0.18);';
+        return `
+        <tr>
+          <td style="padding:11px 12px 11px 0;${border}font-family:'Inter',sans-serif;color:#1c1618;font-size:14px;line-height:1.55;vertical-align:top;">${qtyPrefix}${desc}</td>
+          <td style="padding:11px 0 11px 12px;${border}font-family:'Cormorant Garamond',Georgia,serif;color:#1c1618;font-size:17px;font-weight:500;text-align:right;white-space:nowrap;vertical-align:top;">${fmtCurrency(li.total)}</td>
+        </tr>`;
+      }).join('');
+      const lineItemRowsText = lineItems.map((li: any) =>
+        `  ${Number(li.quantity || 1) > 1 ? Number(li.quantity) + ' × ' : ''}${li.description}  = ${fmtCurrency(li.total)}`
+      ).join('\n');
+      const invoiceDate = data.invoice_date
+        ? new Date(data.invoice_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const dueDate = data.due_date
+        ? new Date(data.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : '';
+      const isWithin = data.business_line === 'within';
+      const brand = isWithin
+        ? { name: 'Within Center', wordmark: 'WITHIN CENTER', subheader: 'at AWKN Ranch · Austin, Texas', supportEmail: 'admin@within.center' }
+        : { name: 'AWKN Ranch',    wordmark: 'AWKN RANCH',    subheader: 'Austin, Texas',                 supportEmail: 'admin@awknranch.com' };
+      const total = Number(data.total || 0);
+      const cardTotal = Number(data.card_total || total * 1.03);
+      return {
+        subject: `Invoice ${data.invoice_number || ''} from ${brand.name}`.trim(),
+        html: `
+<div style="max-width:600px;margin:0 auto;background:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1c1618;">
+
+  <!-- Header -->
+  <div style="padding:36px 40px 24px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">${brand.wordmark}</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">${brand.subheader}</div>
+  </div>
+
+  <!-- Invoice hero -->
+  <div style="padding:40px 40px 24px 40px;text-align:center;">
+    <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Invoice ${String(data.invoice_number || '')}</div>
+    <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:500;color:#1c1618;margin:0 0 10px 0;line-height:1.25;">For ${String(data.client_name || data.recipient_first_name || 'your services')}</h1>
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:#6b4c3b;margin:0;line-height:1.6;">Hi ${String(data.recipient_first_name || 'there')} — your invoice from ${brand.name} is below.</p>
+  </div>
+
+  <!-- Bill to + dates -->
+  <div style="padding:0 40px 28px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;">
+        <tr>
+          <td style="padding:4px 0;color:#6b4c3b;width:120px;">Bill to</td>
+          <td style="padding:4px 0;font-weight:600;">${String(data.client_name || '')}</td>
+        </tr>
+        ${invoiceDate ? `<tr><td style="padding:4px 0;color:#6b4c3b;">Date</td><td style="padding:4px 0;font-weight:600;">${invoiceDate}</td></tr>` : ''}
+        ${dueDate ? `<tr><td style="padding:4px 0;color:#6b4c3b;">Due</td><td style="padding:4px 0;font-weight:600;">${dueDate}</td></tr>` : ''}
+      </table>
+    </div>
+  </div>
+
+  ${lineItems.length > 0 ? `
+  <!-- Line items — cream callout with gold left rule (matches welcome
+       letter "Your Package Includes" block) -->
+  <div style="padding:0 40px 8px 40px;">
+    <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Invoice Includes</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+        <tbody>${lineItemRows}</tbody>
+      </table>
+    </div>
+  </div>` : ''}
+
+  <!-- Totals -->
+  <div style="padding:20px 40px 8px 40px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;">
+      ${data.subtotal !== undefined ? `<tr><td style="padding:3px 0;text-align:right;">Subtotal</td><td style="padding:3px 0;text-align:right;width:120px;color:#1c1618;font-weight:500;">${fmtCurrency(data.subtotal)}</td></tr>` : ''}
+      ${data.discount_amount && Number(data.discount_amount) > 0 ? `<tr><td style="padding:3px 0;text-align:right;">${String(data.discount_label || 'Discount')}</td><td style="padding:3px 0;text-align:right;color:#1c1618;font-weight:500;">−${fmtCurrency(data.discount_amount)}</td></tr>` : ''}
+      ${data.tax_amount && Number(data.tax_amount) > 0 ? `<tr><td style="padding:3px 0;text-align:right;">Tax</td><td style="padding:3px 0;text-align:right;color:#1c1618;font-weight:500;">${fmtCurrency(data.tax_amount)}</td></tr>` : ''}
+    </table>
+  </div>
+
+  <!-- Total Due (black box) -->
+  <div style="padding:12px 40px 28px 40px;">
+    <div style="background:#1c1618;border-radius:4px;padding:22px 28px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;">Total Due</td>
+          <td style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#ffffff;text-align:right;">${fmtCurrency(total)}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pay buttons -->
+  <div style="padding:0 40px 8px 40px;text-align:center;">
+    <a href="${String(data.payment_link_url || '#')}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;">Pay by Bank — ${fmtCurrency(total)}</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure bank transfer (ACH) via Stripe · no processing fee</p>
+  </div>
+  ${data.payment_link_card_url ? `
+  <div style="padding:14px 40px 8px 40px;text-align:center;">
+    <a href="${String(data.payment_link_card_url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;">Pay by Card — ${fmtCurrency(cardTotal)}</a>
+    <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Includes a 3% credit card processing surcharge</p>
+  </div>` : ''}
+
+  ${data.notes ? `
+  <div style="padding:32px 40px 0 40px;">
+    <div style="border-top:1px solid rgba(201,148,62,0.18);padding-top:20px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Notes</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#1c1618;line-height:1.7;white-space:pre-line;">${String(data.notes)}</div>
+    </div>
+  </div>` : ''}
+
+  <!-- Signoff -->
+  <div style="padding:32px 40px 40px 40px;text-align:center;border-top:1px solid rgba(201,148,62,0.18);margin-top:24px;">
+    <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:#6b4c3b;margin:0 0 10px 0;line-height:1.6;">Thank you for trusting us with your care.</p>
+    <p style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;margin:0;line-height:1.7;">Questions? <a href="mailto:${brand.supportEmail}" style="color:#c9943e;text-decoration:none;">${brand.supportEmail}</a></p>
+  </div>
+
+</div>`,
+        text: `Invoice ${data.invoice_number || ''} from ${brand.name}
+
+Hi ${data.recipient_first_name || 'there'},
+
+Your invoice from ${brand.name} is below.
+
+Bill to: ${data.client_name || ''}
+${invoiceDate ? `Date: ${invoiceDate}\n` : ''}${dueDate ? `Due:  ${dueDate}\n` : ''}
+Line items:
+${lineItemRowsText}
+
+${data.subtotal !== undefined ? `Subtotal:  ${fmtCurrency(data.subtotal)}\n` : ''}${data.discount_amount && Number(data.discount_amount) > 0 ? `${data.discount_label || 'Discount'}: -${fmtCurrency(data.discount_amount)}\n` : ''}${data.tax_amount && Number(data.tax_amount) > 0 ? `Tax: ${fmtCurrency(data.tax_amount)}\n` : ''}TOTAL DUE: ${fmtCurrency(total)}
+
+Pay by Bank (ACH, no fee): ${data.payment_link_url || ''}
+${data.payment_link_card_url ? `Pay by Card (+3%): ${data.payment_link_card_url}\n` : ''}
+${data.notes ? `Notes:\n${data.notes}\n\n` : ''}Questions? Reply to this email or write ${brand.supportEmail}.
 
 — The ${brand.name} Team`
       };

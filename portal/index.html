@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWKN Ranch | Team Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --brown-dark: #3a2a1a;
+            --brown-light: #a67c52;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+        .bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(26,20,13,0.75) 0%, rgba(26,20,13,0.55) 50%, rgba(26,20,13,0.70) 100%);
+            z-index: 1;
+        }
+
+        .center {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255,255,255,0.25);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg">
+        <img src="https://images.squarespace-cdn.com/content/v1/676255f9d9be920b868bbb78/06146aa7-574c-40e2-b352-7dbdaec35e97/PC230187-Enhanced-NR.jpg" alt="">
+    </div>
+    <div class="bg-overlay"></div>
+
+    <div class="center">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
+        const SIGNED_IN_REDIRECT = '/awkn-ranch/spaces/admin/dashboard.html';
+        const LOGIN_URL = '/awkn-ranch/login/';
+
+        (async function route() {
+            try {
+                const { data } = await sb.auth.getSession();
+                if (data.session) {
+                    localStorage.setItem(CACHED_AUTH_KEY, JSON.stringify({
+                        email: data.session.user.email,
+                        ts: Date.now()
+                    }));
+                    window.location.replace(SIGNED_IN_REDIRECT);
+                    return;
+                }
+            } catch (e) {}
+            window.location.replace(LOGIN_URL);
+        })();
+    </script>
+</body>
+</html>

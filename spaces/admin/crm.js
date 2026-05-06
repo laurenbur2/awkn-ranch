@@ -68,13 +68,22 @@ function formatCurrency(num) {
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr);
+  // Plain "YYYY-MM-DD" (from <input type="date">) parses as UTC midnight,
+  // which renders as the previous day in any negative-offset timezone.
+  // Treat it as a local calendar date instead so "2026-05-06" stays May 6.
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  const d = ymd
+    ? new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]))
+    : new Date(dateStr);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function formatDateTime(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr);
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  const d = ymd
+    ? new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]))
+    : new Date(dateStr);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
@@ -2593,7 +2602,7 @@ async function openInvoiceModal(invoice = null, lead = null) {
   document.getElementById('btn-send-invoice').addEventListener('click', () => saveInvoice(invoice, 'sent'));
 
   // Preview invoice
-  document.getElementById('btn-preview-invoice').addEventListener('click', () => openInvoicePreview());
+  document.getElementById('btn-preview-invoice').addEventListener('click', () => openInvoicePreview(invoice));
 
   // Recalculate totals on discount/tax change
   document.getElementById('inv-discount')?.addEventListener('input', recalcInvoiceTotals);
@@ -2662,7 +2671,7 @@ function recalcInvoiceTotals() {
   if (totalEl) totalEl.textContent = formatCurrency(total);
 }
 
-function openInvoicePreview() {
+function openInvoicePreview(existingInvoice = null) {
   const lineItems = [];
   document.querySelectorAll('.crm-line-item').forEach(el => {
     const desc = el.querySelector('.crm-li-desc')?.value?.trim() || '';
@@ -2686,98 +2695,157 @@ function openInvoicePreview() {
   const subtotal = lineItems.reduce((s, li) => s + li.total, 0);
   const total = subtotal - discount + tax;
 
-  const logoUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/housephotos/logos/logo-black-transparent.png';
-  const accentColor = bizLine === 'within' ? '#2a1f23' : '#d4883a';
+  // Brand language matches the Within / AWKN welcome letter and
+  // deposit-received emails: Cormorant Garamond for headlines and numbers,
+  // Inter for body, gold #c9943e accent, cream callout block on a white
+  // 600px card. AWKN Ranch invoices use the same chrome with a different
+  // wordmark line.
+  const brand = bizLine === 'within'
+    ? { wordmark: 'WITHIN CENTER', tagline: 'at AWKN Ranch · Austin, Texas' }
+    : { wordmark: 'AWKN RANCH', tagline: 'Austin, Texas' };
 
-  const lineItemRows = lineItems.map(li => `
-    <tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;white-space:pre-line;">${escapeHtml(li.description)}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:center;">${li.quantity}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;">${formatCurrency(li.unit_price)}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #eee;font-size:13px;text-align:right;font-weight:600;">${formatCurrency(li.total)}</td>
-    </tr>
-  `).join('');
+  // Stripe payment buttons mirror the proposal email: ACH (no fee) on top,
+  // card (+3% surcharge) below. When viewing the preview from the form
+  // before the invoice has been sent, we don't have a real link yet — show
+  // disabled-style buttons with a small caption so the operator sees what
+  // the recipient will see.
+  const ach = existingInvoice?.stripe_payment_link_url || null;
+  const card = existingInvoice?.stripe_payment_link_card_url || null;
+  const cardTotal = Math.round(total * 1.03 * 100) / 100;
+  const isPreviewOnly = !ach && !card;
+  const payButtonsHtml = `
+    <div style="padding:0 40px 8px 40px;text-align:center;">
+      <a href="${ach || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#c9943e;color:#ffffff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:3px;${isPreviewOnly ? 'opacity:0.7;pointer-events:none;' : ''}">Pay by Bank — ${formatCurrency(total)}</a>
+      <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Secure bank transfer (ACH) via Stripe · no processing fee</p>
+    </div>
+    <div style="padding:14px 40px 8px 40px;text-align:center;">
+      <a href="${card || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#ffffff;color:#1c1618;border:1px solid #1c1618;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:13px 32px;border-radius:3px;${isPreviewOnly ? 'opacity:0.7;pointer-events:none;' : ''}">Pay by Card — ${formatCurrency(cardTotal)}</a>
+      <p style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;line-height:1.6;margin:10px 0 0 0;">Card payments include a 3% processing fee</p>
+    </div>
+    ${isPreviewOnly ? `<p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#a67a2e;text-align:center;margin:14px 40px 0;">Payment links activate when you send the invoice.</p>` : ''}
+  `;
+
+  // Render line items the way the welcome letter / proposal email do:
+  // a "3 ×" qty prefix in front of the description, the line amount on
+  // the right, all wrapped below in a cream callout block with a gold
+  // left rule. Qty/Rate columns drop out — they're rarely useful for
+  // service-style invoices and the package-style layout reads better.
+  const lineItemRows = lineItems.map((li, i) => {
+    const qty = Number(li.quantity || 1);
+    const qtyPrefix = qty > 1 ? `<strong style="color:#1c1618;">${qty} ×</strong> ` : '';
+    const isLast = i === lineItems.length - 1;
+    const border = isLast ? '' : 'border-bottom:1px solid rgba(201,148,62,0.18);';
+    return `
+      <tr>
+        <td style="padding:11px 12px 11px 0;${border}font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;line-height:1.55;vertical-align:top;white-space:pre-line;">${qtyPrefix}${escapeHtml(li.description)}</td>
+        <td style="padding:11px 0 11px 12px;${border}font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:500;color:#1c1618;text-align:right;white-space:nowrap;vertical-align:top;">${formatCurrency(li.total)}</td>
+      </tr>`;
+  }).join('');
 
   const previewHtml = `
     <div id="invoice-preview-overlay" style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;">
-      <div style="background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #eee;">
-          <span style="font-weight:700;font-size:15px;">Invoice Preview</span>
+      <div style="background:#faf8f5;border-radius:12px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid rgba(28,22,24,0.08);background:#fff;">
+          <span style="font-family:'Inter',sans-serif;font-weight:600;font-size:13px;letter-spacing:0.16em;text-transform:uppercase;color:#6b4c3b;">Invoice Preview</span>
           <div style="display:flex;gap:8px;align-items:center;">
-            <button id="btn-print-invoice" style="padding:6px 14px;font-size:12px;font-weight:600;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">Print / PDF</button>
+            <button id="btn-print-invoice" style="padding:7px 14px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #c9943e;color:#c9943e;border-radius:3px;background:#fff;cursor:pointer;">Print / PDF</button>
             <button id="btn-close-preview" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;">&times;</button>
           </div>
         </div>
-        <div id="invoice-preview-content" style="padding:32px;font-family:'DM Sans',system-ui,sans-serif;">
-          <!-- Header -->
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
-            <div>
-              <img src="${logoUrl}" alt="${escapeHtml(bizLabel)}" style="height:48px;margin-bottom:8px;" onerror="this.style.display='none'">
-              <div style="font-size:12px;color:#888;margin-top:4px;">${escapeHtml(bizLabel)}</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:28px;font-weight:800;color:${accentColor};letter-spacing:-0.5px;">INVOICE</div>
-              ${invoiceNumber ? `<div style="font-size:13px;color:#666;margin-top:4px;">${escapeHtml(invoiceNumber)}</div>` : ''}
-            </div>
-          </div>
+        <div id="invoice-preview-content" style="padding:0;background:#faf8f5;">
+          <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid rgba(28,22,24,0.06);border-radius:6px;overflow:hidden;margin-top:24px;margin-bottom:24px;">
 
-          <!-- Client & Date Info -->
-          <div style="display:flex;justify-content:space-between;margin-bottom:28px;gap:24px;">
-            <div>
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;margin-bottom:6px;">Bill To</div>
-              <div style="font-size:14px;font-weight:600;color:#222;">${escapeHtml(clientName)}</div>
-              ${clientEmail ? `<div style="font-size:12px;color:#666;margin-top:2px;">${escapeHtml(clientEmail)}</div>` : ''}
-              ${clientPhone ? `<div style="font-size:12px;color:#666;margin-top:2px;">${escapeHtml(clientPhone)}</div>` : ''}
+            <!-- Brand header -->
+            <div style="padding:36px 40px 22px 40px;border-bottom:1px solid rgba(201,148,62,0.18);text-align:center;">
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:500;color:#1c1618;letter-spacing:0.04em;">${escapeHtml(brand.wordmark)}</div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:13px;color:#6b4c3b;margin-top:4px;">${escapeHtml(brand.tagline)}</div>
             </div>
-            <div style="text-align:right;">
-              ${invoiceDate ? `<div style="margin-bottom:6px;"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Date</span><br><span style="font-size:13px;color:#333;">${formatDate(invoiceDate)}</span></div>` : ''}
-              ${dueDate ? `<div><span style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Due Date</span><br><span style="font-size:13px;color:#333;">${formatDate(dueDate)}</span></div>` : ''}
+
+            <!-- Invoice hero -->
+            <div style="padding:36px 40px 24px 40px;text-align:center;">
+              <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:10px;">Invoice</div>
+              <h1 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:500;color:#1c1618;margin:0 0 6px 0;line-height:1.25;">For ${escapeHtml(clientName || 'your services')}</h1>
+              ${invoiceNumber ? `<div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:14px;color:#6b4c3b;">No. ${escapeHtml(invoiceNumber)}</div>` : ''}
             </div>
-          </div>
 
-          <!-- Line Items Table -->
-          <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-            <thead>
-              <tr style="border-bottom:2px solid ${accentColor};">
-                <th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Description</th>
-                <th style="padding:8px 12px;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Qty</th>
-                <th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Rate</th>
-                <th style="padding:8px 12px;text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${lineItemRows || '<tr><td colspan="4" style="padding:20px;text-align:center;color:#999;font-size:13px;">No line items added</td></tr>'}
-            </tbody>
-          </table>
+            <!-- Bill to + Date block -->
+            <div style="padding:0 40px 28px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+                <tr>
+                  <td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;padding-bottom:6px;">Bill To</td>
+                  ${invoiceDate ? `<td style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;padding-bottom:6px;text-align:right;">Date</td>` : ''}
+                </tr>
+                <tr>
+                  <td style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#1c1618;font-weight:500;line-height:1.3;">${escapeHtml(clientName)}</td>
+                  ${invoiceDate ? `<td style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#c9943e;font-weight:500;text-align:right;">${formatDate(invoiceDate)}</td>` : ''}
+                </tr>
+                ${(clientEmail || clientPhone) ? `<tr><td colspan="2" style="font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;padding-top:6px;line-height:1.6;">${[escapeHtml(clientEmail), escapeHtml(clientPhone)].filter(Boolean).join(' · ')}</td></tr>` : ''}
+                ${dueDate ? `<tr><td colspan="2" style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;padding-top:10px;border-top:1px solid rgba(201,148,62,0.18);"><span style="letter-spacing:0.12em;text-transform:uppercase;font-size:10px;font-weight:600;">Due</span> &nbsp; <strong style="color:#1c1618;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;">${formatDate(dueDate)}</strong></td></tr>` : ''}
+              </table>
+            </div>
 
-          <!-- Totals -->
-          <div style="display:flex;justify-content:flex-end;">
-            <div style="width:240px;">
-              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
-                <span>Subtotal</span><span>${formatCurrency(subtotal)}</span>
-              </div>
-              ${discount > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
-                <span>${escapeHtml(discountLabel || 'Discount')}</span><span>-${formatCurrency(discount)}</span>
-              </div>` : ''}
-              ${tax > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
-                <span>Tax</span><span>${formatCurrency(tax)}</span>
-              </div>` : ''}
-              <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:18px;font-weight:800;color:${accentColor};border-top:2px solid ${accentColor};margin-top:6px;">
-                <span>Total</span><span>${formatCurrency(total)}</span>
+            <!-- Line items — cream callout with gold left rule (matches the
+                 welcome-letter "Your Package Includes" block) -->
+            <div style="padding:0 40px 28px 40px;">
+              <div style="background:#faf8f5;border-left:3px solid #c9943e;padding:20px 24px;">
+                <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6b4c3b;font-weight:600;margin-bottom:12px;">Your Invoice Includes</div>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                  <tbody>
+                    ${lineItemRows || '<tr><td style="padding:8px 0;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:#6b4c3b;font-size:14px;">No line items added yet</td></tr>'}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
 
-          <!-- Notes -->
-          ${notes ? `
-          <div style="margin-top:28px;padding-top:20px;border-top:1px solid #eee;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;font-weight:700;margin-bottom:6px;">Notes</div>
-            <div style="font-size:12px;color:#666;white-space:pre-line;">${escapeHtml(notes)}</div>
-          </div>` : ''}
+            <!-- Totals -->
+            <div style="padding:0 40px 32px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td></td><td width="280">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;">Subtotal</td>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;text-align:right;">${formatCurrency(subtotal)}</td>
+                    </tr>
+                    ${discount > 0 ? `<tr>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;">${escapeHtml(discountLabel || 'Discount')}</td>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;text-align:right;">-${formatCurrency(discount)}</td>
+                    </tr>` : ''}
+                    ${tax > 0 ? `<tr>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#6b4c3b;">Tax</td>
+                      <td style="padding:8px 0;font-family:'Inter',sans-serif;font-size:13px;color:#1c1618;text-align:right;">${formatCurrency(tax)}</td>
+                    </tr>` : ''}
+                    <tr>
+                      <td style="padding:14px 0 0;border-top:1.5px solid #c9943e;font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;">Total</td>
+                      <td style="padding:14px 0 0;border-top:1.5px solid #c9943e;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;color:#1c1618;text-align:right;line-height:1;">${formatCurrency(total)}</td>
+                    </tr>
+                  </table>
+                </td></tr>
+              </table>
+            </div>
 
-          <!-- Footer -->
-          <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;text-align:center;">
-            <div style="font-size:11px;color:#bbb;">Thank you for your business</div>
+            <!-- Stripe pay buttons -->
+            <div style="padding:0 0 8px 0;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+              <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9943e;font-weight:600;text-align:center;margin-bottom:14px;">Pay your invoice</div>
+              ${payButtonsHtml}
+            </div>
+
+            <!-- Notes -->
+            ${notes ? `
+            <div style="padding:24px 40px 32px 40px;">
+              <div style="border-top:1px solid rgba(28,22,24,0.08);padding-top:20px;">
+                <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;margin-bottom:8px;">Notes</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:#1c1618;line-height:1.7;white-space:pre-line;">${escapeHtml(notes)}</div>
+              </div>
+            </div>` : ''}
+
+            <!-- Signoff -->
+            <div style="padding:0 40px 36px 40px;text-align:center;border-top:1px solid rgba(201,148,62,0.18);padding-top:24px;">
+              <p style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:15px;color:#6b4c3b;margin:0;line-height:1.6;">Thank you for trusting us with your care.</p>
+              <div style="font-family:'Inter',sans-serif;font-size:12px;color:#6b4c3b;margin-top:14px;line-height:1.7;">
+                Questions? <a href="mailto:info@within.center" style="color:#c9943e;text-decoration:none;">info@within.center</a> &nbsp;·&nbsp; <a href="tel:5129692399" style="color:#c9943e;text-decoration:none;">512-969-2399</a>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -2796,8 +2864,8 @@ function openInvoicePreview() {
     const content = document.getElementById('invoice-preview-content').innerHTML;
     const win = window.open('', '_blank', 'width=700,height=900');
     win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${escapeHtml(invoiceNumber)}</title>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-      <style>body{margin:0;padding:32px;font-family:'DM Sans',system-ui,sans-serif;}@media print{body{padding:20px;}}</style>
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <style>body{margin:0;padding:0;background:#faf8f5;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:#1c1618;}@media print{body{background:#fff;}#invoice-preview-content > div{box-shadow:none !important;border:none !important;margin-top:0 !important;}}</style>
     </head><body>${content}</body></html>`);
     win.document.close();
     win.onload = () => { win.print(); };
@@ -2854,6 +2922,61 @@ async function saveInvoice(existingInvoice, status) {
     created_by: authState?.user?.id || null,
   };
 
+  // When sending the invoice, generate Stripe payment links (ACH + card)
+  // — same pattern proposals use. Skip if links already exist (idempotent
+  // re-send) or if the email is missing (Stripe needs it for receipts).
+  if (status === 'sent'
+      && !existingInvoice?.stripe_payment_link_url
+      && payload.client_email
+      && total > 0) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (token) {
+        const cardTotal = Math.round(total * 1.03 * 100) / 100;
+        async function makeLink(amount, method, suffix) {
+          const r = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/create-payment-link', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token,
+            },
+            body: JSON.stringify({
+              amount,
+              description: `${payload.invoice_number} — Invoice for ${clientName}${suffix}`,
+              person_name: clientName,
+              person_email: payload.client_email,
+              category: 'crm_invoice',
+              payment_method: method,
+              metadata: {
+                source: 'crm-invoice',
+                invoice_number: payload.invoice_number,
+                lead_id: payload.lead_id,
+                payment_method: method,
+              },
+            }),
+          });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok || !d.url) {
+            throw new Error(`Stripe ${method} link failed: ${d.error || d.detail || r.status}`);
+          }
+          return d;
+        }
+        const ach  = await makeLink(total, 'ach', '');
+        const card = await makeLink(cardTotal, 'card', ' (card)');
+        payload.stripe_payment_link_id       = ach.payment_link_id;
+        payload.stripe_payment_link_url      = ach.url;
+        payload.stripe_payment_link_card_id  = card.payment_link_id;
+        payload.stripe_payment_link_card_url = card.url;
+      }
+    } catch (linkErr) {
+      // Don't block the send if Stripe is down — the invoice still gets
+      // saved as sent so the operator can resend / collect manually.
+      console.warn('Stripe payment link generation failed:', linkErr);
+      showToast('Saved, but Stripe payment link could not be generated. Resend after connecting Stripe.', 'warning');
+    }
+  }
+
   try {
     let invoiceId;
     if (existingInvoice) {
@@ -2873,6 +2996,57 @@ async function saveInvoice(existingInvoice, status) {
       const itemsPayload = lineItems.map(li => ({ ...li, invoice_id: invoiceId }));
       const { error: liError } = await supabase.from('crm_invoice_line_items').insert(itemsPayload);
       if (liError) throw liError;
+    }
+
+    // Email the branded invoice to the client when sending. Skip if no
+    // email on file. Soft-fails — invoice still saves as sent if Resend
+    // is down so the operator can retry without losing data.
+    if (status === 'sent' && payload.client_email) {
+      try {
+        const recipientFirstName = String(payload.client_name || '').trim().split(/\s+/)[0] || '';
+        const emailResp = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+          },
+          body: JSON.stringify({
+            type: 'invoice_sent',
+            to: payload.client_email,
+            data: {
+              recipient_first_name: recipientFirstName,
+              business_line: payload.business_line,
+              invoice_number: payload.invoice_number,
+              client_name: payload.client_name,
+              invoice_date: payload.invoice_date,
+              due_date: payload.due_date,
+              subtotal: payload.subtotal,
+              discount_amount: payload.discount_amount,
+              discount_label: payload.discount_label,
+              tax_amount: payload.tax_amount,
+              total: payload.total,
+              card_total: Math.round(Number(payload.total) * 1.03 * 100) / 100,
+              payment_link_url: payload.stripe_payment_link_url || null,
+              payment_link_card_url: payload.stripe_payment_link_card_url || null,
+              notes: payload.notes,
+              line_items: lineItems.map(li => ({
+                description: li.description,
+                quantity: li.quantity,
+                unit_price: li.unit_price,
+                total: li.total,
+              })),
+            },
+          }),
+        });
+        if (!emailResp.ok) {
+          const err = await emailResp.json().catch(() => ({}));
+          throw new Error(err.error || ('Email send returned ' + emailResp.status));
+        }
+      } catch (emailErr) {
+        console.warn('Invoice email send failed:', emailErr);
+        showToast('Invoice saved, but email did not send. Check the email address and try Resend.', 'warning');
+      }
     }
 
     showToast(status === 'sent' ? 'Invoice sent' : 'Invoice saved as draft', 'success');

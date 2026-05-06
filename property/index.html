@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Our Property | AWKN Ranch</title>
+  <meta name="description" content="Twelve acres of Texas Hill Country, twenty minutes from downtown Austin. The temple, the gardens, the Honey Dome, and every space in between.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/property/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/awkn/site.css">
+
+  <style>
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      background: var(--white);
+    }
+    .feature-row {
+      display: contents;
+    }
+    .feature-img {
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      object-fit: cover;
+    }
+    .feature-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 3.5rem;
+    }
+    .feature-text .s-eyebrow { margin-bottom: 0.5rem; }
+    .feature-text p {
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 900px) {
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-img { min-height: 300px; }
+      .feature-text { padding: 2.5rem 2rem; }
+      /* on mobile, image should always come first regardless of source order */
+      .feature-text { order: 2; }
+      .feature-img { order: 1; }
+    }
+
+    /* gallery wall */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+    .gallery img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+    .gallery img.tall { aspect-ratio: 1 / 1.5; grid-row: span 2; }
+    @media (max-width: 800px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+      .gallery img.tall { grid-row: auto; aspect-ratio: 1 / 1; }
+    }
+
+    .map-wrap {
+      max-width: 880px;
+      margin: 3rem auto 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .map-wrap img { width: 100%; display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact</a>
+      <a href="../book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../" data-menu-link>Home</a></li>
+      <li><a href="../property/" class="current" data-menu-link>Explore Our Property</a></li>
+      <li><a href="../book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="../host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="../events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="../services/" data-menu-link>Our Services</a></li>
+      <li><a href="../team/" data-menu-link>Our Team</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <!-- HERO -->
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('../assets/awkn/temple.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Explore Our Property</span>
+      <h1>Twelve acres, <em>held for healing</em>.</h1>
+      <span class="page-hero-tagline">Texas Hill Country, twenty minutes from downtown Austin &mdash; designed corner to corner for inner work and rest.</span>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="bg-cream">
+    <div class="intro-block">
+      <div class="s-eyebrow">A Sacred Container</div>
+      <h2 class="s-title">Every space here was <em>chosen</em>.</h2>
+      <p class="s-desc centered">The land was an Austin homestead before it became AWKN. We've spent years restoring its old buildings, planting its gardens, and adding the spaces a modern wellness retreat needs &mdash; while leaving the wildness of the hills intact.</p>
+    </div>
+  </section>
+
+  <!-- TEMPLE FEATURE -->
+  <div class="feature-grid">
+    <img src="../assets/awkn/temple-interior-2.jpg" alt="Inside the temple at AWKN Ranch" class="feature-img">
+    <div class="feature-text">
+      <div class="s-eyebrow">The Temple</div>
+      <h2 class="s-title">A room built for <em>presence</em>.</h2>
+      <p>The temple is the heart of AWKN. It's where ceremonies are held, where mornings begin in stillness, and where evenings end in song. Cushions, candles, and natural light through tall windows. No screens, no clocks.</p>
+      <p>Capacity for groups up to 40 in seated practice, or 16 in lying ceremony.</p>
+    </div>
+  </div>
+
+  <!-- HONEY DOME -->
+  <div class="feature-grid">
+    <div class="feature-text">
+      <div class="s-eyebrow">The Honey Dome</div>
+      <h2 class="s-title">Geodesic, with <em>sky</em>.</h2>
+      <p>A warm-light geodesic dome at the edge of the property. Hexagonal panes overhead, soft cushions below. Used by day as a movement and meditation studio, by night as star-gazing lodging for the guest who wants quiet.</p>
+      <p>Sleeps two; doubles as a 12-person workshop space.</p>
+    </div>
+    <img src="../assets/awkn/honey-dome.jpeg" alt="The Honey Dome at AWKN Ranch" class="feature-img">
+  </div>
+
+  <!-- RETREAT HOUSE -->
+  <div class="feature-grid">
+    <img src="../assets/awkn/retreat-house.jpg" alt="The Retreat House at AWKN Ranch" class="feature-img">
+    <div class="feature-text">
+      <div class="s-eyebrow">The Retreat House</div>
+      <h2 class="s-title">A residence to <em>land</em> in.</h2>
+      <p>Our central building &mdash; a low Texas farmhouse with a wraparound porch, a chef's kitchen, and seven bedrooms (some private, some shared). The hub for retreats and the closest lodging to the temple, sauna, and gardens.</p>
+      <p>Sleeps up to 14 across private and shared rooms.</p>
+    </div>
+  </div>
+
+  <!-- WELLNESS COURTYARD -->
+  <div class="feature-grid">
+    <div class="feature-text">
+      <div class="s-eyebrow">The Wellness Courtyard</div>
+      <h2 class="s-title">Sauna, plunge, <em>fire</em>.</h2>
+      <p>A cedar barrel sauna and a cold plunge tub framed by live oaks. A short walk away, the fire pit &mdash; for late-night conversation, fire ceremony, or quiet stargazing. The contrast practice that anchors most stays here.</p>
+      <p>Open to all guests; included with every stay.</p>
+    </div>
+    <img src="../assets/awkn/cold-plunge.jpeg" alt="The cold plunge at AWKN Ranch" class="feature-img">
+  </div>
+
+  <!-- YURT + GARDENS PHOTO STRIP -->
+  <section class="bg-cream-deep" style="padding-bottom: 0;">
+    <div class="container" style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">More to Discover</div>
+      <h2 class="s-title">Gardens, paths, <em>and quiet places</em>.</h2>
+      <p class="s-desc centered">Beyond the named buildings, the property is full of small spaces designed to be found &mdash; a hammock under the oaks, a bench at the high point, the koi pond at dusk.</p>
+    </div>
+  </section>
+
+  <div class="gallery">
+    <img src="../assets/awkn/awkn-yurt-1.jpg" alt="The yurt">
+    <img src="../assets/awkn/sauna.jpg" alt="The sauna">
+    <img src="../assets/awkn/frire-pit.jpg" alt="Fire pit">
+    <img src="../assets/awkn/temple-point.jpg" alt="The temple at sunset">
+    <img src="../assets/awkn/dome.jpeg" alt="Dome interior">
+    <img src="../assets/awkn/temple-inside-3.jpg" alt="Inside the temple">
+    <img src="../assets/awkn/sound-bath.jpeg" alt="Sound bath">
+    <img src="../assets/awkn/meditation-awkn.png" alt="Meditation space">
+  </div>
+
+  <!-- MAP -->
+  <section class="bg-cream">
+    <div class="container" style="text-align:center;">
+      <div class="s-eyebrow">Property Map</div>
+      <h2 class="s-title">Find your way <em>around</em>.</h2>
+      <p class="s-desc centered">A bird's-eye view of the ranch, from the gate to the gardens. Use it to orient yourself before you arrive, or print it for guests of a retreat you're hosting.</p>
+      <div class="map-wrap">
+        <img src="../assets/awkn/awkn-map.jpg" alt="Map of AWKN Ranch">
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section class="bg-cream-deep">
+    <div class="container" style="text-align:center;">
+      <div class="s-eyebrow">Location</div>
+      <h2 class="s-title">Twenty minutes from <em>downtown Austin</em>.</h2>
+      <p class="s-desc centered">7600 Stillridge Drive, Austin, TX 78736. Tucked into the hills southwest of the city &mdash; close enough to fly in for a weekend, far enough to feel like another world.</p>
+      <div style="margin-top: 2.5rem;">
+        <a href="../book/" class="btn btn-gold">Plan Your Visit</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="cta-section">
+    <h2>Want to <em>see it in person</em>?</h2>
+    <p>Schedule a private tour, or ask any question about the spaces above.</p>
+    <a href="../contact/" class="btn btn-gold">Get in Touch</a>
+    <div class="contact-row">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="../within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="../property/">Property</a>
+    <a href="../book/">Book</a>
+    <a href="../host-a-retreat/">Host</a>
+    <a href="../events/">Events</a>
+    <a href="../services/">Services</a>
+    <a href="../team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="../within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>
