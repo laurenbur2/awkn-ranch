@@ -1,6 +1,6 @@
 # AWKN — Status
 
-**Last Updated:** 2026-05-05 (post-audit-driven port session)
+**Last Updated:** 2026-05-06 (session: bos hostname revert + main merge + supporting fixes)
 **Last Updated By:** Matthew Miceli (`miceli`)
 
 ## Project Overview
@@ -77,12 +77,14 @@ Audit-driven port. **12 legacy pages ported** into the new app at `awkn-web-app/
 - AWKN profile system (`/directory/`) has a schema gap — `app_users` is missing `slug`/`bio`/`pronouns`. Phase 5 closes the gap.
 - Within Center brand tokens not yet defined in repo. Phase 4 will source from live within.center.
 - **Multi-domain auth bridging:** the new app's cookie-based `@supabase/ssr` auth (used by `portal/login`, `bos/login`) and the legacy localStorage-based auth (used by ported `/login`, `/team`) are independent — sessions don't cross. The legacy bridge handles ports that use `shared/supabase.js`; cross-domain SSO post-deploy is its own follow-up.
+- **Dev permission bypass ≠ data access.** The `window.__AWKN_DEV_BYPASS_AUTH` flag (set when `NEXT_PUBLIC_DISABLE_AUTH=true`) short-circuits client-side `hasPermission` checks so legacy admin chrome renders. It does NOT grant Supabase RLS access — table queries still hit prod with the user's actual `app_users.role`. Result: chrome renders, data tables stay empty/loading. Fix: grant the dev's `app_users` row admin role in prod (or stand up a local DB clone).
 
 ## Recent Changes (last 5 sessions)
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-05-05 | **Phase 3 audit-driven port (this session):** 12 legacy pages ported into awkn-web-app via verbatim Route Handlers under `(internal)` route group. Functional `/login` with legacy session bridge to `/team`. Dev landing now tracks port progress nested per-domain. Deletions on miceli: bug-reporter extensions, clauded/, branding preview HTMLs, 404.html, lost.html, 1 Finder dupe. CSP relaxed for Google Fonts + jsdelivr. Brand assets copied into public/. 19 commits, `792d9f8f` → `848d0d31`. | Miceli |
+| 2026-05-06 | **Hard reset + main merge + support fixes.** Local reset to `f4c37072` (right before the bos hostname move), then `git merge origin/main` brought in 13 commits — Justin's BOS Edit-button update (`db0620a6` on `spaces/admin/within-schedule.{html,js}`) + 6 admissions docs commits, plus Lauren's 6 condition card photo commits. Cherry-picked `f09540c0` (CompareButton hydration fix). Uncommitted supporting fixes for legacy URL/asset/auth runtime issues: `proxy.ts` `/awkn-ranch/` + `.html` strip, `next.config.js` framework-level rewrite (handles image assets that bypass middleware matcher), `public/shared/supabase-health.css` mirror, `auth.js` dev permission bypass + `serve-legacy-html.ts` flag injection (`window.__AWKN_DEV_BYPASS_AUTH`). Local diverged from `origin/miceli` (15 ahead, 11 behind); force-push pending until dev verification. **Decision:** BOS admin pages stay on awknranch hostname through Phase 3–5; bos hostname migration deferred to Phase 6 page-by-page re-scaffolds. Supabase MCP added to `.mcp.json` (auth pending — required to grant admin role on `app_users` so RLS-protected queries return data). | Miceli |
+| 2026-05-05 | **Phase 3 audit-driven port:** 12 legacy pages ported into awkn-web-app via verbatim Route Handlers under `(internal)` route group. Functional `/login` with legacy session bridge to `/team`. Dev landing now tracks port progress nested per-domain. Deletions on miceli: bug-reporter extensions, clauded/, branding preview HTMLs, 404.html, lost.html, 1 Finder dupe. CSP relaxed for Google Fonts + jsdelivr. Brand assets copied into public/. 19 commits, `792d9f8f` → `848d0d31`. | Miceli |
 | 2026-05-04 | **Phase 2.4:** Supabase Auth wired against existing app_users. Login form (shadcn), `getCurrentUser()` server helper, sign-out endpoint. | Miceli |
 | 2026-05-04 | **Phase 2.3:** `drizzle-kit pull` introspected prod (72 tables / 873 cols / 80 FKs / 180 policies). Live AWKN spaces render on `/bos/spaces`. | Miceli |
 | 2026-05-04 | **Phase 2 polish:** AWKN brand tokens ported to multi-theme architecture. Renamed `middleware.ts` → `proxy.ts`. | Miceli |

@@ -4,6 +4,17 @@
 > Program spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`
 > Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
 
+## Resume actions (next session — 2026-05-06 handoff)
+
+State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/miceli`. Working tree has 5 uncommitted support fixes (proxy strip, next.config rewrite, auth bypass, flag injection, supabase-health.css). `stash@{0}` holds prior session's bos-revert workarounds as a safety net. Reflog has 8 discarded commits recoverable for ~90 days.
+
+- [ ] **Restart Claude Code session, run `/mcp`, authenticate Supabase MCP server** — `.mcp.json` already has the entry; auth flow is interactive.
+- [ ] **Grant admin role on `app_users` for `mmicel583@gmail.com`** via Supabase MCP. Plan: SELECT first to confirm row, then `UPDATE app_users SET role = 'admin' WHERE email = 'mmicel583@gmail.com' RETURNING *;`. Unlocks RLS-protected admin queries so data tables actually populate.
+- [ ] **Verify dev experience end-to-end** — admin chrome renders + data loads on key pages: `/spaces/admin/dashboard`, `/spaces/admin/crm`, `/spaces/admin/venue-events`, `/spaces/admin/within-schedule` (Justin's new Edit button — incoming from main merge).
+- [ ] **Commit the 5 uncommitted support fixes** as one logical commit when verified.
+- [ ] **Force-push miceli to origin/miceli** (`git push --force-with-lease origin miceli`). Discards 8 commits on origin (recoverable from local reflog).
+- [ ] **Replay today's repo housekeeping** on top: legacy GH-Pages site → `legacy/`, `awkn-web-app/` flatten to root, archive 9 legacy-era docs, unify CLAUDE.md/STATUS.md/TODO.md per framework. (Optionally cherry-pick `95cfd0c9` portal split + `7367f657` visitor-identity TS port from reflog before the housekeeping replay — both were small wins lost to the reset.)
+
 ## Critical (blocks production)
 
 ### Open questions across phases
