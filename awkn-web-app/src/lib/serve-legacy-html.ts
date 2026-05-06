@@ -40,6 +40,18 @@ interface ServeOptions {
    */
   legacyAuthPort?: boolean;
   /**
+   * Apply BOS / spaces port rewrites for the admin/staff/spaces pages and
+   * the associates surface:
+   *  - Strip `/awkn-ranch/` GH-Pages prefix from absolute URLs (intra-site
+   *    nav like /awkn-ranch/spaces/, /awkn-ranch/community/, plus assets).
+   *  - Rewrite `/assets/branding/X` (the leftover after the strip) to
+   *    `/branding/X` since we mirror AWKN brand assets at public/branding/.
+   * Relative `../../shared/X.js` etc. paths resolve correctly without
+   * rewriting because we mirror legacy shared/, styles/, spaces/,
+   * associates/ under public/ at the same depth.
+   */
+  bosPort?: boolean;
+  /**
    * Apply Within (clinical) port rewrites for the EMR/sign-in concept pages
    * at `/within/index.html` and `/within/emr/index.html`:
    *  - Rewrite `../`-traversed favicon and apple-touch-icon refs to root.
@@ -135,6 +147,12 @@ export function serveLegacyHtml(
         /\/login\/update-password\.html/g,
         "/login/update-password",
       );
+  }
+
+  if (options.bosPort) {
+    html = html
+      .replaceAll(/(["'(=])\/awkn-ranch\//g, "$1/")
+      .replaceAll(/(["'(=])\/assets\/branding\//g, "$1/branding/");
   }
 
   if (options.clinicalPort) {
