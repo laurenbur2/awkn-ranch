@@ -8,7 +8,7 @@
  * visit `http://awknranch.localhost:3000`, `http://within.localhost:3000`, etc.
  * Plain `http://localhost:3000` falls through to the dev landing page.
  */
-export type DomainKey = "awknranch" | "within" | "portal" | "bos";
+export type DomainKey = "awknranch" | "within" | "portal" | "team";
 
 export interface DomainConfig {
   key: DomainKey;
@@ -45,12 +45,12 @@ export const DOMAINS: DomainConfig[] = [
     description: "Authenticated client-facing portal (bookings, payments, documents)",
   },
   {
-    key: "bos",
-    label: "Admin BOS",
-    prodHosts: ["bos.awknranch.com"],
-    devHostMatchers: [/^bos\.localhost(:\d+)?$/],
+    key: "team",
+    label: "Team",
+    prodHosts: ["team.awknranch.com"],
+    devHostMatchers: [/^team\.localhost(:\d+)?$/],
     authRequired: true,
-    description: "Internal Business Operating System (CRM, scheduling, accounting)",
+    description: "Internal Business Operating System for AWKN + Within team (CRM, scheduling, accounting)",
   },
 ];
 

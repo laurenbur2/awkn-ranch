@@ -11,9 +11,9 @@ import { Button } from "~/components/ui/button";
  * proves the stack reads prod end-to-end (proxy → server component →
  * Drizzle → Supabase pooler → prod Postgres).
  */
-export default async function BosSpacesPage() {
+export default async function TeamSpacesPage() {
   const h = await headers();
-  const path = h.get("x-matched-path") ?? "/bos/spaces";
+  const path = h.get("x-matched-path") ?? "/team/spaces";
   const user = await getCurrentUser();
 
   let rows: Array<typeof spaces.$inferSelect> = [];

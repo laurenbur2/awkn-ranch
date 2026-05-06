@@ -473,7 +473,7 @@ export default function DevLandingPage() {
 
           <footer className="dev-footer">
             Tip — set <code>NEXT_PUBLIC_DISABLE_AUTH=true</code> in{" "}
-            <code>.env.local</code> to bypass auth on bos / portal during dev.
+            <code>.env.local</code> to bypass auth on team / portal during dev.
           </footer>
         </div>
       </main>

@@ -5,7 +5,7 @@
  * variables so all shadcn components inherit AWKN's brand automatically.
  *
  * Apply via `<div className="theme-awkn">` on a domain layout. Currently used
- * by awknranch (the canonical brand), bos (admin inherits AWKN), and within
+ * by awknranch (the canonical brand), team (admin inherits AWKN), and within
  * + portal (both temporarily — Within gets its own palette in Phase 4,
  * portal switches dynamically per logged-in client in Phase 5).
  */

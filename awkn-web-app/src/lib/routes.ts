@@ -83,8 +83,8 @@ const portal: DomainRoutes = {
   ],
 };
 
-const bos: DomainRoutes = {
-  domain: "bos",
+const team: DomainRoutes = {
+  domain: "team",
   routes: [
     // Dashboard / shell
     { segment: "", label: "Dashboard", group: "Overview" },
@@ -147,7 +147,7 @@ export const ROUTES: Record<DomainKey, DomainRoutes> = {
   awknranch,
   within,
   portal,
-  bos,
+  team,
 };
 
 /** Flatten a domain's nested routes into a list of `{ path, label }` entries. */

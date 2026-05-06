@@ -7,7 +7,7 @@
  * port), don't add them — the absence is the progress signal.
  */
 
-export type PortDomain = "awknranch" | "within" | "portal" | "bos";
+export type PortDomain = "awknranch" | "within" | "portal" | "team";
 
 export interface PortedPage {
   /** Display label. */

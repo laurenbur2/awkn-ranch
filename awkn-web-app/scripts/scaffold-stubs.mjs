@@ -56,7 +56,7 @@ const ROUTES = {
     "receipts",
     "login",
   ],
-  bos: [
+  team: [
     "",
     "manage",
     "crm",

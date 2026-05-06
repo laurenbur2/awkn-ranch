@@ -6,7 +6,7 @@ import { updateSession } from "~/lib/supabase/middleware";
 /**
  * Multi-domain + auth proxy (Next 16 successor to `middleware.ts`).
  *
- * 1. Reads `host` header → maps to a domain (awknranch / within / portal / bos)
+ * 1. Reads `host` header → maps to a domain (awknranch / within / portal / team)
  *    via `resolveDomain`. Rewrites incoming path to `/<key>{pathname}` so the
  *    right route folder renders.
  * 2. For domains marked `authRequired`, checks Supabase session and redirects
@@ -61,7 +61,7 @@ export async function proxy(request: NextRequest) {
     if (!session.user && pathname !== "/login") {
       // Redirect to the clean public `/login` URL — proxy will rewrite it
       // to `/${prefix}/login` on the way in. Stay on the same hostname so
-      // the URL bar shows e.g. `bos.awknranch.com/login`, not `/bos/login`.
+      // the URL bar shows e.g. `team.awknranch.com/login`, not `/team/login`.
       const loginUrl = new URL("/login", request.url);
       return NextResponse.redirect(loginUrl);
     }

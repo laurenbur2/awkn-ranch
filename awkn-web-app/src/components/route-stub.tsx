@@ -8,7 +8,7 @@ import { flattenRoutes } from "~/lib/routes";
  * header (set by middleware) plus the `host` header to figure out which
  * domain + route is being rendered, then shows a placeholder.
  *
- * Every page.tsx in awknranch/within/portal/bos folders is just:
+ * Every page.tsx in awknranch/within/portal/team folders is just:
  *   import { RouteStub } from "~/components/route-stub";
  *   export default function Page() { return <RouteStub />; }
  */
@@ -48,7 +48,7 @@ export async function RouteStub() {
 
       <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
         Phase 2.2 stub. Real content lands when this surface gets ported in
-        its phase (3 = awknranch, 4 = within, 5 = portal, 6 = bos).
+        its phase (3 = awknranch, 4 = within, 5 = portal, 6 = team).
       </div>
 
       <DomainCrossLinks current={domainKey} />
