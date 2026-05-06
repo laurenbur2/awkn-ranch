@@ -2,1165 +2,326 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="color-scheme" content="light">
-  <title>Org Chart — Heart Space Health</title>
-  <link rel="icon" type="image/png" href="../favicon.png">
-  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Team | AWKN Ranch</title>
+  <meta name="description" content="The people who hold the land at AWKN Ranch — founders, guides, and practitioners.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/team/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/awkn/site.css">
+
   <style>
-    * { box-sizing: border-box; }
-    :root { color-scheme: light; }
-    html, body { background: #f6f5f0; color: #2a1f23; }
-    body { margin: 0; font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
-
-    .org-page { max-width: 1500px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-    .org-head { text-align: center; margin-bottom: 1.25rem; }
-    .org-head h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; margin: 0 0 0.4rem; letter-spacing: -0.01em; }
-    .org-head p  { margin: 0; color: #6b7280; font-size: 0.9rem; }
-
-    /* Toolbar */
-    .org-toolbar {
-      display: flex; gap: 0.5rem; justify-content: center; align-items: center;
-      flex-wrap: wrap; margin: 0 auto 2rem; padding: 0.7rem 1rem;
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
-      max-width: 720px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-top: 3.5rem;
     }
-    .org-toolbar-msg { font-size: 0.78rem; color: #6b7280; flex: 1 0 100%; text-align: center; }
-    .tb-btn {
-      padding: 0.45rem 0.9rem; border-radius: 8px; border: 1px solid #d1d5db;
-      background: #fff; font-family: inherit; font-size: 0.82rem; font-weight: 600; color: #374151;
-      cursor: pointer;
-    }
-    .tb-btn:hover { background: #f9fafb; }
-    .tb-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
-    .tb-btn-primary:hover { background: #b87625; }
-    .tb-btn-danger  { color: #991b1b; border-color: #fecaca; }
-    .tb-btn-danger:hover { background: #fef2f2; }
-
-    /* Canvas — gives the tree horizontal-scroll fallback when it's too wide
-       even after auto-fit zoom. Also clips the half-tint backgrounds when
-       boxes near the edges. */
-    .org-canvas {
-      overflow-x: auto;
-      overflow-y: visible;
-      padding: 0.5rem 1rem 1rem;
-      margin: 0 -1rem;
-    }
-
-    /* Tree — `zoom` is set dynamically after every render so the entire tree
-       fits within the canvas without horizontal scrolling whenever possible. */
-    .org-tree { display: flex; flex-direction: column; align-items: center; min-width: max-content; }
-    .org-down { width: 2px; height: 28px; background: #d1d5db; margin: 0 auto; flex-shrink: 0; }
-
-    .org-row {
-      display: flex; gap: 1.5rem; justify-content: center;
-      flex-wrap: nowrap; position: relative;
-      padding-top: 20px; align-items: flex-start;
-    }
-    .org-row.has-bar::before {
-      content: ""; position: absolute; top: 0;
-      left: 50%; transform: translateX(-50%);
-      width: calc(100% - 220px); height: 2px; background: #d1d5db;
-    }
-    .org-row > .org-child::before {
-      content: ""; display: block; width: 2px; height: 20px; background: #d1d5db;
-      margin: -20px auto 0;
-    }
-    .org-child { display: flex; flex-direction: column; align-items: center; gap: 0; flex: 0 0 auto; }
-    .org-single { display: flex; flex-direction: column; align-items: center; }
-
-    .org-stack { display: flex; flex-direction: column; align-items: center; gap: 0; }
-    .org-stack-item { display: flex; flex-direction: column; align-items: center; }
-    .org-stack-item + .org-stack-item { margin-top: 12px; position: relative; }
-    .org-stack-item + .org-stack-item::before {
-      content: ""; position: absolute; left: 50%; top: -12px;
-      width: 2px; height: 12px; background: #d1d5db;
-    }
-
-    /* Box */
-    .org-node {
-      background: #fff; border: 1px solid #e5e7eb;
-      border-radius: 12px; padding: 0.7rem 0.95rem;
-      min-width: 200px; max-width: 260px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    .team-card {
       text-align: center;
-      display: inline-flex; flex-direction: column; gap: 0.15rem;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      position: relative; cursor: grab;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease;
     }
-    .org-node:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); transform: translateY(-1px); }
-    .org-node:active { cursor: grabbing; }
-    .org-node.dragging { opacity: 0.45; }
-    .org-node.drop-child  { border-color: #d4883a; box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.20); transform: translateY(-1px); }
-    .org-node.drop-invalid { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important; cursor: not-allowed; }
+    .team-photo,
+    .team-avatar {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+      background: var(--cream-deep);
+      border: 4px solid var(--white);
+    }
+    .team-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 4rem;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--cream-deep) 0%, var(--cream) 100%);
+    }
+    .team-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.2rem;
+    }
+    .team-role {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .team-bio {
+      font-size: 0.9rem;
+      color: var(--grey);
+      line-height: 1.75;
+      max-width: 280px;
+    }
+    @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+    @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
 
-    /* "Drop below to make child" indicator — pulsing orange bar centered
-       under the target box, mirroring the left/right sibling-insert bars. */
-    .org-node.drop-child::after {
-      content: ""; position: absolute; left: 12%; right: 12%; bottom: -12px; height: 7px;
-      background: #d4883a; border-radius: 4px;
-      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
-      animation: dropPulse 0.9s ease-in-out infinite;
-      z-index: 5;
+    .values-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-top: 3rem;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
-    /* Sibling-insert indicators — bright orange bar on the appropriate edge
-       of the target box. Row-context = vertical bars on left/right;
-       stack-context = horizontal bars on top/bottom. The bar pulses to draw
-       attention while a drag is in progress. */
-    @keyframes dropPulse {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: 0.65; }
+    .value-item { text-align: center; }
+    .value-item .num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      color: var(--gold);
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
     }
-    .org-node.drop-before-row::before,
-    .org-node.drop-after-row::after {
-      content: ""; position: absolute; top: -10px; bottom: -10px; width: 7px;
-      background: #d4883a; border-radius: 4px;
-      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
-      animation: dropPulse 0.9s ease-in-out infinite;
-      z-index: 5;
+    .value-item h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
     }
-    .org-node.drop-before-row::before { left: -14px; }
-    .org-node.drop-after-row::after  { right: -14px; }
-
-    .org-node.drop-before-stack::before,
-    .org-node.drop-after-stack::after {
-      content: ""; position: absolute; left: -10px; right: -10px; height: 7px;
-      background: #d4883a; border-radius: 4px;
-      box-shadow: 0 0 0 3px rgba(212, 136, 58, 0.30), 0 0 14px rgba(212, 136, 58, 0.55);
-      animation: dropPulse 0.9s ease-in-out infinite;
-      z-index: 5;
-    }
-    .org-node.drop-before-stack::before { top: -12px; }
-    .org-node.drop-after-stack::after  { bottom: -12px; }
-
-    /* Faint half-tint on the box itself so it's obvious which side wins. */
-    .org-node.drop-before-row  { background-image: linear-gradient(to right,  rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
-    .org-node.drop-after-row   { background-image: linear-gradient(to left,   rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
-    .org-node.drop-before-stack{ background-image: linear-gradient(to bottom, rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
-    .org-node.drop-after-stack { background-image: linear-gradient(to top,    rgba(212, 136, 58, 0.10) 0%, rgba(212, 136, 58, 0.10) 35%, transparent 35%); }
-
-    .org-node-name { font-size: 0.95rem; font-weight: 700; color: #111827; line-height: 1.2; }
-    .org-node-person { font-size: 0.78rem; color: #4b5563; font-weight: 500; }
-    .org-node-person.empty { color: #9ca3af; font-style: italic; font-weight: 400; }
-    .org-node-tag {
-      font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-      padding: 0.18rem 0.55rem; border-radius: 999px;
-      margin-top: 0.3rem;
-    }
-
-    .org-node.is-parent     { background: #fef3e6; border-color: #d4883a; }
-    .org-node.is-parent     .org-node-tag { background: #d4883a; color: #fff; }
-    .org-node.is-person     { background: #fff; }
-    .org-node.is-person     .org-node-tag { background: #ecfdf5; color: #14532d; }
-    .org-node.is-business   { background: #f0f9ff; border-color: #0c5a85; }
-    .org-node.is-business   .org-node-tag { background: #0c5a85; color: #fff; }
-    .org-node.is-role       { background: #fafafa; border-style: dashed; min-width: 180px; }
-    .org-node.is-role       .org-node-name { font-weight: 600; color: #374151; font-size: 0.88rem; }
-
-    .org-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: #f3e6d3; color: #d4883a;
-      font-weight: 700; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 0.35rem;
-    }
-
-    /* Action buttons inside the box (revealed on hover) */
-    .org-actions {
-      position: absolute; top: 4px; right: 4px;
-      display: flex; gap: 2px; opacity: 0; transition: opacity 0.12s ease;
-    }
-    .org-node:hover .org-actions { opacity: 1; }
-    /* Hide the action chiclets while a drag is in progress so they can't
-       eat hit-test pixels at the top-right of the box during dragover. */
-    body.is-dragging .org-actions { display: none !important; }
-    .org-act-btn {
-      width: 22px; height: 22px; border-radius: 5px;
-      background: rgba(255,255,255,0.9); border: 1px solid #e5e7eb;
-      cursor: pointer; padding: 0;
-      display: flex; align-items: center; justify-content: center;
-      color: #4b5563; font-size: 12px;
-    }
-    .org-act-btn:hover { background: #fff; color: #111827; border-color: #d1d5db; }
-    .org-act-btn.danger:hover { color: #991b1b; border-color: #fecaca; background: #fef2f2; }
-    .org-act-btn svg { width: 12px; height: 12px; pointer-events: none; }
-
-    .org-foot {
-      margin-top: 3rem; text-align: center; font-size: 0.78rem; color: #9ca3af;
-    }
-    .org-foot small { display: block; margin-top: 0.4rem; opacity: 0.7; }
-
-    /* Floating hint shown during a drag */
-    .drop-hint {
-      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-      background: #2a1f23; color: #fff; padding: 0.55rem 1rem; border-radius: 999px;
-      font-size: 0.84rem; font-weight: 600;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-      pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
-      z-index: 100;
-    }
-    .drop-hint.show { opacity: 1; }
-    .drop-hint .hint-arrow { color: #fbbf24; margin: 0 0.35rem; }
-
-    /* Auth banner */
-    .auth-banner {
-      max-width: 720px; margin: 0 auto 1rem;
-      padding: 0.6rem 0.85rem; border-radius: 10px;
-      font-size: 0.82rem; display: flex; align-items: center; gap: 0.6rem; justify-content: center;
-      flex-wrap: wrap;
-    }
-    .auth-banner.signed-in { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    .auth-banner.anon      { background: #fef3c7; color: #78350f; border: 1px solid #fde68a; }
-    .auth-banner a { color: inherit; font-weight: 700; text-decoration: underline; }
-
-    /* Read-only state for unauthenticated viewers */
-    .read-only .org-actions { display: none !important; }
-    .read-only .org-toolbar .tb-btn:not(#btnExport) { opacity: 0.45; pointer-events: none; }
-    .read-only .org-node { cursor: default !important; }
-
-    /* Save status pill */
-    .save-status {
-      font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px;
-      margin-left: 0.5rem; font-weight: 600;
-    }
-    .save-status.saving { background: #fef3c7; color: #78350f; }
-    .save-status.saved  { background: #ecfdf5; color: #065f46; }
-    .save-status.error  { background: #fef2f2; color: #991b1b; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 50;
-      background: rgba(20, 20, 20, 0.45);
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem;
-    }
-    .modal-overlay.hidden { display: none; }
-    .modal {
-      background: #fff; border-radius: 14px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-      width: 100%; max-width: 460px; max-height: calc(100vh - 2rem);
-      display: flex; flex-direction: column;
-    }
-    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; }
-    .modal-title { font-size: 1.05rem; font-weight: 700; color: #111827; }
-    .modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; }
-    .modal-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; }
-    .modal-foot { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6; }
-    .modal-field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .modal-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6b7280; }
-    .modal-help  { font-size: 0.72rem; color: #9ca3af; margin-top: -0.15rem; }
-    .modal-field input, .modal-field select {
-      padding: 0.55rem 0.7rem; border: 1px solid #d1d5db; border-radius: 8px;
-      font-family: inherit; font-size: 0.9rem; background: #fff;
-    }
-    .modal-field input:focus, .modal-field select:focus { outline: 2px solid #d4883a; outline-offset: -1px; border-color: #d4883a; }
-
-    @media (max-width: 1100px) {
-      .org-row { flex-wrap: wrap; gap: 1.25rem; }
-    }
-    @media (max-width: 760px) {
-      .org-row { flex-direction: column; align-items: center; gap: 0.6rem; }
-      .org-row.has-bar::before { display: none; }
-      .org-row > .org-child::before { display: none; }
-      .org-stack-item + .org-stack-item { margin-top: 8px; }
-      .org-down { height: 18px; }
-      .org-page { padding: 1.5rem 1rem 3rem; }
-      .org-actions { opacity: 1; } /* always show on touch */
-    }
-
-    @media print {
-      body { background: #fff; }
-      .org-toolbar, .org-actions, .org-foot small { display: none; }
-    }
+    .value-item p { font-size: 0.92rem; color: var(--grey); line-height: 1.75; }
+    @media (max-width: 800px) { .values-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="org-page">
-    <div class="org-head">
-      <h1>Heart Space Health</h1>
-      <p>Org chart across operating businesses.</p>
-    </div>
 
-    <div class="auth-banner" id="authBanner" style="display:none;"></div>
-
-    <div class="org-toolbar">
-      <button class="tb-btn tb-btn-primary" id="btnAddRoot">+ Add Top-Level Position</button>
-      <button class="tb-btn" id="btnUndo" disabled title="Nothing to undo">↶ Undo</button>
-      <button class="tb-btn" id="btnExport">Export JSON</button>
-      <button class="tb-btn" id="btnImport">Import JSON</button>
-      <button class="tb-btn tb-btn-danger" id="btnReset">Reset to Default</button>
-      <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
-      <div class="org-toolbar-msg">Hover any box for actions · Drag a position onto another · Drop in the middle/bottom = report · Top edge = peer above · Left/right edge = peer beside · ⌘Z / Ctrl-Z to undo</div>
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
     </div>
-    <div id="dropHint" class="drop-hint" aria-live="polite"></div>
-
-    <div class="org-canvas" id="orgCanvas">
-      <div class="org-tree" id="orgTree"></div>
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="/contact/" class="secondary-cta">Contact</a>
+      <a href="/book/">Book Your Stay</a>
     </div>
+  </nav>
 
-    <div class="org-foot">
-      <span id="lastSaved">Loading…</span><span id="saveStatus" class="save-status" style="display:none;"></span>
-      <small>Saved to a shared Supabase database. Two editors see each other's changes live.</small>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="/" data-menu-link>Home</a></li>
+      <li><a href="/property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="/book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="/host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="/events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="/services/" data-menu-link>Our Services</a></li>
+      <li><a href="/team/" class="current" data-menu-link>Our Team</a></li>
+      <li><a href="/contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/assets/awkn/sunflower-group.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Our Team</span>
+      <h1>The people who <em>hold the land</em>.</h1>
+      <span class="page-hero-tagline">Founders, guides, practitioners, and the live-in family that keeps AWKN open.</span>
     </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="bg-cream">
+    <div class="intro-block">
+      <div class="s-eyebrow">Who We Are</div>
+      <h2 class="s-title">A small team, <em>by intention</em>.</h2>
+      <p class="s-desc centered">AWKN Ranch is run by a tight group of founders, resident practitioners, and visiting facilitators. Most of us live on the land or close to it. Most of us have come to this work through our own healing.</p>
+    </div>
+  </section>
+
+  <!-- FOUNDERS -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Founders</div>
+        <h2 class="s-title">The people who <em>started this</em></h2>
+      </div>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-avatar">J</div>
+          <div class="team-name">Justin</div>
+          <div class="team-role">Co-Founder</div>
+          <div class="team-bio">Founder of AWKN Ranch and Within Center. Came to this work through his own journey; built the ranch into the container he wished he'd found.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">H</div>
+          <div class="team-name">Heather Hoover</div>
+          <div class="team-role">Co-Founder &amp; Guide</div>
+          <div class="team-bio">Holds the day-to-day on the land. Trained in somatic practice, breathwork, and ceremonial space-holding. Likely the first person you'll meet when you arrive.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">L</div>
+          <div class="team-name">Lauren</div>
+          <div class="team-role">Operations</div>
+          <div class="team-bio">Runs the systems that keep AWKN running &mdash; bookings, the kitchen, the books. The reason your retreat starts on time.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTITIONERS -->
+  <section class="bg-cream-deep">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Resident Practitioners</div>
+        <h2 class="s-title">The people who <em>hold sessions</em></h2>
+        <p class="s-desc centered">Resident practitioners rotate seasonally; below is a snapshot of who's currently on the land. Visiting facilitators join us throughout the year for retreats and workshops.</p>
+      </div>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-avatar">M</div>
+          <div class="team-name">Mayra</div>
+          <div class="team-role">Bodywork</div>
+          <div class="team-bio">Somatic-experiencing-trained massage therapist. Specializes in nervous-system-aware deep tissue and trauma-informed touch.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">K</div>
+          <div class="team-name">Kama</div>
+          <div class="team-role">Yoga &amp; Movement</div>
+          <div class="team-bio">Lead movement teacher. Roots in vinyasa, yin, and feminine somatic practice. Daily classes 7am and 5pm.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">S</div>
+          <div class="team-name">Sound Practitioner</div>
+          <div class="team-role">Sound Healing</div>
+          <div class="team-bio">Holds our weekly sound bath in the temple. Crystal bowls, gongs, voice. Bring a blanket.</div>
+        </div>
+
+      </div>
+      <div style="text-align: center; margin-top: 3rem;">
+        <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; color: var(--grey); font-size: 1.05rem;">More headshots and bios coming soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="bg-cream">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">How We Work</div>
+        <h2 class="s-title">A few <em>commitments</em></h2>
+      </div>
+      <div class="values-row">
+        <div class="value-item">
+          <div class="num">01</div>
+          <h3>Slow on Purpose</h3>
+          <p>We will not rush you. The schedule has space; the practitioners have presence; the land has time.</p>
+        </div>
+        <div class="value-item">
+          <div class="num">02</div>
+          <h3>No Performance</h3>
+          <p>You don't need to arrive ready, photogenic, or healed. The point of coming here is the part you can't post.</p>
+        </div>
+        <div class="value-item">
+          <div class="num">03</div>
+          <h3>Real Practitioners</h3>
+          <p>Every offering is held by a trained, human practitioner &mdash; never auto-played. The medicine is in the relationship.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN US -->
+  <section class="bg-cream-deep">
+    <div class="intro-block">
+      <div class="s-eyebrow">Join the Team</div>
+      <h2 class="s-title">Looking for <em>practitioners and care staff</em>.</h2>
+      <p class="s-desc centered">If you teach, hold ceremony, cook for groups, or care for a property &mdash; and the words on this site resonate &mdash; we'd love to hear from you. We hire slowly and on relationship.</p>
+      <div style="margin-top: 2rem;">
+        <a href="/contact/" class="btn btn-gold">Reach Out</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="cta-section">
+    <h2>Want to <em>meet us</em>?</h2>
+    <p>The easiest way to get a sense of the team is to come for a day. Sauna, a class, lunch on the porch.</p>
+    <a href="/book/" class="btn btn-gold">Book a Day Visit</a>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="/within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="/property/">Property</a>
+    <a href="/book/">Book</a>
+    <a href="/host-a-retreat/">Host</a>
+    <a href="/events/">Events</a>
+    <a href="/services/">Services</a>
+    <a href="/team/">Team</a>
   </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="/within-center/">Within Center</a>.</p>
+  </footer>
 
-  <!-- Edit modal -->
-  <div class="modal-overlay hidden" id="editModal">
-    <div class="modal">
-      <div class="modal-head">
-        <span class="modal-title" id="modalTitle">Edit Position</span>
-        <button class="modal-close" id="modalClose">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-field">
-          <span class="modal-label">Position / Title</span>
-          <input type="text" id="fieldName" placeholder="e.g. Marketing Lead">
-        </div>
-        <div class="modal-field">
-          <span class="modal-label">Person Assigned <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
-          <input type="text" id="fieldPerson" placeholder="e.g. Jane Smith">
-        </div>
-        <div class="modal-field">
-          <span class="modal-label">Type</span>
-          <select id="fieldKind">
-            <option value="parent">Parent Company</option>
-            <option value="person">Person (Owner / Director / Manager)</option>
-            <option value="business">Business / Department</option>
-            <option value="role">Role / Position</option>
-          </select>
-        </div>
-        <div class="modal-field">
-          <span class="modal-label">Tag <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional pill, e.g. "Parent Company")</span></span>
-          <input type="text" id="fieldTag" placeholder="">
-        </div>
-        <div class="modal-field" id="layoutWrap">
-          <span class="modal-label">Children Layout</span>
-          <select id="fieldLayout">
-            <option value="stack">Stacked vertically</option>
-            <option value="row">Side-by-side row</option>
-          </select>
-          <span class="modal-help">Only matters when this position has 2+ children.</span>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="tb-btn" id="modalCancel">Cancel</button>
-        <button class="tb-btn tb-btn-primary" id="modalSave">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
   <script>
-  // =========================================================================
-  // SUPABASE — shared client. Uses the same auth storage key as the rest of
-  // the awkn-ranch portal so a logged-in session is automatically inherited.
-  // =========================================================================
-  const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      storage: window.localStorage,
-      storageKey: 'awkn-ranch-auth',
-      flowType: 'pkce',
-    },
-  });
-
-  // =========================================================================
-  // DEFAULT ORG (used to seed an empty DB or when Reset is clicked)
-  // =========================================================================
-  const DEFAULT_ORG = {
-    kind: 'parent', name: 'Heart Space Health', tag: 'Parent Company',
-    children: [{
-      kind: 'person', name: 'William Naylor', role: 'Owner / Founder',
-      children: [{
-        kind: 'person', name: 'Justin DeLaCruz', role: 'Executive Director',
-        layout: 'row',
-        children: [
-          { kind: 'business', name: 'AWKN Venue Rental', children: [
-            { kind: 'role', name: 'Sales / Event Coordinator' },
-            { kind: 'role', name: 'Marketing' },
-            { kind: 'role', name: 'Cleaning Crew' },
-          ]},
-          { kind: 'business', name: 'AWKN Retreat House', children: [
-            { kind: 'role', name: 'Sales Team' },
-            { kind: 'role', name: 'Guest Experience' },
-            { kind: 'role', name: 'Guides / Coaches' },
-            { kind: 'role', name: 'Maintenance / Housekeeping' },
-          ]},
-          { kind: 'business', name: 'Within Center', children: [{
-            kind: 'role', name: 'Medical Director', layout: 'row',
-            children: [
-              { kind: 'role', name: 'Psych NP' },
-              { kind: 'role', name: 'RN / IV Nurse' },
-            ],
-          }]},
-        ],
-      }],
-    }],
-  };
-
-  // =========================================================================
-  // STATE
-  // =========================================================================
-  let ORG = JSON.parse(JSON.stringify(DEFAULT_ORG));
-  ensureIds(ORG);
-  let editingId = null;     // node currently in the edit modal
-  let dragId = null;        // node currently being dragged
-  let isAuthed = false;     // whether the current session can write
-  let authedEmail = null;
-  let saveTimer = null;     // debounce timer
-  let lastSavedHash = null; // skip realtime echoes of our own writes
-  let undoStack = [];       // JSON snapshots of ORG before each local mutation
-  const UNDO_MAX = 80;
-
-  // -- Supabase persistence --------------------------------------------------
-  async function loadFromDb() {
-    const { data, error } = await sb
-      .from('org_chart_state')
-      .select('chart_data, updated_at, updated_by_email')
-      .eq('id', 'main')
-      .single();
-    if (error) {
-      console.warn('[org-chart] load failed:', error);
-      setStatus('error', 'Load failed');
-      return;
-    }
-    const remote = data?.chart_data;
-    if (!remote || !remote.name) {
-      // Empty DB — seed with the default and write back. Only authed users
-      // can write, so this only happens once for the first authed visitor.
-      if (isAuthed) {
-        ORG = JSON.parse(JSON.stringify(DEFAULT_ORG));
-        ensureIds(ORG);
-        await pushToDb();
-      } else {
-        ORG = JSON.parse(JSON.stringify(DEFAULT_ORG));
-        ensureIds(ORG);
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
       }
-    } else {
-      ORG = remote;
-      ensureIds(ORG);
-    }
-    lastSavedHash = JSON.stringify(ORG);
-    if (data?.updated_at) {
-      const ts = new Date(data.updated_at).toLocaleString();
-      const who = data.updated_by_email ? ` by ${data.updated_by_email}` : '';
-      document.getElementById('lastSaved').textContent = `Last saved: ${ts}${who}`;
-    }
-  }
-
-  async function pushToDb() {
-    if (!isAuthed) {
-      setStatus('error', 'Sign in to edit');
-      return;
-    }
-    setStatus('saving', 'Saving…');
-    const { error } = await sb
-      .from('org_chart_state')
-      .update({
-        chart_data: ORG,
-        updated_at: new Date().toISOString(),
-        updated_by_email: authedEmail || null,
-      })
-      .eq('id', 'main');
-    if (error) {
-      console.warn('[org-chart] save failed:', error);
-      setStatus('error', error.message || 'Save failed');
-      return;
-    }
-    lastSavedHash = JSON.stringify(ORG);
-    setStatus('saved', 'Saved');
-    const ts = new Date().toLocaleString();
-    const who = authedEmail ? ` by ${authedEmail}` : '';
-    document.getElementById('lastSaved').textContent = `Last saved: ${ts}${who}`;
-    setTimeout(() => setStatus(null), 1800);
-  }
-
-  // Mutations call this after editing the in-memory tree.
-  // Debounced so a flurry of edits collapses into one DB write.
-  function save() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => { pushToDb(); }, 250);
-  }
-
-  // Push current state onto the undo stack BEFORE applying a mutation.
-  // Realtime updates from other users do NOT push (that would let me
-  // undo their changes). Also drops the oldest entries past UNDO_MAX.
-  function pushUndo() {
-    undoStack.push(JSON.stringify(ORG));
-    if (undoStack.length > UNDO_MAX) undoStack.shift();
-    refreshUndoButton();
-  }
-  function undo() {
-    if (!isAuthed) { alert('Sign in to edit.'); return; }
-    if (undoStack.length === 0) return;
-    const prev = undoStack.pop();
-    try {
-      const parsed = JSON.parse(prev);
-      ORG = parsed;
-      ensureIds(ORG);
-      save();
-      render();
-      refreshUndoButton();
-    } catch (e) {
-      console.warn('[org-chart] undo parse failed:', e);
-    }
-  }
-  function refreshUndoButton() {
-    const btn = document.getElementById('btnUndo');
-    if (!btn) return;
-    btn.disabled = undoStack.length === 0;
-    btn.title = undoStack.length === 0
-      ? 'Nothing to undo'
-      : `Undo last change (${undoStack.length} step${undoStack.length === 1 ? '' : 's'} available)`;
-  }
-
-  function setStatus(kind, msg) {
-    const el = document.getElementById('saveStatus');
-    if (!el) return;
-    el.className = 'save-status' + (kind ? ' ' + kind : '');
-    el.textContent = msg || '';
-    el.style.display = msg ? '' : 'none';
-  }
-
-  // -- Realtime subscription -------------------------------------------------
-  function subscribeRealtime() {
-    sb.channel('org_chart_state_main')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'org_chart_state',
-        filter: 'id=eq.main',
-      }, (payload) => {
-        const incoming = payload?.new?.chart_data;
-        if (!incoming || !incoming.name) return;
-        const incomingHash = JSON.stringify(incoming);
-        if (incomingHash === lastSavedHash) return; // our own write
-        ORG = incoming;
-        ensureIds(ORG);
-        lastSavedHash = incomingHash;
-        render();
-        const ts = new Date().toLocaleString();
-        const who = payload.new.updated_by_email ? ` by ${payload.new.updated_by_email}` : '';
-        document.getElementById('lastSaved').textContent = `Last saved: ${ts}${who}`;
-        setStatus('saved', 'Synced');
-        setTimeout(() => setStatus(null), 1500);
-      })
-      .subscribe();
-  }
-
-  // -- Auth gating -----------------------------------------------------------
-  function applyAuthState(session) {
-    isAuthed = !!session?.user;
-    authedEmail = session?.user?.email || null;
-    document.body.classList.toggle('read-only', !isAuthed);
-
-    const banner = document.getElementById('authBanner');
-    banner.style.display = '';
-    if (isAuthed) {
-      banner.className = 'auth-banner signed-in';
-      banner.innerHTML = `Signed in as <strong>${esc(authedEmail || 'team member')}</strong> — your edits sync to everyone in real time.`;
-    } else {
-      const here = encodeURIComponent(window.location.pathname);
-      banner.className = 'auth-banner anon';
-      banner.innerHTML = `You're viewing read-only. <a href="/awkn-ranch/login/?redirect=${here}">Sign in</a> to edit and sync changes to the team.`;
-    }
-  }
-
-  function ensureIds(node) {
-    if (!node.id) node.id = newId();
-    (node.children || []).forEach(ensureIds);
-  }
-
-  function newId() {
-    return 'n' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-  }
-
-  // =========================================================================
-  // TREE OPERATIONS
-  // =========================================================================
-  function findNode(id, node = ORG) {
-    if (node.id === id) return node;
-    for (const c of node.children || []) {
-      const f = findNode(id, c);
-      if (f) return f;
-    }
-    return null;
-  }
-
-  function findParent(id, node = ORG, parent = null) {
-    if (node.id === id) return parent;
-    for (const c of node.children || []) {
-      const f = findParent(id, c, node);
-      if (f !== null) return f;
-    }
-    return null;
-  }
-
-  function isDescendant(ancestorId, candidateId) {
-    const a = findNode(ancestorId);
-    if (!a) return false;
-    return !!findNode(candidateId, a) && ancestorId !== candidateId;
-  }
-
-  function removeNode(id) {
-    const parent = findParent(id);
-    if (!parent) return null; // root can't be removed
-    const idx = (parent.children || []).findIndex(c => c.id === id);
-    if (idx === -1) return null;
-    return parent.children.splice(idx, 1)[0];
-  }
-
-  function addChild(parentId, child) {
-    const parent = findNode(parentId);
-    if (!parent) return false;
-    parent.children = parent.children || [];
-    parent.children.push(child);
-    return true;
-  }
-
-  function moveNode(draggedId, newParentId) {
-    if (draggedId === newParentId) return false;
-    if (isDescendant(draggedId, newParentId)) return false; // cycle guard
-    if (draggedId === ORG.id) return false; // can't move root
-    const removed = removeNode(draggedId);
-    if (!removed) return false;
-    return addChild(newParentId, removed);
-  }
-
-  // Insert dragged node as a sibling of target (same level) at position
-  // before/after target. Optional `orientation` ('row' | 'stack') updates
-  // the target's parent layout so the resulting arrangement actually
-  // displays the way the user dropped — drop on left/right edges sets
-  // parent.layout = 'row' (siblings go side-by-side); top edge sets it
-  // back to stack. Without an orientation, layout stays as-is.
-  function moveAsSibling(draggedId, targetId, before, orientation) {
-    if (draggedId === targetId) return false;
-    if (isDescendant(draggedId, targetId)) return false;
-    if (draggedId === ORG.id) return false;
-    if (targetId === ORG.id) return false; // root has no siblings
-
-    const targetParent = findParent(targetId);
-    if (!targetParent) return false;
-    const draggedParent = findParent(draggedId);
-    if (!draggedParent) return false;
-
-    const draggedIdx = draggedParent.children.findIndex(c => c.id === draggedId);
-    if (draggedIdx === -1) return false;
-    const removed = draggedParent.children.splice(draggedIdx, 1)[0];
-
-    // If we just removed from the same parent at a lower index than target,
-    // target's index shifted down by 1.
-    let targetIdx = targetParent.children.findIndex(c => c.id === targetId);
-    if (targetIdx === -1) {
-      // Shouldn't happen; restore for safety
-      draggedParent.children.splice(draggedIdx, 0, removed);
-      return false;
-    }
-    targetParent.children.splice(before ? targetIdx : targetIdx + 1, 0, removed);
-
-    if (orientation === 'row') targetParent.layout = 'row';
-    else if (orientation === 'stack') delete targetParent.layout;
-    return true;
-  }
-
-  // =========================================================================
-  // RENDER
-  // =========================================================================
-  function render() {
-    const root = document.getElementById('orgTree');
-    root.innerHTML = renderNode(ORG);
-    // Make sure no leftover zoom from earlier sessions is on the tree —
-    // CSS zoom desyncs hit-testing with the cursor in Safari and was
-    // routing drops to the wrong drop zone.
-    root.style.zoom = '';
-    root.style.transform = '';
-    bindNodeEvents();
-  }
-
-  function renderNode(n) {
-    const box = renderBox(n);
-    const kids = n.children || [];
-    if (kids.length === 0) return box;
-    if (kids.length === 1) {
-      return `<div class="org-single">${box}<div class="org-down"></div>${renderNode(kids[0])}</div>`;
-    }
-    if (n.layout === 'row') {
-      return `<div class="org-single">${box}<div class="org-down"></div>
-        <div class="org-row has-bar">
-          ${kids.map(c => `<div class="org-child">${renderNode(c)}</div>`).join('')}
-        </div></div>`;
-    }
-    return `<div class="org-single">${box}<div class="org-down"></div>
-      <div class="org-stack">
-        ${kids.map(c => `<div class="org-stack-item">${renderNode(c)}</div>`).join('')}
-      </div></div>`;
-  }
-
-  function renderBox(n) {
-    const kind = n.kind || 'role';
-    const tag = n.tag ? `<span class="org-node-tag">${esc(n.tag)}</span>` : '';
-    // For person nodes the name is the person and `role` is the title.
-    // For other nodes the person line shows below the name when set.
-    let personLine = '';
-    if (kind === 'person') {
-      // name = person's name, role = title
-      personLine = n.role ? `<span class="org-node-person">${esc(n.role)}</span>` : '';
-    } else if (n.person) {
-      personLine = `<span class="org-node-person">${esc(n.person)}</span>`;
-    } else if (kind === 'role' || kind === 'business') {
-      personLine = `<span class="org-node-person empty">— vacant —</span>`;
-    }
-    const avatarSource = (kind === 'person') ? n.name : n.person;
-    const avatar = avatarSource
-      ? `<span class="org-avatar">${initials(avatarSource)}</span>`
-      : '';
-    const isRoot = n === ORG;
-    const childCount = (n.children || []).length;
-    const isRow = n.layout === 'row';
-    // Layout toggle is only meaningful when this box has 2+ children — with
-    // a single child or none, row vs stack is visually identical.
-    const layoutBtn = childCount >= 2
-      ? `<button class="org-act-btn" data-action="layout" title="${isRow ? 'Switch reports to a stacked column' : 'Switch reports to a side-by-side row'}">${isRow ? ICON_TO_STACK : ICON_TO_ROW}</button>`
-      : '';
-    return `
-      <div class="org-node is-${kind}" data-id="${n.id}" draggable="${isRoot ? 'false' : 'true'}">
-        ${avatar}
-        <span class="org-node-name">${esc(n.name)}</span>
-        ${personLine}
-        ${tag}
-        <div class="org-actions" data-id="${n.id}">
-          <button class="org-act-btn" data-action="edit" title="Edit">${ICON_EDIT}</button>
-          <button class="org-act-btn" data-action="add" title="Add a direct report">${ICON_PLUS}</button>
-          ${layoutBtn}
-          ${isRoot ? '' : `<button class="org-act-btn danger" data-action="delete" title="Remove">${ICON_X}</button>`}
-        </div>
-      </div>
-    `;
-  }
-
-  // Determine which drop zone the cursor is in. Five outcomes:
-  //   'child'        — drop below or in the center → become target's report
-  //   'before-stack' — top of target → place above as a peer (stack layout)
-  //   'before-row'   — left of target → place beside as a peer (row layout)
-  //   'after-row'    — right of target → place beside as a peer (row layout)
-  // Row drops set parent.layout = 'row' so the new arrangement actually
-  // renders side-by-side; stack drops set parent.layout = stack.
-  function getDropZone(e, box) {
-    // Root has no siblings — only "child" is meaningful.
-    if (box.dataset.id === ORG.id) return 'child';
-
-    const parent = findParent(box.dataset.id);
-    if (!parent) return 'child';
-
-    const rect = box.getBoundingClientRect();
-    const xPct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const yPct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-
-    // Four regions per box, regardless of the parent's current layout —
-    // each maps to a clear, predictable result:
-    //
-    //   ┌─────────────────┐
-    //   │       TOP       │  → place above (peer)
-    //   │ LEFT  ·  RIGHT  │  → place beside (peer)   ← parent flips to row
-    //   │      BOTTOM     │  → place below (child)
-    //   └─────────────────┘
-    //
-    // "Beside" requires the parent to be a row, so dropping on left/right
-    // sets parent.layout = 'row'. Use the layout toggle button on the
-    // parent to flip back to a stack if needed.
-    if (yPct < 0.20) return 'before-stack';
-    if (yPct > 0.65) return 'child';
-    // Middle vertical band — left/right edges are peer-beside, center is child.
-    if (xPct < 0.28) return 'before-row';
-    if (xPct > 0.72) return 'after-row';
-    return 'child';
-  }
-
-  function clearDropClasses() {
-    document.querySelectorAll('.org-node').forEach(n => {
-      n.classList.remove('drop-child', 'drop-invalid', 'drop-before-row', 'drop-after-row', 'drop-before-stack', 'drop-after-stack');
-    });
-  }
-
-  function updateDropHint(kind, target) {
-    const el = document.getElementById('dropHint');
-    if (!el) return;
-    const dragged = findNode(dragId);
-    const dragName = dragged ? esc(dragged.name) : 'this';
-    const tgtName  = target ? esc(target.name) : '?';
-    let html = '';
-    if (kind === 'invalid') {
-      html = `Can't drop <strong>${dragName}</strong> into its own subtree`;
-      el.style.background = '#7f1d1d';
-    } else if (kind === 'child') {
-      html = `<strong>${dragName}</strong> reports to <strong>${tgtName}</strong>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'before') {       // legacy compat (unused after this commit)
-      html = `Insert <strong>${dragName}</strong> before <strong>${tgtName}</strong>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'after') {        // legacy compat (unused after this commit)
-      html = `Insert <strong>${dragName}</strong> after <strong>${tgtName}</strong>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'before-row') {
-      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">←</span> to the left of <strong>${tgtName}</strong>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'after-row') {
-      html = `Insert <strong>${dragName}</strong> to the right of <strong>${tgtName}</strong> <span class="hint-arrow">→</span>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'before-stack') {
-      html = `Insert <strong>${dragName}</strong> <span class="hint-arrow">↑</span> above <strong>${tgtName}</strong>`;
-      el.style.background = '#2a1f23';
-    } else if (kind === 'after-stack') {
-      html = `Insert <strong>${dragName}</strong> below <strong>${tgtName}</strong> <span class="hint-arrow">↓</span>`;
-      el.style.background = '#2a1f23';
-    }
-    el.innerHTML = html;
-    el.classList.add('show');
-  }
-  function hideDropHint() {
-    const el = document.getElementById('dropHint');
-    if (el) el.classList.remove('show');
-  }
-
-  // SVG icons (kept inline so the file stays standalone)
-  const ICON_EDIT     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4z"/></svg>';
-  const ICON_PLUS     = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-  const ICON_X        = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>';
-  // Click → switch children to a horizontal row (3 vertical bars).
-  const ICON_TO_ROW   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4"  y="6" width="4" height="12" rx="1"/><rect x="10" y="6" width="4" height="12" rx="1"/><rect x="16" y="6" width="4" height="12" rx="1"/></svg>';
-  // Click → switch children to a stacked column (3 horizontal bars).
-  const ICON_TO_STACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="4"  width="12" height="4" rx="1"/><rect x="6" y="10" width="12" height="4" rx="1"/><rect x="6" y="16" width="12" height="4" rx="1"/></svg>';
-
-  function bindNodeEvents() {
-    // Action buttons
-    document.querySelectorAll('.org-act-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.closest('.org-actions').dataset.id;
-        const action = btn.dataset.action;
-        if (action === 'edit') openEditModal(id);
-        else if (action === 'add') addChildAction(id);
-        else if (action === 'delete') deleteAction(id);
-        else if (action === 'layout') toggleLayoutAction(id);
-      });
-    });
-
-    // Whole-box click → edit (ignored if click was on an action button via stopPropagation above)
-    document.querySelectorAll('.org-node').forEach(box => {
-      box.addEventListener('click', (e) => {
-        if (e.target.closest('.org-act-btn')) return;
-        if (e.target.closest('.org-node') === box) openEditModal(box.dataset.id);
-      });
-
-      // Drag & drop
-      box.addEventListener('dragstart', (e) => {
-        if (box.getAttribute('draggable') !== 'true') { e.preventDefault(); return; }
-        dragId = box.dataset.id;
-        box.classList.add('dragging');
-        document.body.classList.add('is-dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        try { e.dataTransfer.setData('text/plain', dragId); } catch (e) {}
-      });
-      box.addEventListener('dragend', () => {
-        box.classList.remove('dragging');
-        document.body.classList.remove('is-dragging');
-        clearDropClasses();
-        hideDropHint();
-        dragId = null;
-      });
-      box.addEventListener('dragover', (e) => {
-        if (!dragId || dragId === box.dataset.id) return;
-        e.preventDefault();
-        const valid = !isDescendant(dragId, box.dataset.id) && dragId !== box.dataset.id;
-        const zone = valid ? getDropZone(e, box) : null;
-        e.dataTransfer.dropEffect = valid ? 'move' : 'none';
-        clearDropClasses();
-        if (!valid) {
-          box.classList.add('drop-invalid');
-          updateDropHint('invalid', findNode(box.dataset.id));
-          return;
-        }
-        const target = findNode(box.dataset.id);
-        const cls = {
-          'child':        'drop-child',
-          'before-row':   'drop-before-row',
-          'after-row':    'drop-after-row',
-          'before-stack': 'drop-before-stack',
-          'after-stack':  'drop-after-stack',
-        }[zone] || 'drop-child';
-        box.classList.add(cls);
-        updateDropHint(zone, target);
-      });
-      box.addEventListener('dragleave', () => {
-        // Don't clear here — dragover on adjacent boxes will refresh classes.
-        // Only clear when the drag actually ends.
-      });
-      box.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const targetId = box.dataset.id;
-        const zone = getDropZone(e, box);
-        clearDropClasses();
-        if (!dragId || dragId === targetId) return;
-        const valid = !isDescendant(dragId, targetId) && dragId !== targetId;
-        if (!valid) return;
-
-        let ok = false;
-        if (zone === 'before-row') {
-          pushUndo();
-          ok = moveAsSibling(dragId, targetId, true, 'row');
-        } else if (zone === 'after-row') {
-          pushUndo();
-          ok = moveAsSibling(dragId, targetId, false, 'row');
-        } else if (zone === 'before-stack') {
-          pushUndo();
-          ok = moveAsSibling(dragId, targetId, true, 'stack');
-        } else if (zone === 'after-stack') {
-          pushUndo();
-          ok = moveAsSibling(dragId, targetId, false, 'stack');
-        } else {
-          pushUndo();
-          ok = moveNode(dragId, targetId);
-        }
-        if (!ok) undoStack.pop();    // mutation didn't actually change anything
-        if (ok) {
-          save();
-          render();
-        }
-      });
-    });
-  }
-
-  // =========================================================================
-  // ACTIONS
-  // =========================================================================
-  function addChildAction(parentId) {
-    pushUndo();
-    const child = { id: newId(), kind: 'role', name: 'New Position' };
-    if (addChild(parentId, child)) {
-      save();
-      render();
-      // Open the edit modal for the new child immediately so it can be named.
-      openEditModal(child.id);
-    } else {
-      undoStack.pop();
-    }
-  }
-
-  function deleteAction(id) {
-    const node = findNode(id);
-    if (!node) return;
-    const subtreeCount = countDescendants(node);
-    const msg = subtreeCount > 0
-      ? `Remove "${node.name}" and ${subtreeCount} position${subtreeCount === 1 ? '' : 's'} reporting under it?`
-      : `Remove "${node.name}"?`;
-    if (!confirm(msg)) return;
-    pushUndo();
-    removeNode(id);
-    save();
-    render();
-  }
-
-  function countDescendants(node) {
-    return (node.children || []).reduce((n, c) => n + 1 + countDescendants(c), 0);
-  }
-
-  // Toggle this position's children between stacked-column and side-by-side
-  // row. Only mutates THIS node's `layout` property — siblings of this node
-  // are unaffected.
-  function toggleLayoutAction(id) {
-    const node = findNode(id);
-    if (!node) return;
-    if (!isAuthed) { alert('Sign in to edit.'); return; }
-    pushUndo();
-    if (node.layout === 'row') delete node.layout;
-    else node.layout = 'row';
-    save();
-    render();
-  }
-
-  // =========================================================================
-  // EDIT MODAL
-  // =========================================================================
-  const modal       = document.getElementById('editModal');
-  const fieldName   = document.getElementById('fieldName');
-  const fieldPerson = document.getElementById('fieldPerson');
-  const fieldKind   = document.getElementById('fieldKind');
-  const fieldTag    = document.getElementById('fieldTag');
-  const fieldLayout = document.getElementById('fieldLayout');
-  const layoutWrap  = document.getElementById('layoutWrap');
-
-  function openEditModal(id) {
-    const n = findNode(id);
-    if (!n) return;
-    editingId = id;
-
-    // For persons, the "name" stored is the person's name and `role` is the title.
-    // For everything else, `name` is the position/title and `person` (optional) is who's in it.
-    if (n.kind === 'person') {
-      fieldName.value   = n.role || '';
-      fieldPerson.value = n.name || '';
-    } else {
-      fieldName.value   = n.name || '';
-      fieldPerson.value = n.person || '';
-    }
-    fieldKind.value   = n.kind || 'role';
-    fieldTag.value    = n.tag || '';
-    fieldLayout.value = n.layout === 'row' ? 'row' : 'stack';
-
-    layoutWrap.style.display = (n.children && n.children.length >= 2) ? '' : 'none';
-
-    document.getElementById('modalTitle').textContent = 'Edit Position';
-    modal.classList.remove('hidden');
-    setTimeout(() => fieldName.focus(), 30);
-  }
-
-  function closeEditModal() {
-    modal.classList.add('hidden');
-    editingId = null;
-  }
-
-  document.getElementById('modalClose').addEventListener('click', closeEditModal);
-  document.getElementById('modalCancel').addEventListener('click', closeEditModal);
-  modal.addEventListener('click', (e) => { if (e.target === modal) closeEditModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (!modal.classList.contains('hidden') && e.key === 'Escape') closeEditModal();
-  });
-
-  document.getElementById('modalSave').addEventListener('click', () => {
-    if (!editingId) return;
-    const n = findNode(editingId);
-    if (!n) return;
-    const newKind = fieldKind.value || 'role';
-    const titleVal = fieldName.value.trim();
-    const personVal = fieldPerson.value.trim();
-    if (!titleVal) { alert('Position name is required.'); return; }
-
-    pushUndo();
-    n.kind = newKind;
-    n.tag = fieldTag.value.trim() || undefined;
-    n.layout = fieldLayout.value === 'row' ? 'row' : undefined;
-
-    if (newKind === 'person') {
-      // Persons store the human's name as `name`, the title as `role`.
-      n.role = titleVal;
-      n.name = personVal || titleVal;
-      delete n.person;
-    } else {
-      n.name = titleVal;
-      n.person = personVal || undefined;
-      delete n.role;
-    }
-
-    save();
-    render();
-    closeEditModal();
-  });
-
-  // =========================================================================
-  // TOOLBAR
-  // =========================================================================
-  document.getElementById('btnAddRoot').addEventListener('click', () => {
-    addChildAction(ORG.id);
-  });
-
-  document.getElementById('btnReset').addEventListener('click', () => {
-    if (!isAuthed) { alert('Sign in to edit.'); return; }
-    if (!confirm('Reset to the default org chart? This is shared — everyone will see the reset.')) return;
-    pushUndo();
-    ORG = JSON.parse(JSON.stringify(DEFAULT_ORG));
-    ensureIds(ORG);
-    save();
-    render();
-  });
-
-  document.getElementById('btnUndo').addEventListener('click', undo);
-
-  // Keyboard shortcut: ⌘Z (mac) or Ctrl+Z elsewhere. Skip when typing in an input/textarea.
-  document.addEventListener('keydown', (e) => {
-    const isUndoKey = (e.key === 'z' || e.key === 'Z') && (e.metaKey || e.ctrlKey) && !e.shiftKey;
-    if (!isUndoKey) return;
-    const t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    e.preventDefault();
-    undo();
-  });
-
-  document.getElementById('btnExport').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(ORG, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'awkn-org-chart.json';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
-  });
-
-  document.getElementById('btnImport').addEventListener('click', () => {
-    document.getElementById('fileImport').click();
-  });
-  document.getElementById('fileImport').addEventListener('change', (e) => {
-    if (!isAuthed) { alert('Sign in to edit.'); e.target.value = ''; return; }
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result);
-        if (!parsed || typeof parsed !== 'object' || !parsed.name) throw new Error('Not a valid org chart JSON.');
-        pushUndo();
-        ensureIds(parsed);
-        ORG = parsed;
-        save();
-        render();
-      } catch (err) {
-        alert('Import failed: ' + err.message);
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
       }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
-
-  // =========================================================================
-  // HELPERS
-  // =========================================================================
-  function initials(name) {
-    if (!name) return '?';
-    const p = String(name).trim().split(/\s+/);
-    return p.length >= 2 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : name[0].toUpperCase();
-  }
-  function esc(s) {
-    if (s == null) return '';
-    const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML;
-  }
-
-  // =========================================================================
-  // INIT — async: auth → load shared chart → render → subscribe to realtime
-  // =========================================================================
-  (async function boot() {
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      applyAuthState(session);
-      sb.auth.onAuthStateChange((_evt, sess) => applyAuthState(sess));
-      await loadFromDb();
-      render();
-      subscribeRealtime();
-    } catch (err) {
-      console.error('[org-chart] boot failed:', err);
-      // Last-resort: render whatever DEFAULT_ORG already has so the page isn't blank.
-      render();
-      setStatus('error', 'Connection failed — showing default chart');
-    }
-  })();
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
   </script>
+
 </body>
 </html>

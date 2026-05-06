@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Host a Retreat | AWKN Ranch</title>
+  <meta name="description" content="Rent AWKN Ranch for your retreat. Twelve private acres, lodging for 22, full kitchen, a temple, and the wellness facilities — yours for the weekend or the week.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/host-a-retreat/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/awkn/site.css">
+
+  <style>
+    /* numbered process row */
+    .process-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .process-step {
+      text-align: center;
+      padding: 0 0.75rem;
+    }
+    .process-step-num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.6rem;
+      color: var(--gold);
+      line-height: 1;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      opacity: 0.55;
+    }
+    .process-step h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .process-step p { font-size: 0.88rem; color: var(--grey); line-height: 1.7; }
+    @media (max-width: 900px) { .process-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .process-row { grid-template-columns: 1fr; } }
+
+    /* capacity table */
+    .capacity-table {
+      max-width: 720px;
+      margin: 3rem auto 0;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .capacity-row {
+      display: grid;
+      grid-template-columns: 1.4fr 0.7fr 1fr;
+      padding: 1.4rem 2rem;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+    .capacity-row:last-child { border-bottom: none; }
+    .capacity-row.head {
+      background: var(--cream-deep);
+      font-size: 0.6rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--brown);
+      font-weight: 600;
+    }
+    .capacity-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    .capacity-meta { font-size: 0.85rem; color: var(--grey); }
+    @media (max-width: 600px) {
+      .capacity-row { grid-template-columns: 1fr; gap: 0.4rem; padding: 1.2rem 1.5rem; }
+      .capacity-row.head { display: none; }
+    }
+
+    /* benefit grid */
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .benefit-item {
+      display: flex;
+      gap: 1.4rem;
+      align-items: flex-start;
+    }
+    .benefit-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+    }
+    .benefit-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .benefit-item h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
+    }
+    .benefit-item p { font-size: 0.9rem; color: var(--grey); line-height: 1.7; }
+    @media (max-width: 720px) { .benefit-grid { grid-template-columns: 1fr; } }
+
+    .quote-block {
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 2rem;
+    }
+    .quote-block blockquote {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+      color: var(--dark);
+      line-height: 1.5;
+      font-weight: 300;
+      margin: 0 0 1.5rem;
+    }
+    .quote-block cite {
+      display: block;
+      font-style: normal;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="/contact/" class="secondary-cta">Contact</a>
+      <a href="/book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="/" data-menu-link>Home</a></li>
+      <li><a href="/property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="/book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="/host-a-retreat/" class="current" data-menu-link>Host a Retreat</a></li>
+      <li><a href="/events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="/services/" data-menu-link>Our Services</a></li>
+      <li><a href="/team/" data-menu-link>Our Team</a></li>
+      <li><a href="/contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/assets/awkn/sunflower-group.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Host a Retreat</span>
+      <h1>Bring your container <em>here</em>.</h1>
+      <span class="page-hero-tagline">Teachers, facilitators, and small groups: rent the ranch in full or in part. We hold the lodging, meals, and spaces &mdash; you bring the work.</span>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="bg-cream">
+    <div class="intro-block">
+      <div class="s-eyebrow">For Facilitators</div>
+      <h2 class="s-title">A retreat venue, <em>not a hotel</em>.</h2>
+      <p class="s-desc centered">AWKN was built by people who run retreats. Every detail &mdash; the temple acoustics, the kitchen flow, the timing of breakfast, where the cushions live &mdash; was designed for the work. Bring your group; we handle the rest.</p>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="bg-cream">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">What's Included</div>
+        <h2 class="s-title">Everything you'd <em>have to source</em></h2>
+      </div>
+      <div class="benefit-grid">
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M3 12L12 4l9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></div>
+          <div>
+            <h3>Lodging for up to 22</h3>
+            <p>Private and shared rooms, two yurts, and two geodesic domes. Most guests have their own bed; almost everyone has a window.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3c-2 3-2 5 0 7s2 4 0 7"/></svg></div>
+          <div>
+            <h3>The Temple</h3>
+            <p>A dedicated ceremonial space with cushions, candles, sound system, and natural light. Capacity 40 seated, 16 lying.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M3 18h18"/><path d="M5 12h14l-1 6H6z"/><path d="M7 12V8a5 5 0 0 1 10 0v4"/></svg></div>
+          <div>
+            <h3>Chef-Built Kitchen</h3>
+            <p>Bring your own chef, or hire one of ours. Commercial-grade range, walk-in pantry, and a long farmhouse table.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M12 2v3m0 14v3M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M2 12h3m14 0h3M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12"/><circle cx="12" cy="12" r="4"/></svg></div>
+          <div>
+            <h3>Wellness Facilities</h3>
+            <p>Cedar sauna, cold plunge, fire pit, gardens, and the Honey Dome studio &mdash; all included with the buyout, all open during your retreat.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h12"/></svg></div>
+          <div>
+            <h3>On-Site Concierge</h3>
+            <p>A live-in caretaker handles the logistics during your retreat &mdash; firewood, linens, garbage, late-night requests &mdash; so you can stay in role.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M3 12l3-3 4 4 8-8 3 3"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7"/></svg></div>
+          <div>
+            <h3>Optional Add-Ons</h3>
+            <p>We can layer in bodywork, sound healing, ceremonial offerings, or our medical team from Within Center &mdash; if your container calls for it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPACITY -->
+  <section class="bg-cream-deep">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Capacity</div>
+        <h2 class="s-title">How big can your <em>group be</em>?</h2>
+        <p class="s-desc centered">Most retreats land between 8 and 16 guests. The temple comfortably holds 40 in seated practice, and the property maxes out at 22 overnight.</p>
+      </div>
+      <div class="capacity-table">
+        <div class="capacity-row head">
+          <div>Space</div>
+          <div>Sleeps</div>
+          <div>Practice Capacity</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">Retreat House</div>
+          <div class="capacity-meta">14</div>
+          <div class="capacity-meta">N/A</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">The Yurt</div>
+          <div class="capacity-meta">2</div>
+          <div class="capacity-meta">N/A</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">Honey Dome</div>
+          <div class="capacity-meta">2</div>
+          <div class="capacity-meta">12 (workshop)</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">Star Dome</div>
+          <div class="capacity-meta">2</div>
+          <div class="capacity-meta">12 (workshop)</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">Cabins (2)</div>
+          <div class="capacity-meta">2 each</div>
+          <div class="capacity-meta">N/A</div>
+        </div>
+        <div class="capacity-row">
+          <div class="capacity-name">The Temple</div>
+          <div class="capacity-meta">N/A</div>
+          <div class="capacity-meta">40 seated &middot; 16 lying</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Booking Process</div>
+        <h2 class="s-title">How it <em>works</em></h2>
+      </div>
+      <div class="process-row">
+        <div class="process-step">
+          <div class="process-step-num">01</div>
+          <h3>Inquire</h3>
+          <p>Tell us your dates, group size, and what you're holding. Form below or email us directly.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">02</div>
+          <h3>Walk the Land</h3>
+          <p>We schedule a video call or in-person tour. Most facilitators visit before they book.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">03</div>
+          <h3>Hold Dates</h3>
+          <p>50% deposit holds your dates. We send a planning packet with maps, menus, and timing.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">04</div>
+          <h3>Land &amp; Lead</h3>
+          <p>Arrive a day early to settle. We're on call for the duration; you're free to be in role.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="bg-cream-deep">
+    <div class="quote-block">
+      <blockquote>&ldquo;The land does half the work. The team does the other half. I just had to show up and lead.&rdquo;</blockquote>
+      <cite>&mdash; Returning facilitator, fall retreat</cite>
+    </div>
+  </section>
+
+  <!-- INQUIRY FORM -->
+  <section class="bg-cream" id="inquire">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Inquire</div>
+        <h2 class="s-title">Tell us about your <em>retreat</em>.</h2>
+        <p class="s-desc centered">We respond personally to every facilitator inquiry. The more you share, the better we can scope.</p>
+      </div>
+
+      <form class="awkn-form" action="mailto:hello@awknranch.com" method="post" enctype="text/plain">
+        <div class="awkn-form-row">
+          <div>
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+        <div class="awkn-form-row">
+          <div>
+            <label for="org">Organization or Lineage</label>
+            <input type="text" id="org" name="org" placeholder="optional">
+          </div>
+          <div>
+            <label for="size">Group Size</label>
+            <input type="number" id="size" name="size" min="1" max="40">
+          </div>
+        </div>
+        <div>
+          <label for="dates">Dates You're Considering</label>
+          <input type="text" id="dates" name="dates" placeholder="e.g. last week of September, 5 nights">
+        </div>
+        <div>
+          <label for="modality">Modality / Type of Retreat</label>
+          <select id="modality" name="modality">
+            <option>Yoga &amp; movement</option>
+            <option>Meditation / silent</option>
+            <option>Plant medicine / ceremonial</option>
+            <option>Coaching / corporate offsite</option>
+            <option>Mixed / other</option>
+          </select>
+        </div>
+        <div>
+          <label for="vision">What's the container?</label>
+          <textarea id="vision" name="vision" placeholder="A few sentences on the work you'll be holding."></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark">Send Inquiry</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="cta-section">
+    <h2>Or just <em>email</em>.</h2>
+    <p>For repeat facilitators, the form is overkill. Email us directly and we'll pick up the thread.</p>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="/within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="/property/">Property</a>
+    <a href="/book/">Book</a>
+    <a href="/host-a-retreat/">Host</a>
+    <a href="/events/">Events</a>
+    <a href="/services/">Services</a>
+    <a href="/team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="/within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>

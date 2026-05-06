@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Services | AWKN Ranch</title>
+  <meta name="description" content="Wellness offerings at AWKN Ranch — sound baths, breathwork, sauna, cold plunge, bodywork, fire ceremony, and more. Add any to your stay or book a la carte.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/services/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/awkn/site.css">
+
+  <style>
+    /* category nav */
+    .cat-nav {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 2.5rem auto 0;
+    }
+    .cat-nav a {
+      padding: 0.55rem 1.2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brown);
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .cat-nav a:hover { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+
+    .service-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .service-row + .service-row { margin-top: 5rem; }
+    .service-row.reverse { direction: rtl; }
+    .service-row.reverse > * { direction: ltr; }
+    .service-row img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+    }
+    .service-row h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+    .service-row h3 em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .service-row p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+    .service-meta {
+      display: inline-flex;
+      gap: 1.5rem;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--brown);
+      font-weight: 600;
+    }
+    .service-meta span { color: var(--gold); }
+    @media (max-width: 800px) {
+      .service-row, .service-row.reverse { grid-template-columns: 1fr; gap: 1.5rem; direction: ltr; }
+      .service-row + .service-row { margin-top: 3.5rem; }
+    }
+
+    .cat-anchor { padding-top: 6rem; margin-top: -2rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="/contact/" class="secondary-cta">Contact</a>
+      <a href="/book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="/" data-menu-link>Home</a></li>
+      <li><a href="/property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="/book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="/host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="/events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="/services/" class="current" data-menu-link>Our Services</a></li>
+      <li><a href="/team/" data-menu-link>Our Team</a></li>
+      <li><a href="/contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/assets/awkn/sound-bath.jpeg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Our Services</span>
+      <h1>Offerings for the <em>body and spirit</em>.</h1>
+      <span class="page-hero-tagline">Layer your stay with the practices that meet you where you are. Each session is held by a practitioner, not booked through an app.</span>
+    </div>
+  </header>
+
+  <!-- CATEGORY NAV -->
+  <section class="bg-cream" style="padding-bottom: 2rem;">
+    <div class="intro-block">
+      <div class="s-eyebrow">A Living Menu</div>
+      <h2 class="s-title">Choose what <em>your stay needs</em>.</h2>
+      <p class="s-desc centered">All offerings are available a-la-carte to overnight guests, day visitors, and members. Practitioners rotate seasonally; this list reflects what's currently available.</p>
+      <nav class="cat-nav">
+        <a href="#movement">Movement</a>
+        <a href="#sound">Sound</a>
+        <a href="#contrast">Contrast</a>
+        <a href="#bodywork">Bodywork</a>
+        <a href="#ceremony">Ceremony</a>
+        <a href="#medical">Medical</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- MOVEMENT -->
+  <section class="bg-cream" id="movement">
+    <div style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">Movement</div>
+      <h2 class="s-title">Yoga, breath, <em>somatics</em></h2>
+    </div>
+
+    <div class="service-row">
+      <img src="/assets/awkn/yoga.jpg" alt="Yoga at AWKN Ranch">
+      <div>
+        <h3>Yoga &amp; <em>Mindful Movement</em></h3>
+        <div class="service-meta"><span>60 min</span> <span>Group or 1:1</span> <span>From $35</span></div>
+        <p>Slow vinyasa, yin, and restorative classes held in the temple or under the oaks. Trained for trauma-informed practice; suitable for first-timers and longtime practitioners alike.</p>
+        <p>Daily group classes 7am &amp; 5pm. Private sessions by appointment.</p>
+      </div>
+    </div>
+
+    <div class="service-row reverse">
+      <img src="/assets/awkn/meditation-awkn.png" alt="Meditation at AWKN Ranch">
+      <div>
+        <h3>Breathwork &amp; <em>Meditation</em></h3>
+        <div class="service-meta"><span>45&ndash;75 min</span> <span>Group or 1:1</span> <span>From $45</span></div>
+        <p>Pranayama, holotropic-style sessions, and silent sits. Held in the temple with cushions, blankets, and intentional pacing &mdash; designed to be safe to fall apart in.</p>
+        <p>Group breathwork ceremonies on Saturday evenings; private sessions on request.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOUND -->
+  <section class="bg-cream-deep" id="sound">
+    <div style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">Sound</div>
+      <h2 class="s-title">Listening as <em>medicine</em></h2>
+    </div>
+
+    <div class="service-row">
+      <img src="/assets/awkn/sound-bath.jpeg" alt="Sound bath at AWKN Ranch">
+      <div>
+        <h3>Sound <em>Bath</em></h3>
+        <div class="service-meta"><span>60 min</span> <span>Group up to 16</span> <span>From $55</span></div>
+        <p>Quartz crystal bowls, gongs, voice. Lie down, cover up, and let the room become a single instrument. One of the most-requested sessions on the ranch.</p>
+        <p>Held weekly in the temple; private sessions for retreat groups.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRAST -->
+  <section class="bg-cream" id="contrast">
+    <div style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">Contrast Therapy</div>
+      <h2 class="s-title">Heat, cold, <em>and rest</em></h2>
+    </div>
+
+    <div class="service-row">
+      <img src="/assets/awkn/sauna.jpg" alt="Cedar sauna at AWKN Ranch">
+      <div>
+        <h3>Cedar <em>Sauna</em></h3>
+        <div class="service-meta"><span>Open daily</span> <span>Up to 6</span> <span>Included</span></div>
+        <p>A traditional barrel sauna under the live oaks. Authentic dry heat with the option to layer in essential oils or guided rounds.</p>
+        <p>Open to all overnight guests &amp; members; day-pass holders welcome.</p>
+      </div>
+    </div>
+
+    <div class="service-row reverse">
+      <img src="/assets/awkn/cold-plunge.jpeg" alt="Cold plunge at AWKN Ranch">
+      <div>
+        <h3>Cold <em>Plunge</em></h3>
+        <div class="service-meta"><span>Open daily</span> <span>Solo or group</span> <span>Included</span></div>
+        <p>A contrast cold tub kept between 38&ndash;45&deg;F year-round, paired with the sauna for proper hot-cold cycling. Guided plunge instruction available for first-timers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODYWORK -->
+  <section class="bg-cream-deep" id="bodywork">
+    <div style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">Bodywork</div>
+      <h2 class="s-title">Touch, presence, <em>release</em></h2>
+    </div>
+
+    <div class="service-row">
+      <img src="/assets/awkn/body-work.jpeg" alt="Bodywork at AWKN Ranch">
+      <div>
+        <h3>Massage &amp; <em>Somatic Bodywork</em></h3>
+        <div class="service-meta"><span>60 / 90 / 120 min</span> <span>1:1</span> <span>From $145</span></div>
+        <p>Deep tissue, Swedish, and somatic-experiencing-informed bodywork with our resident practitioners. Held in a private room of the Retreat House.</p>
+        <p>Book in advance &mdash; sessions fill quickly during retreat weeks.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CEREMONY -->
+  <section class="bg-cream" id="ceremony">
+    <div style="text-align:center; margin-bottom: 3rem;">
+      <div class="s-eyebrow">Ceremony</div>
+      <h2 class="s-title">Ritual at the <em>edge of the woods</em></h2>
+    </div>
+
+    <div class="service-row">
+      <img src="/assets/awkn/frire-pit.jpg" alt="Fire circle at AWKN Ranch">
+      <div>
+        <h3>Fire <em>Circle</em></h3>
+        <div class="service-meta"><span>2 hours</span> <span>Group up to 30</span> <span>From $35</span></div>
+        <p>A held container around the fire pit. Songs, silence, and the structure of intention &mdash; for retreat closings, full moons, or simply because it's Saturday.</p>
+      </div>
+    </div>
+
+    <div class="service-row reverse">
+      <img src="/assets/awkn/temple-inside-3.jpg" alt="Temple ceremony at AWKN Ranch">
+      <div>
+        <h3>Temple <em>Ceremony</em></h3>
+        <div class="service-meta"><span>2&ndash;4 hours</span> <span>Group or private</span> <span>By inquiry</span></div>
+        <p>Cacao, plant-medicine-aligned (no medicine), or simply a held silence in the temple. We work with visiting facilitators and our own resident guides.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEDICAL / SISTER PRACTICE -->
+  <section class="bg-dark" id="medical" style="text-align:center;">
+    <div class="container">
+      <div class="s-eyebrow">Medical &amp; Therapeutic</div>
+      <h2 class="s-title">Sister Practice: <em>Within Center</em></h2>
+      <p class="s-desc centered" style="margin-top: 1rem;">For ceremonial ketamine therapy, medication management, and clinical psychiatric care, we partner with our sister practice Within Center, located at AWKN Ranch.</p>
+      <p class="s-desc centered" style="margin-top: 0.5rem;">Within is a fully licensed medical practice; the AWKN Ranch wellness offerings on this page are non-medical and complementary.</p>
+      <div style="margin-top: 2.5rem;">
+        <a href="/within-center/" class="btn btn-gold">Visit Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING CTA -->
+  <section class="cta-section">
+    <h2>Ready to <em>book a session</em>?</h2>
+    <p>Most offerings can be added to a stay or booked stand-alone. Tell us what calls and we'll find a time.</p>
+    <a href="/book/" class="btn btn-gold">Book Your Experience</a>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="/within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="/property/">Property</a>
+    <a href="/book/">Book</a>
+    <a href="/host-a-retreat/">Host</a>
+    <a href="/events/">Events</a>
+    <a href="/services/">Services</a>
+    <a href="/team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="/within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>

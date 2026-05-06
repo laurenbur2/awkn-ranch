@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Your Experience | AWKN Ranch</title>
+  <meta name="description" content="Book a stay, a day visit, or a wellness session at AWKN Ranch. Rooms, packages, and membership inquiries.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/book/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/awkn/site.css">
+
+  <style>
+    /* ── ROOM CARDS ── */
+    .room-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-top: 3.5rem;
+    }
+    .room-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .room-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(201,148,62,0.3);
+    }
+    .room-card-img { width: 100%; height: 240px; object-fit: cover; }
+    .room-card-body { padding: 1.85rem; display: flex; flex-direction: column; flex-grow: 1; }
+    .room-card-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+    .room-card-meta {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .room-card ul { list-style: none; padding: 0; margin: 0 0 1.4rem; flex-grow: 1; }
+    .room-card li {
+      padding: 0.45rem 0 0.45rem 1.4rem;
+      position: relative;
+      font-size: 0.85rem;
+      color: var(--grey);
+      line-height: 1.55;
+    }
+    .room-card li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.85rem;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+    .room-card-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.15rem;
+      line-height: 1;
+    }
+    .room-card-price-note {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 1.2rem;
+    }
+    @media (max-width: 1100px) { .room-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .room-grid { grid-template-columns: 1fr; } }
+
+    /* ── PACKAGE TILES (horizontal) ── */
+    .package-list { margin-top: 3rem; display: grid; gap: 1rem; }
+    .package-item {
+      display: grid;
+      grid-template-columns: 200px 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .package-item:hover { border-color: rgba(201,148,62,0.3); box-shadow: var(--shadow-md); }
+    .package-item-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.1;
+    }
+    .package-item-meta {
+      font-size: 0.6rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 0.4rem;
+      font-weight: 600;
+    }
+    .package-item-desc { font-size: 0.92rem; color: var(--grey); line-height: 1.7; }
+    @media (max-width: 800px) {
+      .package-item { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="/contact/" class="secondary-cta">Contact</a>
+      <a href="/book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="/" data-menu-link>Home</a></li>
+      <li><a href="/property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="/book/" class="current" data-menu-link>Book Your Experience</a></li>
+      <li><a href="/host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="/events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="/services/" data-menu-link>Our Services</a></li>
+      <li><a href="/team/" data-menu-link>Our Team</a></li>
+      <li><a href="/contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('/assets/awkn/awkn-yurt-1.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Book Your Experience</span>
+      <h1>Your stay, <em>your way</em>.</h1>
+      <span class="page-hero-tagline">Reserve a room, choose a package, or join us for a day. Every option includes the wellness facilities and the land itself.</span>
+    </div>
+  </header>
+
+  <!-- ROOMS -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Stay With Us</div>
+        <h2 class="s-title">Choose Your <em>Room</em></h2>
+        <p class="s-desc centered">All stays include access to the wellness facilities (sauna, cold plunge, gardens) and a continental breakfast. Three-night minimum on weekends.</p>
+      </div>
+      <div class="room-grid">
+
+        <div class="room-card">
+          <img src="/assets/awkn/retreat-house.jpg" alt="Retreat House private room" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">Retreat House &mdash; Private</div>
+            <div class="room-card-meta">Queen bed &middot; ensuite bath</div>
+            <ul>
+              <li>Closest to the temple &amp; kitchen</li>
+              <li>Wraparound porch access</li>
+              <li>Private bathroom</li>
+              <li>Sleeps 2</li>
+            </ul>
+            <div class="room-card-price">$285</div>
+            <div class="room-card-price-note">per night</div>
+            <a href="#inquire" class="btn btn-gold">Inquire</a>
+          </div>
+        </div>
+
+        <div class="room-card">
+          <img src="/assets/awkn/awkn-sharedroom.png" alt="Retreat House shared room" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">Retreat House &mdash; Shared</div>
+            <div class="room-card-meta">Twin beds &middot; shared bath</div>
+            <ul>
+              <li>For groups &amp; retreat guests</li>
+              <li>Two single beds per room</li>
+              <li>Shared bathroom on hall</li>
+              <li>Sleeps 1&ndash;2</li>
+            </ul>
+            <div class="room-card-price">$165</div>
+            <div class="room-card-price-note">per person, per night</div>
+            <a href="#inquire" class="btn btn-gold">Inquire</a>
+          </div>
+        </div>
+
+        <div class="room-card">
+          <img src="/assets/awkn/awkn-yurt-1.jpg" alt="The Yurt" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">The Yurt</div>
+            <div class="room-card-meta">Private cabin &middot; under the trees</div>
+            <ul>
+              <li>Private circular sanctuary</li>
+              <li>Wood floors, soft bed</li>
+              <li>Outdoor shower nearby</li>
+              <li>Sleeps 2</li>
+            </ul>
+            <div class="room-card-price">$245</div>
+            <div class="room-card-price-note">per night</div>
+            <a href="#inquire" class="btn btn-gold">Inquire</a>
+          </div>
+        </div>
+
+        <div class="room-card">
+          <img src="/assets/awkn/honey-dome.jpeg" alt="Honey Dome" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">Honey Dome</div>
+            <div class="room-card-meta">Geodesic stay &middot; sky views</div>
+            <ul>
+              <li>Sleep under hexagonal panes</li>
+              <li>Edge of the property, full quiet</li>
+              <li>Stargazing from bed</li>
+              <li>Sleeps 2</li>
+            </ul>
+            <div class="room-card-price">$295</div>
+            <div class="room-card-price-note">per night</div>
+            <a href="#inquire" class="btn btn-gold">Inquire</a>
+          </div>
+        </div>
+
+        <div class="room-card">
+          <img src="/assets/awkn/dome.jpeg" alt="Star Dome" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">Star Dome</div>
+            <div class="room-card-meta">Second geodesic &middot; meadow side</div>
+            <ul>
+              <li>Twin to the Honey Dome</li>
+              <li>Meadow setting</li>
+              <li>Quietest spot on the property</li>
+              <li>Sleeps 2</li>
+            </ul>
+            <div class="room-card-price">$295</div>
+            <div class="room-card-price-note">per night</div>
+            <a href="#inquire" class="btn btn-gold">Inquire</a>
+          </div>
+        </div>
+
+        <div class="room-card">
+          <img src="/assets/awkn/sunflower-group.jpg" alt="Whole ranch" class="room-card-img">
+          <div class="room-card-body">
+            <div class="room-card-name">Whole Ranch Buyout</div>
+            <div class="room-card-meta">All buildings &middot; up to 22 guests</div>
+            <ul>
+              <li>The full property to yourselves</li>
+              <li>For retreats, weddings, or family</li>
+              <li>Includes meals &amp; concierge</li>
+              <li>3-night minimum</li>
+            </ul>
+            <div class="room-card-price">Custom</div>
+            <div class="room-card-price-note">request a quote</div>
+            <a href="/host-a-retreat/" class="btn btn-gold">Inquire to Host</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PACKAGES -->
+  <section class="bg-cream-deep">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Or Choose a Package</div>
+        <h2 class="s-title">Curated <em>Stays</em></h2>
+        <p class="s-desc centered">Bundled experiences that pair lodging with wellness offerings. Save against booking a-la-carte, and let us hold the schedule for you.</p>
+      </div>
+      <div class="package-list">
+
+        <div class="package-item">
+          <div>
+            <div class="package-item-name">The Day Pass</div>
+            <div class="package-item-meta">Single Day &middot; No Lodging</div>
+          </div>
+          <div class="package-item-desc">Sauna, cold plunge, gardens, and one wellness session of your choice. Arrive at 10am, leave by sunset.</div>
+          <a href="#inquire" class="btn btn-gold">From $145</a>
+        </div>
+
+        <div class="package-item">
+          <div>
+            <div class="package-item-name">The Reset</div>
+            <div class="package-item-meta">2 Nights &middot; 3 Days</div>
+          </div>
+          <div class="package-item-desc">A weekend to put yourself down. Lodging, meals, two daily wellness practices, and one bodywork session.</div>
+          <a href="#inquire" class="btn btn-gold">From $895</a>
+        </div>
+
+        <div class="package-item">
+          <div>
+            <div class="package-item-name">The Immersion</div>
+            <div class="package-item-meta">5 Nights &middot; 6 Days</div>
+          </div>
+          <div class="package-item-desc">Our flagship retreat experience. Lodging, all meals, daily yoga and meditation, two bodywork sessions, sound bath, and a guided fire ceremony.</div>
+          <a href="#inquire" class="btn btn-gold">From $2,400</a>
+        </div>
+
+        <div class="package-item">
+          <div>
+            <div class="package-item-name">Ceremonial Ketamine</div>
+            <div class="package-item-meta">Sister Practice &middot; Within Center</div>
+          </div>
+          <div class="package-item-desc">For ceremonial ketamine therapy, our sister practice Within Center holds dedicated retreats and day experiences.</div>
+          <a href="/within-center/" class="btn btn-outline" style="color:var(--brown); border-color:var(--brown);">Visit Within</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERSHIP -->
+  <section class="bg-cream">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Or Become a Member</div>
+        <h2 class="s-title">Belong to the <em>Land</em></h2>
+        <p class="s-desc centered">Members get unlimited day-use access to the wellness facilities, priority booking, and a discount on all stays and offerings. One membership covers AWKN Ranch and Within Center.</p>
+        <div style="margin-top: 2rem;">
+          <a href="#inquire" class="btn btn-gold">Apply for Membership</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INQUIRY FORM -->
+  <section class="bg-cream-deep" id="inquire">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Reserve</div>
+        <h2 class="s-title">Tell us what <em>you're after</em>.</h2>
+        <p class="s-desc centered">We respond to every inquiry personally. Most replies go out within a day.</p>
+      </div>
+
+      <form class="awkn-form" action="mailto:hello@awknranch.com" method="post" enctype="text/plain">
+        <div class="awkn-form-row">
+          <div>
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+        <div class="awkn-form-row">
+          <div>
+            <label for="dates">Preferred Dates</label>
+            <input type="text" id="dates" name="dates" placeholder="e.g. weekend of June 14">
+          </div>
+          <div>
+            <label for="party">Party Size</label>
+            <input type="number" id="party" name="party" min="1" max="22">
+          </div>
+        </div>
+        <div>
+          <label for="interest">What You're Looking For</label>
+          <select id="interest" name="interest">
+            <option>A specific room</option>
+            <option>A package (Reset / Immersion)</option>
+            <option>Day pass</option>
+            <option>Membership</option>
+            <option>Whole ranch buyout</option>
+            <option>Not sure yet &mdash; tell me what's possible</option>
+          </select>
+        </div>
+        <div>
+          <label for="notes">Anything else we should know</label>
+          <textarea id="notes" name="notes" placeholder="Dietary needs, intentions for the visit, etc."></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark">Send Inquiry</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="cta-section">
+    <h2>Or just <em>call</em>.</h2>
+    <p>If your visit is more nuanced than a form can capture, we'd love to hear it.</p>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="/within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="/property/">Property</a>
+    <a href="/book/">Book</a>
+    <a href="/host-a-retreat/">Host</a>
+    <a href="/events/">Events</a>
+    <a href="/services/">Services</a>
+    <a href="/team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="/within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>
