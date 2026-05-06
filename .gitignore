@@ -4,6 +4,17 @@ docs/CREDENTIALS.md
 HOMEAUTOMATION.local.md
 .mcp.json
 .machine-name
+.env
+.env.local
+.env.*.local
+
+# Editor / tool artifacts
+.playwright-mcp/
+
+# Stray Next.js artifacts at repo root (real ones live in awkn-web-app/)
+/next-env.d.ts
+/tsconfig.tsbuildinfo
+*.tsbuildinfo
 # SSH password files (use ~/.ssh/alpacapps-*.pass outside repo; ignore any local pass files)
 .sshpass-*
 *.pass
