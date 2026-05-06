@@ -2727,10 +2727,10 @@ function openInvoicePreview(existingInvoice = null) {
 
   const lineItemRows = lineItems.map(li => `
     <tr>
-      <td style="padding:14px 16px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#1c1618;white-space:pre-line;line-height:1.5;">${escapeHtml(li.description)}</td>
-      <td style="padding:14px 16px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:center;">${li.quantity}</td>
-      <td style="padding:14px 16px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:right;">${formatCurrency(li.unit_price)}</td>
-      <td style="padding:14px 16px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:#1c1618;text-align:right;">${formatCurrency(li.total)}</td>
+      <td style="padding:16px 12px 16px 4px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:15px;color:#1c1618;white-space:pre-line;line-height:1.65;">${escapeHtml(li.description)}</td>
+      <td style="padding:16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:center;vertical-align:top;">${li.quantity}</td>
+      <td style="padding:16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Inter',sans-serif;font-size:14px;color:#6b4c3b;text-align:right;vertical-align:top;white-space:nowrap;">${formatCurrency(li.unit_price)}</td>
+      <td style="padding:16px 4px 16px 8px;border-bottom:1px solid rgba(28,22,24,0.08);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:#1c1618;text-align:right;vertical-align:top;white-space:nowrap;">${formatCurrency(li.total)}</td>
     </tr>
   `).join('');
 
@@ -2778,13 +2778,19 @@ function openInvoicePreview(existingInvoice = null) {
 
             <!-- Line items -->
             <div style="padding:0 40px 28px 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;table-layout:fixed;">
+                <colgroup>
+                  <col style="width:auto;">
+                  <col style="width:48px;">
+                  <col style="width:90px;">
+                  <col style="width:100px;">
+                </colgroup>
                 <thead>
                   <tr>
-                    <th style="padding:8px 16px;text-align:left;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Description</th>
-                    <th style="padding:8px 16px;text-align:center;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Qty</th>
-                    <th style="padding:8px 16px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Rate</th>
-                    <th style="padding:8px 16px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Amount</th>
+                    <th style="padding:10px 12px 10px 4px;text-align:left;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Description</th>
+                    <th style="padding:10px 8px;text-align:center;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Qty</th>
+                    <th style="padding:10px 8px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Rate</th>
+                    <th style="padding:10px 4px 10px 8px;text-align:right;font-family:'Inter',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c9943e;font-weight:600;border-bottom:1.5px solid #c9943e;">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2992,6 +2998,57 @@ async function saveInvoice(existingInvoice, status) {
       const itemsPayload = lineItems.map(li => ({ ...li, invoice_id: invoiceId }));
       const { error: liError } = await supabase.from('crm_invoice_line_items').insert(itemsPayload);
       if (liError) throw liError;
+    }
+
+    // Email the branded invoice to the client when sending. Skip if no
+    // email on file. Soft-fails — invoice still saves as sent if Resend
+    // is down so the operator can retry without losing data.
+    if (status === 'sent' && payload.client_email) {
+      try {
+        const recipientFirstName = String(payload.client_name || '').trim().split(/\s+/)[0] || '';
+        const emailResp = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+          },
+          body: JSON.stringify({
+            type: 'invoice_sent',
+            to: payload.client_email,
+            data: {
+              recipient_first_name: recipientFirstName,
+              business_line: payload.business_line,
+              invoice_number: payload.invoice_number,
+              client_name: payload.client_name,
+              invoice_date: payload.invoice_date,
+              due_date: payload.due_date,
+              subtotal: payload.subtotal,
+              discount_amount: payload.discount_amount,
+              discount_label: payload.discount_label,
+              tax_amount: payload.tax_amount,
+              total: payload.total,
+              card_total: Math.round(Number(payload.total) * 1.03 * 100) / 100,
+              payment_link_url: payload.stripe_payment_link_url || null,
+              payment_link_card_url: payload.stripe_payment_link_card_url || null,
+              notes: payload.notes,
+              line_items: lineItems.map(li => ({
+                description: li.description,
+                quantity: li.quantity,
+                unit_price: li.unit_price,
+                total: li.total,
+              })),
+            },
+          }),
+        });
+        if (!emailResp.ok) {
+          const err = await emailResp.json().catch(() => ({}));
+          throw new Error(err.error || ('Email send returned ' + emailResp.status));
+        }
+      } catch (emailErr) {
+        console.warn('Invoice email send failed:', emailErr);
+        showToast('Invoice saved, but email did not send. Check the email address and try Resend.', 'warning');
+      }
     }
 
     showToast(status === 'sent' ? 'Invoice sent' : 'Invoice saved as draft', 'success');
