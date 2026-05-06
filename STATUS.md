@@ -1,6 +1,6 @@
 # AWKN — Status
 
-**Last Updated:** 2026-05-06 (session: bos hostname revert + main merge + supporting fixes)
+**Last Updated:** 2026-05-06 (session: main merge + Phase 3→6 transition)
 **Last Updated By:** Matthew Miceli (`miceli`)
 
 ## Project Overview
@@ -15,77 +15,66 @@ Architecture and migration plan: `docs/ECOSYSTEM-MAP.md` + `docs/superpowers/spe
 
 ## Active program
 
-**8-phase cleanup + Next.js refactor** in flight on `miceli`.
+**8-phase cleanup + Next.js refactor** on `miceli`.
 
-**Phase 0** ✅ branch reset · **Phase 1** ✅ Alpaca purge · **Phase 2** ✅ Next.js scaffold + auth · **Phase 3** 🟡 in flight
+**Phase 0** ✅ · **Phase 1** ✅ Alpaca purge · **Phase 2** ✅ scaffold + auth · **Phase 3** ✅ audit-driven port · **Phase 6** 🟡 starting (consolidation + IA cleanup)
 
-### Phase 3 reframed (this session)
+### Phase 3 — port catalog (complete, ongoing additions)
 
-Original program spec framed Phase 3 as "awknranch.com → Next.js rebuild." Mid-session reframe: actual current goal is **audit-driven port of the existing repo** (legacy public pages, BOS, edge functions) into `awkn-web-app/`, NOT rebuilding from Squarespace. The multi-domain scaffolding from Phase 2 is forward-compat — public-site rebuilds (awknranch.com / within.center) come downstream.
+**107 entries** in `awkn-web-app/src/lib/port-status.ts` across 4 domains. Snapshot:
 
-See `project_refactor-program-scope` memory for the full intent capture.
+| Domain | Group | Count |
+|---|---|---|
+| `awknranch` | Public site (home + property/book/host-a-retreat/services/events/contact/team) | 8 |
+| `awknranch` | Investor / Operations | 5 |
+| `awknranch` | Reference (pricing, schedule, retreat) | 6 |
+| `awknranch` | Auth (login + reset/update/email-confirm) | 5 |
+| `awknranch` | Team Portal (sign-in landing + org chart) | 2 |
+| `awknranch` | BOS Admin | 39 |
+| `awknranch` | Associates | 4 |
+| `within` | Marketing + Booking + Ceremonial Ketamine + Immersive Retreat + Resources + Conditions + Email Templates + Clinical (future) | 38 |
 
-### Phase 3 progress this session
+**Established patterns:** verbatim Route Handler ports via `serveLegacyHtml()` helper at `awkn-web-app/src/lib/serve-legacy-html.ts`; `(internal)` route group bypasses `DomainNav`; dev landing at `/` is the live port-progress index.
 
-Audit-driven port. **12 legacy pages ported** into the new app at `awkn-web-app/`:
+### Phase 6 — kicked off this session
 
-| Group | Pages |
-|---|---|
-| **Investor / Operations** (5) | `/operations`, `/investor`, `/investor-presentation`, `/investor/projections`, `/investor/projections-10y` |
-| **Reference** (6) | `/pricing`, `/pricing/wordpress-embed`, `/team`, `/schedule`, `/schedule/manage`, `/retreat`, plus `/login` (functional, with session bridge to /team) |
-
-**Deletions** (audit-confirmed, on miceli; live `main` retains until end-of-program merge):
-- `bug-reporter-extension/`, `bug-reporter-firefox/` — Bug Scout extensions
-- `clauded/` — internal Claude Code session dashboard (orphans `cloudflare/` Worker — flagged but not deleted)
-- `assets/branding/{color-palettes,font-options,logos}.html` — preview pages only (logos remain)
-- `404.html` — GH-Pages SPA-routing fallback (Next handles 404 natively)
-- `lost.html` — initially restored, then deleted ("not needed in new system")
-- 1 Finder dupe `investor/index 3.html` (byte-identical of already-deleted `index 2.html`)
-
-**Patterns established this session:**
-
-- **Verbatim Route Handler ports** via `serveLegacyHtml(legacyRelativePath, { imageBase? })` helper at `awkn-web-app/src/lib/serve-legacy-html.ts`. Reads legacy HTML from the repo root (above `awkn-web-app/`) and returns it as a `text/html` Response. Optional `imageBase` rewrites relative `images/...` refs to absolute paths (works around the trailing-slash-vs-not URL resolution issue).
-- **`(internal)` route group** under `awknranch/` for ported pages that bypass `DomainNav`. Empty `layout.tsx` returns bare children. Used by all 12 ports.
-- **Dev landing as live port index** at `/`. `awkn-web-app/src/lib/port-status.ts` is the manifest; the landing renders ported pages nested under each domain card grouped by `group` field. Currently shows `awknranch · 12 ported` across 3 groups (Investor / Operations · Reference · Auth via Reference).
-- **Functional `/login` + legacy session bridge.** Legacy `login/index.html` ported with surgical patches: rewrites `src="app.js"` to absolute path, injects sessionStorage override for the post-login redirect, copies legacy JS deps (`login/app.js`, `shared/supabase.js`, `shared/auth.js`, `shared/version-info.js`) into `awkn-web-app/public/`. Patches the public copy of `app.js` to use new-app paths instead of hardcoded `/awkn-ranch/...` legacy URLs. After sign-in, lands at `/logged-in` (custom-styled to match login aesthetic). Session lives in `localStorage[awkn-ranch-auth]` — `/team` reads the same key, so it sees the session automatically.
-- **CSP additions:** `script-src` allows `https://cdn.jsdelivr.net` (Supabase JS bundle on legacy pages); `style-src` + `font-src` allow `fonts.googleapis.com` + `fonts.gstatic.com` (Google Fonts).
-- **Brand assets** copied to `awkn-web-app/public/assets/branding/` (14 files) + page-specific image dirs (`public/{investor,investor-presentation,pricing}/images/`).
+- **`bos.` → `team.` rename.** Domain key, prod hostnames, dev matchers, route folders (`src/app/bos/` → `src/app/team/`) all flipped. BOS Admin pages keep serving on `awknranch.localhost` through Phase 5 — only the Phase-2 hostname stub renamed.
+- **Public spaces retired.** 5 public-facing Spaces application pages (`/spaces`, `/spaces/apply`, `/spaces/hostevent`, `/spaces/verify`, `/spaces/w9`) deleted across legacy + ports + manifest. Venue rentals now go through CRM, not a public form. `spaces/admin/` (the BOS) untouched.
+- **Env inventory written.** Comprehensive `awkn-web-app/.env.example` mapping every prod Supabase Functions secret to vault locations + flagging DB-row-managed credentials (Telnyx, WhatsApp, Square, Tellescope) so we don't double-store them.
+- **Lauren + Justin work factored from `origin/main`.** 12 net-new commits merged: Lauren's public AWKN Ranch site (`/`, 6 sub-pages, 26 image assets) + portal restructure (team portal moved to `/portal/`, internal team org chart to `/portal/team-chart/`, public team page now at `/team/`). Justin's invoice flow with Stripe pay buttons + branded `invoice_sent` email + 2 new SQL migrations (already applied to prod).
 
 ### Branching + DB rules
 
-- **Branching:** `miceli` is the long-lived workspace. Strategic well-scoped commits direct to `miceli`. No per-phase sub-branches. 19 commits this session.
-- **DB:** read-only prod via `supabase db query --linked` and `drizzle-kit pull`. **No parallel local clone** (Pass 5.2 abandoned). Single prod-write event reserved for end-of-program cutover.
+- **Branching:** `miceli` is the long-lived workspace. Strategic well-scoped commits direct to `miceli`. Currently 35 commits ahead of `origin/miceli`; force-push pending.
+- **DB:** read-only prod via Supabase MCP and `drizzle-kit pull`. No parallel local clone. Single prod-write event reserved for end-of-program cutover.
 
 ## Feature Status
 
 | Area | State | Notes |
 |---|---|---|
 | Legacy BOS at `spaces/admin/` | ✅ Live on GitHub Pages | Source of truth until cutover |
-| New Next.js app `awkn-web-app/` | 🟡 Phase 3 in flight | 12 pages ported (verbatim Route Handlers); functional /login with legacy session bridge; dev landing tracks port progress |
-| Voice / PAI / Vapi | ✅ Decommissioned | Source removed in Pass 4. 5 prod edge fns still need undeployment at end-of-program cutover |
-| Payments (Stripe + Square + PayPal) | ✅ Live (legacy) | Untested — no CI gates on money flows |
-| SignWell webhook | 🟡 Empirically dead | Tables missing in prod; COO call pending on delete vs dormant |
-| AlpacaPlayhouse residue | ✅ Removed | Phase 1 deleted ~50k+ LOC; Phase 3 deletions added small follow-ups |
+| New Next.js app `awkn-web-app/` | 🟡 Phase 6 starting | 107 ports wired; functional `/login` legacy bridge; dev landing tracks port progress |
+| Voice / PAI / Vapi | ✅ Decommissioned | Source removed Pass 4. 5 prod edge fns still need undeploy at end-of-program cutover |
+| Payments (Stripe + Square + PayPal) | ✅ Live (legacy) | Stripe invoice flow added by Justin 2026-05-06; no CI gates on money flows |
+| SignWell webhook | 🟡 Empirically dead | Tables missing in prod; COO call pending |
 | Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; downstream of current port |
 | Client portal | ⏳ Phase 5 | Greenfield |
 
 ## Known Limitations
 
-- No tests / no TypeScript on legacy BOS / no CI gates on money handlers — addressed incrementally per phase.
+- No tests / no TypeScript on legacy BOS / no CI gates on money handlers.
 - Founder's personal Google account owns prod assets (Resend, R2, DO droplet) — bus-factor risk.
 - IA mid-refactor — Pillar model (Ranch / Within / Retreat / Venue) needs to be locked before final BOS port.
 - AWKN profile system (`/directory/`) has a schema gap — `app_users` is missing `slug`/`bio`/`pronouns`. Phase 5 closes the gap.
-- Within Center brand tokens not yet defined in repo. Phase 4 will source from live within.center.
-- **Multi-domain auth bridging:** the new app's cookie-based `@supabase/ssr` auth (used by `portal/login`, `bos/login`) and the legacy localStorage-based auth (used by ported `/login`, `/team`) are independent — sessions don't cross. The legacy bridge handles ports that use `shared/supabase.js`; cross-domain SSO post-deploy is its own follow-up.
-- **Dev permission bypass ≠ data access.** The `window.__AWKN_DEV_BYPASS_AUTH` flag (set when `NEXT_PUBLIC_DISABLE_AUTH=true`) short-circuits client-side `hasPermission` checks so legacy admin chrome renders. It does NOT grant Supabase RLS access — table queries still hit prod with the user's actual `app_users.role`. Result: chrome renders, data tables stay empty/loading. Fix: grant the dev's `app_users` row admin role in prod (or stand up a local DB clone).
+- **Multi-domain auth bridging:** new app's cookie-based `@supabase/ssr` and legacy localStorage-based auth are independent. The legacy bridge handles ports that use `shared/supabase.js`; cross-domain SSO is its own follow-up.
+- **Dev permission bypass ≠ data access.** `NEXT_PUBLIC_DISABLE_AUTH=true` renders chrome but doesn't grant Supabase RLS access. Granting admin role on `app_users` for the dev's email is the data-access gate.
 
 ## Recent Changes (last 5 sessions)
 
 | Date | Change | Author |
 |---|---|---|
-| 2026-05-06 | **Hard reset + main merge + support fixes.** Local reset to `f4c37072` (right before the bos hostname move), then `git merge origin/main` brought in 13 commits — Justin's BOS Edit-button update (`db0620a6` on `spaces/admin/within-schedule.{html,js}`) + 6 admissions docs commits, plus Lauren's 6 condition card photo commits. Cherry-picked `f09540c0` (CompareButton hydration fix). Uncommitted supporting fixes for legacy URL/asset/auth runtime issues: `proxy.ts` `/awkn-ranch/` + `.html` strip, `next.config.js` framework-level rewrite (handles image assets that bypass middleware matcher), `public/shared/supabase-health.css` mirror, `auth.js` dev permission bypass + `serve-legacy-html.ts` flag injection (`window.__AWKN_DEV_BYPASS_AUTH`). Local diverged from `origin/miceli` (15 ahead, 11 behind); force-push pending until dev verification. **Decision:** BOS admin pages stay on awknranch hostname through Phase 3–5; bos hostname migration deferred to Phase 6 page-by-page re-scaffolds. Supabase MCP added to `.mcp.json` (auth pending — required to grant admin role on `app_users` so RLS-protected queries return data). | Miceli |
-| 2026-05-05 | **Phase 3 audit-driven port:** 12 legacy pages ported into awkn-web-app via verbatim Route Handlers under `(internal)` route group. Functional `/login` with legacy session bridge to `/team`. Dev landing now tracks port progress nested per-domain. Deletions on miceli: bug-reporter extensions, clauded/, branding preview HTMLs, 404.html, lost.html, 1 Finder dupe. CSP relaxed for Google Fonts + jsdelivr. Brand assets copied into public/. 19 commits, `792d9f8f` → `848d0d31`. | Miceli |
-| 2026-05-04 | **Phase 2.4:** Supabase Auth wired against existing app_users. Login form (shadcn), `getCurrentUser()` server helper, sign-out endpoint. | Miceli |
-| 2026-05-04 | **Phase 2.3:** `drizzle-kit pull` introspected prod (72 tables / 873 cols / 80 FKs / 180 policies). Live AWKN spaces render on `/bos/spaces`. | Miceli |
-| 2026-05-04 | **Phase 2 polish:** AWKN brand tokens ported to multi-theme architecture. Renamed `middleware.ts` → `proxy.ts`. | Miceli |
-| 2026-05-04 | **Phase 2.2:** Stubbed 70+ routes for full ecosystem click-through. Route manifest, `<RouteStub>`, per-domain `<DomainNav>`, idempotent scaffold script. | Miceli |
+| 2026-05-06 | **Main merge + Phase 6 kickoff.** 12 net-new commits factored in from `origin/main` (Lauren's public site rebuild — 8 new pages + portal restructure; Justin's invoice flow with Stripe + 2 SQL migrations). Then: comprehensive `.env.example` salvaged from prod secrets, public spaces application surface retired (5 pages), and `bos` → `team` domain rename across the new app. STATUS.md refreshed to reflect actual port catalog (107 entries, was misreporting 12). 7 commits this session: `9741a7e4` (merge) → `12195dc4`. | Miceli |
+| 2026-05-06 | **Hard reset + main merge + support fixes.** Local reset to `f4c37072` (right before the bos hostname move), then merged `origin/main` — Justin's BOS Edit-button + 6 admissions docs + Lauren's 6 condition card photo commits. Cherry-picked `f09540c0` (CompareButton hydration fix). Applied 5 support fixes for legacy URL/asset/auth runtime issues. **Decision:** BOS admin pages stay on awknranch hostname through Phase 5; bos hostname migration deferred to Phase 6. | Miceli |
+| 2026-05-05 | **Phase 3 audit-driven port:** 12 legacy pages ported into awkn-web-app via verbatim Route Handlers under `(internal)` route group. Functional `/login` with legacy session bridge to `/team`. Dev landing now tracks port progress nested per-domain. | Miceli |
+| 2026-05-04 | **Phase 2.4:** Supabase Auth wired against existing `app_users`. Login form (shadcn), `getCurrentUser()` server helper, sign-out endpoint. | Miceli |
+| 2026-05-04 | **Phase 2.3:** `drizzle-kit pull` introspected prod (72 tables / 873 cols / 80 FKs / 180 policies). Live AWKN spaces render on `/team/spaces`. | Miceli |
