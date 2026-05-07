@@ -223,14 +223,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get SignWell config for API key
-    const { data: config, error: configError } = await supabase
-      .from('signwell_config')
-      .select('api_key')
-      .single();
-
-    if (configError || !config?.api_key) {
-      console.error('SignWell config not found');
+    // SignWell API key — read from Functions Secrets, matching the outbound
+    // create-proposal-contract / create-retreat-agreement pattern. The legacy
+    // signwell_config DB table never existed in prod, which is why this whole
+    // branch was silently 500-ing on every signed-document callback.
+    const signwellApiKey = Deno.env.get('SIGNWELL_API_KEY');
+    if (!signwellApiKey) {
+      console.error('SIGNWELL_API_KEY not set on this function');
       return new Response(
         JSON.stringify({ error: 'SignWell not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -242,7 +241,7 @@ Deno.serve(async (req) => {
       `https://www.signwell.com/api/v1/documents/${documentId}/completed_pdf`,
       {
         headers: {
-          'X-Api-Key': config.api_key,
+          'X-Api-Key': signwellApiKey,
         },
       }
     );
