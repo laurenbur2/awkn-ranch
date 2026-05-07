@@ -11,6 +11,10 @@ HOMEAUTOMATION.local.md
 # Editor / tool artifacts
 .playwright-mcp/
 
+# One-shot secret-dump function — see supabase/functions/_dump-secrets/README.md
+# Never commit. Deploy → curl → delete pattern only.
+supabase/functions/_dump-secrets/
+
 # Stray Next.js artifacts at repo root (real ones live in awkn-web-app/)
 /next-env.d.ts
 /tsconfig.tsbuildinfo
