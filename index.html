@@ -254,10 +254,18 @@
       transform: translateY(-6.5px) rotate(-45deg);
     }
     .menu-toggle-bars span { transition: transform 0.3s, opacity 0.3s; }
-    .site-nav.menu-is-open .menu-label::before { content: 'Close'; }
+    /* Label flows naturally inside the .menu-toggle flex row so it shares the
+     * same vertical center as the hamburger bars (and aligns with the right-
+     * side nav links across the bar). The min-width reserves space for the
+     * widest of "Menu"/"Close" so the button doesn't reflow when toggled. */
     .menu-label::before { content: 'Menu'; }
-    .menu-label { visibility: hidden; position: relative; }
-    .menu-label::before { visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap; }
+    .site-nav.menu-is-open .menu-label::before { content: 'Close'; }
+    .menu-label {
+      display: inline-block;
+      min-width: 3.6em; /* fits "Close" at letter-spacing 0.25em */
+      white-space: nowrap;
+      text-align: left;
+    }
 
     @media (max-width: 768px) {
       .menu-panel { width: 100%; padding-top: 7rem; }
