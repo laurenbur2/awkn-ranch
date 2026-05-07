@@ -30,14 +30,29 @@ serve(async (req) => {
   }
 
   const signature = req.headers.get("stripe-signature");
-  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseSrk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!webhookSecret || !supabaseUrl || !supabaseSrk) {
+  if (!supabaseUrl || !supabaseSrk) {
     return new Response("Server not configured", { status: 500, headers: corsHeaders });
   }
   if (!signature) {
     return new Response("Missing stripe-signature", { status: 400, headers: corsHeaders });
+  }
+
+  // Webhook secret: prefer env var, fall back to active stripe_config row.
+  let webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
+  if (!webhookSecret) {
+    const cfgClient = createClient(supabaseUrl, supabaseSrk);
+    const { data: cfg } = await cfgClient
+      .from("stripe_config")
+      .select("webhook_secret")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle();
+    if (cfg?.webhook_secret) webhookSecret = cfg.webhook_secret;
+  }
+  if (!webhookSecret) {
+    return new Response("Webhook secret not configured", { status: 500, headers: corsHeaders });
   }
 
   const rawBody = await req.text();
