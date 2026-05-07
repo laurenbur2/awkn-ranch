@@ -12,17 +12,41 @@ Move all team-facing routes (Auth + Team Portal + BOS Admin = 47 routes includin
 - **M2** — Centralize the SUPABASE_ANON_KEY (currently hardcoded in 12 sites across crm.js + clients.js)
 - **M3** — Wrap 5 highest-risk operator writes (role changes, user deletion, payment link creation, lead deletion, permission reset) in Next.js API routes with bearer-token auth, Origin checks, input validation, and role-matrix enforcement
 
-After this lands, production runs on a stable Phase 6a baseline. The long-game React rebuild proceeds page-by-page on a separate dev branch with no time pressure.
+After this lands locally + on `main`, the long-game React rebuild proceeds page-by-page on a separate dev branch. Production cutover to Vercel is a separate downstream event (see §Production Cutover at end of doc).
 
-## Critical concept: deploy stack vs commit stack
+## Scope: local implementation, then production cutover later
 
-This plan distinguishes between **commit boundaries** (which can be granular for review) and **deploy boundaries** (which must be coarse to avoid stranding operators in broken intermediate states).
+This plan covers two distinct workstreams that can happen on independent timelines:
 
-- **Commits 6a.1, 6a.2, 6a.3, 6a.4** are independent and can land separately on `miceli` and even ship to prod individually. Each is internally consistent.
-- **Commits 6a.5, 6a.6, 6a.7, 6a.8** form a single **deploy stack** — they MUST go to prod together. Splitting them would strand operators (auth on team but BOS on awknranch = login redirects to a 404).
-- **Commit 6a.9** is docs-only; ships anytime after the stack lands.
+**Workstream A — Phase 6a Local Implementation (this spec, focus now):**
+- All code changes on `miceli`
+- Local verification on `*.localhost` (multi-domain routing works automatically — no DNS or Vercel setup needed for dev)
+- Merge `miceli` → `main` when verified
+- ✅ This is what we're doing right now
 
-The Vercel cutover (merge `miceli` → `main`) happens once the entire deploy stack is verified locally + on a Vercel preview.
+**Workstream B — Phase 6a-Deploy Production Cutover (deferred, see §end of doc):**
+- Add `team.awknranch.com` to Vercel project + DNS CNAME
+- Pre-deploy checklist (TLS provisioning, env var sync, etc.)
+- Operator comms + rollback script
+- Promote `main` → Vercel prod
+- ⏳ When you're ready to go live (post-implementation)
+
+**Why split:** Local implementation just needs Next.js dev server + `team.localhost`. Browsers auto-resolve `*.localhost` to 127.0.0.1, the proxy.ts maps hostnames to route folders, and we can verify everything end-to-end without touching Vercel or DNS. Deploy infra is a downstream concern that depends on choices the user can make later (DNS provider, exact cutover timing, comms strategy).
+
+### A note on the prior failed attempt
+
+Production deploy DOES have a coupling rule worth carrying forward: phases 6a.5–6a.8 must hit prod *together*, never individually, because deploying just 6a.5 (auth on team) without 6a.7 (BOS on team) would strand operators with a working login that redirects to 404 BOS pages. **This rule applies only when actually deploying to Vercel** — locally and in main-branch state, the four phases can land individually because nothing's serving traffic yet.
+
+## Local impact on existing GitHub Pages legacy site
+
+Most Phase 6a phases live inside `awkn-web-app/` (which isn't deployed anywhere yet — neither GitHub Pages nor Vercel). But two phases touch files that ARE on the legacy GitHub Pages production site at `laurenbur2.github.io/awkn-ranch/` (which auto-deploys on push to main):
+
+| Phase | Legacy impact |
+|---|---|
+| 6a.1 (M2) | Modifies legacy `spaces/admin/{crm,clients}.js` — replaces hardcoded JWTs with imports from existing `shared/supabase.js`. After main-deploy, legacy admin pages use the centralized client. Should be transparent (replacement uses the same auth pattern other admin pages already use). |
+| 6a.4 (Associates delete) | Removes legacy `associates/` directory. After main-deploy, `awknranch.com/associates/*` returns 404 on GitHub Pages. Already approved per IA review. |
+
+All other phases (6a.2 M3, 6a.3 auth gate, 6a.5–6a.7 route moves, 6a.8 redirects, 6a.9 docs) are inside `awkn-web-app/` only — zero legacy GH Pages impact.
 
 ---
 
@@ -49,10 +73,12 @@ The Vercel cutover (merge `miceli` → `main`) happens once the entire deploy st
 
 ## Risk register (28 risks, all pre-mitigated — incorporates 30-item Codex audit)
 
+**Risk severity is unchanged from v2 audit, but several risks (#1, #2, #15, #17, #20, #21) only materialize at production cutover. They're held in §Production Cutover until then.**
+
 | # | Severity | Risk | Mitigation | Phase |
 |---|---|---|---|---|
-| 1 | CRITICAL | Phased rollout strands operators (auth on team, BOS on awknranch = login redirects to 404) | 6a.5–6a.8 ship as a single **deploy stack** to prod. Local dev commits stay separate for review. **Do not merge `miceli` → `main` until all four commits are green AND verified on Vercel preview.** | deploy gate |
-| 2 | CRITICAL | Reverting 6a.7 without 6a.8 leaves 301s pointing to team while routes live on awknranch (404 loop) | Documented coupled rollback order: revert 6a.8 → 6a.7 → 6a.6 → 6a.5 in reverse. Single revert script in `scripts/rollback-6a-stack.sh`. Never revert mid-stack on deployed environments. | rollback |
+| 1 | CRITICAL (production-only) | Deploying 6a.5 to Vercel prod without 6a.7 strands operators (working login redirects to 404 BOS) | 6a.5–6a.8 ship as a coupled bundle in the production cutover. Local implementation is unaffected — nothing's serving traffic until Vercel goes live. See §Production Cutover. | 6a-Deploy |
+| 2 | CRITICAL (production-only) | Reverting 6a.7 in prod without reverting 6a.8 leaves 301s pointing to team while routes live on awknranch (404 loop) | Coupled rollback order: revert 6a.8 → 6a.7 → 6a.6 → 6a.5. Documented in `scripts/rollback-6a-stack.sh` (created during 6a-Deploy). Never revert mid-bundle in prod. | 6a-Deploy |
 | 3 | CRITICAL | M3 Server Actions assume a server-readable session, but legacy auth is browser-only localStorage | M3 uses **bearer-token** auth: legacy JS reads `supabase.auth.getSession().access_token` from the existing localStorage session and sends it in the `Authorization: Bearer <token>` header. Server validates the token via `supabase.auth.getUser(token)` before escalating to service-role for the actual mutation. | 6a.2 |
 | 4 | CRITICAL | Privileged Server Actions vulnerable to CSRF if cookies are ever introduced | Bearer-token approach (instead of cookies) is naturally CSRF-immune (browsers don't auto-attach Authorization headers cross-origin). Plus explicit `Origin` header allowlist enforced in every API route. | 6a.2 |
 | 5 | MAJOR | `/logged-in` host placement undecided | **Locked decision: move to team.** New path: `team.awknranch.com/logged-in`. Phase-2 stub at `team/logged-in/page.tsx` doesn't exist (verified). | 6a.6 |
@@ -60,18 +86,18 @@ The Vercel cutover (merge `miceli` → `main`) happens once the entire deploy st
 | 7 | MAJOR | Server Actions accept arbitrary IDs/bodies with service-role key — risk of unintended deletes/amounts | All inputs validated with Zod schemas (already in repo via `~/server/api`). UUIDs constrained, payment amounts within range, role values from enum. | 6a.2 |
 | 8 | MAJOR | No durable audit trail for M3 mutations | Structured `console.log` in each handler with `{ actor, action, target, timestamp, payload }`. Captured by Vercel function logs. Persistent audit table deferred to Phase 6b. **Risk acknowledged as the cost of the lean baseline.** | 6a.2 |
 | 9 | MAJOR | `/api/team/*` reachable from awknranch.com or open internet | Each handler enforces `Origin` header allowlist: `https://team.awknranch.com`, `http://team.localhost:3000` (and Vercel preview domain at deploy time). Mismatched origin returns 403. | 6a.2 |
-| 10 | MAJOR | `SUPABASE_SERVICE_ROLE_KEY` not in Vercel env yet | Added to 6a.0 prereq checklist. Pre-deploy verification step in 6a.8 confirms presence via `vercel env ls`. | 6a.0 |
+| 10 | MAJOR (production-only) | `SUPABASE_SERVICE_ROLE_KEY` not in Vercel env yet | Local impl uses `.env.local` (already populated). Vercel env var setup deferred to §Production Cutover. | 6a-Deploy |
 | 11 | MAJOR | AUTH_FLOW_PATHS gate uses `startsWith` — vulnerable to path traversal (`/login/../spaces/admin`, percent-encoded variants) | Path normalized via `new URL(pathname, origin).pathname` BEFORE allowlist check. Reject anything containing `..` or encoded slashes (`%2e%2e`, `%2f`). Exact-match or single-level prefix only. | 6a.3 |
 | 12 | MAJOR | Auth gate doesn't restrict HTTP method — POST to `/login/reset-password` could bypass auth even if it's a privileged endpoint | Method-aware gate: GET/HEAD allowed for auth-flow routes (they're rendering pages); other methods enforced via per-route handlers + Origin check. The current ports are all GET (Route Handlers), so this risk is currently theoretical but baked into the spec for forward safety. | 6a.3 |
 | 13 | MAJOR | `domain.authRequired` config for `team` not yet verified | Verified in `awkn-web-app/src/lib/domains.ts`: `team` has `authRequired: true` (set during 2026-05-06 bos→team rename). Re-confirmed in 6a.3 verification. | 6a.3 |
 | 14 | MAJOR | `team/` already has 39 RouteStub Phase-2 stubs that conflict with new Route Handlers | Pre-enumerated in 6a.7; deleted in same commit as each batch of route moves | 6a.5–6a.7 |
-| 15 | MAJOR | Legacy session lives in `localStorage[awkn-ranch-auth]` — per-origin, won't carry across subdomains | Operators sign in fresh on `team.awknranch.com` post-migration. Documented in 6a.8 operator comms. The `awknranch.com/login` 301-redirects to `team.awknranch.com/login`, so existing bookmarks just bounce. | 6a.5, 6a.8 |
+| 15 | MAJOR (production-only) | Legacy session lives in `localStorage[awkn-ranch-auth]` — per-origin, won't carry across subdomains | Operators sign in fresh on `team.awknranch.com` post-cutover. Documented in §Production Cutover operator comms. Local impl unaffected (operators don't have prod sessions to lose). | 6a-Deploy |
 | 16 | MAJOR | Some BOS pages have hardcoded `awknranch.com` absolute URLs in HTML/JS that break on team subdomain | Pre-deploy asset audit (script in 6a.7) greps for hardcoded hostnames in `spaces/admin/*`, surfaces any matches for surgical fix. The existing `bosPort: true` rewrite handles `/awkn-ranch/` GH-Pages-prefix URLs but doesn't touch absolute hostnames — known gap. | 6a.7 |
-| 17 | MAJOR | Inbound legacy redirect `/spaces/admin/dashboard` after login bounces hosts post-migration | All auth-related routes deploy together (6a.5–6a.8 deploy stack). Within team subdomain, the relative redirect resolves correctly. No cross-host bouncing because BOS is also on team. | deploy stack |
+| 17 | MAJOR (production-only) | Inbound legacy redirect `/spaces/admin/dashboard` after login bounces hosts post-cutover | All auth-related routes deploy together (6a.5–6a.8 production bundle). Within team subdomain, the relative redirect resolves correctly. No cross-host bouncing because BOS is also on team. Local impl: relative redirect resolves to `team.localhost:3000/spaces/admin/dashboard` — works. | 6a-Deploy |
 | 18 | MAJOR | 301 redirects need to cover `www.awknranch.com`, `awknranch.vercel.app`, plus `/api/*` and webhook callback paths | Redirect rules enumerated explicitly in 6a.8: cover bare host, `www`, Vercel preview/prod hosts. `/api/*` redirects added. `/api/webhooks/*` paths excluded (webhook callers have URLs registered against awknranch — see #19). | 6a.8 |
 | 19 | MAJOR | Third-party webhook URLs (Stripe, SignWell, Resend, Square) registered against `awknranch.com` | **Strategy: keep webhook handlers on awknranch.com host** (no redirect for `/api/webhooks/*` paths). The webhook handlers run as Vercel functions on the same project, just served from awknranch.com. No vendor-side URL changes needed. Documented in 6a.8. | 6a.8 |
-| 20 | MAJOR | Cloudflare CNAME proxy mode (orange cloud) can interfere with Vercel SSL provisioning | 6a.0 prereq specifies "orange cloud OFF" for `team.awknranch.com` CNAME. Standard Vercel + Cloudflare DNS-only setup. | 6a.0 |
-| 21 | MAJOR | Vercel SSL cert may not be issued before deploy → first hits return cert errors | Pre-deploy step in 6a.8: verify `team.awknranch.com` resolves AND has valid TLS via `curl -v https://team.awknranch.com/` before merging to main. | 6a.8 |
+| 20 | MAJOR (production-only) | DNS provider proxy/CDN mode can interfere with Vercel SSL provisioning | Documented in §Production Cutover. DNS-provider-agnostic: whatever provider hosts the domain, configure CNAME with proxy/CDN OFF for the team subdomain. | 6a-Deploy |
+| 21 | MAJOR (production-only) | Vercel SSL cert may not be issued before deploy → first hits return cert errors | Pre-cutover verification step: `dig` + `curl -v https://team.awknranch.com/` confirms TLS valid before promoting. | 6a-Deploy |
 | 22 | MAJOR | SEO impact of moving auth/admin to team subdomain | New `team/robots.txt` with `Disallow: /` (admin pages should never be indexed). Update awknranch sitemap to remove BOS paths. Verified in 6a.7. | 6a.7 |
 | 23 | MAJOR | Verification only checks 200/404 status — misses asset 404s, broken UI, JS errors | Per-batch verification adds: (a) HTML response grep for `awknranch.com` hardcoded refs, (b) browser-tab smoke test on 5 representative pages with DevTools network panel open, (c) console error count assertion (target: zero unexpected errors). | each phase |
 | 24 | MAJOR | Operators have cached login pages on `awknranch.com/login` that won't reflect the redirect | Operator comms (6a.8) include "hard-refresh" instruction. No service workers in repo (verified — `awkn-web-app/public/` has no `sw.js`, `manifest.json` etc.), so cache invalidation is just a Cmd+Shift+R. | 6a.8 |
@@ -94,57 +120,31 @@ The prior `f9c06c4d refactor(bos): move 39 admin pages from awknranch to bos hos
 
 ## Phase structure
 
-| Phase | Title | Commit type | Deploy gate |
+| Phase | Title | Local-only | Affects legacy GitHub Pages on main-deploy |
 |---|---|---|---|
-| 6a.0 | Prerequisites (USER ACTIONS, NO CODE) | None | Must complete before deploy stack |
-| 6a.1 | M2: Centralize SUPABASE_ANON_KEY | Independent | Can ship alone |
-| 6a.2 | M3: Server Actions for risky writes | Independent | Can ship alone |
-| 6a.3 | Auth gate update on team subdomain | Independent | Can ship alone (no-op without 6a.5–6a.8) |
-| 6a.4 | Delete Associates surface | Independent | Can ship alone |
-| 6a.5 | Move Auth routes to team (5 routes) | **Deploy stack** | Blocks deploy; must go with 6a.6–6a.8 |
-| 6a.6 | Move Team Portal routes to team (3 routes incl. /logged-in) | **Deploy stack** | Blocks deploy; must go with 6a.5, 6a.7, 6a.8 |
-| 6a.7 | Move BOS Admin routes to team (39 routes) | **Deploy stack** | Blocks deploy; must go with 6a.5, 6a.6, 6a.8 |
-| 6a.8 | next.config.js redirects + Vercel deploy prep | **Deploy stack** | Blocks deploy; must go with 6a.5–6a.7 |
-| 6a.9 | STATUS / TODO / memory updates | Docs-only | Anytime |
+| 6a.1 | M2: Centralize SUPABASE_ANON_KEY | Yes | Yes (legacy admin pages auto-deploy) |
+| 6a.2 | M3: Server Actions for risky writes | Yes | No (awkn-web-app only) |
+| 6a.3 | Auth gate update on team subdomain | Yes | No |
+| 6a.4 | Delete Associates surface | Yes | Yes (associates pages 404 on GitHub Pages) |
+| 6a.5 | Move Auth routes to team (5 routes) | Yes | No |
+| 6a.6 | Move Team Portal routes to team (3 routes incl. /logged-in) | Yes | No |
+| 6a.7 | Move BOS Admin routes + add team robots.txt (39 routes) | Yes | No |
+| 6a.8 | next.config.js redirects (ready for prod) | Yes | No |
+| 6a.9 | STATUS / TODO / memory updates | Yes | No |
+
+For production cutover (Vercel domain config, DNS CNAME, operator comms, etc.) see **§Production Cutover** at end of doc — deferred until you're ready to go live.
 
 Each phase below has: prerequisites, deliverables, verification, rollback. Designed so a future Claude session can pick up cold from any phase boundary.
 
 ---
 
-### 6a.0 — Prerequisites (USER ACTIONS, NO CODE)
+### Local impl prereqs — none
 
-Before any code lands, the user (Miceli) needs to:
+`.env.local` already contains all secrets. `*.localhost` resolves automatically. The local dev server (`cd awkn-web-app && npm run dev`) is the only thing that needs to be running. Code work begins immediately at 6a.1.
 
-#### Vercel project setup
-- [ ] Confirm `awkn-web-app` is linked to a Vercel project (or create one via `vercel link`)
-- [ ] Add `team.awknranch.com` as an additional domain on the Vercel project
-- [ ] Add `awknranch.com` and `www.awknranch.com` as domains too (if not already)
-- [ ] Wait for Vercel domain verification (usually <5 min)
-- [ ] Wait for SSL cert issuance — verify via `curl -v https://team.awknranch.com/` returns valid cert
+**Constraint reminder:** No prod DB writes during 6a code work (per `feedback_prod-db-discipline`). M3 verification carve-out documented in 6a.2.
 
-#### Vercel environment variables
-Set the following in Vercel project settings → Environment Variables (Production + Preview):
-
-- [ ] `NEXT_PUBLIC_SUPABASE_URL` = `https://lnqxarwqckpmirpmixcw.supabase.co`
-- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (from `.env.local`)
-- [ ] `SUPABASE_URL` = `https://lnqxarwqckpmirpmixcw.supabase.co` (server-side mirror)
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` = (from `.env.local`, just dumped via dump-secrets workflow)
-- [ ] `SUPABASE_DB_PASSWORD` = (from `.env.local`)
-- [ ] **Do NOT set `NEXT_PUBLIC_DISABLE_AUTH=true`** — that flag is dev-only; production should always enforce auth
-
-#### Cloudflare DNS
-- [ ] Add CNAME for `team.awknranch.com` → `cname.vercel-dns.com`
-- [ ] **Set proxy status to DNS-only (orange cloud OFF)** — Vercel handles its own SSL/CDN; Cloudflare proxy mode interferes
-- [ ] Set TTL to 5 min (or "Auto") during cutover; can raise to 1 hour after stable
-- [ ] Verify CNAME resolves: `dig team.awknranch.com CNAME +short`
-
-#### Optional but recommended
-- [ ] Within stakeholder call — flag the within-center separate Supabase question (memory: `project_within-separate-supabase`) for COO. Not blocking 6a but unblocks Within port planning.
-
-#### Constraint reminder
-- [ ] **No prod DB writes during 6a code work** (per `feedback_prod-db-discipline`). Exception: 6a.2 M3 verification creates and cleans up one test user — explicitly carved out.
-
-Local dev needs no DNS work — `team.localhost` resolves automatically on macOS/most Linux distros via the `*.localhost` rule.
+For Vercel + DNS prereqs (deferred until production cutover), see **§Production Cutover** at end of doc.
 
 ### 6a.1 — M2: Centralize the SUPABASE_ANON_KEY
 
@@ -563,11 +563,7 @@ done
 
 ---
 
-## DEPLOY STACK — 6a.5 + 6a.6 + 6a.7 + 6a.8 (4 commits, ship together)
-
-The next four phases form a single deploy unit. Local commits stay separate for review, but **none of them ship to prod individually**. The Vercel cutover happens once all four are green on Vercel preview.
-
-### 6a.5 — Move Auth routes to team subdomain (5 routes) [DEPLOY STACK]
+### 6a.5 — Move Auth routes to team subdomain (5 routes)
 
 **Prerequisite:** 6a.3 done (auth gate patched).
 
@@ -639,8 +635,7 @@ done
 
 `git revert <6a.5-commit>` restores routes to awknranch + brings back the team/login Phase-2 stub. **WARNING:** if reverted in isolation while 6a.7 + 6a.8 remain, the deploy is broken. Use `scripts/rollback-6a-stack.sh` (defined in 6a.8) for safe sequenced rollback.
 
-### 6a.6 — Move Team Portal routes + /logged-in to team subdomain (3 routes) [DEPLOY STACK]
-
+### 6a.6 — Move Team Portal routes + /logged-in to team subdomain (3 routes)
 **Prerequisite:** 6a.5 done.
 
 #### Moves
@@ -690,8 +685,7 @@ done
 
 `git revert <6a.6-commit>`. Same deploy-stack warning as 6a.5.
 
-### 6a.7 — Move BOS Admin routes + add team robots.txt (39 routes + robots) [DEPLOY STACK]
-
+### 6a.7 — Move BOS Admin routes + add team robots.txt (39 routes + robots)
 **Prerequisite:** 6a.5 + 6a.6 done.
 
 **Scope:** Move all 39 Route Handlers from `awknranch/(internal)/spaces/admin/*` to `team/(internal)/spaces/admin/*`. URL paths preserve the `/spaces/admin/` prefix per locked decision (least disruptive — only hostname changes).
@@ -816,8 +810,7 @@ Manual browser verification on 5 representative pages with DevTools open:
 
 `git revert <6a.7-commit>`. Deploy-stack warning applies.
 
-### 6a.8 — next.config.js redirects + Vercel deploy prep + rollback script [DEPLOY STACK]
-
+### 6a.8 — next.config.js redirects + Vercel deploy prep + rollback script
 **Prerequisite:** 6a.5 + 6a.6 + 6a.7 done.
 
 **Scope:**
