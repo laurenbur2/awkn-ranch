@@ -39,16 +39,30 @@ serve(async (req) => {
   }
 
   try {
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseSrk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const publicOrigin = Deno.env.get("PUBLIC_SITE_ORIGIN") ||
       "https://laurenbur2.github.io/awkn-ranch";
-    if (!stripeKey || !supabaseUrl || !supabaseSrk) {
+    if (!supabaseUrl || !supabaseSrk) {
       return json({ error: "Server not fully configured" }, 500);
     }
 
     const supabase = createClient(supabaseUrl, supabaseSrk);
+
+    // Stripe key: prefer env var, fall back to active stripe_config row.
+    let stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+    if (!stripeKey) {
+      const { data: cfg } = await supabase
+        .from("stripe_config")
+        .select("secret_key")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+      if (cfg?.secret_key) stripeKey = cfg.secret_key;
+    }
+    if (!stripeKey) {
+      return json({ error: "Stripe is not configured" }, 500);
+    }
 
     const body: ReqBody = await req.json();
     if (!body?.booking_id) return json({ error: "Missing booking_id" }, 400);
