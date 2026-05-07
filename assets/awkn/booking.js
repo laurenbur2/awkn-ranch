@@ -8,7 +8,20 @@
 // When wired to a fresh seed, this listings array should match
 // supabase/migrations/20260507_awkn_booking_v1.sql so the IDs stay stable.
 
-import { supabase } from '/shared/supabase.js';
+import { supabase } from '../../shared/supabase.js';
+
+// Detect repo base path so we work on both GitHub Pages (/awkn-ranch/) and
+// a custom-domain root (/). Used to resolve image paths inside LISTINGS data
+// which is shared across pages at different depths.
+const BASE = (() => {
+  const segments = location.pathname.split('/').filter(Boolean);
+  // If first segment is 'awkn-ranch' (GitHub Pages), strip it as prefix.
+  if (segments[0] === 'awkn-ranch') return '/awkn-ranch';
+  return '';
+})();
+export function asset(path) {
+  return BASE + (path.startsWith('/') ? path : '/' + path);
+}
 
 export const LISTINGS = [
   {
