@@ -320,24 +320,24 @@
     }
     .awknhero h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(3.4rem, 9vw, 7rem);
+      font-size: clamp(4.2rem, 13vw, 9.5rem);
       color: #fff;
-      font-weight: 300;
-      letter-spacing: 0.02em;
-      line-height: 1.05;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      line-height: 1;
       margin: 0;
+      /* visual offset: tracking pushes the last letter past center */
+      text-indent: 0.18em;
     }
-    .awknhero h1 em { font-style: italic; font-weight: 300; color: var(--gold); }
-    /* The logo JPG has a black background; mix-blend-mode: screen
-       drops the black and lets the bronze AWKN letters glow over the
-       hero photo. Requires .awknhero-content NOT to create a stacking
-       context (see above). */
-    .awknhero-logo {
+    .awknhero-mantra {
       display: block;
-      width: clamp(260px, 48vw, 540px);
-      height: auto;
-      margin: 0 auto;
-      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
+      margin-top: 1.6rem;
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.6rem, 0.9vw, 0.74rem);
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.78);
+      font-weight: 400;
     }
     .awknhero-tagline {
       display: block;
@@ -910,8 +910,8 @@
     <div class="awknhero-bg"></div>
     <div class="awknhero-content">
       <span class="awknhero-place">Austin, Texas</span>
-      <h1 style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">AWKN Ranch</h1>
-      <img src="assets/awkn/awkn-logo.png" alt="AWKN — Ancient Wisdom Known Now" class="awknhero-logo">
+      <h1>AWKN</h1>
+      <span class="awknhero-mantra">Ancient Wisdom Known Now</span>
       <span class="awknhero-tagline">A wellness retreat held by the land.</span>
     </div>
     <a href="#welcome" class="awknhero-scroll-cue" aria-label="Scroll down">
