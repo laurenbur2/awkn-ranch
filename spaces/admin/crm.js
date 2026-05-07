@@ -1,7 +1,7 @@
 // CRM Page - Admin Dashboard
 // Manages leads, pipeline, invoices, proposals, and analytics
 
-import { supabase } from '../../shared/supabase.js';
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '../../shared/supabase.js';
 import { initAdminPage, showToast, setupLightbox } from '../../shared/admin-shell.js';
 import { sendProposalEmail, sendAgreementEmail, previewAgreementPdf } from './crm-actions.js';
 
@@ -1349,13 +1349,12 @@ The ${bizLabel} Team</textarea>
         const { data: session } = await supabase.auth.getSession();
         const token = session?.session?.access_token;
 
-        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-        const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
+        const resp = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+            'apikey': SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({
             type: 'custom',
@@ -1624,8 +1623,8 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Loading preview…';
       try {
-        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const supabaseUrl = SUPABASE_URL;
+        const anonKey = SUPABASE_ANON_KEY;
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
@@ -1657,8 +1656,8 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Sending…';
       try {
-        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const supabaseUrl = SUPABASE_URL;
+        const anonKey = SUPABASE_ANON_KEY;
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
@@ -1684,8 +1683,8 @@ The ${bizLabel} Team</textarea>
       btn.disabled = true;
       btn.textContent = 'Sending…';
       try {
-        const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+        const supabaseUrl = SUPABASE_URL;
+        const anonKey = SUPABASE_ANON_KEY;
         const resp = await fetch(supabaseUrl + '/functions/v1/send-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + anonKey, 'apikey': anonKey },
@@ -2079,12 +2078,12 @@ async function sendLeadEmail(lead, body) {
 
   const { data: session } = await supabase.auth.getSession();
   const token = session?.session?.access_token;
-  const resp = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
+  const resp = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token,
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+      'apikey': SUPABASE_ANON_KEY,
     },
     body: JSON.stringify({ type: 'custom', to: lead.email, data: { subject, html: htmlBody, text: body } }),
   });
@@ -3004,12 +3003,12 @@ async function saveInvoice(existingInvoice, status) {
     if (status === 'sent' && payload.client_email) {
       try {
         const recipientFirstName = String(payload.client_name || '').trim().split(/\s+/)[0] || '';
-        const emailResp = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/send-email', {
+        const emailResp = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+            'apikey': SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({
             type: 'invoice_sent',
@@ -3688,8 +3687,8 @@ async function previewProposalEmail() {
   const tax = parseFloat(document.getElementById('prop-tax').value) || 0;
   const total = subtotal - discount + tax;
 
-  const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+  const supabaseUrl = SUPABASE_URL;
+  const anonKey = SUPABASE_ANON_KEY;
 
   const btn = document.getElementById('btn-preview-proposal');
   const prevLabel = btn?.textContent;

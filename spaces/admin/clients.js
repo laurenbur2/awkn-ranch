@@ -1,7 +1,7 @@
 // Clients Page - Admin view for AWKN Within ketamine clients.
 // Sub-tabs: Clients / Schedule / House / Services.
 
-import { supabase } from '../../shared/supabase.js';
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '../../shared/supabase.js';
 import { initAdminPage, showToast } from '../../shared/admin-shell.js';
 import { sendProposalEmail } from './crm-actions.js';
 import { openClientStayModal } from '../../shared/client-stay-modal.js';
@@ -2255,8 +2255,7 @@ const WELCOME_PACKAGES = {
   },
 };
 
-const SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+// (SUPABASE_URL + SUPABASE_ANON_KEY now imported from shared/supabase.js — see top of file)
 
 // Map a client_packages.name to one of the welcome-letter preset keys, so the
 // modal can auto-select the right preset for clients who already have a
@@ -3422,8 +3421,8 @@ async function saveScheduledSession(sessionId, options = {}) {
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData?.session?.access_token;
-    const supabaseUrl = 'https://lnqxarwqckpmirpmixcw.supabase.co';
-    const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+    const supabaseUrl = SUPABASE_URL;
+    const anonKey = SUPABASE_ANON_KEY;
 
     const payload = isClass
       ? {
