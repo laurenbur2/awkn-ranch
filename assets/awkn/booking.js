@@ -412,3 +412,35 @@ export async function submitBookingRequest(payload) {
     .single();
   return { data, error };
 }
+
+// ─── Stripe Checkout ────────────────────────────────────────────────────────
+// Asks the awkn-create-checkout edge function for a Checkout Session URL for
+// a just-inserted booking. The function reads the booking's stored amount
+// server-side (never trusting the client). On success returns { url } so the
+// caller can window.location = url.
+const FUNCTIONS_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1';
+const SUPABASE_ANON_KEY_FOR_FN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+export async function createStripeCheckout(bookingId) {
+  try {
+    const res = await fetch(`${FUNCTIONS_URL}/awkn-create-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY_FOR_FN}`,
+        'apikey': SUPABASE_ANON_KEY_FOR_FN,
+      },
+      body: JSON.stringify({
+        booking_id: bookingId,
+        origin: location.origin + (location.pathname.startsWith('/awkn-ranch') ? '/awkn-ranch' : ''),
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { error: data.error || `HTTP ${res.status}` };
+    if (!data.url) return { error: 'No checkout URL returned' };
+    return { url: data.url };
+  } catch (e) {
+    return { error: e.message || 'Network error' };
+  }
+}

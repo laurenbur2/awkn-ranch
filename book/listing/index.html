@@ -138,7 +138,8 @@
           </div>
         </div>
 
-        <button type="submit" class="book-submit" id="submitBtn">Request to Book</button>
+        <button type="submit" class="book-submit" id="submitBtn">Continue to Payment</button>
+        <div class="book-secure-note">Secured by Stripe &middot; you won&rsquo;t be charged until you confirm on the next page.</div>
         <div id="bookMessage"></div>
       </form>
     </aside>
@@ -162,7 +163,7 @@
   <script type="module">
     import {
       getListing, fmtMoney, mountCalendar, fetchBlockedDates,
-      calculatePrice, submitBookingRequest, toDateKey, asset
+      calculatePrice, submitBookingRequest, createStripeCheckout, toDateKey, asset
     } from '../../assets/awkn/booking.js';
     import { supabase } from '../../shared/supabase.js';
 
@@ -449,10 +450,9 @@
           notes: fd.get('notes')?.toString().trim() || null,
         });
 
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Request to Book';
-
         if (error) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Continue to Payment';
           console.error('[booking] submit failed:', error);
           // If the table doesn't exist yet, fall back to mailto
           if (error.code === 'PGRST205' || /relation .* does not exist/.test(error.message || '')) {
@@ -460,7 +460,7 @@
               <div class="book-success">
                 Database not yet provisioned — your request has been prepared as an email.
                 <a href="mailto:hello@awknranch.com?subject=Booking%20Request%20-%20${encodeURIComponent(listing.name)}&body=${encodeURIComponent(
-                  `Listing: ${listing.name}\nName: ${guest_name}\nEmail: ${guest_email}\nDates: ${start.toLocaleString()} → ${end.toLocaleString()}\nGuests: ${guests}\nTotal: ${fmtMoney(breakdown.total)}\nNotes: ${fd.get('notes') || ''}`
+                  `Listing: ${listing.name}\nName: ${guest_name}\nEmail: ${guest_email}\nPhone: ${guest_phone}\nDates: ${start.toLocaleString()} → ${end.toLocaleString()}\nGuests: ${guests}\nTotal: ${fmtMoney(breakdown.total)}\nNotes: ${fd.get('notes') || ''}`
                 )}" style="color:var(--gold);font-weight:600;">Click to send →</a>
               </div>`;
           } else {
@@ -469,13 +469,25 @@
           return;
         }
 
-        messageEl.innerHTML = `
-          <div class="book-success">
-            <strong>Request received.</strong> We&rsquo;ll confirm availability within a day at ${guest_email}.
-          </div>`;
-        form.reset();
-        cal.reset();
-        totalHost.hidden = true;
+        // Booking saved — request a Stripe Checkout URL and redirect.
+        submitBtn.textContent = 'Redirecting to payment…';
+        const checkout = await createStripeCheckout(data.id);
+        if (checkout.error) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Continue to Payment';
+          console.error('[booking] checkout error:', checkout.error);
+          messageEl.innerHTML = `
+            <div class="book-success">
+              <strong>We received your request.</strong> Our payment system isn&rsquo;t live yet, so we&rsquo;ll
+              email you a payment link at ${guest_email} within a day.
+            </div>`;
+          form.reset();
+          cal.reset();
+          totalHost.hidden = true;
+          return;
+        }
+        // Hand off to Stripe
+        window.location.href = checkout.url;
       });
     }
   </script>

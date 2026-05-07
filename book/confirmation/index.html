@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmed | AWKN Ranch</title>
+  <meta name="description" content="Your booking at AWKN Ranch is confirmed.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/awkn/site.css?v=20260507c">
+  <link rel="stylesheet" href="../../assets/awkn/booking.css?v=20260507a">
+  <style>
+    .confirm-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 8rem 2rem 6rem;
+      text-align: center;
+    }
+    .confirm-mark {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--dark);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+    .confirm-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .confirm-title em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .confirm-sub {
+      font-size: 1rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+    .confirm-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.85rem 2rem;
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+    .confirm-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.55rem 0;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .confirm-row:last-child { border-bottom: none; }
+    .confirm-row .label {
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      font-weight: 600;
+      align-self: center;
+    }
+    .confirm-row .value { color: var(--dark); text-align: right; }
+    .confirm-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../../" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../../contact/" class="secondary-cta">Contact</a>
+      <a href="../">All Listings</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../../" data-menu-link>Home</a></li>
+      <li><a href="../../property/" data-menu-link>Property</a></li>
+      <li><a href="../" data-menu-link>Book</a></li>
+      <li><a href="../../contact/" data-menu-link>Contact</a></li>
+    </ul>
+  </aside>
+
+  <main class="confirm-wrap">
+    <div class="confirm-mark">&#10003;</div>
+    <h1 class="confirm-title" id="title">Booking <em>confirmed</em>.</h1>
+    <p class="confirm-sub" id="subtitle">Loading your booking details&hellip;</p>
+
+    <div class="confirm-card" id="bookingCard" hidden>
+      <div class="confirm-row"><span class="label">Listing</span><span class="value" id="rowListing">—</span></div>
+      <div class="confirm-row"><span class="label">Dates</span><span class="value" id="rowDates">—</span></div>
+      <div class="confirm-row"><span class="label">Guest</span><span class="value" id="rowGuest">—</span></div>
+      <div class="confirm-row"><span class="label">Total</span><span class="value" id="rowTotal">—</span></div>
+      <div class="confirm-row"><span class="label">Status</span><span class="value" id="rowStatus">—</span></div>
+    </div>
+
+    <div class="confirm-actions">
+      <a href="../" class="btn btn-outline" style="color:var(--gold);border-color:var(--gold);">Back to all listings</a>
+      <a href="../../" class="btn btn-gold">Back to Home</a>
+    </div>
+  </main>
+
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">&middot;</span> Parent of <a href="../../within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script src="../../assets/awkn/site.js?v=20260507c" defer></script>
+  <script type="module">
+    import { fmtMoney } from '../../assets/awkn/booking.js';
+    import { supabase } from '../../shared/supabase.js';
+
+    const params = new URLSearchParams(location.search);
+    const bookingId = params.get('booking_id');
+    const subtitleEl = document.getElementById('subtitle');
+    const cardEl = document.getElementById('bookingCard');
+
+    if (!bookingId) {
+      subtitleEl.textContent = "We didn't find a booking reference in this URL. If you just paid, give us a few seconds and refresh — or check your email for a confirmation.";
+    } else {
+      // Poll the booking until status flips to 'paid' (webhook lag is usually
+      // a couple of seconds). Give up after ~20s and show what we have.
+      let tries = 0;
+      const maxTries = 10;
+      const tick = async () => {
+        tries++;
+        const { data, error } = await supabase
+          .from('awkn_bookings')
+          .select('status,total_amount,start_at,end_at,mode,guest_name,listing:awkn_listings(name)')
+          .eq('id', bookingId)
+          .maybeSingle();
+        if (error) {
+          subtitleEl.textContent = "We're having trouble loading your booking. Check your email for the confirmation, or get in touch.";
+          return;
+        }
+        if (!data) {
+          subtitleEl.textContent = "We couldn't find that booking. Check your email for the confirmation.";
+          return;
+        }
+        renderBooking(data);
+        if (data.status === 'paid' || tries >= maxTries) {
+          if (data.status === 'paid') {
+            subtitleEl.innerHTML = "Thanks &mdash; we&rsquo;ve received your payment and will be in touch with arrival details shortly.";
+          } else {
+            subtitleEl.innerHTML = "Payment is processing. We&rsquo;ll email you the moment it confirms.";
+          }
+          return;
+        }
+        setTimeout(tick, 2000);
+      };
+      tick();
+    }
+
+    function renderBooking(b) {
+      cardEl.hidden = false;
+      const listingName = b.listing?.name || '—';
+      const start = new Date(b.start_at);
+      const end = new Date(b.end_at);
+      const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+      const dates = b.mode === 'hourly'
+        ? `${start.toLocaleDateString('en-US', opts)}, ${start.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})} → ${end.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`
+        : `${start.toLocaleDateString('en-US', opts)} → ${end.toLocaleDateString('en-US', opts)}`;
+      document.getElementById('rowListing').textContent = listingName;
+      document.getElementById('rowDates').textContent = dates;
+      document.getElementById('rowGuest').textContent = b.guest_name;
+      document.getElementById('rowTotal').textContent = fmtMoney(Number(b.total_amount) || 0);
+      document.getElementById('rowStatus').textContent = b.status === 'paid' ? 'Paid' : (b.status === 'hold' ? 'Awaiting payment confirmation' : b.status);
+    }
+  </script>
+</body>
+</html>

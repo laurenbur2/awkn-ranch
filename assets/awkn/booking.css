@@ -403,6 +403,13 @@
 }
 .book-submit:hover:not(:disabled) { background: #e3aa50; transform: translateY(-1px); }
 .book-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.book-secure-note {
+  margin-top: 0.85rem;
+  font-size: 0.7rem;
+  color: var(--grey);
+  text-align: center;
+  line-height: 1.5;
+}
 
 .book-success,
 .book-error {
