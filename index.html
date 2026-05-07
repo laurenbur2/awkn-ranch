@@ -913,18 +913,38 @@
   <div class="menu-backdrop" id="menuBackdrop"></div>
   <aside class="menu-panel" id="menuPanel" aria-hidden="true">
     <ul>
-      <li><a href="./" data-menu-link>Home</a></li>
-      <li><a href="property/" data-menu-link>Explore Our Property</a></li>
-      <li><a href="book/" data-menu-link>Book Your Experience</a></li>
-      <li><a href="host-a-retreat/" data-menu-link>Host a Retreat</a></li>
-      <li><a href="events/" data-menu-link>Event Schedule</a></li>
-      <li><a href="services/" data-menu-link>Our Services</a></li>
-      <li><a href="team/" data-menu-link>Our Team</a></li>
-      <li><a href="contact/" data-menu-link>Contact Us</a></li>
+      <li class="has-sub"><a href="property/" data-submenu-toggle data-sub="menuSubStay">Stay</a></li>
+      <li class="has-sub"><a href="services/" data-submenu-toggle data-sub="menuSubExperience">Experience</a></li>
+      <li class="has-sub"><a href="team/" data-submenu-toggle data-sub="menuSubAbout">About</a></li>
+      <li><a href="contact/" data-menu-link>Contact</a></li>
     </ul>
-    <div class="menu-panel-foot">
-      Twelve acres held for healing &mdash; in the hills outside Austin, Texas.
-    </div>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+  <aside class="menu-sub" id="menuSubStay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Stay With Us</span>
+    <ul>
+      <li><a href="property/" data-menu-link>Property Tour<span class="sub-tagline">The land &amp; spaces</span></a></li>
+      <li><a href="book/" data-menu-link>Rooms &amp; Lodging<span class="sub-tagline">Book a stay</span></a></li>
+      <li><a href="book/#membership" data-menu-link>Memberships<span class="sub-tagline">Belong to the land</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubExperience" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Experience</span>
+    <ul>
+      <li><a href="services/" data-menu-link>Services &amp; Amenities<span class="sub-tagline">Sauna, sound, bodywork</span></a></li>
+      <li><a href="events/" data-menu-link>Events &amp; Classes<span class="sub-tagline">What's coming up</span></a></li>
+      <li><a href="host-a-retreat/" data-menu-link>Host a Retreat<span class="sub-tagline">For facilitators</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About</span>
+    <ul>
+      <li><a href="team/" data-menu-link>Our Team<span class="sub-tagline">Founders &amp; guides</span></a></li>
+      <li><a href="within-center/" data-menu-link>Within Center<span class="sub-tagline">Sister practice for psychedelic therapy</span></a></li>
+    </ul>
   </aside>
 
   <!-- ══ HERO ═══════════════════════════════════════════ -->
@@ -1161,17 +1181,8 @@
     <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="within-center/">Within Center</a>, our sister practice for ceremonial ketamine therapy.</p>
   </footer>
 
+  <script src="assets/awkn/site.js" defer></script>
   <script>
-    // Nav background swap on scroll
-    (function () {
-      var nav = document.getElementById('siteNav');
-      function update() {
-        if (window.scrollY > 80) nav.classList.add('scrolled');
-        else nav.classList.remove('scrolled');
-      }
-      window.addEventListener('scroll', update);
-      update();
-    })();
 
     // Philosophy block: bidirectional scroll-bound stagger
     (function () {
@@ -1205,37 +1216,6 @@
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
       update();
-    })();
-
-    // Menu open / close
-    (function () {
-      var nav = document.getElementById('siteNav');
-      var toggle = document.getElementById('menuToggle');
-      var panel = document.getElementById('menuPanel');
-      var backdrop = document.getElementById('menuBackdrop');
-      function isOpen() { return panel.classList.contains('open'); }
-      function openMenu() {
-        panel.classList.add('open');
-        backdrop.classList.add('open');
-        nav.classList.add('menu-is-open');
-        panel.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('menu-open');
-      }
-      function closeMenu() {
-        panel.classList.remove('open');
-        backdrop.classList.remove('open');
-        nav.classList.remove('menu-is-open');
-        panel.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('menu-open');
-      }
-      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
-      backdrop.addEventListener('click', closeMenu);
-      document.querySelectorAll('[data-menu-link]').forEach(function (a) {
-        a.addEventListener('click', closeMenu);
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && isOpen()) closeMenu();
-      });
     })();
   </script>
 
