@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Within Schedule — AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    /* Page chrome */
+    .ws-wrap { max-width: 1500px; margin: 0 auto; padding: 1rem 1.25rem 4rem; }
+    .ws-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .ws-head p  { margin: 0 0 1rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+
+    /* Toolbar */
+    .ws-toolbar {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px 12px 0 0; padding: 0.55rem 0.75rem;
+      border-bottom: none;
+    }
+    .ws-tb-btn {
+      padding: 0.4rem 0.75rem; border-radius: 7px; border: 1px solid #e5e7eb;
+      background: #fff; font: inherit; font-size: 0.82rem; font-weight: 600; color: #374151; cursor: pointer;
+    }
+    .ws-tb-btn:hover { background: #f9fafb; }
+    .ws-tb-range { font-size: 0.92rem; font-weight: 600; color: #111827; padding: 0 0.5rem; flex: 1; text-align: center; }
+    .ws-tb-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; }
+    .ws-tb-btn-primary:hover { background: #b87625; }
+
+    /* Layout: separate header row from body. Body has a time column on the
+       left and 7 equal-width day columns. Each day column is its own
+       positioned context for absolutely-placed events.
+
+       Why not CSS Grid with one big multi-row item? Grid auto-row sizing
+       interacts unpredictably with overlay items spanning many rows — events
+       were drifting to the top of the day. A pure flex layout where each
+       day column owns its own height makes the math one-to-one. */
+    :root { --hour-h: 70px; --header-h: 56px; --time-col-w: 60px; }
+
+    .ws-grid-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 0 0 12px 12px; overflow: auto;
+    }
+
+    .ws-header {
+      display: flex; min-width: 980px;
+      position: sticky; top: 0; z-index: 4;
+      background: #fafafa; border-bottom: 1px solid #e5e7eb;
+    }
+    .ws-corner {
+      flex: 0 0 var(--time-col-w);
+      height: var(--header-h);
+      background: #fafafa; border-right: 1px solid #f3f4f6;
+    }
+    .ws-day-head {
+      flex: 1 1 0; min-width: 140px;
+      height: var(--header-h);
+      padding: 0.55rem 0.6rem;
+      border-right: 1px solid #f3f4f6;
+      background: #fafafa; text-align: center;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .ws-day-head.is-today { background: #fef3e6; }
+    .ws-day-dow { font-size: 0.7rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+    .ws-day-date { font-size: 1rem; font-weight: 700; color: #111827; margin-top: 0.1rem; }
+    .ws-day-head.is-today .ws-day-date { color: #d4883a; }
+
+    .ws-body {
+      display: flex; min-width: 980px;
+      position: relative;
+    }
+
+    /* Time-of-day labels column on the left. Stacked hour rows. */
+    .ws-time-col {
+      flex: 0 0 var(--time-col-w);
+      background: #fafafa; border-right: 1px solid #f3f4f6;
+      position: sticky; left: 0; z-index: 3;
+    }
+    .ws-time-cell {
+      height: var(--hour-h);
+      font-size: 0.7rem; color: #6b7280;
+      padding: 0.2rem 0.4rem 0; text-align: right;
+      border-bottom: 1px solid #f3f4f6;
+      box-sizing: border-box;
+    }
+
+    /* Day column: positioned context for absolutely-placed events. Hour
+       gridlines drawn as a repeating background so they always line up
+       with the time labels on the left. */
+    .ws-day-col {
+      flex: 1 1 0; min-width: 140px;
+      position: relative;
+      border-right: 1px solid #f3f4f6;
+      background-image:
+        linear-gradient(to bottom, transparent calc(var(--hour-h) - 1px), #f3f4f6 calc(var(--hour-h) - 1px), #f3f4f6 var(--hour-h));
+      background-size: 100% var(--hour-h);
+      background-repeat: repeat-y;
+    }
+    .ws-day-col.is-today { background-color: #fef9f3; }
+
+    /* Events absolutely positioned within their day column. The day-col itself
+       is the positioning context; all events use top/height/left/width % */
+    .ws-event {
+      position: absolute;
+      box-sizing: border-box;
+      padding: 0.3rem 0.45rem;
+      border-radius: 6px;
+      font-size: 0.74rem; line-height: 1.2;
+      overflow: hidden;
+      cursor: grab;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      transition: box-shadow 0.12s ease;
+      touch-action: none; /* prevent touch scroll from interrupting drag on mobile */
+    }
+    .ws-event:active { cursor: grabbing; }
+    .ws-event:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.10); }
+    .ws-event-time  { font-weight: 600; font-size: 0.66rem; opacity: 0.85; margin-bottom: 0.05rem; }
+    .ws-event-title { font-weight: 700; }
+    .ws-event-sub   { font-size: 0.66rem; opacity: 0.75; margin-top: 0.1rem; }
+
+    /* Session events — colored by service / status */
+    .ws-event.session {
+      background: #ecfdf5; color: #065f46; border-left: 3px solid #16a34a;
+    }
+    .ws-event.session.cancelled { opacity: 0.45; text-decoration: line-through; border-left-color: #9ca3af; }
+    .ws-event.session.integration { background: #eff6ff; color: #1e3a8a; border-left-color: #2563eb; }
+    .ws-event.session.massage     { background: #fdf4ff; color: #6b21a8; border-left-color: #a855f7; }
+    .ws-event.session.iv          { background: #fff7ed; color: #9a3412; border-left-color: #f97316; }
+
+    /* Meal events — click to edit (rename, move, change times, delete) */
+    .ws-event.meal {
+      background: #fef3e6; color: #b45309; border-left: 3px solid #d4883a;
+    }
+    .ws-event.meal .ws-event-title { font-weight: 600; }
+
+    /* Now-line: subtle horizontal indicator for current time. Lives inside
+       today's day column, positioned absolutely. */
+    .ws-now-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: #ef4444;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .ws-now-line::before {
+      content: ""; position: absolute; left: -4px; top: -3px;
+      width: 8px; height: 8px; background: #ef4444; border-radius: 50%;
+    }
+
+    /* Modal — session details */
+    .ws-modal-overlay {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(20, 20, 20, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .ws-modal-overlay.hidden { display: none; }
+    .ws-modal {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      width: 100%; max-width: 460px; max-height: calc(100vh - 2rem);
+      display: flex; flex-direction: column;
+    }
+    .ws-modal-head { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6; }
+    .ws-modal-title { font-size: 1.05rem; font-weight: 700; color: #111827; }
+    .ws-modal-x { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #6b7280; padding: 0 0.25rem; }
+    .ws-modal-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; }
+    .ws-modal-row { display: flex; flex-direction: column; gap: 0.15rem; }
+    .ws-modal-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+    .ws-modal-value { font-size: 0.92rem; color: #111827; }
+    .ws-modal-foot { display: flex; gap: 0.5rem; justify-content: flex-end; padding: 0.85rem 1.25rem; border-top: 1px solid #f3f4f6; }
+    .ws-modal-link {
+      padding: 0.5rem 0.95rem; border-radius: 8px; border: 1px solid #d4883a;
+      background: #d4883a; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .ws-modal-link:hover { background: #b87625; }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="ws-wrap">
+      <div class="ws-head">
+        <h1>Within Schedule</h1>
+        <p>Within client sessions for the week, with meals shown as house events. Click any session to see details.</p>
+      </div>
+
+      <div class="ws-toolbar">
+        <button class="ws-tb-btn" id="btnPrev" aria-label="Previous week">←</button>
+        <button class="ws-tb-btn" id="btnToday">Today</button>
+        <button class="ws-tb-btn" id="btnNext" aria-label="Next week">→</button>
+        <span class="ws-tb-range" id="tbRange">—</span>
+        <button class="ws-tb-btn" id="btnNewMeal">+ New Meal</button>
+        <button class="ws-tb-btn ws-tb-btn-primary" id="btnNewSession">+ New Session</button>
+      </div>
+      <div class="ws-grid-wrap">
+        <div class="ws-header" id="wsHeader"></div>
+        <div class="ws-body" id="wsBody"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- New session modal -->
+  <div class="ws-modal-overlay hidden" id="nsModal">
+    <div class="ws-modal" style="max-width: 520px;">
+      <div class="ws-modal-head">
+        <span class="ws-modal-title" id="nsModalTitle">New Session</span>
+        <button class="ws-modal-x" id="nsClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ws-modal-body">
+        <div id="nsError" style="background:#fef2f2;color:#991b1b;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fecaca;display:none;"></div>
+        <div id="nsConflict" style="background:#fef3c7;color:#78350f;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fde68a;display:none;"></div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Client</span>
+          <div style="position: relative;">
+            <input type="text" id="nsClientSearch" placeholder="Search Within client (name, email)…" autocomplete="off"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+            <div id="nsClientResults" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:5;display:none;box-shadow:0 8px 20px rgba(0,0,0,0.08);"></div>
+            <div id="nsSelectedClient" style="margin-top:0.4rem;display:none;background:#f9fafb;padding:0.45rem 0.6rem;border-radius:6px;border:1px solid #e5e7eb;font-size:0.84rem;"></div>
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Service</span>
+          <select id="nsService" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select service —</option>
+          </select>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Facilitator / Staff</span>
+          <select id="nsAssignee" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select who's running this session —</option>
+          </select>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Additional Facilitator <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional, for ketamine sessions or co-facilitated work)</span></span>
+          <select id="nsAdditionalFacilitator" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— None —</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Date</span>
+            <input type="date" id="nsDate" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Start</span>
+            <input type="time" step="300" id="nsStart" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">End</span>
+            <input type="time" step="300" id="nsEnd" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Space</span>
+          <select id="nsSpace" style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;background:#fff;">
+            <option value="">— Select a space —</option>
+          </select>
+        </div>
+
+        <div class="ws-modal-row" id="nsOtherWrap" style="display:none;">
+          <span class="ws-modal-label">Location</span>
+          <input type="text" id="nsOtherLocation" placeholder="Type the location (e.g., Outside, Pool deck, Off-site)"
+                 style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Notes <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="nsNotes" rows="2" placeholder="Anything the team should know about this session…"
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="ws-modal-foot">
+        <button class="ws-tb-btn" id="nsCancel">Cancel</button>
+        <button class="ws-tb-btn ws-tb-btn-primary" id="nsSave">Create Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meal modal — add new or edit/delete an existing meal entry -->
+  <div class="ws-modal-overlay hidden" id="mealModal">
+    <div class="ws-modal" style="max-width: 480px;">
+      <div class="ws-modal-head">
+        <span class="ws-modal-title" id="mealModalTitle">New Meal</span>
+        <button class="ws-modal-x" id="mealClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="ws-modal-body">
+        <div id="mealError" style="background:#fef2f2;color:#991b1b;padding:0.55rem 0.7rem;border-radius:8px;font-size:0.82rem;border:1px solid #fecaca;display:none;"></div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Name</span>
+          <input type="text" id="mealName" placeholder="e.g., Continental Breakfast, Lunch, Dinner"
+                 style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">What's being served <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="mealDescription" rows="2" placeholder="Pancakes &amp; fruit, garden salad with grilled chicken, etc."
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;">
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Date</span>
+            <input type="date" id="mealDate"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">Start</span>
+            <input type="time" step="300" id="mealStart"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+          <div class="ws-modal-row">
+            <span class="ws-modal-label">End</span>
+            <input type="time" step="300" id="mealEnd"
+                   style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;">
+          </div>
+        </div>
+
+        <div class="ws-modal-row">
+          <span class="ws-modal-label">Notes <span style="font-weight:500;color:#9ca3af;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea id="mealNotes" rows="2" placeholder="Anything else the team should know…"
+                    style="width:100%;padding:0.55rem 0.7rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="ws-modal-foot" style="justify-content:space-between;">
+        <button class="ws-tb-btn" id="mealDelete" style="color:#b91c1c;border-color:#fca5a5;display:none;">Delete</button>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="ws-tb-btn" id="mealCancel">Cancel</button>
+          <button class="ws-tb-btn ws-tb-btn-primary" id="mealSave">Save Meal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session detail modal -->
+  <div class="ws-modal-overlay hidden" id="wsModal">
+    <div class="ws-modal">
+      <div class="ws-modal-head">
+        <span class="ws-modal-title" id="wsModalTitle">Session</span>
+        <button class="ws-modal-x" id="wsModalClose">&times;</button>
+      </div>
+      <div class="ws-modal-body" id="wsModalBody"></div>
+      <div class="ws-modal-foot" id="wsModalFoot"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="within-schedule.js?v=20260505e"></script>
+</body>
+</html>

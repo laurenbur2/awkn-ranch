@@ -24,7 +24,7 @@ import path from "node:path";
  * to /team without further bridging.
  */
 export function GET() {
-  const fullPath = path.join(process.cwd(), "..", "login/index.html");
+  const fullPath = path.join(process.cwd(), "legacy", "login/index.html");
   let html = fs.readFileSync(fullPath, "utf-8");
 
   html = html.replaceAll('src="app.js"', 'src="/login/app.js"');

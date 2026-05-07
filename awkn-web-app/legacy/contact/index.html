@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | AWKN Ranch</title>
+  <meta name="description" content="Get in touch with AWKN Ranch — for stays, retreats, services, and visits to the property in Austin, TX.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/contact/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/awkn/site.css">
+
+  <style>
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+    }
+
+    .contact-info-block { display: grid; gap: 2rem; }
+    .contact-info-item { padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .contact-info-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .contact-info-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+    }
+    .contact-info-value {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+    .contact-info-value a { transition: color 0.25s; }
+    .contact-info-value a:hover { color: var(--gold); }
+    .contact-info-note {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+
+    .map-iframe {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      border: none;
+      background: var(--cream-deep);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact</a>
+      <a href="../book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../" data-menu-link>Home</a></li>
+      <li><a href="../property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="../book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="../host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="../events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="../services/" data-menu-link>Our Services</a></li>
+      <li><a href="../team/" data-menu-link>Our Team</a></li>
+      <li><a href="../contact/" class="current" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('../assets/awkn/temple.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Contact Us</span>
+      <h1>Come <em>visit</em>.</h1>
+      <span class="page-hero-tagline">For stays, retreats, services, or simply to see the land &mdash; we'd love to hear from you.</span>
+    </div>
+  </header>
+
+  <!-- CONTACT GRID -->
+  <section class="bg-cream">
+    <div class="contact-grid">
+
+      <!-- Form -->
+      <div>
+        <div class="s-eyebrow">Send a Note</div>
+        <h2 class="s-title">Tell us what <em>you're after</em>.</h2>
+        <p style="font-size: 0.95rem; color: var(--grey); line-height: 1.85; margin-top: 0.75rem;">Most inquiries are answered within a day, often by Heather or Lauren directly.</p>
+
+        <form class="awkn-form" action="mailto:hello@awknranch.com" method="post" enctype="text/plain" style="margin-top: 1.75rem;">
+          <div class="awkn-form-row">
+            <div>
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+          </div>
+          <div>
+            <label for="reason">What's This About?</label>
+            <select id="reason" name="reason">
+              <option>Booking a stay</option>
+              <option>Hosting a retreat</option>
+              <option>A wellness service</option>
+              <option>An event or class</option>
+              <option>Membership</option>
+              <option>Press / partnerships</option>
+              <option>Joining the team</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div>
+            <label for="msg">Your Message</label>
+            <textarea id="msg" name="msg" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-dark">Send Message</button>
+        </form>
+      </div>
+
+      <!-- Info -->
+      <div class="contact-info-block">
+        <div class="contact-info-item">
+          <div class="contact-info-label">Email</div>
+          <div class="contact-info-value"><a href="mailto:hello@awknranch.com">hello@awknranch.com</a></div>
+          <div class="contact-info-note">For all inquiries. Replies usually within one business day.</div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-label">Visit</div>
+          <div class="contact-info-value">7600 Stillridge Dr<br>Austin, TX 78736</div>
+          <div class="contact-info-note">Visits are by appointment only &mdash; the gate is closed unless we're expecting you. Twenty minutes from downtown Austin.</div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-label">For Medical &amp; Therapy</div>
+          <div class="contact-info-value"><a href="../within-center/">Within Center</a></div>
+          <div class="contact-info-note">For ceremonial ketamine therapy and psychiatric care, our sister practice Within Center is also located on the ranch.</div>
+        </div>
+
+        <div class="contact-info-item">
+          <div class="contact-info-label">Hours</div>
+          <div class="contact-info-value">By Appointment</div>
+          <div class="contact-info-note">Day visits: Mon&ndash;Sat, 10am&ndash;6pm.<br>Overnight stays: check-in from 3pm.<br>Weekly classes per the <a href="../events/" style="color:var(--gold);">events page</a>.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="bg-cream-deep">
+    <div class="container" style="text-align:center;">
+      <div class="s-eyebrow">Where We Are</div>
+      <h2 class="s-title">In the hills <em>southwest of Austin</em>.</h2>
+      <p class="s-desc centered">A short drive from the city, but feels like another country once you're through the gate.</p>
+      <iframe class="map-iframe" loading="lazy"
+        src="https://www.google.com/maps?q=7600+Stillridge+Dr,+Austin,+TX+78736&output=embed"
+        title="Map to AWKN Ranch"
+        style="margin-top: 2.5rem;">
+      </iframe>
+    </div>
+  </section>
+
+  <!-- ALSO -->
+  <section class="bg-cream">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Other Ways to Connect</div>
+        <h2 class="s-title">Or pick the <em>right path</em>.</h2>
+      </div>
+      <div class="three-col">
+        <div class="col-card">
+          <div class="col-num">01</div>
+          <h3>Book a Stay</h3>
+          <p>Rooms, packages, and day passes &mdash; the fastest route to seeing the land in person.</p>
+          <div style="margin-top: 1rem;">
+            <a href="../book/" class="btn btn-outline" style="color:var(--brown); border-color:var(--brown);">Book</a>
+          </div>
+        </div>
+        <div class="col-card">
+          <div class="col-num">02</div>
+          <h3>Host a Retreat</h3>
+          <p>For facilitators considering AWKN as a venue. Tour, dates, and rates.</p>
+          <div style="margin-top: 1rem;">
+            <a href="../host-a-retreat/" class="btn btn-outline" style="color:var(--brown); border-color:var(--brown);">Host</a>
+          </div>
+        </div>
+        <div class="col-card">
+          <div class="col-num">03</div>
+          <h3>Join the List</h3>
+          <p>First access to retreat dates and seasonal gatherings. Less than one email a month.</p>
+          <div style="margin-top: 1rem;">
+            <a href="mailto:hello@awknranch.com?subject=Add%20me%20to%20the%20AWKN%20list" class="btn btn-outline" style="color:var(--brown); border-color:var(--brown);">Subscribe</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="../property/">Property</a>
+    <a href="../book/">Book</a>
+    <a href="../host-a-retreat/">Host</a>
+    <a href="../events/">Events</a>
+    <a href="../services/">Services</a>
+    <a href="../team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="../within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reserve Your Package | Within Center</title>
+  <meta name="description" content="Reserve your ceremonial ketamine package at Within Center with a 10% deposit. Fully refundable if you do not medically qualify.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <style>
+    body { background: #f7f3ec; }
+    /* Soft ambient texture behind the whole page */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(201,148,62,0.08), transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(107,76,59,0.06), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .book-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 7rem 2.5rem 4rem;
+    }
+    /* ── COMPACT HEADER ──────────────────────── */
+    .book-header {
+      text-align: center;
+      margin-bottom: 2.2rem;
+    }
+    .book-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    .book-eyebrow::before, .book-eyebrow::after {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+    .book-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      color: var(--dark);
+      font-weight: 400;
+      letter-spacing: -0.005em;
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
+    }
+    .book-title em { font-style: italic; color: var(--gold); font-weight: 300; }
+    .book-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.98rem;
+      color: var(--brown);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── TWO-COLUMN ABOVE THE FOLD ─────────── */
+    .book-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .book-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .book-wrap { padding: 6rem 1.25rem 3rem; }
+    }
+
+    /* ── COMPACT PRICING PANEL ──────────────── */
+    .price-panel {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      border: 1px solid rgba(28,22,24,0.09);
+      position: relative;
+      box-shadow: 0 20px 60px -25px rgba(28,22,24,0.18), 0 4px 18px rgba(28,22,24,0.05);
+    }
+    .price-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+    }
+    .panel-pkg-label {
+      text-align: center;
+      padding: 0.7rem 1.5rem 0.6rem;
+      border-bottom: 1px solid rgba(28,22,24,0.08);
+      background: #fbf8f2;
+    }
+    .panel-pkg-label .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--grey);
+      display: block;
+      margin-bottom: 0.18rem;
+    }
+    .panel-pkg-label .name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--dark);
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .panel-pkg-label .tagline {
+      display: block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.75rem;
+      color: var(--brown);
+      margin-top: 0.1rem;
+    }
+
+    /* The hero deposit — the thing we want to draw the eye */
+    .deposit-hero {
+      position: relative;
+      text-align: center;
+      padding: 0.95rem 1.5rem 0.9rem;
+      background:
+        radial-gradient(ellipse at center top, rgba(201,148,62,0.14), transparent 70%),
+        #fff;
+    }
+    .deposit-hero .tag {
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,148,62,0.1);
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+    .deposit-hero .amount {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 4.2vw, 2.8rem);
+      color: var(--gold);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      display: block;
+    }
+    .deposit-hero .amount .dollar {
+      font-size: 0.48em;
+      vertical-align: super;
+      color: var(--gold);
+      margin-right: 0.1em;
+      font-weight: 300;
+    }
+    .deposit-hero .caption {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dark);
+      margin-top: 0.35rem;
+      display: block;
+    }
+    .deposit-hero .refundable-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.55rem;
+      padding: 0.3rem 0.75rem;
+      background: rgba(28,22,24,0.04);
+      border: 1px solid rgba(28,22,24,0.08);
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--brown);
+    }
+    .deposit-hero .refundable-pill::before {
+      content: '↻';
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Secondary breakdown — muted, smaller, context only */
+    .breakdown {
+      padding: 0.5rem 1.75rem;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      background: #fbf8f2;
+    }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.2rem 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .breakdown-row .lbl { color: rgba(28,22,24,0.5); }
+    .breakdown-row .val {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 0.92rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: rgba(28,22,24,0.55);
+      font-weight: 400;
+    }
+    .breakdown-row .val .strike {
+      text-decoration: line-through;
+      color: rgba(28,22,24,0.28);
+      margin-right: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .breakdown-row.highlight {
+      display: none;
+    }
+
+    /* ── STAY QUESTION (compact) ─────────────── */
+    .stay-question {
+      padding: 0.6rem 1.75rem;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .stay-question .q-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .stay-question .q-label {
+      display: block;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 0.88rem;
+      color: var(--dark);
+      line-height: 1.3;
+      font-weight: 500;
+    }
+    .stay-question .q-sub {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.56rem;
+      color: var(--grey);
+      letter-spacing: 0.04em;
+      margin-top: 0.15rem;
+    }
+    .stay-question .q-sub .req { color: var(--gold); }
+    .stay-options {
+      display: flex;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+    .stay-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey);
+      transition: color 0.25s;
+    }
+    .stay-options label:hover { color: var(--dark); }
+    .stay-options input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(28,22,24,0.25);
+      background: #fff;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .stay-options input[type="radio"]:hover {
+      border-color: var(--gold);
+    }
+    .stay-options input[type="radio"]:checked {
+      border-color: var(--gold);
+    }
+    .stay-options input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+    .stay-options label:has(input[type="radio"]:checked) {
+      color: var(--dark);
+    }
+    @media (max-width: 520px) {
+      .stay-question { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+
+    /* ── CONTACT FIELDS (compact 2x2 grid) ───── */
+    .contact-fields {
+      padding: 0.7rem 1.75rem 0.3rem;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      background: #fff;
+    }
+    .contact-fields .ct-eyebrow {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.54rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+    .contact-fields .ct-eyebrow .req {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .contact-fields .ct-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 0.6rem;
+    }
+    .contact-fields label {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 0.18rem;
+    }
+    .contact-fields label .req {
+      color: var(--gold);
+      margin-left: 0.2em;
+      font-size: 0.85em;
+    }
+    .contact-fields input {
+      width: 100%;
+      padding: 0.42rem 0.6rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: var(--dark);
+      background: #fafaf7;
+      border: 1px solid rgba(28,22,24,0.12);
+      border-radius: 2px;
+      transition: border-color 0.2s, background 0.2s;
+      box-sizing: border-box;
+    }
+    .contact-fields input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: #fff;
+    }
+    .contact-fields input.invalid {
+      border-color: #b04a3a;
+      background: #fff7f5;
+    }
+    @media (max-width: 520px) {
+      .contact-fields .ct-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Pay button + secure line */
+    .pay-btn-wrap {
+      padding: 0.7rem 1.75rem 1.1rem;
+    }
+    .pay-btn {
+      padding: 0.85rem 1rem !important;
+      font-size: 0.62rem !important;
+      letter-spacing: 0.22em !important;
+    }
+    .secure-line {
+      font-size: 0.54rem !important;
+      margin-top: 0.5rem !important;
+    }
+
+    .pay-btn {
+      display: block;
+      width: 100%;
+      padding: 1.4rem 1.5rem;
+      background: var(--dark);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s, letter-spacing 0.3s, color 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .pay-btn:hover:not(:disabled) {
+      background: var(--gold);
+      letter-spacing: 0.3em;
+    }
+    .pay-btn:disabled {
+      background: rgba(28,22,24,0.3);
+      cursor: not-allowed;
+    }
+    .secure-line {
+      margin-top: 1.4rem;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--grey);
+      text-transform: uppercase;
+    }
+    .secure-line::before { content: '◆ '; color: var(--gold); }
+
+    /* ── COMPACT PROCESS TIMELINE (LEFT COLUMN) ─ */
+    .process-section {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    .process-section .section-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.56rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+    .process-section h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.35rem;
+      color: var(--dark);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+    .process-section .section-sub { display: none; }
+
+    .timeline {
+      position: relative;
+      margin: 0;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 16px;
+      bottom: 16px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--gold) 0%, rgba(201,148,62,0.3) 100%);
+    }
+    .step {
+      position: relative;
+      padding: 0 0 1.2rem 3rem;
+    }
+    .step:last-child { padding-bottom: 0; }
+    .step .num-circle {
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid rgba(201,148,62,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 0.88rem;
+      color: var(--gold);
+      font-weight: 500;
+      box-shadow: 0 3px 10px rgba(201,148,62,0.12);
+    }
+    .step.refund .num-circle {
+      background: rgba(201,148,62,0.08);
+      border-color: var(--gold);
+    }
+    .step h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--dark);
+      font-weight: 500;
+      margin-bottom: 0.15rem;
+      line-height: 1.25;
+    }
+    .step h3 .amt {
+      color: var(--gold);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .step p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.74rem;
+      color: var(--grey);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .step.refund {
+      margin-top: 0.8rem;
+      padding-top: 1rem;
+      border-top: 1px dashed rgba(201,148,62,0.35);
+    }
+    .step.refund::before {
+      /* hide timeline line through refund */
+    }
+    .step.refund h3 { color: var(--gold-dark); font-size: 0.95rem; }
+    .step.refund p { color: var(--brown); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 4rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--grey);
+      transition: color 0.3s, gap 0.3s;
+    }
+    .back-link:hover { color: var(--gold); gap: 1rem; }
+
+    .questions-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin: 4rem auto 0;
+      padding: 2.5rem 2rem;
+      max-width: 540px;
+      background: #fff;
+      border: 1px solid rgba(201, 162, 39, 0.2);
+      border-radius: 4px;
+      text-align: center;
+    }
+    .questions-cta .q-label {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--dark);
+      letter-spacing: 0.01em;
+    }
+    .questions-cta .q-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.8rem;
+      background: var(--gold);
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: background 0.2s ease, gap 0.2s ease;
+    }
+    .questions-cta .q-btn:hover { background: var(--gold-dark, #a88520); gap: 1rem; }
+
+    .error-state {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+    .error-state h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      font-weight: 400;
+    }
+    .error-state a { color: var(--gold); }
+
+    .status-banner {
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      background: rgba(28,22,24,0.04);
+      font-size: 0.72rem;
+      color: var(--grey);
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── RETREAT DATE PICKER ───────────────────── */
+    .retreat-dates {
+      padding: 0.9rem 1.75rem 0.8rem;
+      border-top: 1px solid rgba(28,22,24,0.08);
+      background: #fff;
+    }
+    .retreat-dates .rd-eyebrow {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.54rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+    .retreat-dates .rd-eyebrow .req { color: var(--gold); font-weight: 600; }
+    .retreat-dates .rd-hint {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--grey);
+      margin: 0 0 0.75rem;
+      line-height: 1.4;
+    }
+    .date-scroller {
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+    .date-scroller::-webkit-scrollbar { width: 4px; }
+    .date-scroller::-webkit-scrollbar-thumb { background: rgba(201,148,62,0.35); border-radius: 2px; }
+    .date-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.85rem;
+      background: #fafaf7;
+      border: 1px solid rgba(28,22,24,0.1);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .date-option:hover {
+      border-color: rgba(201,148,62,0.5);
+      background: #fff;
+    }
+    .date-option.selected {
+      border-color: var(--gold);
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--gold) inset;
+    }
+    .date-option .dates {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .date-option .days {
+      font-size: 0.56rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+    .date-option.selected .days { color: var(--gold); }
+    .date-option .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(28,22,24,0.2);
+      margin-left: 0.75rem;
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .date-option.selected .check {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+    .date-option.selected .check::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+    .room-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      padding: 0.22rem 0.7rem;
+      border: 1px solid rgba(201,148,62,0.5);
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.54rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">
+      A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
+    </div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="../our-team/" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="../medication-management/" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="../resources/" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="book-wrap">
+    <div id="bookContent"><!-- filled by JS --></div>
+  </main>
+
+  <div style="background:var(--dark);border-top:1px solid rgba(255,255,255,0.08);padding:1.25rem 2rem;display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap;">
+    <span style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.4);">We Work With</span>
+    <a href="/depression-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Depression</a>
+    <a href="/anxiety-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Anxiety</a>
+    <a href="/burnout-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Burnout</a>
+    <a href="/grief-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Grief</a>
+    <a href="/addiction-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Addiction</a>
+  </div>
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; Ketamine therapy is a medical service that requires clearance from our licensed clinician. Your deposit is fully refundable if you do not qualify. This site is for informational purposes only, not medical advice.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script src="js/packages.js"></script>
+  <script>
+    // Render package summary from ?pkg= query param
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var slug = params.get('pkg');
+
+      // Resolve immersive retreat slug from ?pkg=immersive&room=... or ?pkg=immersive-3day&room=...
+      if (slug === 'immersive' || slug === 'immersive-3day') {
+        var room = (params.get('room') || '').toLowerCase();
+        if (room === 'private' || room === 'shared') {
+          slug = slug + '-' + room;
+        }
+      }
+
+      var pkg = window.WITHIN_PACKAGES[slug];
+      var root = document.getElementById('bookContent');
+
+      // ── Retreat date generator ──────────────────────────────
+      // For 6-day: next 12 Sundays (Sun → Fri, 5 nights)
+      // For 3-day: next 12 weeks, two slots each (Sun→Tues + Wed→Fri, 2 nights)
+      function generateRetreatDates(retreatType, weekCount) {
+        var options = [];
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        // Find the next upcoming Sunday (day 0). If today is Sunday, start next week.
+        var next = new Date(today);
+        var daysUntilSunday = (7 - today.getDay()) % 7;
+        if (daysUntilSunday === 0) daysUntilSunday = 7;
+        next.setDate(today.getDate() + daysUntilSunday);
+
+        for (var w = 0; w < weekCount; w++) {
+          var sunday = new Date(next);
+          sunday.setDate(next.getDate() + w * 7);
+
+          if (retreatType === '6day') {
+            var friday = new Date(sunday);
+            friday.setDate(sunday.getDate() + 5);
+            options.push({
+              start: sunday,
+              end: friday,
+              label: 'Sun → Fri',
+              nights: 5,
+            });
+          } else if (retreatType === '3day') {
+            var tuesday = new Date(sunday);
+            tuesday.setDate(sunday.getDate() + 2);
+            var wednesday = new Date(sunday);
+            wednesday.setDate(sunday.getDate() + 3);
+            var friday3 = new Date(sunday);
+            friday3.setDate(sunday.getDate() + 5);
+            options.push({
+              start: sunday,
+              end: tuesday,
+              label: 'Sun → Tues',
+              nights: 2,
+            });
+            options.push({
+              start: wednesday,
+              end: friday3,
+              label: 'Wed → Fri',
+              nights: 2,
+            });
+          }
+        }
+        return options;
+      }
+
+      function formatDateRange(start, end) {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var s = months[start.getMonth()] + ' ' + start.getDate();
+        var e = months[end.getMonth()] + ' ' + end.getDate();
+        return s + ' – ' + e;
+      }
+
+      function toISODate(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
+
+      // Expose for use below
+      window.__retreatDates = { generate: generateRetreatDates, format: formatDateRange, toISO: toISODate };
+
+      if (!pkg) {
+        root.innerHTML = '' +
+          '<div class="error-state">' +
+            '<h2>Choose a package to begin</h2>' +
+            '<p style="color:var(--grey);">Please select a package from our <a href="../ceremonial-ketamine/">offerings page</a> to reserve your container.</p>' +
+          '</div>';
+        document.title = 'Reserve Your Package | Within Center';
+        return;
+      }
+
+      var deposit = Math.round(pkg.price * pkg.depositPct);
+      var remaining = pkg.price - deposit;
+
+      document.title = 'Reserve ' + pkg.name + ' | Within Center';
+
+      var strikeHtml = pkg.strike
+        ? '<span class="strike">' + window.formatCurrency(pkg.strike) + '</span>'
+        : '';
+
+      // Build retreat date picker HTML (only for immersive packages)
+      var retreatDatesHtml = '';
+      var retreatOptions = [];
+      if (pkg.retreatType) {
+        retreatOptions = window.__retreatDates.generate(pkg.retreatType, 12);
+        var optsHtml = retreatOptions.map(function(opt, i){
+          return '' +
+            '<div class="date-option" data-idx="' + i + '">' +
+              '<div>' +
+                '<div class="dates">' + window.__retreatDates.format(opt.start, opt.end) + '</div>' +
+                '<div class="days">' + opt.label + ' · ' + opt.nights + ' Nights</div>' +
+              '</div>' +
+              '<span class="check"></span>' +
+            '</div>';
+        }).join('');
+        retreatDatesHtml =
+          '<div class="retreat-dates">' +
+            '<span class="rd-eyebrow">Choose Your Retreat Dates <span class="req">*</span></span>' +
+            '<p class="rd-hint">Pick the week that calls you. Your dates are held the moment your deposit is placed.</p>' +
+            '<div class="date-scroller" id="dateScroller">' + optsHtml + '</div>' +
+          '</div>';
+      }
+
+      // Room badge (for retreats that have a room choice)
+      var roomBadgeHtml = '';
+      if (/-private$/.test(slug)) roomBadgeHtml = '<span class="room-badge">Private Room</span>';
+      if (/-shared$/.test(slug))  roomBadgeHtml = '<span class="room-badge">Shared Room</span>';
+
+      // Split the deposit amount into $ symbol + number for refined typography
+      var depositFormatted = deposit.toLocaleString('en-US');
+
+      root.innerHTML = '' +
+        '<header class="book-header">' +
+          '<div class="book-eyebrow">Reserve Your Container</div>' +
+          '<h1 class="book-title">' + pkg.name + ' <em>Package</em></h1>' +
+          '<p class="book-sub">A ten-percent deposit holds your place while we confirm medical clearance. Fully refundable if you are not a fit.</p>' +
+        '</header>' +
+
+        '<div class="book-grid">' +
+
+          // ── LEFT: Compact process timeline ──
+          '<section class="process-section">' +
+            '<div class="section-eyebrow">How It Works</div>' +
+            '<h2>The path to your ' + pkg.name + ' journey</h2>' +
+            '<div class="timeline">' +
+              '<div class="step">' +
+                '<div class="num-circle">i</div>' +
+                '<h3>Place your <span class="amt">' + window.formatCurrency(deposit) + '</span> deposit today</h3>' +
+                '<p>A ten-percent reservation holds your place. Nothing else is charged until you are medically cleared.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">ii</div>' +
+                '<h3>Book a medical consultation</h3>' +
+                '<p>Schedule a confidential screening with our MAPS-trained nurse practitioner to confirm fit.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">iii</div>' +
+                '<h3>Complete the <span class="amt">' + window.formatCurrency(remaining) + '</span> balance</h3>' +
+                '<p>Once cleared, pay the remaining investment and we begin preparing your container.</p>' +
+              '</div>' +
+              '<div class="step">' +
+                '<div class="num-circle">iv</div>' +
+                '<h3>Reserve your ceremony dates</h3>' +
+                '<p>Together we choose the dates for your ceremonies and integration sessions. Your journey begins.</p>' +
+              '</div>' +
+              '<div class="step refund">' +
+                '<div class="num-circle">↻</div>' +
+                '<h3>Not cleared? Deposit returned in full</h3>' +
+                '<p>Your ' + window.formatCurrency(deposit) + ' is refunded within 3&ndash;5 business days. No friction, no questions.</p>' +
+              '</div>' +
+            '</div>' +
+          '</section>' +
+
+          // ── RIGHT: Compact pricing panel ──
+          '<aside class="price-panel">' +
+            '<div class="panel-pkg-label">' +
+              '<span class="eyebrow">The Offering</span>' +
+              '<span class="name">' + pkg.name + '</span>' +
+              '<span class="tagline">' + pkg.tagline + '</span>' +
+              roomBadgeHtml +
+            '</div>' +
+
+            '<div class="deposit-hero">' +
+              '<span class="tag">Deposit Due Today</span>' +
+              '<span class="amount"><span class="dollar">$</span>' + depositFormatted + '</span>' +
+              '<span class="caption">Ten Percent to Reserve</span>' +
+              '<div class="refundable-pill">Fully Refundable</div>' +
+            '</div>' +
+
+            '<div class="breakdown">' +
+              '<div class="breakdown-row">' +
+                '<span class="lbl">Package Total</span>' +
+                '<span class="val">' + strikeHtml + window.formatCurrency(pkg.price) + '</span>' +
+              '</div>' +
+              '<div class="breakdown-row">' +
+                '<span class="lbl">Balance After Qualification</span>' +
+                '<span class="val">' + window.formatCurrency(remaining) + '</span>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="contact-fields">' +
+              '<span class="ct-eyebrow">Your Information <span class="req">*</span> all required</span>' +
+              '<div class="ct-grid">' +
+                '<div><label for="ct-first">First Name<span class="req">*</span></label><input id="ct-first" type="text" autocomplete="given-name" required></div>' +
+                '<div><label for="ct-last">Last Name<span class="req">*</span></label><input id="ct-last" type="text" autocomplete="family-name" required></div>' +
+                '<div><label for="ct-email">Email<span class="req">*</span></label><input id="ct-email" type="email" autocomplete="email" required></div>' +
+                '<div><label for="ct-phone">Phone<span class="req">*</span></label><input id="ct-phone" type="tel" autocomplete="tel" required></div>' +
+              '</div>' +
+            '</div>' +
+
+            retreatDatesHtml +
+
+            (pkg.retreatType ? '' :
+            '<div class="stay-question">' +
+              '<div class="q-text">' +
+                '<span class="q-label">Stay at AWKN Ranch during your sessions?</span>' +
+                '<span class="q-sub">Onsite lodging available <span class="req">*</span> required</span>' +
+              '</div>' +
+              '<div class="stay-options">' +
+                '<label><input type="radio" name="stay_at_ranch" value="yes" required>Yes</label>' +
+                '<label><input type="radio" name="stay_at_ranch" value="no" required>No</label>' +
+              '</div>' +
+            '</div>') +
+
+            '<div class="pay-btn-wrap">' +
+              '<button class="pay-btn" id="payBtn">Reserve with ' + window.formatCurrency(deposit) + '</button>' +
+              '<div class="secure-line">Secured by Stripe</div>' +
+              '<div class="status-banner" id="statusBanner" style="display:none;"></div>' +
+            '</div>' +
+          '</aside>' +
+
+        '</div>' +
+
+        '<div class="questions-cta">' +
+          '<span class="q-label">Still have questions?</span>' +
+          '<a href="../book-a-call/" class="q-btn">Book a Call &rarr;</a>' +
+        '</div>' +
+
+        '<div style="text-align:center;margin-top:2.5rem;">' +
+          '<a href="../' + (pkg.retreatReturnPath || ('ceremonial-ketamine/' + slug + '/')) + '" class="back-link">&larr; Return to ' + pkg.name + '</a>' +
+        '</div>';
+
+      // Wire up the pay button
+      var payBtn = document.getElementById('payBtn');
+      var banner = document.getElementById('statusBanner');
+
+      // Wire up retreat date selection (only present for retreat packages)
+      var selectedRetreatIdx = null;
+      if (pkg.retreatType) {
+        var scroller = document.getElementById('dateScroller');
+        if (scroller) {
+          scroller.addEventListener('click', function(e){
+            var card = e.target.closest('.date-option');
+            if (!card) return;
+            scroller.querySelectorAll('.date-option').forEach(function(el){ el.classList.remove('selected'); });
+            card.classList.add('selected');
+            selectedRetreatIdx = parseInt(card.getAttribute('data-idx'), 10);
+          });
+        }
+      }
+
+      payBtn.addEventListener('click', async function () {
+        // Reset previous validation state
+        ['ct-first','ct-last','ct-email','ct-phone'].forEach(function(id){
+          var el = document.getElementById(id);
+          if (el) el.classList.remove('invalid');
+        });
+
+        // For retreat packages, require date selection; for others, require stay-at-ranch answer
+        var stayChoice = null;
+        var chosenRetreat = null;
+        if (pkg.retreatType) {
+          if (selectedRetreatIdx === null || !retreatOptions[selectedRetreatIdx]) {
+            banner.style.display = 'block';
+            banner.textContent = 'Please choose your retreat dates.';
+            banner.style.color = 'var(--gold-dark)';
+            var rd = document.querySelector('.retreat-dates');
+            if (rd) rd.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+          chosenRetreat = retreatOptions[selectedRetreatIdx];
+        } else {
+          stayChoice = document.querySelector('input[name="stay_at_ranch"]:checked');
+          if (!stayChoice) {
+            banner.style.display = 'block';
+            banner.textContent = 'Please let us know if you are interested in staying at AWKN Ranch.';
+            banner.style.color = 'var(--gold-dark)';
+            var q = document.querySelector('.stay-question');
+            if (q) q.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+        }
+
+        // Validate contact fields
+        var firstName = (document.getElementById('ct-first').value || '').trim();
+        var lastName  = (document.getElementById('ct-last').value || '').trim();
+        var email     = (document.getElementById('ct-email').value || '').trim();
+        var phone     = (document.getElementById('ct-phone').value || '').trim();
+        var emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        var phoneOk   = phone.replace(/\D/g, '').length >= 10;
+        var missing = [];
+        if (!firstName) { document.getElementById('ct-first').classList.add('invalid'); missing.push('first name'); }
+        if (!lastName)  { document.getElementById('ct-last').classList.add('invalid');  missing.push('last name'); }
+        if (!emailOk)   { document.getElementById('ct-email').classList.add('invalid'); missing.push('a valid email'); }
+        if (!phoneOk)   { document.getElementById('ct-phone').classList.add('invalid'); missing.push('a valid phone number'); }
+        if (missing.length) {
+          banner.style.display = 'block';
+          banner.style.color = 'var(--gold-dark)';
+          banner.textContent = 'Please enter ' + missing.join(', ') + '.';
+          var ct = document.querySelector('.contact-fields');
+          if (ct) ct.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        payBtn.disabled = true;
+        payBtn.textContent = 'Redirecting to secure checkout…';
+        banner.style.display = 'block';
+        banner.style.color = '';
+        banner.textContent = 'Connecting to Stripe…';
+
+        // Call our Supabase edge function to create a Stripe Checkout Session,
+        // then redirect the browser to the hosted checkout URL Stripe returns.
+        var WITHIN_SUPABASE_URL = 'https://gatsnhekviqooafddzey.supabase.co';
+        try {
+          var payload = {
+            package_slug: slug,
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            phone: phone,
+            stay_at_ranch: stayChoice ? stayChoice.value : 'yes',
+          };
+          if (chosenRetreat) {
+            payload.retreat_start_date = window.__retreatDates.toISO(chosenRetreat.start);
+            payload.retreat_end_date   = window.__retreatDates.toISO(chosenRetreat.end);
+            payload.retreat_nights     = String(chosenRetreat.nights);
+          }
+          var res = await fetch(WITHIN_SUPABASE_URL + '/functions/v1/create-within-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          var data = await res.json();
+          if (!res.ok || !data.url) {
+            throw new Error(data.error || 'Could not start checkout');
+          }
+          banner.textContent = 'Redirecting to Stripe…';
+          window.location.href = data.url;
+        } catch (err) {
+          payBtn.disabled = false;
+          payBtn.textContent = 'Reserve with ' + window.formatCurrency(deposit);
+          banner.style.color = 'var(--gold-dark)';
+          banner.textContent = 'Something went wrong starting checkout: ' + (err && err.message ? err.message : 'Please try again.');
+        }
+      });
+    })();
+  </script>
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');var allSubs=document.querySelectorAll('.menu-sub');function isOpen(){return panel.classList.contains('open');}function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});backdrop.addEventListener('click',closeMenu);if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});})();
+  </script>
+</body>
+</html>

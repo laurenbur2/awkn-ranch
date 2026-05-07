@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AWKN Dashboard - Redirecting...</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script type="module" src="../../shared/version-info.js"></script>
+  <script>
+    // Redirect to the dashboard (new default), preserving any query parameters
+    const params = window.location.search;
+    window.location.replace('./dashboard.html' + params);
+  </script>
+</head>
+<body>
+  <p>Redirecting to admin dashboard...</p>
+  <p>If you are not redirected, <a href="./dashboard.html">click here</a>.</p>
+</body>
+</html>

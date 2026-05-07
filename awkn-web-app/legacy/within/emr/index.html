@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+  <title>Within EMR</title>
+  <link rel="stylesheet" href="emr.css">
+</head>
+<body>
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/awkn-wordmark-copper.svg" alt="AWKN" style="width:120px;">
+    </div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Main app shell -->
+  <div id="appShell" class="app-shell hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        <img src="../../assets/branding/awkn-wordmark-copper.svg" alt="AWKN" class="sidebar__logo">
+        <span class="sidebar__title">Within</span>
+      </div>
+
+      <nav class="sidebar__nav" id="sidebarNav">
+        <button class="nav-item active" data-tab="dashboard">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-tab="patients">
+          <span class="material-symbols-outlined">group</span>
+          <span>Patients</span>
+        </button>
+        <button class="nav-item" data-tab="schedule">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span>Schedule</span>
+        </button>
+        <button class="nav-item" data-tab="sessions">
+          <span class="material-symbols-outlined">monitor_heart</span>
+          <span>Sessions</span>
+        </button>
+        <button class="nav-item" data-tab="outcomes">
+          <span class="material-symbols-outlined">trending_up</span>
+          <span>Outcomes</span>
+        </button>
+        <button class="nav-item" data-tab="consents">
+          <span class="material-symbols-outlined">verified</span>
+          <span>Consents</span>
+        </button>
+        <button class="nav-item" data-tab="scribe">
+          <span class="material-symbols-outlined">mic</span>
+          <span>Scribe</span>
+        </button>
+        <button class="nav-item" data-tab="notes">
+          <span class="material-symbols-outlined">clinical_notes</span>
+          <span>Notes</span>
+        </button>
+        <button class="nav-item" data-tab="inventory">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>Inventory</span>
+        </button>
+        <button class="nav-item" data-tab="billing">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <span>Billing</span>
+        </button>
+
+        <div class="sidebar__divider" id="staffNavDivider" style="display:none;"></div>
+        <button class="nav-item" data-tab="staff" id="staffNavBtn" style="display:none;">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Staff</span>
+        </button>
+      </nav>
+
+      <div class="sidebar__footer">
+        <div class="sidebar__user" id="userInfo">
+          <div class="sidebar__avatar" id="userAvatar"></div>
+          <div class="sidebar__user-details">
+            <div class="sidebar__user-name" id="userName"></div>
+            <div class="sidebar__user-email" id="userEmail"></div>
+          </div>
+        </div>
+        <button class="nav-item" id="signOutBtn">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile header -->
+    <header class="mobile-header" id="mobileHeader">
+      <button class="mobile-header__menu" id="menuToggle">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <div class="mobile-header__brand">
+        <img src="../../assets/branding/awkn-wordmark-copper.svg" alt="AWKN" style="width:60px;">
+        <span>Within</span>
+      </div>
+      <div class="mobile-header__spacer"></div>
+    </header>
+
+    <!-- Mobile sidebar overlay -->
+    <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+    <!-- Main content area -->
+    <main class="main-content" id="mainContent">
+      <!-- Top bar -->
+      <div class="topbar">
+        <div>
+          <h1 class="topbar__title" id="pageTitle">Dashboard</h1>
+          <p class="topbar__subtitle" id="pageSubtitle">Overview of your clinic</p>
+        </div>
+        <div class="topbar__actions" id="topbarActions"></div>
+      </div>
+
+      <!-- Tab content panels -->
+      <div class="content-area" id="contentArea">
+
+        <!-- ====== DASHBOARD ====== -->
+        <section class="tab-panel active" data-panel="dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(45,138,78,0.1);color:#2d8a4e;">
+                <span class="material-symbols-outlined">group</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="statTotalPatients">0</div>
+                <div class="stat-card__label">Active Patients</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(49,130,206,0.1);color:#3182ce;">
+                <span class="material-symbols-outlined">event</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="statTodaySessions">0</div>
+                <div class="stat-card__label">Today's Sessions</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(201,169,110,0.1);color:#c9a96e;">
+                <span class="material-symbols-outlined">trending_up</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="statAvgImprovement">--</div>
+                <div class="stat-card__label">Avg PHQ-9 Change</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(197,48,48,0.1);color:#c53030;">
+                <span class="material-symbols-outlined">pending_actions</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="statPendingConsents">0</div>
+                <div class="stat-card__label">Pending Consents</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="card">
+              <div class="card__header">
+                <h3>Today's Schedule</h3>
+                <button class="btn-text" onclick="switchTab('schedule')">View All</button>
+              </div>
+              <div class="card__body" id="dashTodaySchedule">
+                <div class="empty-state">
+                  <span class="material-symbols-outlined">calendar_month</span>
+                  <p>No sessions scheduled today</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card__header">
+                <h3>Recent Patients</h3>
+                <button class="btn-text" onclick="switchTab('patients')">View All</button>
+              </div>
+              <div class="card__body" id="dashRecentPatients">
+                <div class="empty-state">
+                  <span class="material-symbols-outlined">group</span>
+                  <p>No patients yet</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card__header">
+                <h3>Alerts</h3>
+              </div>
+              <div class="card__body" id="dashAlerts">
+                <div class="empty-state">
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <p>No alerts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== PATIENTS ====== -->
+        <section class="tab-panel" data-panel="patients">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="patientSearch" placeholder="Search patients...">
+            </div>
+            <button class="btn-secondary" id="importPatientsBtn" style="margin-right:0.5rem;">
+              <span class="material-symbols-outlined">upload_file</span>
+              Import CSV
+            </button>
+            <button class="btn-primary" id="addPatientBtn">
+              <span class="material-symbols-outlined">person_add</span>
+              Add Patient
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="patientsTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>DOB</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Last Visit</th>
+                  <th>Sessions</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="patientsBody"></tbody>
+            </table>
+            <div class="empty-state" id="patientsEmpty">
+              <span class="material-symbols-outlined">group</span>
+              <p>No patients yet. Click "Add Patient" to get started.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== SCHEDULE ====== -->
+        <section class="tab-panel" data-panel="schedule">
+          <div class="toolbar">
+            <div class="date-nav">
+              <button class="btn-icon" id="prevDay"><span class="material-symbols-outlined">chevron_left</span></button>
+              <span class="date-display" id="scheduleDate"></span>
+              <button class="btn-icon" id="nextDay"><span class="material-symbols-outlined">chevron_right</span></button>
+              <button class="btn-sm" id="todayBtn">Today</button>
+            </div>
+            <button class="btn-primary" id="addApptBtn">
+              <span class="material-symbols-outlined">add</span>
+              New Appointment
+            </button>
+          </div>
+          <div class="schedule-grid" id="scheduleGrid">
+            <div class="empty-state" id="scheduleEmpty">
+              <span class="material-symbols-outlined">calendar_month</span>
+              <p>No appointments for this day</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== SESSIONS (Treatment Documentation) ====== -->
+        <section class="tab-panel" data-panel="sessions">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="sessionSearch" placeholder="Search sessions...">
+            </div>
+            <button class="btn-primary" id="newSessionBtn">
+              <span class="material-symbols-outlined">add</span>
+              New Session
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="sessionsTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Patient</th>
+                  <th>Route</th>
+                  <th>Dose</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="sessionsBody"></tbody>
+            </table>
+            <div class="empty-state" id="sessionsEmpty">
+              <span class="material-symbols-outlined">monitor_heart</span>
+              <p>No treatment sessions recorded yet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== OUTCOMES ====== -->
+        <section class="tab-panel" data-panel="outcomes">
+          <div class="toolbar">
+            <select class="select-input" id="outcomesPatientSelect">
+              <option value="">Select Patient</option>
+            </select>
+            <select class="select-input" id="outcomesMeasureSelect">
+              <option value="phq9">PHQ-9 (Depression)</option>
+              <option value="gad7">GAD-7 (Anxiety)</option>
+              <option value="pcl5">PCL-5 (PTSD)</option>
+              <option value="cssrs">C-SSRS (Suicidality)</option>
+            </select>
+            <button class="btn-primary" id="newAssessmentBtn">
+              <span class="material-symbols-outlined">add</span>
+              New Assessment
+            </button>
+          </div>
+          <div class="outcomes-content">
+            <div class="card">
+              <div class="card__header"><h3>Score Trends</h3></div>
+              <div class="card__body">
+                <div class="chart-area" id="outcomeChart">
+                  <div class="empty-state">
+                    <span class="material-symbols-outlined">trending_up</span>
+                    <p>Select a patient to view outcome trends</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card__header"><h3>Assessment History</h3></div>
+              <div class="card__body" id="assessmentHistory">
+                <div class="empty-state">
+                  <span class="material-symbols-outlined">assignment</span>
+                  <p>No assessments recorded</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== CONSENTS ====== -->
+        <section class="tab-panel" data-panel="consents">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="consentSearch" placeholder="Search consents...">
+            </div>
+            <button class="btn-primary" id="newConsentBtn">
+              <span class="material-symbols-outlined">add</span>
+              Send Consent
+            </button>
+          </div>
+          <div class="consent-templates">
+            <div class="card">
+              <div class="card__header"><h3>Consent Templates</h3></div>
+              <div class="card__body">
+                <div class="consent-template-list">
+                  <div class="consent-template-item">
+                    <span class="material-symbols-outlined">description</span>
+                    <div>
+                      <strong>Informed Consent for Ketamine Treatment</strong>
+                      <p>Off-label use disclosure, risks, benefits, alternatives, driving restrictions</p>
+                    </div>
+                  </div>
+                  <div class="consent-template-item">
+                    <span class="material-symbols-outlined">description</span>
+                    <div>
+                      <strong>HIPAA Notice of Privacy Practices</strong>
+                      <p>Privacy practices acknowledgment and authorization</p>
+                    </div>
+                  </div>
+                  <div class="consent-template-item">
+                    <span class="material-symbols-outlined">description</span>
+                    <div>
+                      <strong>Telehealth Consent</strong>
+                      <p>Authorization for remote integration therapy sessions</p>
+                    </div>
+                  </div>
+                  <div class="consent-template-item">
+                    <span class="material-symbols-outlined">description</span>
+                    <div>
+                      <strong>Financial Agreement</strong>
+                      <p>Treatment cost agreement, cancellation policy, payment terms</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table" id="consentsTable">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Document</th>
+                  <th>Sent</th>
+                  <th>Status</th>
+                  <th>Signed</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="consentsBody"></tbody>
+            </table>
+            <div class="empty-state" id="consentsEmpty">
+              <span class="material-symbols-outlined">verified</span>
+              <p>No consent documents yet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== SCRIBE ====== -->
+        <section class="tab-panel" data-panel="scribe">
+          <!-- Session setup bar -->
+          <div class="scribe-setup-bar">
+            <div class="scribe-setup-bar__left">
+              <select id="scribePatientSelect" class="scribe-patient-select">
+                <option value="">Select patient...</option>
+              </select>
+              <select id="scribeEncounterType">
+                <option value="ketamine_session">Ketamine Session</option>
+                <option value="initial_consult">Initial Consultation</option>
+                <option value="psychiatric_intake">Psychiatric Intake</option>
+                <option value="integration">Integration Therapy</option>
+                <option value="followup">Follow-Up</option>
+                <option value="group_session">Group Session</option>
+                <option value="telehealth">Telehealth</option>
+                <option value="crisis">Crisis Intervention</option>
+              </select>
+              <select id="scribeNoteFormat">
+                <option value="soap">SOAP</option>
+                <option value="dap">DAP</option>
+                <option value="birp">BIRP</option>
+                <option value="intake">Intake Note</option>
+                <option value="treatment_plan">Treatment Plan</option>
+                <option value="progress">Progress Note</option>
+              </select>
+              <select id="scribeDetailLevel">
+                <option value="standard">Standard Detail</option>
+                <option value="brief">Brief</option>
+                <option value="detailed">Detailed</option>
+                <option value="insurance">Insurance-Ready</option>
+              </select>
+            </div>
+            <div class="scribe-setup-bar__right">
+              <label class="scribe-upload-btn btn-secondary" id="scribeUploadBtn">
+                <span class="material-symbols-outlined">upload_file</span>
+                Upload Audio
+                <input type="file" id="scribeAudioInput" accept="audio/*,.wav,.mp3,.m4a,.ogg,.webm" style="display:none;">
+              </label>
+            </div>
+          </div>
+
+          <div class="scribe-layout">
+            <!-- Left: Recording & Transcript -->
+            <div class="scribe-panel">
+              <div class="card">
+                <div class="card__header">
+                  <h3>
+                    <span class="material-symbols-outlined" style="vertical-align:middle;margin-right:0.25rem;color:var(--accent);">mic</span>
+                    Ambient Scribe
+                  </h3>
+                  <div class="scribe-transcript-actions">
+                    <span id="scribeWordCount" style="font-size:0.75rem;color:var(--text-muted);">0 words</span>
+                    <button class="btn-text" id="scribeClearBtn">Clear</button>
+                  </div>
+                </div>
+                <div class="card__body" style="padding-top:0;">
+                  <!-- Recording controls -->
+                  <div class="scribe-controls">
+                    <button class="scribe-record-btn" id="scribeRecordBtn">
+                      <span class="material-symbols-outlined" id="scribeRecordIcon">mic</span>
+                      <span id="scribeRecordLabel">Start Session</span>
+                    </button>
+                    <div class="scribe-timer" id="scribeTimer">00:00</div>
+                    <div class="scribe-status" id="scribeStatus">Ready</div>
+                  </div>
+
+                  <!-- Live transcript -->
+                  <div class="scribe-transcript" id="scribeTranscript" contenteditable="true" placeholder="Start a session to begin ambient listening, or type/paste your session notes here..."></div>
+
+                  <!-- Prior session context -->
+                  <div class="scribe-prior-context" id="scribePriorContext" style="display:none;">
+                    <div class="scribe-prior-context__header">
+                      <span class="material-symbols-outlined" style="font-size:16px;">history</span>
+                      <span>Prior Session Context</span>
+                      <button class="btn-text" id="scribePriorToggle" style="font-size:0.75rem;">Hide</button>
+                    </div>
+                    <div class="scribe-prior-context__body" id="scribePriorBody"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Generated Output -->
+            <div class="scribe-panel">
+              <div class="card">
+                <div class="card__header">
+                  <h3>
+                    <span class="material-symbols-outlined" style="vertical-align:middle;margin-right:0.25rem;color:var(--accent);">auto_awesome</span>
+                    <span id="scribeNoteFormatLabel">SOAP Note</span>
+                  </h3>
+                  <div style="display:flex;gap:0.5rem;">
+                    <button class="btn-secondary" id="scribeGenerateBtn">
+                      <span class="material-symbols-outlined">auto_awesome</span>
+                      Generate Note
+                    </button>
+                    <button class="btn-primary" id="scribeSaveNoteBtn">
+                      <span class="material-symbols-outlined">save</span>
+                      Save
+                    </button>
+                  </div>
+                </div>
+                <div class="card__body" style="padding-top:0;">
+                  <!-- Dynamic note fields (SOAP/DAP/BIRP/etc) -->
+                  <div class="scribe-note-fields" id="scribeNoteFields">
+                    <!-- Populated dynamically based on note format -->
+                  </div>
+
+                  <!-- Session Insights -->
+                  <div class="scribe-insights" id="scribeInsights" style="display:none;">
+                    <label style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:block;">
+                      <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">psychology</span>
+                      Session Insights
+                    </label>
+                    <div class="scribe-insights-grid" id="scribeInsightsBody"></div>
+                  </div>
+
+                  <!-- Ketamine / Clinical Extracts -->
+                  <div class="scribe-quickfill" id="scribeQuickfill">
+                    <label style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:block;">Clinical Extracts</label>
+                    <div class="scribe-extract-grid">
+                      <div class="scribe-extract-item">
+                        <label>Route</label>
+                        <input type="text" id="scribeExtract_route" placeholder="IV, IM, SL...">
+                      </div>
+                      <div class="scribe-extract-item">
+                        <label>Dose</label>
+                        <input type="text" id="scribeExtract_dose" placeholder="mg">
+                      </div>
+                      <div class="scribe-extract-item">
+                        <label>Duration</label>
+                        <input type="text" id="scribeExtract_duration" placeholder="min">
+                      </div>
+                      <div class="scribe-extract-item">
+                        <label>Response</label>
+                        <input type="text" id="scribeExtract_response" placeholder="Good, moderate...">
+                      </div>
+                      <div class="scribe-extract-item">
+                        <label>Side Effects</label>
+                        <input type="text" id="scribeExtract_sideEffects" placeholder="None, nausea...">
+                      </div>
+                      <div class="scribe-extract-item">
+                        <label>Mood Pre/Post</label>
+                        <input type="text" id="scribeExtract_mood" placeholder="e.g. 3/10 → 7/10">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Billing / CPT Coding -->
+                  <div class="scribe-coding" id="scribeCoding" style="display:none;">
+                    <label style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:block;">
+                      <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">receipt</span>
+                      Suggested Billing Codes
+                    </label>
+                    <div id="scribeCodingBody"></div>
+                  </div>
+
+                  <!-- After-Visit Summary -->
+                  <div class="scribe-avs" id="scribeAVS" style="display:none;">
+                    <label style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;display:block;">
+                      <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">summarize</span>
+                      After-Visit Summary
+                      <span style="font-size:0.65rem;color:var(--accent);font-weight:400;margin-left:0.5rem;">Patient-Facing</span>
+                    </label>
+                    <textarea id="scribeAVSText" rows="4" placeholder="Plain-language summary for the patient..." style="width:100%;padding:0.75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:0.8125rem;line-height:1.6;resize:vertical;"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent scribe notes -->
+              <div class="card" style="margin-top:1rem;">
+                <div class="card__header"><h3>Recent Scribe Notes</h3></div>
+                <div class="card__body" id="scribeHistory" style="padding-top:0;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== NOTES (SOAP) ====== -->
+        <section class="tab-panel" data-panel="notes">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="notesSearch" placeholder="Search notes...">
+            </div>
+            <button class="btn-primary" id="newNoteBtn">
+              <span class="material-symbols-outlined">add</span>
+              New SOAP Note
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="notesTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Patient</th>
+                  <th>Type</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="notesBody"></tbody>
+            </table>
+            <div class="empty-state" id="notesEmpty">
+              <span class="material-symbols-outlined">clinical_notes</span>
+              <p>No clinical notes yet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== INVENTORY ====== -->
+        <section class="tab-panel" data-panel="inventory">
+          <div class="toolbar">
+            <h3 style="font-size:1rem;font-weight:600;">Controlled Substance Log</h3>
+            <button class="btn-primary" id="logInventoryBtn">
+              <span class="material-symbols-outlined">add</span>
+              Log Entry
+            </button>
+          </div>
+          <div class="inventory-summary">
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(49,130,206,0.1);color:#3182ce;">
+                <span class="material-symbols-outlined">vaccines</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="invKetamineStock">--</div>
+                <div class="stat-card__label">Ketamine On Hand (mL)</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(201,169,110,0.1);color:#c9a96e;">
+                <span class="material-symbols-outlined">receipt_long</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="invLastOrder">--</div>
+                <div class="stat-card__label">Last Order Date</div>
+              </div>
+            </div>
+          </div>
+          <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table" id="inventoryTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Lot #</th>
+                  <th>Qty (mL)</th>
+                  <th>Balance</th>
+                  <th>Witness</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryBody"></tbody>
+            </table>
+            <div class="empty-state" id="inventoryEmpty">
+              <span class="material-symbols-outlined">inventory_2</span>
+              <p>No inventory entries yet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== BILLING ====== -->
+        <section class="tab-panel" data-panel="billing">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="billingSearch" placeholder="Search invoices...">
+            </div>
+            <button class="btn-primary" id="newInvoiceBtn">
+              <span class="material-symbols-outlined">add</span>
+              New Invoice
+            </button>
+          </div>
+          <div class="billing-summary">
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(45,138,78,0.1);color:#2d8a4e;">
+                <span class="material-symbols-outlined">payments</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="billCollected">$0</div>
+                <div class="stat-card__label">Collected (This Month)</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__icon" style="background:rgba(214,158,46,0.1);color:#d69e2e;">
+                <span class="material-symbols-outlined">schedule</span>
+              </div>
+              <div class="stat-card__data">
+                <div class="stat-card__value" id="billOutstanding">$0</div>
+                <div class="stat-card__label">Outstanding</div>
+              </div>
+            </div>
+          </div>
+          <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table" id="billingTable">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Patient</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="billingBody"></tbody>
+            </table>
+            <div class="empty-state" id="billingEmpty">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <p>No invoices yet</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== STAFF ====== -->
+        <section class="tab-panel" data-panel="staff">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="staffSearch" placeholder="Search staff...">
+            </div>
+            <button class="btn-primary" id="addStaffBtn">
+              <span class="material-symbols-outlined">person_add</span>
+              Add Staff
+            </button>
+          </div>
+
+          <div class="table-container" style="margin-top:1rem;">
+            <table class="data-table" id="staffTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Permissions</th>
+                  <th>Status</th>
+                  <th>Last Login</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="staffBody"></tbody>
+            </table>
+            <div class="empty-state" id="staffEmpty">
+              <span class="material-symbols-outlined">admin_panel_settings</span>
+              <p>No staff members yet. Add your first team member.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ====== MODALS ====== -->
+
+  <!-- Staff Modal -->
+  <div class="modal-overlay hidden" id="staffModal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 id="staffModalTitle">Add Staff Member</h2>
+        <button class="modal__close" data-close-modal="staffModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="staffForm">
+          <div class="form-section">
+            <h4>Staff Information</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" name="staff_first_name" required>
+              </div>
+              <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" name="staff_last_name" required>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Email *</label>
+                <input type="email" name="staff_email" required placeholder="Must match their Google account">
+              </div>
+              <div class="form-group">
+                <label>Role *</label>
+                <select name="staff_role" required>
+                  <option value="">Select role</option>
+                  <option value="admin">Admin — Full access</option>
+                  <option value="provider">Provider — Clinical access</option>
+                  <option value="staff">Staff — Limited access</option>
+                  <option value="readonly">Read Only — View only</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Title / Credential</label>
+                <input type="text" name="staff_title" placeholder="e.g. MD, LCSW, RN">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Permissions</h4>
+            <p style="color:var(--text-muted);font-size:0.8125rem;margin-bottom:0.75rem;">
+              Select which sections this staff member can access.
+            </p>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+              <label class="checkbox-label"><input type="checkbox" name="perm_patients" checked> Patients</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_schedule" checked> Schedule</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_sessions" checked> Treatment Sessions</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_outcomes" checked> Outcomes</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_consents" checked> Consents</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_notes" checked> Clinical Notes</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_inventory"> Inventory (DEA)</label>
+              <label class="checkbox-label"><input type="checkbox" name="perm_billing"> Billing</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="staffModal">Cancel</button>
+        <button class="btn-primary" id="saveStaffBtn">Save Staff Member</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Staff Modal -->
+  <div class="modal-overlay hidden" id="editStaffModal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2>Edit Staff Member</h2>
+        <button class="modal__close" data-close-modal="editStaffModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="editStaffForm">
+          <input type="hidden" name="edit_staff_id">
+          <div class="form-section">
+            <h4>Staff Information</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" name="edit_staff_first_name" required>
+              </div>
+              <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" name="edit_staff_last_name" required>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Email</label>
+                <input type="email" name="edit_staff_email" disabled style="opacity:0.6;">
+              </div>
+              <div class="form-group">
+                <label>Role *</label>
+                <select name="edit_staff_role" required>
+                  <option value="admin">Admin — Full access</option>
+                  <option value="provider">Provider — Clinical access</option>
+                  <option value="staff">Staff — Limited access</option>
+                  <option value="readonly">Read Only — View only</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Title / Credential</label>
+                <input type="text" name="edit_staff_title">
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <select name="edit_staff_status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive (revoke access)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Permissions</h4>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_patients"> Patients</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_schedule"> Schedule</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_sessions"> Treatment Sessions</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_outcomes"> Outcomes</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_consents"> Consents</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_notes"> Clinical Notes</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_inventory"> Inventory (DEA)</label>
+              <label class="checkbox-label"><input type="checkbox" name="edit_perm_billing"> Billing</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="editStaffModal">Cancel</button>
+        <button class="btn-primary" id="updateStaffBtn">Update Staff</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Patients Modal -->
+  <div class="modal-overlay hidden" id="importModal">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h2>Import Patients from CSV</h2>
+        <button class="modal__close" data-close-modal="importModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <!-- Step 1: Upload -->
+        <div id="importStep1">
+          <div class="form-section">
+            <h4>Upload CSV File</h4>
+            <p style="color:var(--text-muted);font-size:0.8125rem;margin-bottom:1rem;">
+              Export your client list from Carepatron (or any EMR) as CSV, then upload it here.
+              The importer will auto-detect common column names.
+            </p>
+            <div class="import-dropzone" id="importDropzone">
+              <span class="material-symbols-outlined" style="font-size:48px;color:var(--accent);margin-bottom:0.5rem;">cloud_upload</span>
+              <p style="font-weight:500;">Drop CSV file here or click to browse</p>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">Supports .csv files</p>
+              <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Map columns -->
+        <div id="importStep2" class="hidden">
+          <div class="form-section">
+            <h4>Map Columns</h4>
+            <p style="color:var(--text-muted);font-size:0.8125rem;margin-bottom:1rem;">
+              Match your CSV columns to patient fields. Auto-mapped columns are pre-selected.
+            </p>
+            <div id="importPreview" style="overflow-x:auto;margin-bottom:1rem;"></div>
+            <div class="form-grid" id="columnMappings"></div>
+          </div>
+        </div>
+
+        <!-- Step 3: Results -->
+        <div id="importStep3" class="hidden">
+          <div class="form-section">
+            <h4>Import Results</h4>
+            <div id="importResults"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="importModal">Cancel</button>
+        <button class="btn-secondary hidden" id="importBackBtn">Back</button>
+        <button class="btn-primary hidden" id="importNextBtn">Next: Map Columns</button>
+        <button class="btn-primary hidden" id="importRunBtn">Import Patients</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Modal -->
+  <div class="modal-overlay hidden" id="patientModal">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h2 id="patientModalTitle">Add New Patient</h2>
+        <button class="modal__close" data-close-modal="patientModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="patientForm">
+          <div class="form-section">
+            <h4>Demographics</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" name="first_name" required>
+              </div>
+              <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" name="last_name" required>
+              </div>
+              <div class="form-group">
+                <label>Date of Birth *</label>
+                <input type="date" name="dob" required>
+              </div>
+              <div class="form-group">
+                <label>Sex</label>
+                <select name="sex">
+                  <option value="">Select</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Gender Identity</label>
+                <input type="text" name="gender_identity" placeholder="Optional">
+              </div>
+              <div class="form-group">
+                <label>Pronouns</label>
+                <input type="text" name="pronouns" placeholder="e.g. she/her">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Contact</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email">
+              </div>
+              <div class="form-group">
+                <label>Phone *</label>
+                <input type="tel" name="phone" required>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Address</label>
+                <input type="text" name="address" placeholder="Street, City, State ZIP">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Emergency Contact</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="emergency_name">
+              </div>
+              <div class="form-group">
+                <label>Relationship</label>
+                <input type="text" name="emergency_relationship">
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" name="emergency_phone">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Clinical</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Primary Diagnosis</label>
+                <select name="primary_diagnosis">
+                  <option value="">Select</option>
+                  <option value="F32.1">F32.1 - Major Depressive Disorder, single episode, moderate</option>
+                  <option value="F32.2">F32.2 - Major Depressive Disorder, single episode, severe</option>
+                  <option value="F33.1">F33.1 - MDD, recurrent, moderate</option>
+                  <option value="F33.2">F33.2 - MDD, recurrent, severe</option>
+                  <option value="F43.10">F43.10 - PTSD, unspecified</option>
+                  <option value="F43.12">F43.12 - PTSD, chronic</option>
+                  <option value="F41.1">F41.1 - Generalized Anxiety Disorder</option>
+                  <option value="F41.0">F41.0 - Panic Disorder</option>
+                  <option value="F40.10">F40.10 - Social Anxiety Disorder</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Referring Provider</label>
+                <input type="text" name="referring_provider" placeholder="Name">
+              </div>
+              <div class="form-group form-group--full">
+                <label>Current Medications</label>
+                <textarea name="current_medications" rows="3" placeholder="List current medications with doses"></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Allergies</label>
+                <textarea name="allergies" rows="2" placeholder="Drug, food, environmental allergies"></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Medical History Notes</label>
+                <textarea name="medical_history" rows="3" placeholder="Relevant medical history, prior treatments, etc."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Contraindication Screening</h4>
+            <div class="checklist">
+              <label class="check-item"><input type="checkbox" name="contra_hypertension"> Uncontrolled hypertension</label>
+              <label class="check-item"><input type="checkbox" name="contra_psychosis"> Active psychosis / schizophrenia</label>
+              <label class="check-item"><input type="checkbox" name="contra_pregnancy"> Pregnancy / breastfeeding</label>
+              <label class="check-item"><input type="checkbox" name="contra_allergy"> Known ketamine allergy</label>
+              <label class="check-item"><input type="checkbox" name="contra_substance"> Active substance abuse</label>
+              <label class="check-item"><input type="checkbox" name="contra_icp"> Elevated intracranial/intraocular pressure</label>
+              <label class="check-item"><input type="checkbox" name="contra_hepatic"> Severe hepatic impairment</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="patientModal">Cancel</button>
+        <button class="btn-primary" id="savePatientBtn">Save Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Modal -->
+  <div class="modal-overlay hidden" id="sessionModal">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h2 id="sessionModalTitle">New Treatment Session</h2>
+        <button class="modal__close" data-close-modal="sessionModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="sessionForm">
+          <div class="form-section">
+            <h4>Session Details</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Patient *</label>
+                <select name="patient_id" id="sessionPatientSelect" required>
+                  <option value="">Select Patient</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Date *</label>
+                <input type="date" name="session_date" required>
+              </div>
+              <div class="form-group">
+                <label>Session # in Series</label>
+                <input type="number" name="session_number" min="1" placeholder="e.g. 3">
+              </div>
+              <div class="form-group">
+                <label>Provider</label>
+                <input type="text" name="provider" placeholder="Provider name">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Medication & Dosing</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Route of Administration *</label>
+                <select name="route" required>
+                  <option value="">Select</option>
+                  <option value="IV">IV Infusion</option>
+                  <option value="IM">Intramuscular (IM)</option>
+                  <option value="sublingual">Sublingual / Oral</option>
+                  <option value="intranasal">Intranasal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Drug</label>
+                <select name="drug">
+                  <option value="ketamine">Ketamine (racemic)</option>
+                  <option value="s-ketamine">S-Ketamine (Spravato)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Patient Weight (kg)</label>
+                <input type="number" name="weight_kg" step="0.1" placeholder="kg">
+              </div>
+              <div class="form-group">
+                <label>Dose (mg)</label>
+                <input type="number" name="dose_mg" step="0.1" placeholder="mg">
+              </div>
+              <div class="form-group">
+                <label>Dose (mg/kg)</label>
+                <input type="number" name="dose_mg_kg" step="0.01" placeholder="mg/kg" readonly>
+              </div>
+              <div class="form-group">
+                <label>Infusion Duration (min)</label>
+                <input type="number" name="duration_min" placeholder="e.g. 40">
+              </div>
+              <div class="form-group">
+                <label>Lot Number</label>
+                <input type="text" name="lot_number">
+              </div>
+              <div class="form-group">
+                <label>Expiration Date</label>
+                <input type="date" name="lot_expiration">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Pre-Treatment Vitals</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>BP Systolic</label>
+                <input type="number" name="pre_bp_systolic" placeholder="mmHg">
+              </div>
+              <div class="form-group">
+                <label>BP Diastolic</label>
+                <input type="number" name="pre_bp_diastolic" placeholder="mmHg">
+              </div>
+              <div class="form-group">
+                <label>Heart Rate</label>
+                <input type="number" name="pre_hr" placeholder="bpm">
+              </div>
+              <div class="form-group">
+                <label>SpO2</label>
+                <input type="number" name="pre_spo2" placeholder="%">
+              </div>
+              <div class="form-group">
+                <label>Temperature</label>
+                <input type="number" name="pre_temp" step="0.1" placeholder="F">
+              </div>
+              <div class="form-group">
+                <label>Respiratory Rate</label>
+                <input type="number" name="pre_rr" placeholder="/min">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Pre-Treatment Screening</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Last Meal Time</label>
+                <input type="time" step="300" name="last_meal_time">
+              </div>
+              <div class="form-group">
+                <label>Meds Taken Today</label>
+                <input type="text" name="meds_today" placeholder="List medications taken">
+              </div>
+              <div class="form-group form-group--full">
+                <label>New Symptoms / Concerns</label>
+                <textarea name="pre_screening_notes" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="go-nogo" style="margin-top:1rem;">
+              <label class="check-item" style="font-weight:600;color:#2d8a4e;">
+                <input type="checkbox" name="go_decision"> GO — Cleared for treatment
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Intra-Treatment Vitals Log</h4>
+            <p style="font-size:0.8125rem;color:#8a8a8a;margin-bottom:0.75rem;">Record vitals every 15 minutes during treatment</p>
+            <div id="vitalsLog">
+              <div class="vitals-entry">
+                <div class="form-grid form-grid--tight">
+                  <div class="form-group"><label>Time</label><input type="time" step="300" name="vital_time_0"></div>
+                  <div class="form-group"><label>BP</label><input type="text" name="vital_bp_0" placeholder="120/80"></div>
+                  <div class="form-group"><label>HR</label><input type="number" name="vital_hr_0" placeholder="bpm"></div>
+                  <div class="form-group"><label>SpO2</label><input type="number" name="vital_spo2_0" placeholder="%"></div>
+                  <div class="form-group"><label>RR</label><input type="number" name="vital_rr_0" placeholder="/min"></div>
+                  <div class="form-group"><label>Sedation</label>
+                    <select name="vital_sedation_0">
+                      <option value="">--</option>
+                      <option value="1">1 - Alert</option>
+                      <option value="2">2 - Drowsy</option>
+                      <option value="3">3 - Light sedation</option>
+                      <option value="4">4 - Moderate</option>
+                      <option value="5">5 - Deep</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" id="addVitalEntry" style="margin-top:0.5rem;">
+              <span class="material-symbols-outlined" style="font-size:16px;">add</span> Add Vitals Entry
+            </button>
+          </div>
+
+          <div class="form-section">
+            <h4>Side Effects / Adverse Events</h4>
+            <div class="checklist checklist--inline">
+              <label class="check-item"><input type="checkbox" name="se_nausea"> Nausea/Vomiting</label>
+              <label class="check-item"><input type="checkbox" name="se_hypertension"> Hypertension</label>
+              <label class="check-item"><input type="checkbox" name="se_dissociation"> Excessive Dissociation</label>
+              <label class="check-item"><input type="checkbox" name="se_anxiety"> Anxiety/Panic</label>
+              <label class="check-item"><input type="checkbox" name="se_headache"> Headache</label>
+              <label class="check-item"><input type="checkbox" name="se_dizziness"> Dizziness</label>
+              <label class="check-item"><input type="checkbox" name="se_blurred_vision"> Blurred Vision</label>
+            </div>
+            <div class="form-group form-group--full" style="margin-top:0.75rem;">
+              <label>Adjunct Medications Given</label>
+              <textarea name="adjunct_meds" rows="2" placeholder="e.g. Ondansetron 4mg IV for nausea at 14:35"></textarea>
+            </div>
+            <div class="form-group form-group--full">
+              <label>Session Notes / Observations</label>
+              <textarea name="session_notes" rows="3" placeholder="Provider observations during treatment"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Post-Treatment</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Post BP Systolic</label>
+                <input type="number" name="post_bp_systolic" placeholder="mmHg">
+              </div>
+              <div class="form-group">
+                <label>Post BP Diastolic</label>
+                <input type="number" name="post_bp_diastolic" placeholder="mmHg">
+              </div>
+              <div class="form-group">
+                <label>Post Heart Rate</label>
+                <input type="number" name="post_hr" placeholder="bpm">
+              </div>
+              <div class="form-group">
+                <label>Post SpO2</label>
+                <input type="number" name="post_spo2" placeholder="%">
+              </div>
+            </div>
+            <div class="form-section" style="margin-top:1rem;">
+              <h4>Discharge Criteria</h4>
+              <div class="checklist">
+                <label class="check-item"><input type="checkbox" name="dc_oriented"> Oriented to person, place, time</label>
+                <label class="check-item"><input type="checkbox" name="dc_ambulating"> Ambulating safely</label>
+                <label class="check-item"><input type="checkbox" name="dc_bp_normal"> BP within acceptable range</label>
+                <label class="check-item"><input type="checkbox" name="dc_no_nausea"> No active nausea/vomiting</label>
+                <label class="check-item"><input type="checkbox" name="dc_transport"> Responsible adult present for transport</label>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-top:0.75rem;">
+              <div class="form-group">
+                <label>Discharge Time</label>
+                <input type="time" step="300" name="discharge_time">
+              </div>
+              <div class="form-group form-group--full">
+                <label>Discharge Notes</label>
+                <textarea name="discharge_notes" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="sessionModal">Cancel</button>
+        <button class="btn-primary" id="saveSessionBtn">Save Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Modal -->
+  <div class="modal-overlay hidden" id="assessmentModal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 id="assessmentModalTitle">New Assessment</h2>
+        <button class="modal__close" data-close-modal="assessmentModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="assessmentForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Patient *</label>
+              <select name="patient_id" id="assessmentPatientSelect" required>
+                <option value="">Select Patient</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date *</label>
+              <input type="date" name="assessment_date" required>
+            </div>
+            <div class="form-group">
+              <label>Measure *</label>
+              <select name="measure" id="assessmentMeasure" required>
+                <option value="phq9">PHQ-9</option>
+                <option value="gad7">GAD-7</option>
+                <option value="pcl5">PCL-5</option>
+                <option value="cssrs">C-SSRS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Total Score *</label>
+              <input type="number" name="score" min="0" required>
+            </div>
+          </div>
+          <div id="phq9Questions" class="assessment-questions" style="margin-top:1rem;">
+            <h4 style="margin-bottom:0.75rem;">PHQ-9 Items (0 = Not at all, 1 = Several days, 2 = More than half, 3 = Nearly every day)</h4>
+            <div class="phq9-items">
+              <div class="assessment-q"><span>1. Little interest or pleasure</span><input type="number" name="phq9_q1" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>2. Feeling down, depressed, hopeless</span><input type="number" name="phq9_q2" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>3. Trouble falling/staying asleep</span><input type="number" name="phq9_q3" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>4. Feeling tired or little energy</span><input type="number" name="phq9_q4" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>5. Poor appetite or overeating</span><input type="number" name="phq9_q5" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>6. Feeling bad about yourself</span><input type="number" name="phq9_q6" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>7. Trouble concentrating</span><input type="number" name="phq9_q7" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>8. Moving or speaking slowly/fidgety</span><input type="number" name="phq9_q8" min="0" max="3" placeholder="0-3"></div>
+              <div class="assessment-q"><span>9. Thoughts of self-harm</span><input type="number" name="phq9_q9" min="0" max="3" placeholder="0-3" class="q9-highlight"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="assessmentModal">Cancel</button>
+        <button class="btn-primary" id="saveAssessmentBtn">Save Assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOAP Note Modal -->
+  <div class="modal-overlay hidden" id="noteModal">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h2 id="noteModalTitle">New SOAP Note</h2>
+        <button class="modal__close" data-close-modal="noteModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="noteForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Patient *</label>
+              <select name="patient_id" id="notePatientSelect" required>
+                <option value="">Select Patient</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date *</label>
+              <input type="date" name="note_date" required>
+            </div>
+            <div class="form-group">
+              <label>Note Type</label>
+              <select name="note_type">
+                <option value="soap">SOAP Note</option>
+                <option value="initial_eval">Initial Psychiatric Evaluation</option>
+                <option value="integration">Integration Therapy Note</option>
+                <option value="consultation">Consultation Note</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Provider</label>
+              <input type="text" name="provider">
+            </div>
+          </div>
+
+          <div class="form-section" style="margin-top:1.25rem;">
+            <div class="form-group form-group--full">
+              <label><strong>S</strong> — Subjective</label>
+              <textarea name="subjective" rows="4" placeholder="Patient-reported mood, sleep, appetite, function since last session. Chief complaint."></textarea>
+            </div>
+            <div class="form-group form-group--full">
+              <label><strong>O</strong> — Objective</label>
+              <textarea name="objective" rows="4" placeholder="Vitals, mental status exam findings, validated measure scores, observed behavior."></textarea>
+            </div>
+            <div class="form-group form-group--full">
+              <label><strong>A</strong> — Assessment</label>
+              <textarea name="assessment" rows="4" placeholder="Diagnosis (ICD-10), treatment response, comparison to baseline, clinical impression."></textarea>
+            </div>
+            <div class="form-group form-group--full">
+              <label><strong>P</strong> — Plan</label>
+              <textarea name="plan" rows="4" placeholder="Next session date, dose adjustments, referrals, integration therapy plan, follow-up."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="noteModal">Cancel</button>
+        <button class="btn-primary" id="saveNoteBtn">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointment Modal -->
+  <div class="modal-overlay hidden" id="apptModal">
+    <div class="modal">
+      <div class="modal__header">
+        <h2>New Appointment</h2>
+        <button class="modal__close" data-close-modal="apptModal"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="modal__body">
+        <form id="apptForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Patient *</label>
+              <select name="patient_id" id="apptPatientSelect" required>
+                <option value="">Select Patient</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date *</label>
+              <input type="date" name="appt_date" required>
+            </div>
+            <div class="form-group">
+              <label>Time *</label>
+              <input type="time" step="300" name="appt_time" required>
+            </div>
+            <div class="form-group">
+              <label>Type *</label>
+              <select name="appt_type" required>
+                <option value="initial_consult">Initial Consultation (60-90 min)</option>
+                <option value="iv_infusion">IV Infusion (2-3 hrs)</option>
+                <option value="im_session">IM Session (1.5-2 hrs)</option>
+                <option value="sublingual">Sublingual Session (1.5-2 hrs)</option>
+                <option value="integration">Integration Therapy (50-60 min)</option>
+                <option value="followup">Follow-Up (15-30 min)</option>
+                <option value="telehealth">Telehealth Follow-Up</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Provider</label>
+              <input type="text" name="provider">
+            </div>
+            <div class="form-group">
+              <label>Room</label>
+              <input type="text" name="room" placeholder="e.g. Infusion Room 1">
+            </div>
+            <div class="form-group form-group--full">
+              <label>Notes</label>
+              <textarea name="notes" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn-secondary" data-close-modal="apptModal">Cancel</button>
+        <button class="btn-primary" id="saveApptBtn">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Team | AWKN Ranch</title>
+  <meta name="description" content="The people who hold the land at AWKN Ranch — founders, guides, and practitioners.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/team/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/awkn/site.css">
+
+  <style>
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-top: 3.5rem;
+    }
+    .team-card {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .team-photo,
+    .team-avatar {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+      background: var(--cream-deep);
+      border: 4px solid var(--white);
+    }
+    .team-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 4rem;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--cream-deep) 0%, var(--cream) 100%);
+    }
+    .team-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.2rem;
+    }
+    .team-role {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .team-bio {
+      font-size: 0.9rem;
+      color: var(--grey);
+      line-height: 1.75;
+      max-width: 280px;
+    }
+    @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+    @media (max-width: 600px) { .team-grid { grid-template-columns: 1fr; } }
+
+    .values-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-top: 3rem;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .value-item { text-align: center; }
+    .value-item .num {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      color: var(--gold);
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
+    }
+    .value-item h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+    .value-item p { font-size: 0.92rem; color: var(--grey); line-height: 1.75; }
+    @media (max-width: 800px) { .values-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact</a>
+      <a href="../book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../" data-menu-link>Home</a></li>
+      <li><a href="../property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="../book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="../host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="../events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="../services/" data-menu-link>Our Services</a></li>
+      <li><a href="../team/" class="current" data-menu-link>Our Team</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('../assets/awkn/sunflower-group.jpg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Our Team</span>
+      <h1>The people who <em>hold the land</em>.</h1>
+      <span class="page-hero-tagline">Founders, guides, practitioners, and the live-in family that keeps AWKN open.</span>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="bg-cream">
+    <div class="intro-block">
+      <div class="s-eyebrow">Who We Are</div>
+      <h2 class="s-title">A small team, <em>by intention</em>.</h2>
+      <p class="s-desc centered">AWKN Ranch is run by a tight group of founders, resident practitioners, and visiting facilitators. Most of us live on the land or close to it. Most of us have come to this work through our own healing.</p>
+    </div>
+  </section>
+
+  <!-- FOUNDERS -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Founders</div>
+        <h2 class="s-title">The people who <em>started this</em></h2>
+      </div>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-avatar">J</div>
+          <div class="team-name">Justin</div>
+          <div class="team-role">Co-Founder</div>
+          <div class="team-bio">Founder of AWKN Ranch and Within Center. Came to this work through his own journey; built the ranch into the container he wished he'd found.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">H</div>
+          <div class="team-name">Heather Hoover</div>
+          <div class="team-role">Co-Founder &amp; Guide</div>
+          <div class="team-bio">Holds the day-to-day on the land. Trained in somatic practice, breathwork, and ceremonial space-holding. Likely the first person you'll meet when you arrive.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">L</div>
+          <div class="team-name">Lauren</div>
+          <div class="team-role">Operations</div>
+          <div class="team-bio">Runs the systems that keep AWKN running &mdash; bookings, the kitchen, the books. The reason your retreat starts on time.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTITIONERS -->
+  <section class="bg-cream-deep">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Resident Practitioners</div>
+        <h2 class="s-title">The people who <em>hold sessions</em></h2>
+        <p class="s-desc centered">Resident practitioners rotate seasonally; below is a snapshot of who's currently on the land. Visiting facilitators join us throughout the year for retreats and workshops.</p>
+      </div>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-avatar">M</div>
+          <div class="team-name">Mayra</div>
+          <div class="team-role">Bodywork</div>
+          <div class="team-bio">Somatic-experiencing-trained massage therapist. Specializes in nervous-system-aware deep tissue and trauma-informed touch.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">K</div>
+          <div class="team-name">Kama</div>
+          <div class="team-role">Yoga &amp; Movement</div>
+          <div class="team-bio">Lead movement teacher. Roots in vinyasa, yin, and feminine somatic practice. Daily classes 7am and 5pm.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-avatar">S</div>
+          <div class="team-name">Sound Practitioner</div>
+          <div class="team-role">Sound Healing</div>
+          <div class="team-bio">Holds our weekly sound bath in the temple. Crystal bowls, gongs, voice. Bring a blanket.</div>
+        </div>
+
+      </div>
+      <div style="text-align: center; margin-top: 3rem;">
+        <p style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; color: var(--grey); font-size: 1.05rem;">More headshots and bios coming soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="bg-cream">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">How We Work</div>
+        <h2 class="s-title">A few <em>commitments</em></h2>
+      </div>
+      <div class="values-row">
+        <div class="value-item">
+          <div class="num">01</div>
+          <h3>Slow on Purpose</h3>
+          <p>We will not rush you. The schedule has space; the practitioners have presence; the land has time.</p>
+        </div>
+        <div class="value-item">
+          <div class="num">02</div>
+          <h3>No Performance</h3>
+          <p>You don't need to arrive ready, photogenic, or healed. The point of coming here is the part you can't post.</p>
+        </div>
+        <div class="value-item">
+          <div class="num">03</div>
+          <h3>Real Practitioners</h3>
+          <p>Every offering is held by a trained, human practitioner &mdash; never auto-played. The medicine is in the relationship.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN US -->
+  <section class="bg-cream-deep">
+    <div class="intro-block">
+      <div class="s-eyebrow">Join the Team</div>
+      <h2 class="s-title">Looking for <em>practitioners and care staff</em>.</h2>
+      <p class="s-desc centered">If you teach, hold ceremony, cook for groups, or care for a property &mdash; and the words on this site resonate &mdash; we'd love to hear from you. We hire slowly and on relationship.</p>
+      <div style="margin-top: 2rem;">
+        <a href="../contact/" class="btn btn-gold">Reach Out</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="cta-section">
+    <h2>Want to <em>meet us</em>?</h2>
+    <p>The easiest way to get a sense of the team is to come for a day. Sauna, a class, lunch on the porch.</p>
+    <a href="../book/" class="btn btn-gold">Book a Day Visit</a>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="../within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="../property/">Property</a>
+    <a href="../book/">Book</a>
+    <a href="../host-a-retreat/">Host</a>
+    <a href="../events/">Events</a>
+    <a href="../services/">Services</a>
+    <a href="../team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="../within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>

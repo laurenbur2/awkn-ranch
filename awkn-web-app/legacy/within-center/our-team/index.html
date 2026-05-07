@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Team | Within Center</title>
+  <meta name="description" content="Meet the clinical team and guides at Within Center — psychiatrists, therapists, and ceremonial guides supporting ketamine-assisted therapy in Austin, TX.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <link rel="canonical" href="https://within.center/our-team/">
+
+  <meta property="og:title" content="Our Team | Within Center">
+  <meta property="og:description" content="The psychiatrists, therapists, and ceremonial guides behind Within Center in Austin, Texas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://within.center/our-team/">
+  <meta property="og:site_name" content="Within Center">
+  <meta property="og:image" content="https://within.center/images/hero.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Our Team | Within Center">
+  <meta name="twitter:description" content="Meet the clinical team and guides at Within Center — psychiatrists, therapists, and ceremonial guides supporting ketamine-assisted therapy in Austin, TX.">
+  <meta name="twitter:image" content="https://within.center/images/hero.jpg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "Within Center",
+    "url": "https://within.center",
+    "telephone": "+1-512-969-2399",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "7600 Stillridge Dr",
+      "addressLocality": "Austin",
+      "addressRegion": "TX",
+      "postalCode": "78736",
+      "addressCountry": "US"
+    },
+    "medicalSpecialty": "Psychiatry"
+  }
+  </script>
+  <style>
+    /* Team page */
+    .team-intro { background: var(--cream); padding: 6rem 2rem 4rem; text-align: center; }
+    .team-intro-inner { max-width: 720px; margin: 0 auto; }
+    .team-intro p { font-size: 1.02rem; color: var(--grey); line-height: 1.9; margin-top: 1rem; }
+
+    .team-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem 2.5rem;
+    }
+    .team-card { text-align: center; }
+    .team-photo {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: var(--radius);
+      background: #ece6da;
+      margin-bottom: 1.25rem;
+    }
+    .team-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--dark);
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .team-role {
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .team-bio {
+      font-size: 0.9rem;
+      color: var(--grey);
+      line-height: 1.75;
+    }
+
+    .team-section-title {
+      text-align: center;
+      padding: 2rem 2rem 0;
+    }
+    .team-section-title .s-eyebrow { margin-bottom: 0.5rem; }
+    .team-section-title h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .team-grid { grid-template-columns: repeat(2, 1fr); gap: 2.5rem 1.5rem; }
+    }
+    @media (max-width: 560px) {
+      .team-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV (shared structure) ══ -->
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">
+      A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
+    </div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="./" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="../medication-management/" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="../resources/" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ── HERO ── -->
+  <header class="page-hero" style="background-color:var(--dark);">
+    <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/temple-point.jpg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">Our Team</span>
+      <h1>The people who hold the space.</h1>
+      <p class="lead">Within Center is a small team of psychiatrists, therapists, and ceremonial guides &mdash; chosen for their experience and their ability to be genuinely present.</p>
+    </div>
+  </header>
+
+  <!-- ── INTRO ── -->
+  <section class="team-intro">
+    <div class="team-intro-inner">
+      <div class="s-eyebrow">Who We Are</div>
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(1.7rem,3.4vw,2.3rem);color:var(--dark);font-weight:700;line-height:1.25;">A team that takes this work seriously.</h2>
+      <p>Every member of our team has been hand-selected for their clinical depth, lived experience, and skill in holding people through real transformation. We are board-certified psychiatrists, licensed therapists, and trained ceremonial guides &mdash; working together as one team.</p>
+    </div>
+  </section>
+
+  <!-- ── CLINICAL TEAM ── -->
+  <div class="team-section-title">
+    <div class="s-eyebrow">Clinical Leadership</div>
+    <h2>Medical &amp; Therapeutic Team</h2>
+  </div>
+  <div class="team-grid">
+
+    <div class="team-card">
+      <img src="../images/about.jpg" alt="Dr. Eric Miller, MD" class="team-photo">
+      <div class="team-name">Eric Miller, MD</div>
+      <div class="team-role">Medical Director</div>
+      <p class="team-bio">Board-certified psychiatrist leading medical oversight for ketamine-assisted therapy at Within Center. Decades of experience in psychiatric medicine and an evidence-based approach to psychedelic medicine.</p>
+    </div>
+
+    <div class="team-card">
+      <img src="../images/ceremony-space.jpg" alt="David Naylor" class="team-photo">
+      <div class="team-name">David Naylor</div>
+      <div class="team-role">Co-Founder &amp; Lead Guide</div>
+      <p class="team-bio">Co-founder of Within Center. David has held thousands of ceremonial sessions and shaped the integration practices that have become central to the work we do.</p>
+    </div>
+
+    <div class="team-card">
+      <img src="../images/hero.jpg" alt="Trecy Bergen" class="team-photo">
+      <div class="team-name">Trecy Bergen</div>
+      <div class="team-role">Therapist &amp; Integration Lead</div>
+      <p class="team-bio">Licensed therapist specializing in trauma-informed integration. Trecy guides clients through preparation and integration sessions that turn ceremony into lasting change.</p>
+    </div>
+
+  </div>
+
+  <!-- ── CEREMONIAL GUIDES ── -->
+  <div class="team-section-title" style="background:var(--white);">
+    <div class="s-eyebrow">Ceremonial Guides</div>
+    <h2>Holding the Container</h2>
+  </div>
+  <div class="team-grid" style="background:var(--white);">
+
+    <div class="team-card">
+      <img src="../images/ceremony-space.jpg" alt="[Guide name]" class="team-photo">
+      <div class="team-name">[Guide Name]</div>
+      <div class="team-role">Ceremonial Guide</div>
+      <p class="team-bio">[Short bio describing experience, training lineage, and approach to holding space.]</p>
+    </div>
+
+    <div class="team-card">
+      <img src="../images/about.jpg" alt="[Guide name]" class="team-photo">
+      <div class="team-name">[Guide Name]</div>
+      <div class="team-role">Ceremonial Guide</div>
+      <p class="team-bio">[Short bio describing experience, training lineage, and approach to holding space.]</p>
+    </div>
+
+    <div class="team-card">
+      <img src="../images/hero.jpg" alt="[Guide name]" class="team-photo">
+      <div class="team-name">[Guide Name]</div>
+      <div class="team-role">Ceremonial Guide</div>
+      <p class="team-bio">[Short bio describing experience, training lineage, and approach to holding space.]</p>
+    </div>
+
+  </div>
+
+  <!-- ── PHILOSOPHY QUOTE ── -->
+  <div style="background:var(--cream); padding:5rem 2rem; text-align:center;">
+    <blockquote style="max-width:720px; margin:0 auto; font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.3rem,2.6vw,1.7rem); font-style:italic; font-weight:300; color:var(--dark); line-height:1.55;">
+      &ldquo;Real healing requires real presence. We hire and train accordingly.&rdquo;
+      <cite style="display:block; margin-top:1.5rem; font-family:'Inter',sans-serif; font-size:0.7rem; font-style:normal; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); font-weight:500;">Within Center</cite>
+    </blockquote>
+  </div>
+
+  <!-- ── CTA ── -->
+  <section style="position:relative; text-align:center; padding:6rem 2rem; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:url('/awkn-ranch/pricing/images/fire-pit.jpg'); background-size:cover; background-position:center; filter:brightness(0.35);"></div>
+    <div style="position:relative; z-index:1;">
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.7rem,3.2vw,2.2rem); font-weight:700; color:#fff; margin-bottom:0.75rem;">Meet the Team</h2>
+      <p style="font-size:0.95rem; color:rgba(255,255,255,0.7); max-width:480px; margin:0 auto 2rem; line-height:1.75;">Schedule a free consultation to speak with someone on our team about whether this work is right for you.</p>
+      <a href="../contact/" class="awknhero-cta">Contact Us</a>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="contact-row">
+      <div class="contact-item">
+        <span class="label">Phone</span>
+        <a href="tel:5129692399">512-969-2399</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:intake@within.center">intake@within.center</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Web</span>
+        <a href="https://within.center">within.center</a>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:var(--dark);border-top:1px solid rgba(255,255,255,0.08);padding:1.25rem 2rem;display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap;">
+    <span style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.4);">We Work With</span>
+    <a href="/depression-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Depression</a>
+    <a href="/anxiety-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Anxiety</a>
+    <a href="/burnout-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Burnout</a>
+    <a href="/grief-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Grief</a>
+    <a href="/addiction-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Addiction</a>
+  </div>
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){
+      var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');
+      var allSubs=document.querySelectorAll('.menu-sub');
+      function isOpen(){return panel.classList.contains('open');}
+      function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}
+      function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}
+      function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}
+      toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});
+      backdrop.addEventListener('click',closeMenu);
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
+    })();
+  </script>
+</body>
+</html>

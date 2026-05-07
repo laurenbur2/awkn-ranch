@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Services | AWKN Ranch</title>
+  <meta name="description" content="Wellness amenities and add-ons at AWKN Ranch — sauna, cold plunge, pool, hammock garden, plus massage, sound, ceremony and more. Ceremonial ketamine therapy through our sister practice Within Center.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://awknranch.com/services/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/awkn/site.css">
+
+  <style>
+    /* ── WITHIN CENTER FEATURE BLOCK ── */
+    .within-feature {
+      position: relative;
+      min-height: 540px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      background: var(--dark);
+      color: #fff;
+    }
+    .within-feature-img {
+      position: relative;
+      overflow: hidden;
+      min-height: 420px;
+    }
+    .within-feature-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 1.4s ease;
+    }
+    .within-feature:hover .within-feature-img img { transform: scale(1.04); }
+    .within-feature-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(33,24,16,0) 60%, rgba(33,24,16,0.6) 100%);
+    }
+    .within-feature-body {
+      padding: 5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 600px;
+    }
+    .within-feature-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1.4rem;
+    }
+    .within-feature h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+    .within-feature h2 em { font-style: italic; color: var(--gold); font-weight: 300; }
+    .within-feature-sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 1.75rem;
+      font-weight: 300;
+    }
+    .within-feature p {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+    .within-feature-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      align-self: flex-start;
+      margin-top: 1.75rem;
+      padding: 1rem 2.5rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--dark);
+      background: var(--gold);
+      border-radius: 999px;
+      transition: background 0.3s, transform 0.3s, gap 0.3s;
+    }
+    .within-feature-cta::after {
+      content: '›';
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.3rem;
+      line-height: 0.8;
+    }
+    .within-feature-cta:hover { background: #e3aa50; transform: translateY(-2px); gap: 0.9rem; }
+    @media (max-width: 900px) {
+      .within-feature { grid-template-columns: 1fr; }
+      .within-feature-img { min-height: 320px; }
+      .within-feature-body { padding: 3rem 2rem; max-width: none; }
+    }
+
+    /* ── AMENITIES GRID ── */
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-top: 3.5rem;
+    }
+    .amenity-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .amenity-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(201,148,62,0.3);
+    }
+    .amenity-card-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+    .amenity-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .amenity-card:hover .amenity-card-img img { transform: scale(1.05); }
+    .amenity-card-body {
+      padding: 1.6rem 1.75rem 1.75rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .amenity-card-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
+      line-height: 1.2;
+    }
+    .amenity-card-meta {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.85rem;
+    }
+    .amenity-card-desc {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+      flex-grow: 1;
+    }
+    @media (max-width: 1000px) { .amenities-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .amenities-grid { grid-template-columns: 1fr; } }
+
+    /* ── ADD-ONS ── */
+    .addons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 3.5rem;
+    }
+    .addon-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem 1.75rem;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .addon-card:hover {
+      border-color: rgba(201,148,62,0.35);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .addon-card-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+    .addon-card-meta {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .addon-card-desc {
+      font-size: 0.86rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-top: 0.4rem;
+    }
+    @media (max-width: 900px) { .addons-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .addons-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav solid" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">AWKN Ranch</span>
+      <span class="nav-brand-sub">Wellness Retreat &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact</a>
+      <a href="../book/">Book Your Stay</a>
+    </div>
+  </nav>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../" data-menu-link>Home</a></li>
+      <li><a href="../property/" data-menu-link>Explore Our Property</a></li>
+      <li><a href="../book/" data-menu-link>Book Your Experience</a></li>
+      <li><a href="../host-a-retreat/" data-menu-link>Host a Retreat</a></li>
+      <li><a href="../events/" data-menu-link>Event Schedule</a></li>
+      <li><a href="../services/" class="current" data-menu-link>Our Services</a></li>
+      <li><a href="../team/" data-menu-link>Our Team</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">Twelve acres held for healing &mdash; in the hills outside Austin, Texas.</div>
+  </aside>
+
+  <header class="page-hero">
+    <div class="page-hero-bg" style="background-image: url('../pricing/images/ceremony-hero.jpeg');"></div>
+    <div class="page-hero-content">
+      <span class="page-hero-eyebrow">Our Services</span>
+      <h1>Amenities, add-ons, <em>and ceremony</em>.</h1>
+      <span class="page-hero-tagline">Everything that's included with your stay, every offering you can layer on, and the medical practice held alongside us.</span>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="bg-cream" style="padding-bottom: 3rem;">
+    <div class="intro-block">
+      <div class="s-eyebrow">Three Ways to Care for Yourself Here</div>
+      <h2 class="s-title">Always-on amenities, <em>by-appointment add-ons</em>, and a sister practice for psychedelic therapy.</h2>
+      <p class="s-desc centered">Members and overnight guests have full use of the wellness facilities. Add-ons are booked through us and held by a practitioner. Ceremonial ketamine therapy is offered through our sister practice, Within Center, located on the ranch.</p>
+    </div>
+  </section>
+
+  <!-- WITHIN CENTER FEATURE — prominent, important -->
+  <section style="padding: 0;">
+    <a href="../within-center/" class="within-feature" style="text-decoration: none;">
+      <div class="within-feature-img">
+        <img src="../pricing/images/ketamine-ceremony-6.jpg" alt="Ceremonial ketamine therapy at Within Center">
+      </div>
+      <div class="within-feature-body">
+        <div class="within-feature-eyebrow">Our Sister Practice</div>
+        <h2>Within <em>Center</em>.</h2>
+        <div class="within-feature-sub">Ceremonial ketamine therapy, held on the ranch.</div>
+        <p>Within Center is the medical practice that lives alongside AWKN. A licensed clinical team holds ceremonial ketamine therapy, medication management, and integration support &mdash; in the same temple, with the same care, on the same land.</p>
+        <p>For guests who want to layer the medicine work into a stay, we coordinate the two together. Most return to AWKN afterward to rest in it.</p>
+        <span class="within-feature-cta">Visit Within Center</span>
+      </div>
+    </a>
+  </section>
+
+  <!-- AMENITIES — included with every stay -->
+  <section class="bg-cream">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Amenities</div>
+        <h2 class="s-title">Open to <em>every guest</em>.</h2>
+        <p class="s-desc centered">The wellness facilities and lodging that come with any stay or membership. No appointment, no add-on charge &mdash; use them as much as you want.</p>
+      </div>
+      <div class="amenities-grid">
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/sauna-interior.jpg" alt="Cedar sauna at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Heat Therapy</div>
+            <div class="amenity-card-name">Cedar Sauna</div>
+            <div class="amenity-card-desc">Traditional barrel sauna under the live oaks. Open daily, fits up to six. Pair with the cold plunge for a proper contrast cycle.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/cold-plunge.jpg" alt="Cold plunge and hot tub at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Contrast</div>
+            <div class="amenity-card-name">Cold Plunge &amp; Hot Tub</div>
+            <div class="amenity-card-desc">A 38-45&deg;F plunge tub paired with a deep hot tub, framed by the wellness courtyard. The most-used space on the property.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/pool.jpg" alt="Pool at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Open Water</div>
+            <div class="amenity-card-name">Pool</div>
+            <div class="amenity-card-desc">A long swimming pool for laps in the morning, lounging in the afternoon. Heated through the cooler months.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/wellness-center.jpg" alt="Wellness Center at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Practice Space</div>
+            <div class="amenity-card-name">Wellness Center</div>
+            <div class="amenity-card-desc">The dedicated building for bodywork, integration, and one-on-one sessions. Quiet rooms, soft light, and a tea bar for between visits.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/pickle-ball.jpg" alt="Pickleball court at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Movement</div>
+            <div class="amenity-card-name">Pickleball Court</div>
+            <div class="amenity-card-desc">A full-size pickleball court tucked between the gardens. Paddles and balls in the basket courtside &mdash; play whenever you like.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/hammock-garden.jpg" alt="Hammock garden at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Rest</div>
+            <div class="amenity-card-name">Hammock Garden</div>
+            <div class="amenity-card-desc">A grove of strung hammocks under the oaks &mdash; the quietest, most-claimed afternoon napping spot on the ranch.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/retreat-house.jpg" alt="The Retreat House at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging</div>
+            <div class="amenity-card-name">Retreat House</div>
+            <div class="amenity-card-desc">The main residence. Private and shared rooms, a chef's kitchen, a wraparound porch, and the long farmhouse table where everyone eats.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/yurts.jpg" alt="Yurts at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging</div>
+            <div class="amenity-card-name">Yurts</div>
+            <div class="amenity-card-desc">Private circular cabins tucked into the trees. Wood floors, soft beds, windows full of sky. For guests who want quiet.</div>
+          </div>
+        </div>
+
+        <div class="amenity-card">
+          <div class="amenity-card-img"><img src="../pricing/images/dome-exterior.jpeg" alt="Geodesic dome at AWKN Ranch"></div>
+          <div class="amenity-card-body">
+            <div class="amenity-card-meta">Lodging &amp; Studio</div>
+            <div class="amenity-card-name">Geodesic Dome</div>
+            <div class="amenity-card-desc">A geodesic shelter at the edge of the meadow. Doubles as overnight lodging and a movement studio for retreat groups.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD-ONS — by appointment -->
+  <section class="bg-cream-deep">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">Add-Ons</div>
+        <h2 class="s-title">By <em>appointment</em>.</h2>
+        <p class="s-desc centered">Sessions held by a practitioner, layered into your stay. Book in advance &mdash; calendars fill quickly during retreat weeks.</p>
+      </div>
+      <div class="addons-grid">
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Bodywork</div>
+          <div class="addon-card-name">60-Minute Massage</div>
+          <div class="addon-card-desc">Deep tissue, Swedish, or somatic-experiencing-informed touch. Held in a private room of the Retreat House.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Coaching</div>
+          <div class="addon-card-name">Integration Coaching</div>
+          <div class="addon-card-desc">A 60-minute session with one of our integration coaches. Useful before or after a ceremony, or at the end of a retreat.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Reading</div>
+          <div class="addon-card-name">Human Design Reading</div>
+          <div class="addon-card-desc">A personalized reading of your Human Design chart. Useful for understanding your patterns of energy and decision-making.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Therapy</div>
+          <div class="addon-card-name">Licensed Therapy Session</div>
+          <div class="addon-card-desc">A one-hour session with a licensed therapist on staff. Talk therapy, IFS, or trauma-focused work depending on need.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Reading</div>
+          <div class="addon-card-name">Astrology Session</div>
+          <div class="addon-card-desc">A natal-chart reading and conversation about transits. For curiosity, decision-points, or the texture of a season.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Ceremony</div>
+          <div class="addon-card-name">Hap&eacute; Ceremony</div>
+          <div class="addon-card-desc">A held container for hap&eacute; (sacred Amazonian snuff), used for grounding, clearing, and intention-setting.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Therapy</div>
+          <div class="addon-card-name">Internal Family Systems Session</div>
+          <div class="addon-card-desc">An IFS-modality session for working with parts. Held by a trained therapist; particularly useful in retreat container.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Sound</div>
+          <div class="addon-card-name">Private Sound Journey</div>
+          <div class="addon-card-desc">A one-on-one or couples sound bath. Crystal bowls, gongs, voice &mdash; held in the temple, just for you.</div>
+        </div>
+
+        <div class="addon-card">
+          <div class="addon-card-meta">Movement</div>
+          <div class="addon-card-name">Pickleball Lesson</div>
+          <div class="addon-card-desc">Yes, really. We have a court. Schedule a lesson with our resident teacher, or just play.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING CTA -->
+  <section class="cta-section">
+    <h2>Ready to <em>add something on</em>?</h2>
+    <p>Most add-ons can be paired with a stay or booked stand-alone. Tell us what's calling and we'll find a time.</p>
+    <a href="../book/" class="btn btn-gold">Book Your Experience</a>
+    <div class="contact-row" style="margin-top:2.5rem; padding-top:2.5rem;">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:hello@awknranch.com">hello@awknranch.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Visit</span>
+        7600 Stillridge Dr<br>Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Sister Practice</span>
+        <a href="../within-center/">Within Center</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="site-foot-strip">
+    <span class="site-foot-strip-label">Explore</span>
+    <a href="../property/">Property</a>
+    <a href="../book/">Book</a>
+    <a href="../host-a-retreat/">Host</a>
+    <a href="../events/">Events</a>
+    <a href="../services/">Services</a>
+    <a href="../team/">Team</a>
+  </div>
+  <footer class="site-foot">
+    <p>&copy; 2026 AWKN Ranch. All rights reserved. <span class="sep">·</span> Parent of <a href="../within-center/">Within Center</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      var nav = document.getElementById('siteNav');
+      var toggle = document.getElementById('menuToggle');
+      var panel = document.getElementById('menuPanel');
+      var backdrop = document.getElementById('menuBackdrop');
+      function isOpen() { return panel.classList.contains('open'); }
+      function openMenu() {
+        panel.classList.add('open'); backdrop.classList.add('open');
+        nav.classList.add('menu-is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+      }
+      function closeMenu() {
+        panel.classList.remove('open'); backdrop.classList.remove('open');
+        nav.classList.remove('menu-is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+      }
+      toggle.addEventListener('click', function () { isOpen() ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+      document.querySelectorAll('[data-menu-link]').forEach(function (a) { a.addEventListener('click', closeMenu); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) closeMenu(); });
+    })();
+  </script>
+
+</body>
+</html>

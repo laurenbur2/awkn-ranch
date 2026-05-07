@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AWKN Ranch & Within Center — 4-Year Financial Projections</title>
+    <meta name="description" content="AWKN Ranch & Within Center — 4-year financial model and exit strategy. Path to profitability, capital deployment, and ecosystem scaling.">
+    <link rel="canonical" href="https://awknranch.com/investor/projections">
+    <link rel="icon" type="image/png" href="../../favicon.png">
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://awknranch.com/investor/projections">
+    <meta property="og:title" content="AWKN Ranch & Within Center — 4-Year Financial Projections">
+    <meta property="og:description" content="AWKN Ranch & Within Center — 4-year financial model and exit strategy. Path to profitability, capital deployment, and ecosystem scaling.">
+    <meta property="og:site_name" content="AWKN Ranch">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/hero-ranch.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AWKN Ranch & Within Center — 4-Year Financial Projections">
+    <meta name="twitter:description" content="AWKN Ranch & Within Center — 4-year financial model and exit strategy. Path to profitability, capital deployment, and ecosystem scaling.">
+    <meta name="twitter:image" content="https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/hero-ranch.jpg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #fafaf9;
+            --text-primary: #2c2c2c;
+            --text-secondary: #5a5a5a;
+            --text-muted: #8a8a8a;
+            --accent-gold: #c49a5c;
+            --accent-gold-dim: rgba(196, 154, 92, 0.10);
+            --accent-green: #6b8f5e;
+            --accent-green-dim: rgba(107, 143, 94, 0.08);
+            --accent-purple: #a07d64;
+            --accent-purple-dim: rgba(160, 125, 100, 0.08);
+            --accent-blue: #7a9e8a;
+            --accent-blue-dim: rgba(122, 158, 138, 0.08);
+            --accent-terracotta: #b5705a;
+            --accent-terracotta-dim: rgba(181, 112, 90, 0.08);
+            --accent-sage: #7f9a6b;
+            --accent-sage-dim: rgba(127, 154, 107, 0.08);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-light: rgba(0, 0, 0, 0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 0 40px;
+        }
+        .topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .topbar-brand { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--accent-green); text-decoration: none; }
+        .topbar-nav { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; }
+        .topbar-nav a { color: var(--text-secondary); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
+        .topbar-nav a:hover { color: var(--accent-green); }
+        .topbar-user { display: flex; align-items: center; gap: 12px; }
+        .topbar-user img { width: 32px; height: 32px; border-radius: 50%; display: none; }
+        .topbar-user span { font-size: 13px; color: var(--text-muted); }
+        .signout-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        .signout-btn:hover { color: var(--accent-terracotta); }
+        .back-deck-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 18px; font-family: 'Inter', sans-serif;
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.15em;
+            text-transform: uppercase; text-decoration: none;
+            color: var(--accent-gold); border: 1px solid rgba(196,154,92,0.35);
+            border-radius: 100px; background: transparent;
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+        .back-deck-btn:hover {
+            background: var(--accent-gold); color: #fff;
+            border-color: var(--accent-gold); box-shadow: 0 2px 12px rgba(196,154,92,0.2);
+        }
+        .back-deck-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* ===== SECTIONS ===== */
+        .section { max-width: 1200px; margin: 0 auto; padding: 80px 40px; }
+        .section-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 16px; }
+        .section h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
+        .section-desc { font-size: 16px; color: var(--text-secondary); max-width: 800px; margin-bottom: 48px; line-height: 1.7; }
+        .divider { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+        .divider::after { content: ''; display: block; height: 1px; background: var(--border); }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative; text-align: center;
+            min-height: 70vh; display: flex; align-items: center; justify-content: center;
+            background: url('https://lnqxarwqckpmirpmixcw.supabase.co/storage/v1/object/public/investor/hero-ranch.jpg') center/cover no-repeat;
+            background-color: #1c1618;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(28,22,24,0.65) 0%, rgba(28,22,24,0.80) 100%);
+            z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 3; max-width: 780px; padding: 80px 40px 60px; }
+        .hero-badge {
+            display: inline-block; padding: 6px 20px;
+            border: 1px solid rgba(196, 154, 92, 0.35); color: var(--accent-gold);
+            border-radius: 100px; font-size: 0.65rem; font-weight: 600;
+            letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2rem;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif; font-size: clamp(32px, 4vw, 52px);
+            font-weight: 700; line-height: 1.15; margin-bottom: 20px; color: #fff;
+        }
+        .hero h1 .gold { color: var(--accent-gold); }
+        .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto 48px; line-height: 1.75; font-weight: 300; }
+        .hero-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+            max-width: 540px; margin: 0 auto;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden;
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
+        }
+        .hero-stat { text-align: center; padding: 1.5rem 1rem; border-right: 1px solid rgba(255,255,255,0.08); }
+        .hero-stat:last-child { border-right: none; }
+        .hero-stat-value { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 700; color: var(--accent-gold); line-height: 1.2; }
+        .hero-stat-label { font-size: 0.6rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+
+        /* ===== TABLES ===== */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .data-table thead { border-bottom: 2px solid var(--border-light); }
+        .data-table th { padding: 12px 16px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); text-align: left; }
+        .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 500; }
+        #expense-detail-table th, #expense-detail-table td { padding: 10px 6px; font-size: 12px; }
+        #expense-detail-table td:first-child { white-space: nowrap; }
+        .data-table tr.total td { border-top: 2px solid var(--border-light); font-weight: 700; color: var(--accent-gold); }
+        .data-table tr.highlight { background: rgba(107, 143, 94, 0.06); }
+
+        /* ===== CHART ===== */
+        .chart-container {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius); padding: 32px; margin-bottom: 48px;
+        }
+        .chart-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .chart-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
+
+        .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 320px; padding-bottom: 40px; position: relative; }
+        .bar-chart-wide { gap: 4px; }
+
+        /* Y-axis gridlines */
+        .bar-chart::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 40px; border-bottom: 1px solid var(--border); }
+
+        .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; height: 100%; justify-content: flex-end; }
+        .bar-stack { width: 100%; max-width: 56px; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+        .bar-segment { width: 100%; transition: height 0.6s ease; border-radius: 3px 3px 0 0; min-height: 1px; position: relative; }
+        .bar-segment:not(:last-child) { border-radius: 0; }
+        .bar-segment:first-child { border-radius: 3px 3px 0 0; }
+        .bar-value {
+            position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+            font-size: 10px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;
+        }
+        .bar-label {
+            font-size: 10px; color: var(--text-muted); text-align: center;
+            position: absolute; bottom: -32px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+        }
+
+        .bar-expense { background: rgba(181, 112, 90, 0.45); }
+        .bar-revenue { background: rgba(107, 143, 94, 0.55); }
+        .bar-net { background: var(--accent-gold); }
+        .bar-phase2 { background: rgba(122, 158, 138, 0.45); }
+
+        .chart-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px; }
+        .chart-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+        .chart-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+        /* ===== SCENARIO TABS ===== */
+        .scenario-tabs { display: flex; gap: 4px; margin-bottom: 32px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-sm); width: fit-content; }
+        .scenario-tab {
+            padding: 10px 24px; border: none; background: none; color: var(--text-muted);
+            font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s;
+        }
+        .scenario-tab.active { background: #ffffff; color: var(--accent-gold); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        /* ===== SUMMARY CARDS ===== */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 48px; }
+        .summary-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 24px; text-align: center;
+        }
+        .summary-card-value { font-size: 28px; font-weight: 800; color: var(--accent-gold); }
+        .summary-card-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        .summary-card.green .summary-card-value { color: var(--accent-green); }
+
+        /* ===== ASSUMPTIONS ===== */
+        .assumptions { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-top: 48px; }
+        .assumptions h3 { font-size: 16px; margin-bottom: 16px; color: var(--text-secondary); }
+        .assumptions ul { list-style: none; padding: 0; }
+        .assumptions li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-muted); display: flex; gap: 12px; }
+        .assumptions li::before { content: ''; width: 6px; height: 6px; background: var(--accent-gold); border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+
+        /* ===== BACK LINK ===== */
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+        .back-link:hover { color: var(--accent-green); }
+
+        /* ===== FOOTER ===== */
+        .footer { text-align: center; padding: 48px 40px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+
+        /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            /* Layout */
+            .section { padding: 40px 16px; }
+            .topbar { padding: 0 12px; }
+            .topbar-inner { height: 52px; }
+            .topbar-nav { display: none; }
+            .topbar-brand { font-size: 16px; }
+            .back-deck-btn { padding: 6px 14px; font-size: 0.55rem; letter-spacing: 0.1em; }
+            .back-deck-btn svg { width: 10px; height: 10px; }
+            .divider { padding: 0 16px; }
+
+            /* Hero */
+            .hero { min-height: 55vh; }
+            .hero-content { padding: 48px 20px 36px; }
+            .hero h1 { font-size: 26px; line-height: 1.25; }
+            .hero-badge { font-size: 0.55rem; padding: 5px 16px; margin-bottom: 1.25rem; }
+            .hero-sub { font-size: 0.85rem; margin-bottom: 28px; line-height: 1.6; }
+            .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
+            .hero-stat { padding: 0.75rem 0.5rem; }
+            .hero-stat-value { font-size: 1.1rem; }
+            .hero-stat-label { font-size: 0.5rem; letter-spacing: 0.08em; }
+
+            /* Section headings */
+            .section h2 { font-size: 20px; }
+            .section-desc { font-size: 13px; margin-bottom: 24px; line-height: 1.6; }
+            .section-label { font-size: 10px; letter-spacing: 2px; }
+
+            /* Summary cards — always 2x2 grid */
+            .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
+            .summary-card { padding: 14px 10px; }
+            .summary-card-value { font-size: 18px; }
+            .summary-card-label { font-size: 8px; letter-spacing: 0.3px; line-height: 1.3; }
+
+            /* Charts */
+            .chart-container { padding: 16px 8px; margin-bottom: 24px; }
+            .chart-title { font-size: 14px; margin-bottom: 4px; }
+            .chart-subtitle { font-size: 10px; margin-bottom: 16px; }
+            .bar-chart { height: 260px; gap: 2px; padding-bottom: 28px; }
+            .bar-value { font-size: 0; visibility: hidden; }
+            .bar-group:nth-child(3n+1) .bar-value { font-size: 7px; visibility: visible; }
+            .bar-label { font-size: 6.5px; bottom: -20px; letter-spacing: -0.02em; }
+            .bar-stack { max-width: 100%; }
+            .chart-legend { gap: 8px; margin-top: 10px; }
+            .chart-legend-item { font-size: 9px; }
+            .chart-legend-dot { width: 7px; height: 7px; }
+
+            /* Scenario tabs */
+            .scenario-tabs { width: 100%; }
+            .scenario-tab { padding: 8px 12px; font-size: 11px; flex: 1; text-align: center; }
+
+            /* Tables — fit to screen, no scroll */
+            div[style*="overflow-x"] { overflow-x: visible !important; }
+            .data-table { font-size: 10px; width: 100%; table-layout: auto; }
+            .data-table th { padding: 6px 3px; font-size: 7px; letter-spacing: 0.2px; white-space: normal; word-break: break-word; }
+            .data-table td { padding: 6px 3px; font-size: 10px; }
+
+            /* 4-year table: compact on mobile */
+            #year4-tbody { font-size: 9px; }
+            #year4-table-wrap th:nth-child(2),
+            #year4-table-wrap td:nth-child(2),
+            #year4-table-wrap th:nth-child(3),
+            #year4-table-wrap td:nth-child(3) { display: none; }
+
+            /* Expense detail table — hide on mobile, too many columns */
+            #expense-detail-table { display: none !important; }
+            .expense-mobile-note { display: block !important; }
+
+            /* Assumptions */
+            .assumptions { padding: 16px 14px; margin-top: 24px; }
+            .assumptions h3 { font-size: 14px; }
+            .assumptions li { font-size: 11px; padding: 6px 0; }
+
+            /* Footer */
+            .footer { padding: 28px 16px; font-size: 10px; }
+        }
+
+        @media (max-width: 420px) {
+            .hero h1 { font-size: 22px; }
+            .hero-sub { font-size: 0.8rem; }
+            .hero-stat-value { font-size: 0.95rem; }
+            .hero-stat-label { font-size: 0.45rem; }
+            .summary-card-value { font-size: 17px; }
+            .summary-card-label { font-size: 7.5px; }
+            .bar-chart { height: 220px; }
+            .bar-group:nth-child(3n+1) .bar-value { font-size: 6.5px; }
+            .bar-label { font-size: 6px; }
+            .chart-title { font-size: 13px; }
+            .scenario-tab { padding: 7px 8px; font-size: 10px; }
+            .section h2 { font-size: 18px; }
+            .section-desc { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <nav class="topbar">
+        <div class="topbar-inner">
+            <span class="topbar-brand">AWKN Ranch</span>
+            <ul class="topbar-nav">
+                <li><a href="#payback">Revenue Ramp</a></li>
+                <li><a href="#year1">Year 1 Detail</a></li>
+                <li><a href="#year4">4-Year Growth</a></li>
+                <li><a href="#exit">Exit Strategy</a></li>
+                <li><a href="#assumptions-section">Assumptions</a></li>
+            </ul>
+            <a href="https://laurenbur2.github.io/awkn-ranch/investor-presentation/" class="back-deck-btn">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Back to Investor Deck
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">Financial Projections</div>
+            <h1><span class="gold">4-Year Financial Model</span><br>&amp; Exit Strategy</h1>
+            <p class="hero-sub">
+                Revenue projections, operating cash flow, and a clear path to capital return. Month-by-month financials across three scenarios, 4-year growth trajectory, and the refinance-based exit.
+            </p>
+            <div class="hero-stats" id="hero-stats"></div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== REVENUE RAMP & PROFITABILITY ===== -->
+    <section class="section" id="payback">
+        <div class="section-label">Revenue Ramp</div>
+        <h2>Path to Profitability</h2>
+        <p class="section-desc">
+            Phase 1 launches with a 3-month ramp as infrastructure comes online and occupancy builds. Months 1&ndash;2 operate at a loss during ramp-up. The business reaches monthly profitability by Month 3 and stabilizes at full run-rate by Month 7. Below is the cumulative cash flow trajectory across all three scenarios.
+        </p>
+
+        <div class="summary-grid" id="payback-summary"></div>
+
+        <!-- Cash flow chart -->
+        <div class="chart-container">
+            <div class="chart-title">Cumulative Net Cash Flow &mdash; Year 1</div>
+            <div class="chart-subtitle">Monthly cumulative operating profit across the 12-month ramp</div>
+            <div class="bar-chart" id="payback-chart"></div>
+            <div class="chart-legend">
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-net"></div> Cumulative Net Profit</div>
+            </div>
+        </div>
+
+        <!-- Scenario comparison table -->
+        <div style="overflow-x: auto;">
+            <table class="data-table" id="payback-table">
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th style="text-align:right">Break-Even Month</th>
+                        <th style="text-align:right">Year 1 Total Net</th>
+                        <th style="text-align:right">Stabilized Monthly Net</th>
+                        <th style="text-align:right">4-Year Cumulative Net</th>
+                    </tr>
+                </thead>
+                <tbody id="payback-tbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== YEAR 1 MONTHLY ===== -->
+    <section class="section" id="year1">
+        <div class="section-label">Year 1 &mdash; Monthly Detail</div>
+        <h2>Month-by-Month: How Your Capital Works</h2>
+        <p class="section-desc">
+            Months 1&ndash;3 are ramp-up as infrastructure comes online and occupancy builds. By Month 4, all six revenue streams are active. By Month 7, the business is at full run-rate. Toggle scenarios below to compare outcomes.
+        </p>
+
+        <div class="scenario-tabs">
+            <button class="scenario-tab" onclick="setScenario('conservative')">Conservative</button>
+            <button class="scenario-tab active" onclick="setScenario('base')">Base Case</button>
+            <button class="scenario-tab" onclick="setScenario('strong')">Strong</button>
+        </div>
+
+        <!-- Summary cards for selected scenario -->
+        <div class="summary-grid" id="year1-summary"></div>
+
+        <!-- Monthly bar chart -->
+        <div class="chart-container">
+            <div class="chart-title">Monthly Revenue vs. Expenses &mdash; Year 1</div>
+            <div class="chart-subtitle" id="chart-scenario-label">Conservative Scenario</div>
+            <div class="bar-chart" id="year1-chart"></div>
+            <div class="chart-legend">
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-revenue"></div> Revenue</div>
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-expense"></div> Expenses</div>
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-net"></div> Net Profit</div>
+            </div>
+        </div>
+
+        <!-- Monthly table -->
+        <div style="overflow-x: auto;">
+            <table class="data-table" id="year1-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th style="text-align:right">Revenue</th>
+                        <th style="text-align:right">Expenses</th>
+                        <th style="text-align:right">Net Profit</th>
+                        <th style="text-align:right">Cumulative</th>
+                    </tr>
+                </thead>
+                <tbody id="year1-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Detailed Monthly Expense Breakdown -->
+        <div style="margin-top: 64px;">
+            <h3 style="font-size: 20px; margin-bottom: 8px;">Monthly Expense Breakdown</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Line-item operating costs by month. Ramp-up months (1&ndash;3) show reduced costs as staffing and marketing scale up.</p>
+
+            <p class="expense-mobile-note" style="display:none; padding:16px; background:var(--bg-secondary); border-radius:var(--radius); font-size:12px; color:var(--text-muted); text-align:center; line-height:1.6;">Detailed monthly expense breakdown available on desktop. Summary: operating expenses range from <strong id="exp-mobile-low"></strong> (ramp) to <strong id="exp-mobile-high"></strong> (stabilized) per month.</p>
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="data-table" id="expense-detail-table" style="table-layout: fixed; min-width: 900px;">
+                    <thead>
+                        <tr>
+                            <th style="width:22%; white-space:nowrap;">Expense Category</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m1">M1</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m2">M2</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m3">M3</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m4">M4</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m5">M5</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m6">M6</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m7">M7</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m8">M8</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m9">M9</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m10">M10</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m11">M11</th>
+                            <th style="text-align:right; font-size:10px;" id="exp-m12">M12</th>
+                            <th style="text-align:right;">Annual</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-detail-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== 4-YEAR ===== -->
+    <section class="section" id="year4">
+        <div class="section-label">4-Year Growth</div>
+        <h2>How the Ecosystem Scales After Year 1</h2>
+        <p class="section-desc">
+            Phase 1 operations stabilize in Year 1. A subsequent $16M Series A funds the Dome Collective (Phase 2) &mdash; land acquisition and build-out. Phase 2 revenue begins Year 2 as domes come online. By Year 4, the full ecosystem is stabilized and ready for refinance.
+        </p>
+
+        <div class="summary-grid" id="year4-summary"></div>
+
+        <div class="chart-container">
+            <div class="chart-title">Annual Net Profit &mdash; Years 1&ndash;4</div>
+            <div class="chart-subtitle">Base case scenario &middot; Phase 2 revenue begins Year 2</div>
+            <div class="bar-chart" id="year4-chart"></div>
+            <div class="chart-legend">
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-revenue"></div> Phase 1 (Ranch + Within)</div>
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-phase2"></div> Phase 2 (Dome Collective)</div>
+                <div class="chart-legend-item"><div class="chart-legend-dot bar-net"></div> Combined Net Profit</div>
+            </div>
+        </div>
+
+        <div id="year4-table-wrap" style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th style="text-align:right">Phase 1 Rev</th>
+                        <th style="text-align:right">Phase 2 Rev</th>
+                        <th style="text-align:right">Total Rev</th>
+                        <th style="text-align:right">Expenses</th>
+                        <th style="text-align:right">Net Profit</th>
+                        <th style="text-align:right">Cumulative</th>
+                    </tr>
+                </thead>
+                <tbody id="year4-tbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== EXIT STRATEGY ===== -->
+    <section class="section" id="exit">
+        <div class="section-label">Exit Strategy</div>
+        <h2>Year 4 Refinance &amp; Valuation</h2>
+        <p class="section-desc">
+            Capital is returned through a debt refinance at Year 4 &mdash; not a sale, not an IPO. By Year 4, the ecosystem is fully stabilized, generating predictable cash flow, and valued on institutional lending metrics. All invested equity is returned while ownership is retained.
+        </p>
+
+        <!-- Refinance KPIs -->
+        <div class="summary-grid" id="exit-investor-kpis"></div>
+
+        <!-- Return Waterfall -->
+        <div class="chart-container" style="margin-top: 32px;">
+            <div class="chart-title">Capital Return Waterfall</div>
+            <div class="chart-subtitle">Operating cash flow through Year 4 + lump-sum return at refinance</div>
+            <table class="data-table" id="exit-your-returns" style="margin-top: 24px;"></table>
+        </div>
+
+        <!-- Year 4 Refinance Detail -->
+        <div class="chart-container" style="margin-top: 24px;">
+            <div class="chart-title">Refinance Mechanics &mdash; Full Capital Stack</div>
+            <div class="chart-subtitle">Stabilized NOI drives appraised value &middot; cash-out refinance returns all invested equity</div>
+            <div class="summary-grid" id="exit-kpis" style="margin-bottom: 24px;"></div>
+            <table class="data-table" id="exit-waterfall"></table>
+        </div>
+
+        <!-- Post-Refi Ongoing -->
+        <div class="chart-container" style="margin-top: 24px;">
+            <div class="chart-title">Post-Refinance: Ongoing Cash Flow</div>
+            <div class="chart-subtitle">Ownership is retained &mdash; the business keeps generating income after debt service</div>
+            <table class="data-table" id="exit-dscr" style="margin-top: 24px;"></table>
+        </div>
+
+        <!-- Key Assumptions -->
+        <div class="assumptions" style="margin-top: 24px;">
+            <h3>Refinance Assumptions</h3>
+            <ul id="exit-assumptions"></ul>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== ASSUMPTIONS ===== -->
+    <section class="section" id="assumptions-section">
+        <div class="section-label">Model Assumptions</div>
+        <h2>Key Assumptions &amp; Methodology</h2>
+
+        <div class="assumptions">
+            <h3>Phase 1 &mdash; AWKN Ranch + Within Center</h3>
+            <ul>
+                <li>Retreat House nightly rate: $349 (shared) &ndash; $499 (private) &middot; 10 beds &middot; 2-night minimum</li>
+                <li>Yurts x2: $699/night each &middot; 50% base occupancy</li>
+                <li>HoneyComb Dome + Model Dome: $599/night each &middot; 50% base occupancy</li>
+                <li>Maloka Dome: $20K&ndash;$40K/mo venue rental + $12K&ndash;$18K/mo nightly lodging</li>
+                <li>Within Center: $16.5K&ndash;$33K/mo from outpatient ketamine therapy packages</li>
+                <li>AWKN Hosted Retreats: $20K&ndash;$75K/mo curated multi-day immersions</li>
+                <li>Monthly operating expenses: $64.8K (low) &ndash; $77.8K (high)</li>
+                <li>Admissions / Corporate Sales: $4,000/mo &mdash; first 5 months funded from capital raise ($20K)</li>
+                <li>Months 1&ndash;3: 40% revenue ramp (infrastructure build-out, marketing launch)</li>
+                <li>Months 4&ndash;6: 70% of steady-state revenue (occupancy growing)</li>
+                <li>Months 7+: 100% steady-state revenue</li>
+                <li>Annual growth rate: 5% (rate increases + occupancy optimization)</li>
+            </ul>
+        </div>
+
+        <div class="assumptions" style="margin-top: 24px;">
+            <h3>Phase 2 &mdash; Dome Collective</h3>
+            <ul>
+                <li>103 domes total: 50 Tier 1 ($2,022/mo) + 40 Tier 2 ($2,322/mo) + 13 STR ($299/night at 70% occ.)</li>
+                <li>Gross monthly revenue at full occupancy: $275,511</li>
+                <li>Estimated net monthly: ~$200,000</li>
+                <li>Year 2: 30% of domes operational (construction ramp)</li>
+                <li>Year 3: 80% operational</li>
+                <li>Year 4: 100% operational &mdash; stabilized for refinance</li>
+                <li>Annual growth rate: 3% (lease renewals + rate increases)</li>
+                <li>Series A ($16M) funds land acquisition ($10M) + build-out ($6M)</li>
+            </ul>
+        </div>
+
+        <div class="assumptions" style="margin-top: 24px;">
+            <h3>Year 4 Refinance Exit</h3>
+            <ul>
+                <li>Refinance at Year 4 stabilized NOI using 8.5% cap rate</li>
+                <li>Loan-to-value (LTV): 65% on appraised value</li>
+                <li>Refinance proceeds used to return investor capital + profit distributions</li>
+                <li>Ownership retained post-refinance &mdash; ongoing cash flow continues</li>
+            </ul>
+        </div>
+
+        <div class="assumptions" style="margin-top: 24px;">
+            <h3>General</h3>
+            <ul>
+                <li>All figures in USD. No inflation adjustment.</li>
+                <li>All income projections reflect a 10% reduction from original model estimates</li>
+                <li>Expense growth: 3% annually (staffing, utilities, maintenance)</li>
+                <li>No additional capital raises assumed beyond Phase 1 seed round (includes 5-month Admissions/Sales hire) and Series A ($16M)</li>
+                <li>Conservative scenario uses low-end revenue and high-end expenses throughout</li>
+                <li>Base case uses midpoint revenue and midpoint expenses</li>
+                <li>Strong scenario uses high-end revenue and low-end expenses</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Within Center &amp; AWKN Ranch. All rights reserved.<br>
+        This document is confidential and intended solely for the use of authorized investors.<br>
+        Projections are estimates based on current operating data and are not guarantees of future performance.</p>
+    </footer>
+</div>
+
+<script>
+    // ===== FINANCIAL MODEL =====
+    const fmt = (n) => '$' + Math.round(n).toLocaleString();
+    const fmtM = (n) => '$' + (n / 1000000).toFixed(1) + 'M';
+
+    // Monthly steady-state figures from investor deck (10% revenue reduction applied)
+    const scenarios = {
+        conservative: { label: 'Conservative', revenue: Math.round(133440 * 0.90), expenses: 76300 },
+        base:         { label: 'Base Case',    revenue: Math.round(185000 * 0.90), expenses: 69500 },
+        strong:       { label: 'Strong',       revenue: Math.round(250940 * 0.90), expenses: 63300 }
+    };
+
+    // Monthly ramp multipliers for Year 1
+    const ramp = [0.25, 0.35, 0.50, 0.65, 0.75, 0.85, 0.90, 0.95, 1.0, 1.05, 1.1025, 1.1576];
+
+    // Detailed expense line items (low / high steady-state from investor deck)
+    const expenseItems = [
+        { name: 'Hospitality Manager (live-in, FT)', low: 4000, high: 5000, rampStart: 1 },
+        { name: 'Operations Manager', low: 4000, high: 4000, rampStart: 1, fullFromStart: true },
+        { name: 'Medical / Clinical Staff (2 days/wk)', low: 3000, high: 5000, rampStart: 1, fullFromStart: true },
+        { name: 'Executive / Management', low: 10000, high: 12000, rampStart: 1 },
+        { name: 'Shannon Cohen — Advisory', low: 3000, high: 3000, rampStart: 1 },
+        { name: 'Property Lease', low: 12800, high: 12800, rampStart: 1, fullFromStart: true },
+        { name: 'Maintenance & Utilities', low: 4000, high: 6000, rampStart: 1 },
+        { name: 'Breakfast & Guest Supplies', low: 2500, high: 3500, rampStart: 2, fullFromStart: true },
+        { name: 'Insurance, Licensing & Compliance', low: 1500, high: 2500, rampStart: 1 },
+        { name: 'Marketing & Booking Platform', low: 5500, high: 6500, rampStart: 1 },
+        { name: 'Google / Meta / AI Advertising', low: 8000, high: 10000, rampStart: 1, fullFromStart: true },
+        { name: 'Admissions / Corporate Sales', low: 4000, high: 4000, rampStart: 1, fullFromStart: true },
+        { name: 'Miscellaneous / Contingency', low: 1000, high: 2000, rampStart: 1 },
+    ];
+
+    let currentScenario = 'base';
+
+    function setScenario(s) {
+        currentScenario = s;
+        document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.scenario-tab[onclick="setScenario('${s}')"]`).classList.add('active');
+        renderYear1();
+    }
+
+    function renderYear1() {
+        const s = scenarios[currentScenario];
+        const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+        let cumulative = 0;
+        let totalRev = 0, totalExp = 0, totalNet = 0;
+        const data = months.map((m, i) => {
+            const rev = Math.round(s.revenue * ramp[i]);
+            const exp = Math.round(s.expenses * (i < 3 ? 0.85 : 1)); // Lower expenses during ramp
+            const net = rev - exp;
+            cumulative += net;
+            totalRev += rev; totalExp += exp; totalNet += net;
+            return { month: m, rev, exp, net, cumulative };
+        });
+
+        // Summary cards
+        document.getElementById('year1-summary').innerHTML = `
+            <div class="summary-card"><div class="summary-card-value">${fmt(totalRev)}</div><div class="summary-card-label">Year 1 Revenue</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmt(totalExp)}</div><div class="summary-card-label">Year 1 Expenses</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmt(totalNet)}</div><div class="summary-card-label">Year 1 Net Profit</div></div>
+            <div class="summary-card"><div class="summary-card-value">${Math.round(totalNet / totalRev * 100)}%</div><div class="summary-card-label">Net Margin</div></div>
+        `;
+
+        document.getElementById('chart-scenario-label').textContent = s.label + ' Scenario';
+
+        // Bar chart
+        const maxVal = Math.max(...data.map(d => Math.max(d.rev, d.exp)));
+        const chartHeight = 280;
+        document.getElementById('year1-chart').innerHTML = data.map(d => `
+            <div class="bar-group">
+                <div class="bar-stack" style="height: ${(d.rev / maxVal) * chartHeight}px;">
+                    <div class="bar-segment bar-revenue" style="height: 100%;">
+                        <div class="bar-value">${fmt(d.rev)}</div>
+                    </div>
+                </div>
+                <div class="bar-label">${d.month}</div>
+            </div>
+            <div class="bar-group">
+                <div class="bar-stack" style="height: ${(d.net > 0 ? d.net : 0) / maxVal * chartHeight}px;">
+                    <div class="bar-segment bar-net" style="height: 100%;"></div>
+                </div>
+                <div class="bar-label"></div>
+            </div>
+        `).join('');
+
+        // Table
+        document.getElementById('year1-tbody').innerHTML = data.map((d, i) => `
+            <tr${i >= 9 ? ' class="highlight"' : ''}>
+                <td>${d.month} ${i < 9 ? '2026' : '2027'}</td>
+                <td style="text-align:right">${fmt(d.rev)}</td>
+                <td style="text-align:right">${fmt(d.exp)}</td>
+                <td style="text-align:right; color: ${d.net >= 0 ? 'var(--accent-green)' : 'var(--accent-terracotta)'};">${fmt(d.net)}</td>
+                <td style="text-align:right; color: ${d.cumulative >= 0 ? 'var(--accent-gold)' : 'var(--accent-terracotta)'};">${fmt(d.cumulative)}</td>
+            </tr>
+        `).join('') + `
+            <tr class="total">
+                <td>Year 1 Total</td>
+                <td style="text-align:right">${fmt(totalRev)}</td>
+                <td style="text-align:right">${fmt(totalExp)}</td>
+                <td style="text-align:right">${fmt(totalNet)}</td>
+                <td style="text-align:right">${fmt(cumulative)}</td>
+            </tr>
+        `;
+
+        // Expense detail table
+        renderExpenseDetail();
+    }
+
+    function renderExpenseDetail() {
+        const scenario = currentScenario;
+        const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+
+        // Update month headers
+        months.forEach((m, i) => {
+            const el = document.getElementById(`exp-m${i+1}`);
+            if (el) el.textContent = m;
+        });
+
+        // For each expense, determine monthly value based on scenario + ramp
+        const fmtK = (n) => n >= 1000 ? '$' + (n/1000).toFixed(1) + 'K' : '$' + n.toLocaleString();
+        const fmtS = (n) => '$' + Math.round(n).toLocaleString();
+
+        let monthTotals = new Array(12).fill(0);
+        let grandTotal = 0;
+
+        const rows = expenseItems.map(item => {
+            // Pick value based on scenario
+            let steadyState;
+            if (scenario === 'conservative') steadyState = item.high;
+            else if (scenario === 'strong') steadyState = item.low;
+            else steadyState = Math.round((item.low + item.high) / 2);
+
+            let annualTotal = 0;
+            const monthlyCells = months.map((m, i) => {
+                const monthNum = i + 1;
+                let val = 0;
+                if (item.oneTime) {
+                    // One-time expense: only charged in the specified month
+                    if (monthNum === item.oneTime) val = steadyState;
+                } else if (monthNum >= item.rampStart) {
+                    // Recurring: full from start if flagged, otherwise ramp in during months 1-3
+                    if (item.fullFromStart) val = steadyState;
+                    else if (monthNum <= 2) val = Math.round(steadyState * 0.6);
+                    else if (monthNum === 3) val = Math.round(steadyState * 0.8);
+                    else val = steadyState;
+                }
+                annualTotal += val;
+                monthTotals[i] += val;
+                return val;
+            });
+            grandTotal += annualTotal;
+
+            return { name: item.name, monthlyCells, annualTotal };
+        });
+
+        document.getElementById('expense-detail-tbody').innerHTML =
+            rows.map(r => `
+                <tr>
+                    <td style="font-size:12px; white-space:nowrap;">${r.name}</td>
+                    ${r.monthlyCells.map(v => `<td style="text-align:right; font-size:11px; color: ${v === 0 ? 'var(--text-muted)' : 'var(--text-secondary)'};">${v === 0 ? '&mdash;' : fmtK(v)}</td>`).join('')}
+                    <td style="text-align:right; font-weight:600; font-size:12px;">${fmtS(r.annualTotal)}</td>
+                </tr>
+            `).join('') + `
+                <tr class="total">
+                    <td>Monthly Total</td>
+                    ${monthTotals.map(t => `<td style="text-align:right; font-size:11px;">${fmtK(t)}</td>`).join('')}
+                    <td style="text-align:right;">${fmtS(grandTotal)}</td>
+                </tr>
+            `;
+
+        // Populate mobile expense summary
+        const lowExp = Math.min(...monthTotals);
+        const highExp = Math.max(...monthTotals);
+        const elLow = document.getElementById('exp-mobile-low');
+        const elHigh = document.getElementById('exp-mobile-high');
+        if (elLow) elLow.textContent = fmtS(lowExp);
+        if (elHigh) elHigh.textContent = fmtS(highExp);
+    }
+
+    // ===== 4-YEAR MODEL =====
+    function render4Year() {
+        const p1Base = scenarios.base;
+        const p1AnnualRev = p1Base.revenue * 12;
+        const p1AnnualExp = p1Base.expenses * 12;
+        const p1Growth = 1.05;
+        const expGrowth = 1.03;
+
+        // Phase 2: 10% revenue reduction applied to dome gross
+        const p2FullGross = Math.round(275511 * 0.90) * 12;
+        const p2Ramp = [0, 0.30, 0.80, 1.0]; // Year 4 = fully stabilized
+        const p2Growth = 1.03;
+
+        let cumulative = 0;
+        const data = [];
+
+        for (let y = 0; y < 4; y++) {
+            let p1Rev, p1Exp;
+            if (y === 0) {
+                p1Rev = 0;
+                ramp.forEach(r => p1Rev += p1Base.revenue * r);
+                p1Exp = p1Base.expenses * 9 + p1Base.expenses * 0.85 * 3;
+            } else {
+                p1Rev = p1AnnualRev * Math.pow(p1Growth, y);
+                p1Exp = p1AnnualExp * Math.pow(expGrowth, y);
+            }
+            const p1Net = p1Rev - p1Exp;
+
+            const p2Rev = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(p2Growth, y - 2) : 1);
+            const p2ExpRatio = 0.27;
+            const p2Exp = p2Rev * p2ExpRatio;
+            const p2Net = p2Rev - p2Exp;
+
+            const totalRev = p1Rev + p2Rev;
+            const totalExp = p1Exp + p2Exp;
+            const totalNet = p1Net + p2Net;
+            cumulative += totalNet;
+
+            data.push({ year: y + 1, p1Rev, p1Net, p2Rev, p2Net, totalRev, totalExp, totalNet, cumulative });
+        }
+
+        // Summary
+        const y4cum = data[3].cumulative;
+        const y4net = data[3].totalNet;
+        document.getElementById('year4-summary').innerHTML = `
+            <div class="summary-card"><div class="summary-card-value">${fmtM(y4cum)}</div><div class="summary-card-label">4-Year Cumulative Net</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(y4net)}</div><div class="summary-card-label">Year 4 Annual Net</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtM(data[3].totalRev)}</div><div class="summary-card-label">Year 4 Annual Revenue</div></div>
+            <div class="summary-card"><div class="summary-card-value">${Math.round(data.reduce((s,d) => s + d.totalRev, 0) / 1000000)}M+</div><div class="summary-card-label">4-Year Total Revenue</div></div>
+        `;
+
+        // Chart
+        const maxVal = Math.max(...data.map(d => d.totalNet));
+        const chartHeight = 280;
+        document.getElementById('year4-chart').innerHTML = data.map(d => `
+            <div class="bar-group">
+                <div class="bar-stack" style="height: ${(d.totalNet / maxVal) * chartHeight}px;">
+                    ${d.p2Net > 0 ? `<div class="bar-segment bar-phase2" style="height: ${d.p2Net / d.totalNet * 100}%;"></div>` : ''}
+                    <div class="bar-segment bar-revenue" style="height: ${d.p1Net / d.totalNet * 100}%; border-radius: 0 0 0 0;"></div>
+                </div>
+                <div class="bar-value">${fmtM(d.totalNet)}</div>
+                <div class="bar-label">Year ${d.year}</div>
+            </div>
+        `).join('');
+
+        // Table
+        document.getElementById('year4-tbody').innerHTML = data.map(d => `
+            <tr${d.year === 4 ? ' class="highlight"' : ''}>
+                <td><strong>Year ${d.year}</strong></td>
+                <td style="text-align:right">${fmt(d.p1Rev)}</td>
+                <td style="text-align:right">${d.p2Rev > 0 ? fmt(d.p2Rev) : '&mdash;'}</td>
+                <td style="text-align:right">${fmt(d.totalRev)}</td>
+                <td style="text-align:right">${fmt(d.totalExp)}</td>
+                <td style="text-align:right; color: var(--accent-green);">${fmt(d.totalNet)}</td>
+                <td style="text-align:right; color: var(--accent-gold);">${fmtM(d.cumulative)}</td>
+            </tr>
+        `).join('');
+
+        return data;
+    }
+
+    // ===== REVENUE RAMP =====
+    function renderPayback() {
+        const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+        const scenarioResults = {};
+
+        // Calculate cash flow trajectory for each scenario
+        ['conservative', 'base', 'strong'].forEach(key => {
+            const s = scenarios[key];
+            let cumulative = 0;
+            let breakEvenMonth = null;
+            const monthData = months.map((m, i) => {
+                const rev = Math.round(s.revenue * ramp[i]);
+                const exp = Math.round(s.expenses * (i < 3 ? 0.85 : 1));
+                const net = rev - exp;
+                cumulative += net;
+                // Break-even = first month with positive monthly net profit
+                if (!breakEvenMonth && net > 0) breakEvenMonth = i + 1;
+                return { month: m, net, cumulative };
+            });
+
+            // Stabilized monthly net (full run-rate)
+            const stabilizedNet = s.revenue - s.expenses;
+
+            // 4-year cumulative for this scenario
+            const p1AnnualRev = s.revenue * 12;
+            const p1AnnualExp = s.expenses * 12;
+            let cum4 = 0;
+            const p2FullGross = Math.round(275511 * 0.90) * 12;
+            const p2Ramp = [0, 0.30, 0.80, 1.0];
+            for (let y = 0; y < 4; y++) {
+                let p1R, p1E;
+                if (y === 0) {
+                    p1R = 0; ramp.forEach(r => p1R += s.revenue * r);
+                    p1E = s.expenses * 9 + s.expenses * 0.85 * 3;
+                } else {
+                    p1R = p1AnnualRev * Math.pow(1.05, y);
+                    p1E = p1AnnualExp * Math.pow(1.03, y);
+                }
+                const p2R = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(1.03, y - 2) : 1);
+                cum4 += (p1R - p1E) + (p2R - p2R * 0.27);
+            }
+
+            const y1Total = monthData[11].cumulative;
+            scenarioResults[key] = {
+                label: s.label,
+                breakEvenMonth,
+                y1Total,
+                stabilizedNet,
+                cum4,
+                monthData
+            };
+        });
+
+        const base = scenarioResults.base;
+
+        // Summary cards
+        document.getElementById('payback-summary').innerHTML = `
+            <div class="summary-card"><div class="summary-card-value">Month ${base.breakEvenMonth}</div><div class="summary-card-label">Monthly Break-Even</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmt(base.y1Total)}</div><div class="summary-card-label">Year 1 Net Profit</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmt(base.stabilizedNet)}/mo</div><div class="summary-card-label">Stabilized Monthly Net</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(base.cum4)}</div><div class="summary-card-label">4-Year Cumulative Net</div></div>
+        `;
+
+        // Cash flow chart — base case cumulative
+        const data = base.monthData;
+        const maxVal = Math.max(data[11].cumulative, Math.abs(Math.min(...data.map(d => d.cumulative)))) * 1.15;
+        const chartHeight = 280;
+        document.getElementById('payback-chart').innerHTML =
+            data.map((d, i) => {
+                const isNeg = d.cumulative < 0;
+                const h = Math.max(Math.abs(d.cumulative) / maxVal * chartHeight, 4);
+                return `
+                    <div class="bar-group">
+                        <div class="bar-stack" style="height: ${h}px; ${isNeg ? 'opacity: 0.6;' : ''}">
+                            <div class="bar-segment ${isNeg ? 'bar-expense' : 'bar-net'}" style="height: 100%;">
+                                <div class="bar-value">${fmt(d.cumulative)}</div>
+                            </div>
+                        </div>
+                        <div class="bar-label">${d.month}</div>
+                    </div>`;
+            }).join('');
+
+        // Scenario comparison table
+        document.getElementById('payback-tbody').innerHTML = ['conservative', 'base', 'strong'].map(key => {
+            const r = scenarioResults[key];
+            return `
+                <tr${key === 'base' ? ' class="highlight"' : ''}>
+                    <td><strong>${r.label}</strong></td>
+                    <td style="text-align:right; color: var(--accent-green); font-weight:600;">Month ${r.breakEvenMonth}</td>
+                    <td style="text-align:right">${fmt(r.y1Total)}</td>
+                    <td style="text-align:right">${fmt(r.stabilizedNet)}/mo</td>
+                    <td style="text-align:right; color: var(--accent-gold); font-weight:700;">${fmtM(r.cum4)}</td>
+                </tr>`;
+        }).join('');
+    }
+
+    // ===== YOUR RETURNS (EXIT) =====
+    function renderExit() {
+        const p1Base = scenarios.base;
+        const p1AnnualRev = p1Base.revenue * 12;
+        const p1AnnualExp = p1Base.expenses * 12;
+        const p1Growth = 1.05;
+        const expGrowth = 1.03;
+        const investment = 500000;
+
+        // Year 4 NOI
+        const p1Rev4 = p1AnnualRev * Math.pow(p1Growth, 3);
+        const p1Exp4 = p1AnnualExp * Math.pow(expGrowth, 3);
+        const p1NOI4 = p1Rev4 - p1Exp4;
+
+        const p2FullGross = Math.round(275511 * 0.90) * 12;
+        const p2Rev4 = p2FullGross * 1.0 * Math.pow(1.03, 1);
+        const p2NOI4 = p2Rev4 - p2Rev4 * 0.27;
+
+        const totalNOI = p1NOI4 + p2NOI4;
+
+        // Capital stack
+        const seriesAEquity = 16000000;
+        const totalEquity = investment + seriesAEquity;
+
+        // Refinance
+        const capRate = 0.085;
+        const appraisedValue = totalNOI / capRate;
+        const ltv = 0.65;
+        const refiProceeds = appraisedValue * ltv;
+        const loanRate = 0.065;
+        const loanTermYears = 30;
+        const monthlyRate = loanRate / 12;
+        const loanAmortMonths = loanTermYears * 12;
+        const monthlyPI = refiProceeds * (monthlyRate * Math.pow(1 + monthlyRate, loanAmortMonths)) / (Math.pow(1 + monthlyRate, loanAmortMonths) - 1);
+        const annualDebtService = monthlyPI * 12;
+        const dscr = totalNOI / annualDebtService;
+        const postRefiCashFlow = totalNOI - annualDebtService;
+
+        // Cumulative operating cash flow (4 years, base case)
+        let cumCashFlow = 0;
+        const p2Ramp = [0, 0.30, 0.80, 1.0];
+        for (let y = 0; y < 4; y++) {
+            let p1R, p1E;
+            if (y === 0) {
+                p1R = 0; ramp.forEach(r => p1R += p1Base.revenue * r);
+                p1E = p1Base.expenses * 9 + p1Base.expenses * 0.85 * 3;
+            } else {
+                p1R = p1AnnualRev * Math.pow(p1Growth, y);
+                p1E = p1AnnualExp * Math.pow(expGrowth, y);
+            }
+            const p2R = p2FullGross * p2Ramp[y] * (y > 1 ? Math.pow(1.03, y - 2) : 1);
+            cumCashFlow += (p1R - p1E) + (p2R - p2R * 0.27);
+        }
+
+        // Seed investor pro-rata share of distributions
+        const ownershipPct = investment / totalEquity; // 3.03% simple pro-rata
+        const theirRefiShare = refiProceeds * ownershipPct;
+        const theirCashFlowShare = cumCashFlow * ownershipPct;
+        const theirTotalReturn = theirRefiShare + theirCashFlowShare;
+        const theirMultiple = theirTotalReturn / investment;
+
+        // Payback comes at Year 4 refinance — refi proceeds return all invested capital
+        // Operating cash flow in Years 1–4 is additional return on top
+
+        // ===== RENDER =====
+
+        // Refinance KPIs
+        document.getElementById('exit-investor-kpis').innerHTML = `
+            <div class="summary-card"><div class="summary-card-value">${fmtM(appraisedValue)}</div><div class="summary-card-label">Year 4 Appraised Value</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(refiProceeds)}</div><div class="summary-card-label">Cash-Out Refi Proceeds</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtM(totalNOI)}</div><div class="summary-card-label">Stabilized Annual NOI</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(postRefiCashFlow)}/yr</div><div class="summary-card-label">Post-Refi Free Cash Flow</div></div>
+        `;
+
+        // Capital return waterfall
+        document.getElementById('exit-your-returns').innerHTML = `
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Operating Cash Flow (Years 1&ndash;4)</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Cumulative operating cash flow</td><td style="text-align:right; font-weight:600;">${fmt(cumCashFlow)}</td></tr>
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Year 4 Refinance</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Stabilized NOI (${fmtM(totalNOI)}) &rarr; ${fmtM(appraisedValue)} appraised value at ${(capRate*100).toFixed(1)}% cap</td><td style="text-align:right">&mdash;</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Cash-out refinance at 65% LTV</td><td style="text-align:right; font-weight:600;">${fmtM(refiProceeds)}</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Total invested equity ($16.5M) returned from refi proceeds</td><td style="text-align:right; color: var(--accent-green);">&#10003;</td></tr>
+            <tr class="highlight"><td>&nbsp;&nbsp;&nbsp;<strong>All investor capital returned at Year 4 refinance</strong></td><td style="text-align:right; color: var(--accent-green); font-weight:700;">&#10003;</td></tr>
+            <tr><td colspan="2" style="border:none; padding:8px 16px; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Post-Refinance</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;Full equity ownership retained &mdash; ongoing free cash flow</td><td style="text-align:right; font-weight:600;">${fmtM(postRefiCashFlow)}/yr</td></tr>
+            <tr class="total"><td>Net result: capital returned + equity retained + ongoing income</td><td style="text-align:right; color: var(--accent-gold); font-weight:700;">Capital returned, ownership kept</td></tr>
+        `;
+
+        // Full capital stack refinance detail
+        const surplusAfterCapReturn = refiProceeds - totalEquity;
+        document.getElementById('exit-kpis').innerHTML = `
+            <div class="summary-card"><div class="summary-card-value">${fmtM(totalNOI)}</div><div class="summary-card-label">Stabilized NOI</div></div>
+            <div class="summary-card"><div class="summary-card-value">${fmtM(appraisedValue)}</div><div class="summary-card-label">Appraised Value</div></div>
+            <div class="summary-card green"><div class="summary-card-value">${fmtM(refiProceeds)}</div><div class="summary-card-label">Refi Proceeds</div></div>
+            <div class="summary-card"><div class="summary-card-value">${dscr.toFixed(2)}x</div><div class="summary-card-label">DSCR</div></div>
+        `;
+
+        document.getElementById('exit-waterfall').innerHTML = `
+            <tr><td>Gross Refinance Proceeds</td><td style="text-align:right; font-weight:600;">${fmt(refiProceeds)}</td></tr>
+            <tr><td>Less: Seed equity return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(investment)})</td></tr>
+            <tr><td>Less: Series A equity return</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(seriesAEquity)})</td></tr>
+            <tr class="total"><td>Surplus / (Shortfall)</td><td style="text-align:right; color: var(${surplusAfterCapReturn >= 0 ? '--accent-green' : '--accent-terracotta'}); font-weight:700;">${fmt(surplusAfterCapReturn)}</td></tr>
+        `;
+
+        // Post-refi ongoing
+        document.getElementById('exit-dscr').innerHTML = `
+            <thead><tr>
+                <th>Metric</th>
+                <th style="text-align:right">Annual</th>
+                <th style="text-align:right">Monthly</th>
+            </tr></thead>
+            <tr><td>Stabilized NOI</td><td style="text-align:right">${fmt(totalNOI)}</td><td style="text-align:right">${fmt(totalNOI / 12)}</td></tr>
+            <tr><td>Debt Service (P&I @ ${(loanRate*100).toFixed(1)}%, ${loanTermYears}-yr am.)</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(annualDebtService)})</td><td style="text-align:right; color: var(--accent-terracotta);">(${fmt(monthlyPI)})</td></tr>
+            <tr class="total"><td>Free Cash Flow to Equity Holders</td><td style="text-align:right; color: var(--accent-green);">${fmt(postRefiCashFlow)}</td><td style="text-align:right; color: var(--accent-green);">${fmt(postRefiCashFlow / 12)}</td></tr>
+            <tr class="highlight"><td><strong>DSCR</strong></td><td style="text-align:right; font-weight:700; color: var(--accent-gold);">${dscr.toFixed(2)}x</td><td style="text-align:right">&mdash;</td></tr>
+        `;
+
+        // Assumptions
+        document.getElementById('exit-assumptions').innerHTML = `
+            <li>Full $16.5M capital stack returned at Year 4 refinance</li>
+            <li>Cap rate: ${(capRate*100).toFixed(1)}% on stabilized NOI &rarr; ${fmtM(appraisedValue)} appraised value</li>
+            <li>Refinance at 65% LTV &rarr; ${fmtM(refiProceeds)} in proceeds</li>
+            <li>Loan: ${(loanRate*100).toFixed(1)}% fixed, ${loanTermYears}-year amortization &rarr; ${fmt(annualDebtService)}/yr debt service</li>
+            <li>DSCR of ${dscr.toFixed(2)}x well above lender minimum (1.25x)</li>
+            <li>Ownership retained post-refinance &mdash; ${fmtM(postRefiCashFlow)}/yr ongoing free cash flow</li>
+            <li>All revenue projections include 10% reduction from original estimates (conservative posture)</li>
+        `;
+    }
+
+    // ===== HERO STATS =====
+    function renderHeroStats() {
+        // Use same calculations as renderExit() so numbers match
+        const s = scenarios.base;
+        const p1AnnualRev = s.revenue * 12;
+        const p1AnnualExp = s.expenses * 12;
+        const p1Growth = 1.05;
+        const expGrowth = 1.03;
+
+        // Year 4 NOI — Phase 1 + Phase 2
+        const p1Rev4 = p1AnnualRev * Math.pow(p1Growth, 3);
+        const p1Exp4 = p1AnnualExp * Math.pow(expGrowth, 3);
+        const p1NOI4 = p1Rev4 - p1Exp4;
+
+        const p2FullGross = Math.round(275511 * 0.90) * 12;
+        const p2Rev4 = p2FullGross * 1.0 * Math.pow(1.03, 1);
+        const p2NOI4 = p2Rev4 - p2Rev4 * 0.27;
+
+        const totalNOI = p1NOI4 + p2NOI4;
+
+        // Appraised value at same cap rate as exit section
+        const capRate = 0.085;
+        const appraisedValue = totalNOI / capRate;
+
+        const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
+
+        document.getElementById('hero-stats').innerHTML = `
+            <div class="hero-stat">
+                <div class="hero-stat-value">${fmtM(appraisedValue)}</div>
+                <div class="hero-stat-label">Year 4 Appraised Value</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">${fmtM(totalNOI)}</div>
+                <div class="hero-stat-label">Stabilized Annual NOI</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">Retained</div>
+                <div class="hero-stat-label">Equity Ownership After Refi</div>
+            </div>
+        `;
+    }
+
+    // ===== INIT =====
+    renderHeroStats();
+    renderPayback();
+    renderYear1();
+    render4Year();
+    renderExit();
+
+    // Smooth nav
+    document.querySelectorAll('.topbar-nav a').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+</script>
+</body>
+</html>

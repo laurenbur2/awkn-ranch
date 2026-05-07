@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Retreat House - AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>
+    try { var c = localStorage.getItem("awkn-ranch-cached-auth"); if (c && JSON.parse(c).appUser) document.documentElement.dataset.cachedAuth = "1"; } catch (e) {}
+    // Embed mode (?embed=1): the page is rendered inside an iframe — hide
+    // the outer admin chrome so just the per-bed rooms calendar shows.
+    try { if (new URL(location.href).searchParams.get('embed') === '1') document.documentElement.classList.add('rh-embed'); } catch (e) {}
+  </script>
+  <style>
+    .rh-embed #siteHeader,
+    .rh-embed #contextSwitcher,
+    .rh-embed .manage-tabs,
+    .rh-embed .rh-head { display: none !important; }
+    .rh-embed .rh-wrap { padding-top: 0.6rem; }
+    .rh-embed body, .rh-embed html { background: transparent; }
+  </style>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .rh-wrap { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .rh-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .rh-head p { margin: 0 0 1.25rem; color: var(--text-muted, #6b7280); font-size: 0.88rem; }
+
+    .rh-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; margin-bottom: 1rem; }
+    .rh-stat { background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 10px; padding: 0.7rem 0.9rem; }
+    .rh-stat-value { font-size: 1.3rem; font-weight: 700; color: #111827; }
+    .rh-stat-label { font-size: 0.7rem; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
+
+    /* Calendar toolbar */
+    .rh-cal-bar {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px 10px 0 0; padding: 0.55rem 0.75rem;
+      border-bottom: none;
+    }
+    .rh-cal-btn {
+      padding: 0.4rem 0.75rem; border-radius: 7px; border: 1px solid #e5e7eb;
+      background: #fff; font-family: inherit; font-size: 0.82rem; font-weight: 600; color: #374151;
+      cursor: pointer;
+    }
+    .rh-cal-btn:hover { background: #f9fafb; }
+    .rh-cal-btn-primary { background: #d4883a; color: #fff; border-color: #d4883a; margin-left: auto; }
+    .rh-cal-btn-primary:hover { background: #b87625; }
+    .rh-cal-range {
+      font-size: 0.88rem; font-weight: 600; color: #111827;
+      padding: 0 0.5rem;
+    }
+
+    /* Calendar grid */
+    .rh-cal-wrap {
+      background: #fff; border: 1px solid var(--border, #e5e7eb); border-radius: 0 0 10px 10px;
+      overflow-x: auto; padding: 0.4rem;
+    }
+    .rh-cal-grid {
+      display: grid;
+      grid-template-columns: 200px repeat(var(--rh-days, 14), minmax(70px, 1fr));
+      min-width: max-content;
+    }
+    .rh-cal-headcell {
+      padding: 0.45rem 0.4rem; font-size: 0.7rem; font-weight: 700;
+      color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em;
+      border-bottom: 1px solid #f3f4f6;
+      text-align: center;
+    }
+    .rh-cal-headcell.today { color: #d4883a; background: #fef3e6; border-radius: 6px 6px 0 0; }
+    .rh-cal-headcell.label-corner { text-align: left; padding-left: 0.6rem; }
+    .rh-cal-floor-row {
+      grid-column: 1 / -1;
+      padding: 0.55rem 0.6rem 0.3rem;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280;
+    }
+    .rh-cal-bed-label {
+      padding: 0.55rem 0.6rem; font-size: 0.83rem;
+      border-bottom: 1px solid #f9fafb;
+      display: flex; flex-direction: column; gap: 0.1rem; justify-content: center;
+      background: #fafafa;
+    }
+    .rh-cal-bed-name { font-weight: 600; color: #111827; }
+    .rh-cal-bed-meta { font-size: 0.7rem; color: var(--text-muted, #6b7280); }
+    .rh-cal-cell {
+      border-bottom: 1px solid #f9fafb;
+      border-left: 1px solid #f9fafb;
+      min-height: 40px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.12s ease;
+    }
+    .rh-cal-cell:hover { background: #fef9f3; }
+    .rh-cal-cell.weekend { background: #fafafa; }
+    .rh-cal-cell.today { background: #fff7ec; }
+    .rh-cal-stay {
+      grid-row: auto;
+      margin: 3px 1px;
+      padding: 0.3rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.74rem; font-weight: 600;
+      cursor: pointer;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .rh-cal-stay.source-within { background: #dcfce7; color: #14532d; border-left: 3px solid #16a34a; }
+    .rh-cal-stay.source-ranch  { background: #fef3c7; color: #78350f; border-left: 3px solid #d97706; }
+    .rh-cal-stay.source-other  { background: #e0e7ff; color: #1e3a8a; border-left: 3px solid #4f46e5; }
+    .rh-cal-stay-source-pill {
+      font-size: 0.58rem; padding: 0.05rem 0.3rem; border-radius: 3px;
+      background: rgba(255,255,255,0.7); flex-shrink: 0;
+    }
+
+    /* Below-grid footer summary */
+    .rh-summary { margin-top: 1.25rem; }
+    .rh-summary h2 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.5rem; color: #374151; }
+    .rh-empty-state {
+      padding: 1.5rem 1rem; text-align: center;
+      color: var(--text-muted, #6b7280); font-size: 0.85rem; font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="rh-wrap">
+      <div class="rh-head">
+        <h1>Retreat House</h1>
+        <p>Click any empty cell to assign a guest to that bed and date. Click an existing stay to edit or cancel it. Within client immersive bookings appear here automatically once linked.</p>
+      </div>
+
+      <div class="rh-stats">
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatRooms">—</div><div class="rh-stat-label">Rooms</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatBeds">—</div><div class="rh-stat-label">Bookable Beds</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatUpcoming">—</div><div class="rh-stat-label">Upcoming Stays</div></div>
+        <div class="rh-stat"><div class="rh-stat-value" id="rhStatActive">—</div><div class="rh-stat-label">Currently In-House</div></div>
+      </div>
+
+      <div class="rh-cal-bar">
+        <button class="rh-cal-btn" id="rhPrev" aria-label="Previous week">←</button>
+        <button class="rh-cal-btn" id="rhToday">Today</button>
+        <button class="rh-cal-btn" id="rhNext" aria-label="Next week">→</button>
+        <span class="rh-cal-range" id="rhRange">—</span>
+        <button class="rh-cal-btn rh-cal-btn-primary" id="rhNewStay">+ New Stay</button>
+      </div>
+      <div class="rh-cal-wrap">
+        <div class="rh-cal-grid" id="rhCalGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="retreat-house.js"></script>
+</body>
+</html>

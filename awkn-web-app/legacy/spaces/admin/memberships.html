@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Memberships - AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=1">
+  <link rel="stylesheet" href="memberships.css?v=1">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="imageLightbox" class="lightbox hidden">
+    <button class="lightbox-close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">&#10094;</button>
+    <img id="lightboxImage" src="" alt="">
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">&#10095;</button>
+  </div>
+
+  <div id="loadingOverlay">
+    <div class="loading-overlay__logo">
+      <img src="../../assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" onerror="this.style.display='none'">
+      <img src="../../assets/branding/wordmark-black-transparent.png" alt="" class="loading-overlay__wordmark" onerror="this.style.display='none'">
+    </div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="hidden"></div>
+
+  <div id="siteHeader"></div>
+
+  <main id="appContent" class="admin-main hidden">
+    <div class="context-switcher hidden" id="contextSwitcher"></div>
+    <div class="manage-tabs"></div>
+
+    <div class="mb-page">
+      <!-- Stats Bar -->
+      <div class="mb-stats">
+        <div class="mb-stat">
+          <div class="mb-stat-value" id="statActive">0</div>
+          <div class="mb-stat-label">Active Members</div>
+        </div>
+        <div class="mb-stat">
+          <div class="mb-stat-value" id="statNew">0</div>
+          <div class="mb-stat-label">New This Month</div>
+        </div>
+        <div class="mb-stat">
+          <div class="mb-stat-value" id="statMRR">$0</div>
+          <div class="mb-stat-label">Monthly Revenue</div>
+        </div>
+        <div class="mb-stat">
+          <div class="mb-stat-value" id="statExpiring">0</div>
+          <div class="mb-stat-label">Expiring Soon</div>
+        </div>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div class="mb-subtabs">
+        <button class="mb-subtab active" data-panel="members">Members</button>
+        <button class="mb-subtab" data-panel="plans">Membership Plans</button>
+      </div>
+
+      <!-- Members Panel -->
+      <div class="mb-panel active" id="panelMembers">
+        <!-- Filter Bar -->
+        <div class="mb-filter-bar">
+          <input type="text" class="mb-search" id="memberSearch" placeholder="Search members...">
+          <select class="mb-filter-select" id="statusFilter">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="trial">Trial</option>
+            <option value="paused">Paused</option>
+            <option value="past_due">Past Due</option>
+            <option value="expired">Expired</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select class="mb-filter-select" id="planFilter">
+            <option value="all">All Plans</option>
+          </select>
+          <button class="mb-btn mb-btn--primary" id="btnAddMember">+ Add Member</button>
+        </div>
+
+        <!-- Members Table -->
+        <div class="mb-table-wrap">
+          <table class="mb-table" id="membersTable">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Plan</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>Next Billing</th>
+                <th>Amount</th>
+                <th>Visits</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="membersTableBody">
+              <tr><td colspan="8" class="mb-empty">No members yet. Click "+ Add Member" to get started.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plans Panel -->
+      <div class="mb-panel" id="panelPlans">
+        <div class="mb-filter-bar">
+          <div></div>
+          <button class="mb-btn mb-btn--primary" id="btnAddPlan">+ New Plan</button>
+        </div>
+        <div class="mb-plans-grid" id="plansGrid">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Member Modal -->
+  <div class="mb-modal-overlay hidden" id="memberModalOverlay">
+    <div class="mb-modal">
+      <div class="mb-modal-header">
+        <h3 class="mb-modal-title" id="memberModalTitle">Add Member</h3>
+        <button class="mb-modal-close" id="memberModalClose">&times;</button>
+      </div>
+      <div class="mb-modal-body" id="memberModalBody"></div>
+      <div class="mb-modal-footer">
+        <button class="mb-btn" id="memberModalCancel">Cancel</button>
+        <button class="mb-btn mb-btn--danger hidden" id="memberModalDelete">Delete</button>
+        <button class="mb-btn mb-btn--primary" id="memberModalSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Modal -->
+  <div class="mb-modal-overlay hidden" id="planModalOverlay">
+    <div class="mb-modal">
+      <div class="mb-modal-header">
+        <h3 class="mb-modal-title" id="planModalTitle">New Plan</h3>
+        <button class="mb-modal-close" id="planModalClose">&times;</button>
+      </div>
+      <div class="mb-modal-body" id="planModalBody"></div>
+      <div class="mb-modal-footer">
+        <button class="mb-btn" id="planModalCancel">Cancel</button>
+        <button class="mb-btn mb-btn--primary" id="planModalSave">Save Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="memberships.js"></script>
+</body>
+</html>

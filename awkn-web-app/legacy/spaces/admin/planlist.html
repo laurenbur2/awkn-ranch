@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PlanList - AWKN Dashboard</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <style>
+    .planlist-page { max-width: 960px; }
+
+    /* Summary stats */
+    .todo-summary { display:flex; gap:1.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .todo-summary-stat { background:var(--bg-card); border-radius:var(--radius); box-shadow:var(--shadow); padding:1rem 1.25rem; flex:1; min-width:120px; text-align:center; }
+    .todo-summary-value { display:block; font-size:1.75rem; font-weight:700; }
+    .todo-summary-value.total { color:var(--text); }
+    .todo-summary-value.done { color:var(--success); }
+    .todo-summary-value.remaining { color:var(--accent); }
+    .todo-summary-label { display:block; font-size:0.75rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    /* Progress bar */
+    .todo-progress-bar { height:6px; background:var(--border); border-radius:3px; margin-bottom:1.5rem; overflow:hidden; }
+    .todo-progress-fill { height:100%; background:var(--success); border-radius:3px; transition:width 0.3s ease; }
+
+    /* Search */
+    .todo-search { display:flex; align-items:center; gap:0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.5rem 0.75rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+    .todo-search svg { color:var(--text-muted); flex-shrink:0; }
+    .todo-search input { flex:1; border:none; outline:none; background:none; font-size:0.9rem; color:var(--text); min-width:0; }
+    .todo-search input::placeholder { color:var(--text-muted); }
+    .todo-search-count { font-size:0.75rem; color:var(--text-muted); white-space:nowrap; }
+    .todo-search-clear { border:none; background:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer; padding:0 0.25rem; line-height:1; }
+    .todo-search-clear:hover { color:var(--text); }
+    .todo-search-highlight { background:#fef3c7; border-radius:2px; }
+
+    /* Actions */
+    .todo-actions { display:flex; gap:0.75rem; margin-bottom:1.5rem; }
+    .todo-actions button {
+      padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer;
+    }
+    .btn-reset { border:1px solid var(--border); background:var(--bg-card); color:var(--text-muted); }
+    .btn-reset:hover { background:var(--bg); }
+    .btn-add-cat { border:none; background:var(--accent); color:#fff; }
+    .btn-add-cat:hover { opacity:0.9; }
+
+    /* Categories */
+    .todo-category { background:var(--bg-card); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:1.25rem; border:1px solid var(--border); overflow:hidden; }
+    .todo-category-header { display:flex; align-items:center; gap:0.6rem; padding:0.85rem 1.25rem; background:var(--bg); border-bottom:1px solid var(--border); cursor:pointer; user-select:none; }
+    .todo-category-header:hover { background:var(--border); }
+    .todo-category-header svg:first-child { color:var(--accent); flex-shrink:0; width:20px; height:20px; }
+    .todo-category-header h2 { font-size:1.05rem; font-weight:700; margin:0; flex:1; }
+    .todo-category-progress { font-size:0.75rem; font-weight:600; color:var(--text-muted); white-space:nowrap; }
+    .todo-category-progress .done { color:var(--success); }
+    .todo-category-chevron { color:var(--text-muted); transition:transform 0.2s; flex-shrink:0; }
+    .todo-category.collapsed .todo-category-chevron { transform:rotate(-90deg); }
+    .todo-category.collapsed .todo-items { display:none; }
+
+    /* Items */
+    .todo-item { display:flex; align-items:flex-start; gap:0.75rem; padding:0.75rem 1.25rem; border-bottom:1px solid var(--border); transition:background 0.15s; }
+    .todo-item:last-child { border-bottom:none; }
+    .todo-item:hover { background:var(--bg); }
+    .todo-item.checked { opacity:0.55; }
+    .todo-item.checked .todo-item-title { text-decoration:line-through; }
+    .todo-checkbox { width:20px; height:20px; margin-top:1px; flex-shrink:0; accent-color:var(--accent); cursor:pointer; }
+    .todo-item-content { flex:1; min-width:0; }
+    .todo-item-title { font-size:0.9rem; font-weight:500; line-height:1.4; }
+    .todo-item-desc { font-size:0.8rem; color:var(--text-muted); line-height:1.4; margin-top:0.2rem; }
+    .todo-item-desc a { color:var(--accent); text-decoration:underline; }
+
+    /* Badges */
+    .todo-badge { font-size:0.65rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:4px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; flex-shrink:0; margin-top:2px; }
+    .todo-badge.critical { background:#fee2e2; color:#991b1b; }
+    .todo-badge.important { background:#fef3c7; color:#92400e; }
+    .todo-badge.nice { background:#e0e7ff; color:#3730a3; }
+    .todo-badge.blocked { background:#f3e8ff; color:#6b21a8; }
+
+    /* Action buttons on hover */
+    .todo-cat-actions, .todo-item-actions { display:flex; gap:0.15rem; opacity:0; transition:opacity 0.15s; flex-shrink:0; }
+    .todo-item-edit-btn { display:flex; align-items:center; justify-content:center; width:28px; height:28px; padding:4px; border:none; background:none; color:var(--text-muted); cursor:pointer; border-radius:4px; flex-shrink:0; }
+    .todo-item-edit-btn:hover { color:var(--accent); background:var(--bg); }
+    .todo-category-header:hover .todo-cat-actions, .todo-item:hover .todo-item-actions { opacity:1; }
+    .todo-action-btn { width:26px; height:26px; padding:4px; border:none; background:none; color:var(--text-muted); cursor:pointer; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+    .todo-action-btn:hover { color:var(--accent); background:var(--bg-card); }
+    .todo-action-btn:disabled { opacity:0.3; cursor:default; }
+    .todo-action-btn:disabled:hover { color:var(--text-muted); background:none; }
+    .todo-action-btn svg { width:14px !important; height:14px !important; }
+    .todo-checked-info { font-size:0.7rem; color:var(--text-muted); margin-top:0.15rem; font-style:italic; }
+    .todo-category.search-hidden { display:none; }
+    .todo-item.search-hidden { display:none; }
+
+    /* Modal */
+    .modal { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal.hidden { display:none; }
+    .modal-content { background:var(--bg-card); border-radius:12px; width:90%; max-width:560px; box-shadow:0 8px 30px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto; }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem; border-bottom:1px solid var(--border); }
+    .modal-header h2 { font-size:1.1rem; font-weight:700; margin:0; }
+    .modal-close { border:none; background:none; font-size:1.5rem; color:var(--text-muted); cursor:pointer; line-height:1; }
+    .modal-body { padding:1.25rem; }
+    .modal-body label { display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.25rem; color:var(--text-muted); }
+    .modal-body input, .modal-body textarea, .modal-body select {
+      width:100%; box-sizing:border-box; padding:0.5rem; border:1px solid var(--border);
+      border-radius:8px; font-size:0.9rem; margin-bottom:0.75rem; font-family:inherit;
+      background:var(--bg-card);
+    }
+    .modal-body textarea { min-height:60px; resize:vertical; }
+    .modal-footer { display:flex; gap:0.5rem; justify-content:flex-end; padding:0.75rem 1.25rem; border-top:1px solid var(--border); }
+    .modal-footer button { padding:0.5rem 1.2rem; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; }
+    .modal-footer .btn-cancel { border:1px solid var(--border); background:var(--bg); color:var(--text); }
+    .modal-footer .btn-delete { border:none; background:none; color:#991b1b; margin-right:auto; }
+    .modal-footer .btn-save { border:none; background:var(--accent); color:#fff; }
+
+    @media (max-width:768px) {
+      .todo-summary { gap:0.75rem; }
+      .todo-summary-stat { padding:0.75rem; min-width:80px; }
+      .todo-summary-value { font-size:1.25rem; }
+      .todo-item { padding:0.6rem 1rem; }
+      .todo-actions { flex-wrap:wrap; }
+      .todo-cat-actions, .todo-item-actions { opacity:1; }
+      .modal-content { max-height:none; margin:1rem; }
+    }
+
+    /* Toast */
+    .toast { padding:0.6rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:500; color:#fff; animation:toastIn 0.2s ease; }
+    .toast--success { background:#54a326; }
+    .toast--error { background:#8f3d4b; }
+    .toast--info { background:#7d6f74; }
+    @keyframes toastIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" style="position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem"></div>
+
+  <main class="planlist-page" style="max-width:960px;margin:0 auto;padding:2rem 1.5rem;" id="planlistContent">
+    <div style="text-align:center;padding:3rem;color:var(--text-muted)">Loading...</div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="planlist.js"></script>
+</body>
+</html>

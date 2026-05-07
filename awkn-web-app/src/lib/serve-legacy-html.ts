@@ -77,7 +77,11 @@ export function serveLegacyHtml(
   legacyRelativePath: string,
   options: ServeOptions = {},
 ): Response {
-  const fullPath = path.join(process.cwd(), "..", legacyRelativePath);
+  // Reads from awkn-web-app/legacy/ (the bundled-in mirror), making the
+  // app self-contained for repo splits. The legacy/ directory is synced
+  // from the parent repo via scripts/sync-legacy.sh whenever Lauren or
+  // Justin update content on the legacy GH-Pages site.
+  const fullPath = path.join(process.cwd(), "legacy", legacyRelativePath);
   let html = fs.readFileSync(fullPath, "utf-8");
 
   if (options.imageBase) {

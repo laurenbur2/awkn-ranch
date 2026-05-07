@@ -3,7 +3,7 @@ import path from "node:path";
 
 export function GET() {
   const file = fs.readFileSync(
-    path.join(process.cwd(), "..", "within-center/robots.txt"),
+    path.join(process.cwd(), "legacy", "within-center/robots.txt"),
     "utf-8",
   );
   return new Response(file, {

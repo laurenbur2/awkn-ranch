@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Booking — AWKN</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: #f5f5f0;
+      color: #2a1f23;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .mg-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+      max-width: 560px;
+      width: 100%;
+      padding: 40px 36px;
+    }
+    .mg-logo-wrap { margin-bottom: 20px; text-align: center; }
+    .mg-logo { max-width: 180px; width: 100%; display: inline-block; }
+    .mg-title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .mg-subtitle { font-size: 14px; color: #888; text-align: center; margin-bottom: 24px; }
+
+    .mg-details {
+      background: #f5f5f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .mg-details div { padding: 4px 0; }
+    .mg-details strong { color: #2a1f23; }
+
+    .mg-cancelled {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .mg-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .mg-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      color: #2a1f23;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+    }
+    .mg-btn:hover { background: #f5f5f0; }
+    .mg-btn--primary {
+      background: #d4883a;
+      border-color: #d4883a;
+      color: #fff;
+    }
+    .mg-btn--primary:hover { background: #c07a30; }
+    .mg-btn--danger {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: #fff;
+    }
+    .mg-btn--danger:hover { background: #b91c1c; }
+    .mg-btn:disabled { opacity: .6; cursor: default; }
+
+    .mg-field { margin-bottom: 16px; }
+    .mg-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .mg-field textarea,
+    .mg-field input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #2a1f23;
+    }
+    .mg-field textarea { resize: vertical; min-height: 80px; }
+
+    .mg-loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #888;
+      font-size: 14px;
+    }
+    .mg-spinner {
+      display: inline-block;
+      width: 24px; height: 24px;
+      border: 3px solid #e5e5e5;
+      border-top-color: #d4883a;
+      border-radius: 50%;
+      animation: mg-spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    @keyframes mg-spin { to { transform: rotate(360deg); } }
+
+    .mg-slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .mg-slot {
+      padding: 10px 8px;
+      border: 1px solid #2563eb;
+      border-radius: 8px;
+      background: #fff;
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      font-family: inherit;
+    }
+    .mg-slot:hover { background: #2563eb; color: #fff; }
+    .mg-slot--selected { background: #2563eb; color: #fff; }
+    .mg-no-slots {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 20px;
+    }
+
+    .mg-back {
+      display: inline-block;
+      color: #d4883a;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+    .mg-back:hover { text-decoration: underline; }
+
+    .mg-hidden { display: none !important; }
+
+    .mg-date-group { margin-bottom: 16px; }
+    .mg-date-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .mg-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .mg-success {
+      text-align: center;
+      padding: 24px 16px;
+    }
+    .mg-success-icon {
+      width: 56px; height: 56px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="mg-card">
+    <div class="mg-logo-wrap">
+      <img src="../assets/branding/awkn-wordmark-logo.jpg" alt="AWKN" class="mg-logo">
+    </div>
+
+    <div id="mgLoading" class="mg-loading">
+      <span class="mg-spinner"></span> Loading your booking…
+    </div>
+
+    <!-- Details + chooser -->
+    <div id="mgView" class="mg-hidden">
+      <div class="mg-title" id="mgTitle">Your Booking</div>
+      <div class="mg-subtitle" id="mgSubtitle"></div>
+      <div id="mgCancelledBanner" class="mg-cancelled mg-hidden">This booking has been cancelled.</div>
+      <div class="mg-details" id="mgDetails"></div>
+      <div class="mg-actions" id="mgActionsRow">
+        <button class="mg-btn" id="mgBtnReschedule">Reschedule</button>
+        <button class="mg-btn mg-btn--danger" id="mgBtnCancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Cancel form -->
+    <div id="mgCancel" class="mg-hidden">
+      <div class="mg-title">Cancel Booking</div>
+      <div class="mg-subtitle">You can leave a note for the host (optional).</div>
+      <div class="mg-details" id="mgCancelDetails"></div>
+      <div class="mg-field">
+        <label for="mgCancelReason">Reason for cancellation (optional)</label>
+        <textarea id="mgCancelReason" placeholder="Something came up…"></textarea>
+      </div>
+      <div id="mgCancelError" class="mg-error mg-hidden"></div>
+      <div class="mg-actions">
+        <button class="mg-btn" id="mgCancelBack">Back</button>
+        <button class="mg-btn mg-btn--danger" id="mgCancelConfirm">Confirm Cancellation</button>
+      </div>
+    </div>
+
+    <!-- Reschedule form -->
+    <div id="mgReschedule" class="mg-hidden">
+      <div class="mg-title">Reschedule</div>
+      <div class="mg-subtitle" id="mgResubtitle">Pick a new time.</div>
+      <div class="mg-field">
+        <label for="mgDate">New date</label>
+        <input type="date" id="mgDate">
+      </div>
+      <div class="mg-date-label">Available times (your timezone)</div>
+      <div class="mg-slots" id="mgSlots">
+        <div class="mg-no-slots">Pick a date to see times.</div>
+      </div>
+      <div id="mgRescheduleError" class="mg-error mg-hidden"></div>
+      <div class="mg-actions">
+        <button class="mg-btn" id="mgRescheduleBack">Back</button>
+        <button class="mg-btn mg-btn--primary" id="mgRescheduleConfirm" disabled>Confirm New Time</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="mgSuccess" class="mg-hidden mg-success">
+      <div class="mg-success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="mg-title" id="mgSuccessTitle">Done.</div>
+      <div class="mg-subtitle" id="mgSuccessMessage"></div>
+      <div class="mg-details mg-hidden" id="mgSuccessDetails"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="mgError" class="mg-hidden">
+      <div class="mg-title">Unable to load booking</div>
+      <div class="mg-subtitle" id="mgErrorMsg">The link may have expired.</div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+    const BOOKER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago';
+
+    const params = new URLSearchParams(location.search);
+    const token = params.get('t');
+    const initialAction = params.get('a');
+
+    const el = (id) => document.getElementById(id);
+    const show = (id) => el(id).classList.remove('mg-hidden');
+    const hide = (id) => el(id).classList.add('mg-hidden');
+    const hideAllPanels = () => ['mgLoading', 'mgView', 'mgCancel', 'mgReschedule', 'mgSuccess', 'mgError'].forEach(hide);
+
+    let booking = null;
+    let availableSlots = []; // [{start, end}]
+    let selectedSlot = null;
+
+    async function callFn(path, body) {
+      const res = await fetch(`${API_BASE}/${path}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'apikey': ANON_KEY,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, data };
+    }
+
+    function fmtDateTime(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString([], {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+      });
+    }
+
+    function fmtTime(iso) {
+      return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function fmtDateOnly(iso) {
+      return new Date(iso).toLocaleDateString([], {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      });
+    }
+
+    function renderDetailsCard(target, b) {
+      const et = b.event_type;
+      const p = b.profile;
+      target.innerHTML = `
+        ${et ? `<div><strong>${et.name}</strong>${et.duration_minutes ? ` — ${et.duration_minutes} min` : ''}</div>` : ''}
+        ${p?.name ? `<div>With: ${p.name}</div>` : ''}
+        <div>${fmtDateTime(b.start_datetime)}</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Timezone: ${BOOKER_TZ}</div>
+      `;
+    }
+
+    async function loadBooking() {
+      if (!token) {
+        hide('mgLoading');
+        show('mgError');
+        el('mgErrorMsg').textContent = 'Missing booking link.';
+        return;
+      }
+      const { ok, data } = await callFn('scheduling-manage', { action: 'lookup', booking_token: token });
+      if (!ok || !data.ok) {
+        hide('mgLoading');
+        show('mgError');
+        el('mgErrorMsg').textContent = data.error === 'booking_not_found' ? 'Booking not found.' : 'Unable to load booking.';
+        return;
+      }
+      booking = data.booking;
+      renderMainView();
+      if (initialAction === 'cancel' && !booking.cancelled_at) openCancel();
+      else if (initialAction === 'reschedule' && !booking.cancelled_at) openReschedule();
+    }
+
+    function renderMainView() {
+      hideAllPanels();
+      show('mgView');
+      el('mgTitle').textContent = booking.cancelled_at ? 'Booking Cancelled' : 'Your Booking';
+      el('mgSubtitle').textContent = booking.cancelled_at ? '' : 'You can reschedule or cancel below.';
+      renderDetailsCard(el('mgDetails'), booking);
+      if (booking.cancelled_at) {
+        show('mgCancelledBanner');
+        hide('mgActionsRow');
+      } else {
+        hide('mgCancelledBanner');
+        show('mgActionsRow');
+      }
+    }
+
+    function openCancel() {
+      hideAllPanels();
+      show('mgCancel');
+      renderDetailsCard(el('mgCancelDetails'), booking);
+      el('mgCancelReason').value = '';
+      hide('mgCancelError');
+    }
+
+    async function confirmCancel() {
+      const btn = el('mgCancelConfirm');
+      btn.disabled = true;
+      btn.textContent = 'Cancelling…';
+      hide('mgCancelError');
+      const reason = el('mgCancelReason').value.trim() || null;
+      const { ok, data } = await callFn('scheduling-manage', {
+        action: 'cancel', booking_token: token, reason,
+      });
+      btn.disabled = false;
+      btn.textContent = 'Confirm Cancellation';
+      if (!ok || !data.ok) {
+        const err = el('mgCancelError');
+        err.textContent = data.error === 'already_cancelled'
+          ? 'This booking was already cancelled.'
+          : `Cancel failed: ${data.error || 'unknown error'}`;
+        show('mgCancelError');
+        return;
+      }
+      hideAllPanels();
+      show('mgSuccess');
+      el('mgSuccessTitle').textContent = 'Booking Cancelled';
+      el('mgSuccessMessage').textContent = 'We\u2019ve sent a cancellation email. You can close this page.';
+    }
+
+    function openReschedule() {
+      hideAllPanels();
+      show('mgReschedule');
+      const et = booking.event_type;
+      el('mgResubtitle').textContent = et ? `Pick a new time for your ${et.duration_minutes}-minute ${et.name}.` : 'Pick a new time.';
+      selectedSlot = null;
+      availableSlots = [];
+      el('mgRescheduleConfirm').disabled = true;
+      el('mgSlots').innerHTML = '<div class="mg-no-slots">Pick a date to see times.</div>';
+      hide('mgRescheduleError');
+
+      const d = el('mgDate');
+      const today = new Date();
+      d.min = today.toISOString().slice(0, 10);
+      const max = new Date(today.getTime() + 60 * 86400000);
+      d.max = max.toISOString().slice(0, 10);
+      d.value = '';
+    }
+
+    async function loadSlotsForDate(dateStr) {
+      el('mgSlots').innerHTML = '<div class="mg-no-slots"><span class="mg-spinner"></span>Loading…</div>';
+      const { ok, data } = await callFn('scheduling-availability', {
+        profile_slug: booking.profile.booking_slug,
+        event_type_slug: booking.event_type.slug,
+        from_date: dateStr,
+        to_date: dateStr,
+        timezone: BOOKER_TZ,
+      });
+      if (!ok) {
+        el('mgSlots').innerHTML = '<div class="mg-no-slots">Unable to load times.</div>';
+        return;
+      }
+      const filtered = (data.slots || []).filter((s) => {
+        const local = new Date(s.start).toLocaleDateString('en-CA', { timeZone: BOOKER_TZ });
+        return local === dateStr;
+      });
+      availableSlots = filtered;
+      renderSlots();
+    }
+
+    function renderSlots() {
+      const container = el('mgSlots');
+      if (!availableSlots.length) {
+        container.innerHTML = '<div class="mg-no-slots">No times available on this date.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      availableSlots.forEach((s) => {
+        const btn = document.createElement('button');
+        btn.className = 'mg-slot' + (selectedSlot?.start === s.start ? ' mg-slot--selected' : '');
+        btn.textContent = fmtTime(s.start);
+        btn.onclick = () => {
+          selectedSlot = s;
+          el('mgRescheduleConfirm').disabled = false;
+          renderSlots();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    async function confirmReschedule() {
+      if (!selectedSlot) return;
+      const btn = el('mgRescheduleConfirm');
+      btn.disabled = true;
+      btn.textContent = 'Rescheduling…';
+      hide('mgRescheduleError');
+      const { ok, data } = await callFn('scheduling-manage', {
+        action: 'reschedule',
+        booking_token: token,
+        new_start: selectedSlot.start,
+      });
+      btn.disabled = false;
+      btn.textContent = 'Confirm New Time';
+      if (!ok || !data.ok) {
+        const err = el('mgRescheduleError');
+        err.textContent = data.error === 'slot_taken'
+          ? 'That slot was just taken. Pick another time.'
+          : `Reschedule failed: ${data.error || 'unknown error'}`;
+        show('mgRescheduleError');
+        if (data.error === 'slot_taken') {
+          const d = el('mgDate').value;
+          if (d) loadSlotsForDate(d);
+        }
+        return;
+      }
+      hideAllPanels();
+      show('mgSuccess');
+      el('mgSuccessTitle').textContent = 'Booking Rescheduled';
+      el('mgSuccessMessage').textContent = 'We\u2019ve sent a confirmation email with the new details.';
+      const newBooking = {
+        ...booking,
+        start_datetime: selectedSlot.start,
+        end_datetime: selectedSlot.end,
+      };
+      show('mgSuccessDetails');
+      renderDetailsCard(el('mgSuccessDetails'), newBooking);
+    }
+
+    el('mgBtnCancel').addEventListener('click', openCancel);
+    el('mgBtnReschedule').addEventListener('click', openReschedule);
+    el('mgCancelBack').addEventListener('click', renderMainView);
+    el('mgCancelConfirm').addEventListener('click', confirmCancel);
+    el('mgRescheduleBack').addEventListener('click', renderMainView);
+    el('mgRescheduleConfirm').addEventListener('click', confirmReschedule);
+    el('mgDate').addEventListener('change', (e) => {
+      selectedSlot = null;
+      el('mgRescheduleConfirm').disabled = true;
+      if (e.target.value) loadSlotsForDate(e.target.value);
+    });
+
+    loadBooking();
+  </script>
+</body>
+</html>

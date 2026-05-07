@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Staff - AWKN</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=5">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .sd-wrap { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .sd-toolbar {
+      display: flex; gap: 0.625rem; flex-wrap: wrap;
+      align-items: center; margin: 0.5rem 0 1.25rem;
+    }
+    .sd-toolbar input[type="search"], .sd-toolbar select {
+      padding: 0.5rem 0.75rem; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 8px; font-family: inherit; font-size: 0.85rem;
+      background: #fff; min-width: 180px;
+    }
+    .sd-toolbar input[type="search"] { flex: 1; min-width: 200px; max-width: 380px; }
+
+    .sd-chips {
+      display: flex; gap: 0.375rem; flex-wrap: wrap;
+    }
+    .sd-chip {
+      padding: 0.3rem 0.625rem; border-radius: 999px;
+      border: 1px solid var(--border, #e5e7eb);
+      background: #fff; font-size: 0.75rem; cursor: pointer;
+      color: #4b5563;
+    }
+    .sd-chip.active { background: var(--accent, #d4883a); color: #fff; border-color: var(--accent, #d4883a); }
+
+    .sd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 0.875rem;
+    }
+    .sd-card {
+      display: flex; flex-direction: column; gap: 0.625rem;
+      padding: 1rem; background: #fff;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .sd-card-head { display: flex; align-items: center; gap: 0.75rem; }
+    .sd-av {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent-light, #f3e6d3); color: var(--accent, #d4883a);
+      font-weight: 700; font-size: 1rem; overflow: hidden; flex-shrink: 0;
+    }
+    .sd-av img { width: 100%; height: 100%; object-fit: cover; }
+    .sd-name { font-weight: 600; font-size: 0.95rem; color: #111827; }
+    .sd-title-chip {
+      display: inline-block; padding: 0.15rem 0.5rem;
+      border-radius: 999px; font-size: 0.7rem; font-weight: 600;
+      background: #f3f4f6; color: #4b5563; margin-top: 0.15rem;
+    }
+    .sd-present {
+      margin-left: auto; font-size: 0.65rem; font-weight: 600;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      background: #dcfce7; color: #166534;
+    }
+    .sd-contact { font-size: 0.82rem; color: #374151; word-break: break-word; }
+    .sd-contact a { color: var(--accent, #d4883a); text-decoration: none; }
+    .sd-contact .sd-label {
+      color: var(--text-muted, #6b7280); font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.04em; margin-right: 0.375rem;
+    }
+    .sd-bio { font-size: 0.8rem; color: #4b5563; border-top: 1px solid #f3f4f6; padding-top: 0.5rem; }
+
+    .sd-empty {
+      padding: 2rem; text-align: center; color: var(--text-muted, #6b7280);
+      border: 1px dashed var(--border, #e5e7eb); border-radius: 12px; background: #fff;
+    }
+
+    .sd-admin-bar {
+      display: flex; gap: 0.5rem; align-items: center;
+      margin: 0.25rem 0 0.75rem; flex-wrap: wrap;
+    }
+    .sd-admin-btn {
+      padding: 0.5rem 0.875rem; border-radius: 8px; border: 1px solid var(--border, #e5e7eb);
+      background: #fff; color: #111827; font-family: inherit; font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 0.375rem;
+    }
+    .sd-admin-btn:hover { background: #f9fafb; }
+    .sd-admin-btn--primary {
+      background: var(--accent, #d4883a); color: #fff; border-color: var(--accent, #d4883a);
+    }
+    .sd-admin-btn--primary:hover { background: #b77128; }
+
+    .sd-menu-wrap { position: relative; }
+    .sd-menu {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: 200px; background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      z-index: 50; padding: 0.25rem; display: none;
+    }
+    .sd-menu.open { display: block; }
+    .sd-menu a {
+      display: block; padding: 0.55rem 0.75rem; border-radius: 6px;
+      color: #111827; text-decoration: none; font-size: 0.85rem;
+    }
+    .sd-menu a:hover { background: #f3f4f6; }
+    .sd-menu-caret {
+      display: inline-block; margin-left: 0.125rem; font-size: 0.6rem; opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-overlay__logo">
+      <img src="/awkn-ranch/assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" width="28" height="40">
+      <img src="/awkn-ranch/assets/branding/wordmark-black-transparent.png" alt="AWKN Ranch" class="loading-overlay__wordmark" width="28" height="28">
+    </div>
+    <div class="spinner spinner--sm"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="loading-overlay hidden"></div>
+
+  <div id="appContent" class="hidden">
+    <div id="siteHeader"></div>
+
+    <span data-site-version style="display:none"></span>
+
+    <div class="context-switcher hidden" id="contextSwitcher">
+      <a class="context-switcher-btn active">Staff</a>
+    </div>
+
+    <div class="manage-tabs"></div>
+
+    <div class="sd-wrap">
+      <div class="sd-admin-bar hidden" id="sdAdminBar">
+        <a class="sd-admin-btn sd-admin-btn--primary" href="users.html" id="sdAddStaff">+ Add Staff</a>
+        <div class="sd-menu-wrap">
+          <button class="sd-admin-btn" id="sdStaffAdminBtn" aria-haspopup="true" aria-expanded="false">
+            Staff Admin <span class="sd-menu-caret">▾</span>
+          </button>
+          <div class="sd-menu" id="sdStaffAdminMenu" role="menu">
+            <a href="users.html" role="menuitem">Manage Users</a>
+            <a href="job-titles.html" role="menuitem">Job Titles &amp; Permissions</a>
+            <a href="users.html?archived=1" role="menuitem">Archived Users</a>
+          </div>
+        </div>
+      </div>
+      <div class="sd-toolbar">
+        <input type="search" id="sdSearch" placeholder="Search by name or email…">
+        <select id="sdTitleFilter"><option value="">All titles</option></select>
+        <div class="sd-chips">
+          <button class="sd-chip active" data-filter="all" id="sdFilterAll">All</button>
+          <button class="sd-chip" data-filter="here" id="sdFilterHere">On site</button>
+        </div>
+      </div>
+      <div id="sdGrid" class="sd-grid"></div>
+    </div>
+  </div>
+
+  <script src="../../shared/instant-chrome.js"></script>
+  <script type="module" src="../../shared/version-info.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="staff.js"></script>
+</body>
+</html>

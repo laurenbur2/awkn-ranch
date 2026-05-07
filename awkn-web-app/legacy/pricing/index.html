@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Within Center — Guided Ketamine Therapy at AWKN Ranch</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta property="og:title" content="Within Center — Guided Ketamine Therapy at AWKN Ranch">
+  <meta property="og:description" content="Guided ceremonial healing designed to support insight, integration, and lasting transformation. Austin, TX.">
+  <style>
+    :root {
+      --gold: #c9943e;
+      --gold-dark: #a67a2e;
+      --gold-glow: rgba(201,148,62,0.15);
+      --green: #3a6b4a;
+      --green-muted: rgba(58,107,74,0.07);
+      --brown: #6b4c3b;
+      --grey: #6b6569;
+      --dark: #1c1618;
+      --cream: #faf8f5;
+      --white: #ffffff;
+      --border: rgba(0,0,0,0.06);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.08);
+      --radius: 14px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--dark);
+      background: var(--cream);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .awknhero {
+      position: relative !important;
+      min-height: 720px !important;
+      max-height: 760px !important;
+      height: 720px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      background: url('images/guided-healing-hero.jpg') center/cover no-repeat;
+      background-color: var(--dark) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .awknhero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(28,22,24,0.55) 0%, rgba(28,22,24,0.80) 100%);
+      z-index: 1;
+    }
+    .awknhero-content {
+      position: relative; z-index: 2;
+      max-width: 720px; padding: 2rem;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .awknhero-logo {
+      display: block;
+      width: 160px;
+      max-width: 40vw;
+      height: auto;
+      margin: 1.25rem auto;
+      opacity: 0.95;
+    }
+    .awknhero-eyebrow {
+      display: inline-block;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,148,62,0.35);
+      padding: 6px 20px;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+    .awknhero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 1rem;
+      white-space: nowrap;
+    }
+    .awknhero p {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.7);
+      max-width: 540px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.8;
+      font-weight: 300;
+    }
+    .awknhero-cta {
+      display: inline-block;
+      background: var(--gold);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .awknhero-cta:hover { background: var(--gold-dark); transform: translateY(-1px); }
+    .awknhero-cta-outline {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 13px 32px;
+      border-radius: 100px;
+      text-decoration: none;
+      margin-left: 0.75rem;
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .awknhero-cta-outline:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 5rem 2rem; }
+    .bg-white { background: var(--white); }
+
+    /* ── SECTION HEADERS ─────────────────────────────────── */
+    .s-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .s-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+      line-height: 1.25;
+    }
+    .s-desc {
+      font-size: 0.95rem;
+      color: var(--grey);
+      max-width: 600px;
+      line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+    .s-desc.centered { margin-left: auto; margin-right: auto; text-align: center; }
+
+    /* ── PHILOSOPHY / APPROACH ────────────────────────── */
+    .philosophy {
+      text-align: center;
+      padding: 2rem 2rem 1rem;
+    }
+    .philosophy-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .philosophy-body {
+      font-size: 0.92rem;
+      color: var(--grey);
+      line-height: 1.85;
+      margin-bottom: 1.25rem;
+    }
+    .philosophy-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--brown);
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0.75rem 0 0;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── PACKAGE CARDS ─────────────────────────────────── */
+    .packages {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .pkg {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2.25rem 1.75rem 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .pkg:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .pkg.featured {
+      border-color: var(--gold);
+      box-shadow: var(--shadow-lg), 0 0 0 1px var(--gold);
+    }
+    .pkg.special {
+      border-color: #c8472b;
+      box-shadow: var(--shadow-lg), 0 0 0 2px #c8472b;
+      background: linear-gradient(180deg, #fff7f3 0%, #fff 35%);
+    }
+    .pkg-badge.special-badge {
+      background: linear-gradient(135deg, #c8472b, #e8693f);
+    }
+    .pkg-price-old {
+      font-size: 1.3rem;
+      color: var(--grey);
+      text-decoration: line-through;
+      font-weight: 400;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    .pkg-badge {
+      position: absolute;
+      top: -11px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #b8872f, #d4a84e);
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 5px 18px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .pkg-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .pkg-tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--brown);
+      margin-bottom: 1.25rem;
+    }
+    .pkg-desc {
+      font-size: 0.78rem;
+      color: var(--grey);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+    .pkg-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      color: var(--gold-dark);
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .pkg-per {
+      font-size: 0.68rem;
+      color: var(--grey);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .pkg-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .pkg-features {
+      list-style: none;
+      flex: 1;
+    }
+    .pkg-features li {
+      font-size: 0.82rem;
+      color: var(--dark);
+      padding: 0.4rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      line-height: 1.55;
+    }
+    .pkg-features li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0.65rem;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold-glow);
+      border: 1.5px solid var(--gold);
+    }
+    .pkg-features li strong { font-weight: 600; }
+
+    /* ── SPECIALTY PACKAGES ───────────────────────────── */
+    .specialty-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .specialty-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .specialty-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .specialty-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .specialty-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .specialty-tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--brown);
+      margin-bottom: 1rem;
+    }
+    .specialty-desc {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+    .specialty-features {
+      list-style: disc;
+      padding-left: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .specialty-features li {
+      font-size: 0.82rem;
+      color: var(--dark);
+      line-height: 1.8;
+    }
+    .specialty-price {
+      display: inline-block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold-dark);
+      font-weight: 700;
+      padding: 0.5rem 1.25rem;
+      background: var(--gold-glow);
+      border-radius: 8px;
+    }
+
+    /* ── RETREAT SECTION ──────────────────────────────── */
+    .retreat-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .retreat-header {
+      background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
+      padding: 2.5rem 2.5rem 2rem;
+      color: #fff;
+    }
+    .retreat-header .s-eyebrow { color: var(--gold); margin-bottom: 0.5rem; }
+    .retreat-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    .retreat-header p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.55);
+      max-width: 500px;
+      line-height: 1.7;
+    }
+    .retreat-body {
+      padding: 2.5rem;
+    }
+    .retreat-includes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 2rem;
+      margin-bottom: 2.5rem;
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+    }
+    .retreat-includes li {
+      font-size: 0.82rem;
+      line-height: 2;
+      list-style: disc;
+      color: var(--dark);
+    }
+    .retreat-includes li strong { font-weight: 600; }
+
+    /* ── RETREAT OPTIONS GRID (side-by-side) ──────────── */
+    .retreat-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .retreat-option-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: visible;
+      background: var(--white);
+      position: relative;
+    }
+    .retreat-option-card .room-photo {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+    }
+    .retreat-option-inner {
+      padding: 2rem;
+      text-align: center;
+    }
+    .retreat-option-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .retreat-option-highlights {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      padding: 0;
+      text-align: center;
+    }
+    .retreat-option-highlights li {
+      font-size: 0.85rem;
+      line-height: 2;
+      color: var(--dark);
+    }
+    .retreat-option-highlights li strong { font-weight: 700; color: var(--gold-dark); }
+    .retreat-shared-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    /* ── SAMPLE SCHEDULE ──────────────────────────────── */
+    .schedule-btn {
+      display: inline-block;
+      margin-top: 1.25rem;
+      padding: 0.5rem 1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      width: auto;
+      color: var(--gold-dark);
+      background: transparent;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .schedule-btn:hover {
+      background: var(--gold);
+      color: #fff;
+    }
+    .schedule-overlay {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+      padding: 2rem;
+      text-align: left;
+    }
+    .schedule-overlay.open { display: block; }
+    .schedule-overlay-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--grey);
+      line-height: 1;
+    }
+    .schedule-overlay-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: var(--dark);
+      text-align: center;
+    }
+    .schedule-day {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .schedule-day:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .schedule-day-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-dark);
+      margin-bottom: 0.35rem;
+    }
+    .schedule-day-details {
+      font-size: 0.82rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+
+    /* ── ROOM GALLERY ─────────────────────────────────── */
+    .room-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .room-gallery-item {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .room-gallery-item img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px 12px 0 0;
+    }
+    .room-gallery-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 0.75rem 0;
+      color: var(--dark);
+      background: var(--cream);
+      border-radius: 0 0 12px 12px;
+    }
+
+    /* ── ROOM PRICING ─────────────────────────────────── */
+    .room-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    .room-option {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-align: center;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .room-option:hover {
+      border-color: rgba(201,148,62,0.3);
+      box-shadow: 0 4px 16px rgba(201,148,62,0.08);
+    }
+    .room-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .room-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold-dark);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .room-compare {
+      font-size: 0.72rem;
+      color: var(--grey);
+      text-decoration: line-through;
+      margin-bottom: 0.25rem;
+    }
+    .room-savings {
+      font-size: 0.72rem;
+      color: var(--green);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .retreat-footer {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--grey);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      line-height: 1.65;
+    }
+    .retreat-footer strong { color: var(--gold-dark); font-weight: 700; }
+
+    /* Add-ons */
+    .addons-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .addons-title {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .addons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .addon-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(212,136,58,.06);
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+    .addon-name { color: var(--dark); font-weight: 500; }
+    .addon-price { color: var(--gold-dark); font-weight: 700; white-space: nowrap; }
+
+    /* ── PROCESS SECTION ──────────────────────────────── */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.5rem;
+    }
+    .step {
+      text-align: center;
+      position: relative;
+    }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      opacity: 0.3;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .step h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+    .step p {
+      font-size: 0.78rem;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+
+    /* ── RANCH EXPERIENCE ─────────────────────────────── */
+    .ranch-section {
+      background: var(--white);
+      padding: 5rem 2rem;
+    }
+    .ranch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+    .ranch-item {
+      background: var(--cream);
+      border-radius: 12px;
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .ranch-item:hover { transform: translateY(-2px); }
+    .ranch-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.7;
+    }
+    .ranch-item h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.92rem;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+    .ranch-item p {
+      font-size: 0.75rem;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+
+    /* ── CTA BANNER ──────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .cta-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+    .cta-section p {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.5);
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    .cta-section .awknhero-cta { font-size: 0.7rem; }
+
+    /* ── CONTACT STRIP ───────────────────────────────── */
+    .contact-strip {
+      background: var(--cream);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .contact-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .contact-item {
+      font-size: 0.82rem;
+      color: var(--dark);
+    }
+    .contact-item a {
+      color: var(--dark);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .contact-item a:hover { border-color: var(--gold); }
+    .contact-item .label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    .site-footer {
+      text-align: center;
+      padding: 2rem 2rem;
+      font-size: 0.7rem;
+      color: var(--grey);
+      border-top: 1px solid var(--border);
+    }
+    .site-footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────── */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .packages { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .packages { grid-template-columns: 1fr; gap: 2rem; }
+      .specialty-grid { grid-template-columns: 1fr; }
+      .retreat-includes { grid-template-columns: 1fr; }
+      .retreat-options-grid { grid-template-columns: 1fr; }
+      .room-gallery { grid-template-columns: 1fr; }
+      .room-grid { grid-template-columns: 1fr; }
+      .addons-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+      .ranch-grid { grid-template-columns: 1fr; }
+      .awknhero { min-height: 480px; }
+      .awknhero h1 { white-space: normal; font-size: clamp(1.6rem, 6vw, 2.4rem); }
+      .retreat-header, .retreat-body { padding: 2rem 1.5rem; }
+      .awknhero-cta-outline { margin-left: 0; margin-top: 0.75rem; display: block; }
+      .contact-row { gap: 2rem; }
+    }
+    @media (max-width: 480px) {
+      .process-steps { grid-template-columns: 1fr; }
+      section { padding: 3.5rem 1.25rem; }
+    }
+
+    /* ── PHOTO STRIPS ─────────────────────────────────── */
+    .photo-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .photo-strip img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-single {
+      width: 100%;
+      max-height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── PHOTO + TEXT SPLIT ───────────────────────────── */
+    .split-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .split-block.reverse { direction: rtl; }
+    .split-block.reverse > * { direction: ltr; }
+    .split-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .split-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3.5rem 3rem;
+      background: var(--white);
+    }
+    .split-text .s-eyebrow { margin-bottom: 0.5rem; }
+    .split-text .s-title { margin-bottom: 0.75rem; }
+    .split-text p {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      .photo-strip img { height: 200px; }
+      .split-block, .split-block.reverse { grid-template-columns: 1fr; }
+      .split-img { height: 280px; }
+      .split-text { padding: 2.5rem 2rem; }
+    }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .awknhero { min-height: auto; padding: 3rem 2rem; }
+      .pkg:hover, .specialty-card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HERO ════════════════════════════════════════ -->
+  <header class="awknhero">
+    <div class="awknhero-content">
+      <div class="awknhero-eyebrow">Within Center &middot; Psychedelic Therapy &middot; Austin, TX</div>
+      <h1>Guided Ceremonial Healing</h1>
+      <p>Designed to support insight, integration, and lasting transformation. Ketamine therapy held within a complete healing container.</p>
+    </div>
+  </header>
+
+  <!-- ══ OUR APPROACH ════════════════════════════════ -->
+  <section class="philosophy">
+    <div class="philosophy-inner">
+      <div class="s-eyebrow">Why Stay With Us</div>
+      <div class="s-title">Immersion Changes Everything</div>
+      <p class="philosophy-body">A single ceremony can open the door. Staying onsite is what lets you walk through it. When you live at AWKN Ranch, there's nowhere to rush back to. No inbox, no obligations, no pretending everything is fine. The space between sessions becomes just as powerful as the sessions themselves: walking the land, sitting with what came up, letting the night air settle you before sleep.</p>
+      <div class="philosophy-quote">The healing doesn't stop between sessions. It deepens.</div>
+    </div>
+  </section>
+
+  <!-- ══ IMMERSIVE RETREATS ══════════════════════════ -->
+  <section id="retreat" style="padding-top: 1rem;">
+    <div class="container">
+      <div class="retreat-card">
+        <div class="retreat-header">
+          <div class="s-eyebrow">Residential Immersion</div>
+          <h2>Immersive Retreats at AWKN Ranch</h2>
+          <p>Leave the world behind. Come back changed. Full residential immersions with everything you need to heal.</p>
+        </div>
+        <div class="retreat-body">
+
+          <!-- Side-by-side retreat options -->
+          <div class="retreat-options-grid">
+
+            <!-- 6 Day -->
+            <div class="retreat-option-card">
+              <div class="retreat-option-inner">
+                <div class="retreat-option-label">6 Days / 5 Nights</div>
+                <ul class="retreat-option-highlights">
+                  <li><strong>2</strong> guided ketamine ceremonies (IM)</li>
+                  <li><strong>2</strong> integration coaching sessions</li>
+                </ul>
+                <div class="room-grid">
+                  <div class="room-option">
+                    <div class="room-label">Private Room</div>
+                    <div class="room-price">$4,799</div>
+                  </div>
+                  <div class="room-option">
+                    <div class="room-label">Shared Room</div>
+                    <div class="room-price">$3,999</div>
+                  </div>
+                </div>
+                <button class="schedule-btn" onclick="var o=this.closest('.retreat-option-card').querySelector('.schedule-overlay');o.classList.toggle('open')">Sample Schedule</button>
+              </div>
+              <div class="schedule-overlay">
+                <button class="schedule-overlay-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="schedule-overlay-title">Sample Schedule: 6 Days / 5 Nights</div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Sunday</div>
+                  <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Monday</div>
+                  <div class="schedule-day-details">Group Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Tuesday</div>
+                  <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Dinner</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Wednesday</div>
+                  <div class="schedule-day-details">Breakfast · Yoga Class · Lunch · Relaxation &amp; Reflection · Dinner<br><em>Down time for wellness, journaling, or add-on sessions</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Thursday</div>
+                  <div class="schedule-day-details">Individual Ketamine Session (IM) · Lunch · Intro to Meditation · Dinner · Evening Ceremony / Ritual<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Friday</div>
+                  <div class="schedule-day-details">Breakfast · Integration Coaching Session · Departure (11am)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3 Day -->
+            <div class="retreat-option-card">
+              <div class="retreat-option-inner">
+                <div class="retreat-option-label">3 Days / 2 Nights</div>
+                <ul class="retreat-option-highlights">
+                  <li><strong>1</strong> guided ketamine ceremony (IM)</li>
+                  <li><strong>1</strong> integration coaching session</li>
+                </ul>
+                <div class="room-grid">
+                  <div class="room-option">
+                    <div class="room-label">Private Room</div>
+                    <div class="room-price">$2,199</div>
+                  </div>
+                  <div class="room-option">
+                    <div class="room-label">Shared Room</div>
+                    <div class="room-price">$1,899</div>
+                  </div>
+                </div>
+                <button class="schedule-btn" onclick="var o=this.closest('.retreat-option-card').querySelector('.schedule-overlay');o.classList.toggle('open')">Sample Schedule</button>
+              </div>
+              <div class="schedule-overlay">
+                <button class="schedule-overlay-close" onclick="this.parentElement.classList.remove('open')">&times;</button>
+                <div class="schedule-overlay-title">Sample Schedule: 3 Days / 2 Nights</div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Sunday</div>
+                  <div class="schedule-day-details">Arrival (4pm) · Dinner · Welcome Session</div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Monday</div>
+                  <div class="schedule-day-details">Group Ketamine Session (IM) · Lunch · Sound Bath · Dinner<br><em>No breakfast before ketamine</em></div>
+                </div>
+                <div class="schedule-day">
+                  <div class="schedule-day-label">Tuesday</div>
+                  <div class="schedule-day-details">Breakfast · IV Vitamin Therapy · Lunch · Integration Coaching · Departure (11am)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Shared included features -->
+          <div class="retreat-shared-label">Included in Both Retreats</div>
+          <ul class="retreat-includes">
+            <li>Clinical intake &amp; medical clearance</li>
+            <li>Live-in concierge</li>
+            <li>Meals included by onsite chef</li>
+            <li>Wellness Center &amp; outdoor spaces</li>
+            <li>Sauna, cold plunge &amp; hot tub</li>
+            <li>Private resort pool</li>
+            <li>IV Vitamin Therapy session</li>
+            <li>Sound bath</li>
+            <li>Yoga class</li>
+            <li>Meditation class</li>
+            <li>Evening ceremony / ritual experience</li>
+            <li>Hammock Garden access</li>
+          </ul>
+
+          <div class="addons-section">
+            <div class="addons-title">Add-Ons</div>
+            <div class="addons-grid">
+              <div class="addon-item">
+                <span class="addon-name">60-Minute Massage</span>
+                <span class="addon-price">$175</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Additional Integration Coaching</span>
+                <span class="addon-price">$150</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Human Design Reading</span>
+                <span class="addon-price">$250</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Licensed Therapy Session</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Astrology Session</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Hap&eacute; Ceremony</span>
+                <span class="addon-price">$75</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Internal Family System Session</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Private Sound Journey</span>
+                <span class="addon-price">$200</span>
+              </div>
+              <div class="addon-item">
+                <span class="addon-name">Pickleball Lesson</span>
+                <span class="addon-price">$50</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Photos -->
+          <div class="room-gallery">
+            <div class="room-gallery-item">
+              <img src="images/private-room.png" alt="Private retreat bedroom with queen bed">
+              <div class="room-gallery-label">Private Room</div>
+            </div>
+            <div class="room-gallery-item">
+              <img src="images/shared-room.jpg" alt="Shared retreat room with bunk beds">
+              <div class="room-gallery-label">Shared Room</div>
+            </div>
+          </div>
+
+          <div class="retreat-footer">
+            After checkout, guests can continue with one day ketamine sessions at only <strong>$799/session</strong> within the next 60 days.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PHOTO STRIP: SPACES ═════════════════════════ -->
+  <div class="photo-strip">
+    <img src="images/dome-interior.jpeg" alt="Honeycomb dome ceremony space with cushions and natural light">
+    <img src="images/yurts.jpg" alt="Private healing yurts nestled under live oaks">
+    <img src="images/dome-exterior.jpeg" alt="Geodesic honeycomb dome under the oaks">
+  </div>
+
+  <!-- ══ OUTPATIENT PACKAGES ═════════════════════════ -->
+  <section class="bg-white" id="packages">
+    <div class="container">
+      <div style="text-align:center; margin-bottom: 3.5rem;">
+        <div class="s-title" style="font-size: clamp(1.8rem, 4vw, 2.4rem);">Ketamine Day Experience Packages</div>
+        <div class="s-desc centered">For those who want the power of guided ketamine therapy with the convenience of a single day visit. Every package includes medical consultation, a preparation session, and full access to AWKN Ranch.</div>
+        <div class="s-eyebrow" style="margin-top: 1rem;">Choose Your Package</div>
+      </div>
+
+      <div class="packages">
+
+        <!-- DISCOVER -->
+        <div class="pkg">
+          <div class="pkg-name">Discover</div>
+          <div class="pkg-tagline">Expand your consciousness</div>
+          <p class="pkg-desc">Your first step into guided ketamine therapy. A single ceremony designed to open new perspectives and give you a felt sense of what this work can do. Ideal for those curious about the medicine and ready to explore.</p>
+          <div class="pkg-price">$1,250</div>
+          <div class="pkg-per">Single Ceremony Investment</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-features">
+            <li><strong>1</strong> guided ketamine ceremony (IM)</li>
+            <li><strong>1</strong> integration coaching session</li>
+            <li>Medical consultation &amp; clearance</li>
+            <li><strong>1 week</strong> AWKN Ranch membership</li>
+          </ul>
+        </div>
+
+        <!-- HEAL — featured -->
+        <div class="pkg featured">
+          <div class="pkg-badge">Most Popular</div>
+          <div class="pkg-name">Heal</div>
+          <div class="pkg-tagline">Heal your nervous system</div>
+          <p class="pkg-desc">Three sessions give your nervous system the repetition it needs to begin rewiring. Built for those ready to move beyond a single experience and commit to a guided process of emotional release and real healing.</p>
+          <div class="pkg-price">$3,300</div>
+          <div class="pkg-per">Package Investment</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-features">
+            <li><strong>3</strong> guided ketamine ceremonies (IM)</li>
+            <li><strong>3</strong> integration coaching sessions</li>
+            <li><strong>1 month</strong> AWKN Ranch membership</li>
+            <li>Medical consultation &amp; clearance</li>
+          </ul>
+        </div>
+
+        <!-- AWKN -->
+        <div class="pkg">
+          <div class="pkg-name">AWKN</div>
+          <div class="pkg-tagline">Come fully home to yourself</div>
+          <p class="pkg-desc">Six sessions is a commitment to deep healing and an investment in lasting change. Our most comprehensive program for those ready to do the full work: peeling back layers, building new patterns, and coming home to themselves.</p>
+          <div class="pkg-price">$5,500</div>
+          <div class="pkg-per">Package Investment</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-features">
+            <li><strong>6</strong> guided ketamine ceremonies (IM)</li>
+            <li><strong>6</strong> integration coaching sessions</li>
+            <li><strong>2 months</strong> AWKN Ranch membership</li>
+            <li>Medical consultation &amp; clearance</li>
+          </ul>
+        </div>
+
+        <!-- JOURNEY FOR TWO -->
+        <div class="pkg">
+          <div class="pkg-name">Journey for Two</div>
+          <div class="pkg-tagline">Heal together, integrate individually</div>
+          <p class="pkg-desc">A shared ceremonial experience for two. One guided ketamine ceremony (IM) together, followed by individual integration sessions so each person can unpack the journey on their own terms.</p>
+          <div class="pkg-price">$1,650</div>
+          <div class="pkg-per">Package for Two</div>
+          <div class="pkg-divider"></div>
+          <ul class="pkg-features">
+            <li><strong>1</strong> guided ketamine ceremony (IM)</li>
+            <li><strong>2</strong> integration coaching sessions</li>
+            <li><strong>2</strong> medical consultations &amp; clearance</li>
+            <li><strong>1 week</strong> AWKN Ranch membership</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- ── ADD-ON: SINGLE-NIGHT RETREAT HOUSE STAYS ──────────── -->
+      <div style="margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border, #e5e7eb);">
+        <div style="text-align:center; margin-bottom: 2rem;">
+          <div class="s-eyebrow">Stay the Night</div>
+          <div class="s-title" style="font-size: clamp(1.4rem, 3vw, 1.8rem);">Single-Night Retreat House Stays</div>
+          <div class="s-desc centered" style="max-width: 640px; margin: 0.5rem auto 0;">For day-experience guests who want to extend the day into rest, or for visitors who simply want a quiet night on the property. Add a night to any session, or book a standalone stay.</div>
+        </div>
+
+        <div class="retreat-options-grid" style="max-width: 720px; margin: 0 auto;">
+          <div class="retreat-option-card">
+            <div class="retreat-option-inner">
+              <div class="retreat-option-label">Private Room</div>
+              <ul class="retreat-option-highlights">
+                <li>Whole-room exclusive use</li>
+                <li>Queen bed</li>
+              </ul>
+              <div class="room-grid">
+                <div class="room-option" style="grid-column: 1 / -1;">
+                  <div class="room-label">Per Night</div>
+                  <div class="room-price">$349</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="retreat-option-card">
+            <div class="retreat-option-inner">
+              <div class="retreat-option-label">Shared Room Bed</div>
+              <ul class="retreat-option-highlights">
+                <li>One bed in a shared room</li>
+                <li>Bunk or queen bed options</li>
+              </ul>
+              <div class="room-grid">
+                <div class="room-option" style="grid-column: 1 / -1;">
+                  <div class="room-label">Per Bed, Per Night</div>
+                  <div class="room-price">$239</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ════════════════════════════════ -->
+  <section class="bg-white" id="process" style="padding-top: 1rem;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom: 3.5rem;">
+        <div class="s-eyebrow">The Journey</div>
+        <div class="s-title">How It Works</div>
+      </div>
+      <div class="process-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h4>Consultation</h4>
+          <p>Free phone call with our clinical team to discuss your goals and medical history.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h4>Medical Clearance</h4>
+          <p>Intake and screening with our MAPS-trained nurse practitioner to ensure safe, personalized care.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h4>Preparation</h4>
+          <p>A dedicated session to set intention, establish safety, and prepare for the ceremonial experience.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <h4>Ceremony</h4>
+          <p>Guided ketamine ceremony in a sacred container with clinical support throughout the experience.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">05</div>
+          <h4>Integration</h4>
+          <p>A 1:1 coaching session to translate insight into lasting change.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WHY IM ═════════════════════════════════════ -->
+  <section class="philosophy" style="padding: 2rem 2rem 1.5rem;">
+    <div class="philosophy-inner" style="max-width: 720px;">
+      <div class="s-title">Why Intramuscular (IM)</div>
+      <p class="philosophy-body" style="margin-bottom: 0;">All of our ketamine sessions are administered intramuscularly. IM delivery offers the highest bioavailability, reaching the bloodstream quickly and consistently. Unlike oral lozenges or nasal sprays, IM allows for precise dosing with a more reliable onset, a deeper therapeutic window, and a fuller experience. It's the method trusted by clinical researchers and the one we believe gives our guests the best opportunity for meaningful healing.</p>
+    </div>
+  </section>
+
+  <!-- ══ EXPERIENCE AWKN RANCH ═══════════════════════ -->
+  <section class="ranch-section" id="ranch">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="s-eyebrow">The Setting</div>
+        <div class="s-title">Experience AWKN Ranch</div>
+        <div class="s-desc centered">A refined wellness sanctuary where members can reset the body and quiet the mind. From sauna and cold immersion to restorative outdoor spaces, the ranch is designed as a place to recover, reconnect, and return to yourself.</div>
+      </div>
+      <div class="ranch-grid">
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Sauna &amp; Cold Plunge</h4>
+          <p>Barrel sauna and cold immersion for nervous system regulation and recovery.</p>
+        </div>
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Ceremony Space</h4>
+          <p>The Within Center. A dedicated, intentional space designed for guided healing work.</p>
+        </div>
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Retreat House</h4>
+          <p>The main house. A warm, welcoming space for rest, reflection, and community between sessions.</p>
+        </div>
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Private Pool</h4>
+          <p>Resort pool and outdoor spaces for quiet reflection between sessions.</p>
+        </div>
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Community Gatherings</h4>
+          <p>Weekly group therapy and integration circles with fellow members on the path.</p>
+        </div>
+        <div class="ranch-item">
+          <div class="ranch-icon" aria-hidden="true">&#9670;</div>
+          <h4>Hill Country Setting</h4>
+          <p>12 acres of natural beauty in Austin, TX. A true container for transformation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PHOTO STRIP: RANCH LIFE ═════════════════════ -->
+  <div class="photo-strip">
+    <img src="images/pool.jpg" alt="Private resort pool at AWKN Ranch">
+    <img src="images/sauna-interior.jpg" alt="Barrel sauna interior">
+    <img src="images/grounds.jpg" alt="Oak groves and hammocks on the ranch grounds">
+  </div>
+
+  <!-- ══ CTA ═════════════════════════════════════════ -->
+  <section class="cta-section">
+    <h2>Begin Your Healing Journey</h2>
+    <p>Schedule a free consultation to learn which package is right for you. Our team is here to guide you every step of the way.</p>
+    <a href="tel:5129692399" class="awknhero-cta">Call 512-969-2399</a>
+  </section>
+
+  <!-- ══ CONTACT STRIP ═══════════════════════════════ -->
+  <div class="contact-strip" id="contact">
+    <div class="contact-row">
+      <div class="contact-item">
+        <span class="label">Phone</span>
+        <a href="tel:5129692399">512-969-2399</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a href="mailto:intake@within.center">intake@within.center</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Address</span>
+        7600 Stillridge Dr, Austin, TX 78736
+      </div>
+      <div class="contact-item">
+        <span class="label">Web</span>
+        <a href="https://within.center">within.center</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════ -->
+  <footer class="site-footer">
+    &copy; 2026 Within Center at AWKN Ranch &middot; Austin, TX &middot; <a href="https://within.center">Home</a>
+  </footer>
+
+  <script>
+    // Auto-resize iframe to content height when embedded
+    (function () {
+      function sendHeight() {
+        var h = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight
+        );
+        // Safety: never report a height that's clearly too small (layout not ready)
+        if (h < 4000) h = 6000;
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: 'awknPricingHeight', height: h }, '*');
+        }
+      }
+      window.addEventListener('load', function () {
+        sendHeight();
+        setTimeout(sendHeight, 300);
+        setTimeout(sendHeight, 800);
+        setTimeout(sendHeight, 2000);
+      });
+      window.addEventListener('resize', sendHeight);
+      if (window.ResizeObserver) {
+        new ResizeObserver(sendHeight).observe(document.body);
+      }
+      // Also send on image load (images affect layout)
+      document.querySelectorAll('img').forEach(function (img) {
+        if (img.complete) return;
+        img.addEventListener('load', sendHeight);
+      });
+    })();
+  </script>
+
+
+</body>
+</html>

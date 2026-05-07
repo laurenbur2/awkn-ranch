@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule a Consultation — AWKN</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: #f5f5f0;
+      color: #2a1f23;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* Main container — Calendly-style card */
+    .sc-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+      max-width: 960px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 540px;
+      overflow: hidden;
+    }
+
+    /* Left panel — staff info */
+    .sc-left {
+      padding: 40px 32px;
+      border-right: 1px solid #e5e5e5;
+      display: flex;
+      flex-direction: column;
+    }
+    .sc-logo-wrap {
+      width: 100%;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .sc-logo {
+      width: 100%;
+      display: block;
+      margin: -18% 0 -20%;
+    }
+    .sc-logo-ranch {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.45em;
+      color: #b07a3a;
+      margin-top: -4px;
+    }
+    .sc-staff-name {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+    .sc-meeting-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+    .sc-meeting-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sc-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+    .sc-meta-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: #888;
+    }
+    .sc-back-link {
+      margin-top: auto;
+      padding-top: 24px;
+      font-size: 13px;
+      color: #d4883a;
+      text-decoration: none;
+      cursor: pointer;
+      display: none;
+    }
+    .sc-back-link:hover { text-decoration: underline; }
+
+    /* Right panel */
+    .sc-right {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Step: Date & Time selection */
+    .sc-step-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    /* Calendar */
+    .sc-cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .sc-cal-nav {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: #888;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background .15s;
+    }
+    .sc-cal-nav:hover { background: #f0f0f0; }
+    .sc-cal-nav:disabled { opacity: .3; cursor: default; }
+    .sc-cal-month {
+      font-size: 16px;
+      font-weight: 600;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .sc-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .sc-cal-dow {
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+      text-align: center;
+      padding: 8px 0;
+      text-transform: uppercase;
+    }
+    .sc-cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 50%;
+      border: none;
+      background: none;
+      cursor: default;
+      color: #ccc;
+      position: relative;
+    }
+    .sc-cal-day--available {
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .sc-cal-day--available:hover {
+      background: #eff6ff;
+    }
+    .sc-cal-day--selected {
+      background: #2563eb;
+      color: #fff !important;
+    }
+    .sc-cal-day--selected:hover {
+      background: #1d4ed8;
+    }
+    .sc-cal-day--today::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #2563eb;
+    }
+
+    /* Timezone */
+    .sc-timezone {
+      font-size: 13px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+    .sc-tz-icon { width: 16px; height: 16px; color: #aaa; }
+
+    /* Time slots */
+    .sc-slots-container {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 340px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .sc-slots-container.active { display: flex; }
+    .sc-slots-date {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    .sc-slot {
+      padding: 12px 16px;
+      border: 1px solid #2563eb;
+      border-radius: 8px;
+      background: #fff;
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+    }
+    .sc-slot:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+    .sc-slot--selected {
+      background: #2563eb;
+      color: #fff;
+    }
+    .sc-slot-pair {
+      display: flex;
+      gap: 8px;
+    }
+    .sc-slot-confirm {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #d4883a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .sc-slot-confirm:hover { background: #c07a30; }
+
+    /* Loading */
+    .sc-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: #aaa;
+      font-size: 14px;
+    }
+    .sc-spinner {
+      width: 24px; height: 24px;
+      border: 3px solid #e5e5e5;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: sc-spin .6s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes sc-spin { to { transform: rotate(360deg); } }
+
+    .sc-no-slots {
+      text-align: center;
+      padding: 24px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    /* Booking form */
+    .sc-form { display: none; }
+    .sc-form.active { display: block; }
+    .sc-form-selected {
+      background: #f5f5f0;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+    .sc-form-selected strong { color: #2a1f23; }
+    .sc-form-field {
+      margin-bottom: 16px;
+    }
+    .sc-form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .sc-form-field input,
+    .sc-form-field textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #2a1f23;
+    }
+    .sc-form-field input:focus,
+    .sc-form-field textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37,99,235,.15);
+    }
+    .sc-form-field textarea { resize: vertical; min-height: 80px; }
+    .sc-form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .sc-form-submit {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      background: #d4883a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .sc-form-submit:hover { background: #c07a30; }
+    .sc-form-submit:disabled { opacity: .6; cursor: default; }
+    .sc-form-back {
+      padding: 12px 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      color: #555;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Confirmation */
+    .sc-confirm { display: none; text-align: center; padding: 40px 20px; }
+    .sc-confirm.active { display: block; }
+    .sc-confirm-check {
+      width: 56px; height: 56px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .sc-confirm-check svg { color: #16a34a; }
+    .sc-confirm h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .sc-confirm p { font-size: 14px; color: #888; line-height: 1.5; }
+    .sc-confirm-details {
+      background: #f5f5f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 14px;
+      text-align: left;
+    }
+    .sc-confirm-details div { padding: 4px 0; }
+    .sc-confirm-details strong { color: #2a1f23; }
+
+    /* Error */
+    .sc-error {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    .sc-error h2 { font-size: 20px; color: #2a1f23; margin-bottom: 8px; }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      body { padding: 12px; align-items: flex-start; }
+      .sc-card {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+      .sc-left {
+        border-right: none;
+        border-bottom: 1px solid #e5e5e5;
+        padding: 24px 20px;
+      }
+      .sc-right { padding: 24px 20px; }
+      .sc-logo-wrap { height: 50px; margin-bottom: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sc-card" id="scCard">
+    <!-- Left panel -->
+    <div class="sc-left">
+      <div class="sc-logo-wrap">
+        <img src="../assets/branding/awkn-wordmark-logo.jpg" alt="AWKN" class="sc-logo">
+      </div>
+      <div class="sc-staff-name" id="scStaffName">Loading...</div>
+      <div class="sc-meeting-title" id="scMeetingTitle">Loading...</div>
+      <div class="sc-meeting-meta">
+        <div class="sc-meta-row">
+          <svg class="sc-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="scDuration">30 min</span>
+        </div>
+        <div class="sc-meta-row">
+          <svg class="sc-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <span>Phone call</span>
+        </div>
+      </div>
+      <a class="sc-back-link" id="scBackLink">← Back</a>
+    </div>
+
+    <!-- Right panel -->
+    <div class="sc-right">
+      <!-- Step 1: Calendar -->
+      <div id="scCalendarStep">
+        <div class="sc-step-title">Select a Date &amp; Time</div>
+        <div class="sc-cal-header">
+          <button class="sc-cal-nav" id="scPrevMonth">&#8249;</button>
+          <div class="sc-cal-month" id="scCalMonth">April 2026</div>
+          <button class="sc-cal-nav" id="scNextMonth">&#8250;</button>
+        </div>
+        <div class="sc-cal-grid" id="scCalGrid"></div>
+
+        <!-- Time slots (shown beside calendar on date click) -->
+        <div class="sc-slots-container" id="scSlots"></div>
+
+        <div class="sc-timezone">
+          <svg class="sc-tz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <span>Central Time - US &amp; Canada</span>
+        </div>
+      </div>
+
+      <!-- Step 2: Booking form -->
+      <div class="sc-form" id="scForm">
+        <div class="sc-step-title">Enter Details</div>
+        <div class="sc-form-selected" id="scFormSelected"></div>
+        <div class="sc-form-field">
+          <label for="scName">Name *</label>
+          <input type="text" id="scName" placeholder="Your full name" required>
+        </div>
+        <div class="sc-form-field">
+          <label for="scEmail">Email *</label>
+          <input type="email" id="scEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="sc-form-field">
+          <label for="scPhone">Phone</label>
+          <input type="tel" id="scPhone" placeholder="(512) 555-1234">
+        </div>
+        <div class="sc-form-field">
+          <label for="scMessage">Anything you'd like us to know?</label>
+          <textarea id="scMessage" placeholder="Goals, questions, or concerns..."></textarea>
+        </div>
+        <div class="sc-form-actions">
+          <button class="sc-form-back" id="scFormBack">Back</button>
+          <button class="sc-form-submit" id="scFormSubmit">Schedule Event</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div class="sc-confirm" id="scConfirm">
+        <div class="sc-confirm-check">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>You're booked!</h2>
+        <p>A confirmation email has been sent with the details.</p>
+        <div class="sc-confirm-details" id="scConfirmDetails"></div>
+        <p style="margin-top:12px;"><a href="#" id="scBookAnother" style="color:#d4883a;font-weight:600;">Book another time</a></p>
+      </div>
+
+      <!-- Error state -->
+      <div class="sc-error" id="scError" style="display:none;">
+        <h2>Scheduling Unavailable</h2>
+        <p id="scErrorMsg">This booking link is not active right now.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+    const BOOKER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago';
+
+    const params = new URLSearchParams(window.location.search);
+    // New URL shape: ?p=<profile_slug>&e=<event_slug>. Fall back to legacy ?staff=<slug> (event=default).
+    const profileSlug = params.get('p') || params.get('staff') || '';
+    const eventSlug = params.get('e') || 'default';
+
+    let currentMonth = new Date();
+    let selectedDate = null;
+    let selectedSlot = null; // ISO UTC start datetime
+    let slotsByDate = {};    // { 'YYYY-MM-DD': [{start, end}] } in booker TZ
+    let eventType = null;
+    let profileInfo = null;
+    let staffTimezone = 'America/Chicago';
+
+    if (!profileSlug) {
+      showError('No booking link specified.');
+    } else {
+      init();
+    }
+
+    async function apiPost(fn, body) {
+      return fetch(`${API_BASE}/${fn}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + ANON_KEY,
+          'apikey': ANON_KEY,
+        },
+        body: JSON.stringify(body),
+      });
+    }
+
+    async function init() {
+      try {
+        await loadMonth(currentMonth);
+      } catch (err) {
+        console.error('Init error:', err);
+        showError('Unable to load scheduling. Please try again later.');
+      }
+    }
+
+    async function loadMonth(monthDate) {
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth();
+      const first = new Date(year, month, 1);
+      const last = new Date(year, month + 1, 0);
+      // Don't request past dates
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const from = first < today ? today : first;
+
+      const res = await apiPost('scheduling-availability', {
+        profile_slug: profileSlug,
+        event_type_slug: eventSlug,
+        from_date: formatDateISO(from),
+        to_date: formatDateISO(last),
+        booker_timezone: BOOKER_TZ,
+      });
+
+      if (res.status === 404) return showError('This booking link is not active right now.');
+      if (!res.ok) return showError('Unable to load availability.');
+
+      const data = await res.json();
+      eventType = data.event_type || null;
+      profileInfo = data.profile || null;
+      staffTimezone = data.staff_timezone || 'America/Chicago';
+
+      // Group slots by local (booker) date
+      slotsByDate = {};
+      (data.slots || []).forEach(slot => {
+        const d = new Date(slot.start);
+        const key = formatDateISO(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        (slotsByDate[key] ||= []).push(slot);
+      });
+
+      updateHeader();
+      renderCalendar();
+    }
+
+    function updateHeader() {
+      if (!eventType) return;
+      document.getElementById('scStaffName').textContent = profileInfo?.name || '';
+      document.getElementById('scMeetingTitle').textContent = eventType.name || 'Meeting';
+      document.getElementById('scDuration').textContent = (eventType.duration_minutes || 30) + ' min';
+
+      const locLabels = { video: 'Video call', phone: 'Phone call', in_person: 'In person', custom: 'Custom' };
+      const locLabel = locLabels[eventType.location_type] || 'Meeting';
+      const locRow = document.querySelectorAll('.sc-meta-row')[1];
+      if (locRow) locRow.querySelector('span').textContent = locLabel + (eventType.location_detail ? ' — ' + eventType.location_detail : '');
+
+      document.title = `${eventType.name || 'Schedule'} — AWKN`;
+
+      // Timezone line
+      const tzSpan = document.querySelector('.sc-timezone span');
+      if (tzSpan) tzSpan.textContent = BOOKER_TZ;
+    }
+
+    function showError(msg) {
+      document.getElementById('scCalendarStep').style.display = 'none';
+      document.getElementById('scForm').classList.remove('active');
+      document.getElementById('scError').style.display = 'block';
+      document.getElementById('scErrorMsg').textContent = msg;
+    }
+
+    function formatDateISO(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function formatDateDisplay(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatSlotTime(isoUtc) {
+      return new Date(isoUtc).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+    }
+
+    function renderCalendar() {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      document.getElementById('scCalMonth').textContent =
+        currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      const thisMonth = new Date();
+      document.getElementById('scPrevMonth').disabled =
+        year < thisMonth.getFullYear() || (year === thisMonth.getFullYear() && month <= thisMonth.getMonth());
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const grid = document.getElementById('scCalGrid');
+      let html = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        .map(d => `<div class="sc-cal-dow">${d}</div>`).join('');
+      for (let i = 0; i < firstDay; i++) html += '<div class="sc-cal-day"></div>';
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month, d);
+        const dateStr = formatDateISO(date);
+        const isToday = date.getTime() === today.getTime();
+        const isSelected = selectedDate === dateStr;
+        const hasSlots = (slotsByDate[dateStr]?.length || 0) > 0;
+
+        let classes = 'sc-cal-day';
+        if (hasSlots) classes += ' sc-cal-day--available';
+        if (isSelected) classes += ' sc-cal-day--selected';
+        if (isToday) classes += ' sc-cal-day--today';
+
+        html += `<div class="${classes}" ${hasSlots ? `data-date="${dateStr}" role="button" tabindex="0"` : ''}>${d}</div>`;
+      }
+
+      grid.innerHTML = html;
+
+      grid.querySelectorAll('.sc-cal-day--available').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedDate = el.dataset.date;
+          selectedSlot = null;
+          renderCalendar();
+          renderSlots();
+        });
+      });
+    }
+
+    function renderSlots() {
+      const container = document.getElementById('scSlots');
+      const slots = slotsByDate[selectedDate] || [];
+      container.classList.add('active');
+
+      if (!slots.length) {
+        container.innerHTML = `<div class="sc-no-slots">No available times for this day.</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="sc-slots-date">${formatDateDisplay(selectedDate)}</div>
+        ${slots.map(s => `<div class="sc-slot" data-start="${s.start}">${formatSlotTime(s.start)}</div>`).join('')}
+      `;
+
+      container.querySelectorAll('.sc-slot').forEach(el => {
+        el.addEventListener('click', () => {
+          if (el.classList.contains('sc-slot--selected')) {
+            selectedSlot = null;
+            renderSlots();
+            return;
+          }
+          selectedSlot = el.dataset.start;
+
+          container.querySelectorAll('.sc-slot').forEach(s => {
+            if (s.dataset.start === selectedSlot) {
+              s.outerHTML = `
+                <div class="sc-slot-pair">
+                  <div class="sc-slot sc-slot--selected">${formatSlotTime(selectedSlot)}</div>
+                  <button class="sc-slot-confirm" id="scConfirmSlot">Confirm</button>
+                </div>
+              `;
+            } else {
+              s.style.display = 'none';
+            }
+          });
+
+          document.getElementById('scConfirmSlot')?.addEventListener('click', showForm);
+        });
+      });
+    }
+
+    function showForm() {
+      document.getElementById('scCalendarStep').style.display = 'none';
+      document.getElementById('scForm').classList.add('active');
+      document.getElementById('scBackLink').style.display = 'block';
+      document.getElementById('scFormSelected').innerHTML =
+        `<strong>${formatDateDisplay(selectedDate)}</strong> at <strong>${formatSlotTime(selectedSlot)}</strong>`;
+    }
+
+    document.getElementById('scFormBack').addEventListener('click', goBackToCalendar);
+    document.getElementById('scBackLink').addEventListener('click', goBackToCalendar);
+
+    function goBackToCalendar() {
+      document.getElementById('scCalendarStep').style.display = 'block';
+      document.getElementById('scForm').classList.remove('active');
+      document.getElementById('scBackLink').style.display = 'none';
+    }
+
+    document.getElementById('scFormSubmit').addEventListener('click', async () => {
+      const name = document.getElementById('scName').value.trim();
+      const email = document.getElementById('scEmail').value.trim();
+      const phone = document.getElementById('scPhone').value.trim();
+      const message = document.getElementById('scMessage').value.trim();
+
+      if (!name) { alert('Please enter your name.'); return; }
+      if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+
+      const btn = document.getElementById('scFormSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Scheduling...';
+
+      try {
+        const res = await apiPost('scheduling-book', {
+          profile_slug: profileSlug,
+          event_type_slug: eventSlug,
+          start_datetime: selectedSlot,
+          booker_name: name,
+          booker_email: email,
+          booker_phone: phone || null,
+          booker_timezone: BOOKER_TZ,
+          notes: message || null,
+        });
+
+        if (res.status === 409) {
+          alert('This time slot was just taken. Please choose another.');
+          btn.disabled = false;
+          btn.textContent = 'Schedule Event';
+          goBackToCalendar();
+          await loadMonth(currentMonth);
+          return;
+        }
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Booking failed');
+        }
+
+        document.getElementById('scForm').classList.remove('active');
+        document.getElementById('scBackLink').style.display = 'none';
+        document.getElementById('scConfirm').classList.add('active');
+
+        document.getElementById('scConfirmDetails').innerHTML = `
+          <div><strong>Date:</strong> ${formatDateDisplay(selectedDate)}</div>
+          <div><strong>Time:</strong> ${formatSlotTime(selectedSlot)} (${BOOKER_TZ})</div>
+          <div><strong>Duration:</strong> ${eventType?.duration_minutes || 30} minutes</div>
+          ${profileInfo?.name ? `<div><strong>With:</strong> ${profileInfo.name}</div>` : ''}
+        `;
+      } catch (err) {
+        console.error('Booking error:', err);
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Schedule Event';
+      }
+    });
+
+    document.getElementById('scBookAnother').addEventListener('click', async (e) => {
+      e.preventDefault();
+      selectedDate = null;
+      selectedSlot = null;
+      document.getElementById('scConfirm').classList.remove('active');
+      document.getElementById('scCalendarStep').style.display = 'block';
+      document.getElementById('scSlots').classList.remove('active');
+      ['scName','scEmail','scPhone','scMessage'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('scFormSubmit').disabled = false;
+      document.getElementById('scFormSubmit').textContent = 'Schedule Event';
+      await loadMonth(currentMonth);
+    });
+
+    document.getElementById('scPrevMonth').addEventListener('click', async () => {
+      currentMonth.setMonth(currentMonth.getMonth() - 1);
+      selectedDate = null;
+      document.getElementById('scSlots').classList.remove('active');
+      await loadMonth(currentMonth);
+    });
+    document.getElementById('scNextMonth').addEventListener('click', async () => {
+      currentMonth.setMonth(currentMonth.getMonth() + 1);
+      selectedDate = null;
+      document.getElementById('scSlots').classList.remove('active');
+      await loadMonth(currentMonth);
+    });
+  </script>
+</body>
+</html>

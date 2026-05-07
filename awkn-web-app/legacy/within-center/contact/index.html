@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Within Center Austin</title>
+  <meta name="description" content="Contact Within Center in Austin, Texas. Call 512-969-2399, email intake@within.center, or visit us at 7600 Stillridge Dr, Austin, TX 78736.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <link rel="canonical" href="https://within.center/contact/">
+
+  <meta property="og:title" content="Contact Us | Within Center">
+  <meta property="og:description" content="Get in touch with Within Center &mdash; Austin, Texas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://within.center/contact/">
+  <meta property="og:site_name" content="Within Center">
+  <meta property="og:image" content="https://within.center/images/hero.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contact Us | Within Center Austin">
+  <meta name="twitter:description" content="Contact Within Center in Austin, Texas. Call 512-969-2399, email intake@within.center, or visit us at 7600 Stillridge Dr, Austin, TX 78736.">
+  <meta name="twitter:image" content="https://within.center/images/hero.jpg">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "Within Center",
+    "description": "Ceremonial, guided ketamine therapy in an outpatient setting in Austin, Texas.",
+    "url": "https://within.center",
+    "telephone": "+1-512-969-2399",
+    "email": "intake@within.center",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "7600 Stillridge Dr",
+      "addressLocality": "Austin",
+      "addressRegion": "TX",
+      "postalCode": "78736",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 30.2462,
+      "longitude": -97.9389
+    },
+    "medicalSpecialty": "Psychiatry",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "17:00"
+      }
+    ]
+  }
+  </script>
+  <style>
+    .contact-block {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+    .contact-info-card {
+      padding: 2.5rem 2.25rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+    }
+    .contact-info-card h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+    .info-row {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .info-value {
+      font-size: 1rem;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    .info-value a { color: var(--dark); transition: color 0.25s; }
+    .info-value a:hover { color: var(--gold); }
+    .info-value-secondary {
+      font-size: 0.85rem;
+      color: var(--grey);
+      margin-top: 0.3rem;
+    }
+
+    .contact-cta-card {
+      padding: 2.5rem 2.25rem;
+      background: linear-gradient(135deg, var(--dark) 0%, #2c2225 100%);
+      border-radius: var(--radius);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .cta-block { display: flex; flex-direction: column; }
+    .cta-block + .cta-block { padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .contact-cta-card .eyebrow {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .contact-cta-card h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+    .contact-cta-card p {
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .contact-cta-card .btn {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #fff;
+      background: var(--gold);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      align-self: flex-start;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .contact-cta-card .btn:hover { background: var(--gold-dark); transform: translateY(-2px); }
+
+    /* ── CONTACT MODAL ── */
+    .contact-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      overflow-y: auto;
+    }
+    .contact-modal.open { display: flex; }
+    .contact-modal-inner {
+      position: relative;
+      background: #fff;
+      max-width: 560px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 2.4rem 2rem 1.8rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .contact-modal-close {
+      position: absolute;
+      top: 0.8rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: #888;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .contact-modal-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--dark);
+      text-align: center;
+    }
+    .contact-modal-sub {
+      font-size: 0.85rem;
+      color: var(--grey);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .contact-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .contact-form .full { grid-column: 1 / -1; }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: var(--dark);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus { outline: none; border-color: var(--gold); }
+    .contact-form textarea { min-height: 110px; resize: vertical; font-family: 'Inter', sans-serif; }
+    .contact-form-submit {
+      margin-top: 0.4rem;
+      padding: 0.85rem 2rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #fff;
+      background: var(--gold);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .contact-form-submit:hover { background: var(--gold-dark); transform: translateY(-1px); }
+    @media (max-width: 520px) {
+      .contact-form { grid-template-columns: 1fr; }
+    }
+    .contact-modal-thanks { text-align: center; padding: 1.2rem 0 0.5rem; }
+    .contact-modal-thanks-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      color: var(--gold);
+    }
+    .contact-modal-thanks-icon svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .contact-modal-thanks p {
+      max-width: 380px;
+      margin: 0 auto 1.6rem;
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+
+    .map-section {
+      padding: 5rem 2rem;
+      background: var(--cream);
+    }
+    .map-section .container { text-align: center; }
+    .map-frame {
+      margin-top: 3rem;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      aspect-ratio: 16 / 7;
+    }
+    .map-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+    @media (max-width: 900px) {
+      .contact-block { grid-template-columns: 1fr; gap: 1.75rem; padding: 4rem 1.25rem 3rem; }
+      .map-frame { aspect-ratio: 4 / 3; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="./" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="./" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.</div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="../our-team/" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="../medication-management/" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="../resources/" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ── HERO ── -->
+  <header class="page-hero" style="background-color:var(--dark); min-height: 64vh;">
+    <div class="page-hero-bg" style="background-image:url('/awkn-ranch/pricing/images/grounds.jpg');"></div>
+    <div class="page-hero-inner">
+      <span class="page-hero-eyebrow">Contact Us</span>
+      <h1>We&rsquo;re here. Reach out.</h1>
+      <p class="lead">Whether you have questions about our work or want to schedule a free consultation &mdash; we&rsquo;d be glad to hear from you.</p>
+    </div>
+  </header>
+
+  <!-- ── CONTACT BLOCK ── -->
+  <div class="contact-block">
+
+    <div class="contact-info-card">
+      <h2>Get in Touch</h2>
+
+      <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value"><a href="tel:5129692399">512-969-2399</a></div>
+        <div class="info-value-secondary">Mon&ndash;Fri, 9am&ndash;5pm CT</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:intake@within.center">intake@within.center</a></div>
+        <div class="info-value-secondary">We respond within one business day</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">Visit</div>
+        <div class="info-value">7600 Stillridge Dr<br>Austin, TX 78736</div>
+        <div class="info-value-secondary">By appointment only</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">After Hours</div>
+        <div class="info-value">For mental health emergencies, call <a href="tel:988">988</a> or 911.</div>
+      </div>
+
+    </div>
+
+    <div class="contact-cta-card">
+      <div class="cta-block">
+        <div class="eyebrow">Ready to Begin?</div>
+        <h3>Schedule a free consultation.</h3>
+        <p>A 15-minute call with our intake team to talk through your situation, answer questions, and see if our work is the right fit for you. No commitment.</p>
+        <a href="../book-a-call/" class="btn">Book a Call</a>
+      </div>
+      <div class="cta-block">
+        <div class="eyebrow">Have a Question?</div>
+        <h3>Send us a message.</h3>
+        <p>Share what&rsquo;s on your mind and we&rsquo;ll get back to you within one business day.</p>
+        <button type="button" class="btn" onclick="document.getElementById('contactFormModal').classList.add('open')">Send Us a Message</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── MAP ── -->
+  <section class="map-section">
+    <div class="container">
+      <div class="s-eyebrow">Our Location</div>
+      <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:clamp(1.6rem,3vw,2.1rem); color:var(--dark); font-weight:700;">7600 Stillridge Dr, Austin, TX</h2>
+      <p class="s-desc centered">Twelve private acres on the western edge of Austin &mdash; about 25 minutes from downtown.</p>
+    </div>
+    <div class="map-frame">
+      <iframe
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=7600+Stillridge+Dr,+Austin,+TX+78736&output=embed">
+      </iframe>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contact">
+    <div class="contact-row">
+      <div class="contact-item"><span class="label">Phone</span><a href="tel:5129692399">512-969-2399</a></div>
+      <div class="contact-item"><span class="label">Email</span><a href="mailto:intake@within.center">intake@within.center</a></div>
+      <div class="contact-item"><span class="label">Visit</span>7600 Stillridge Dr<br>Austin, TX 78736</div>
+      <div class="contact-item"><span class="label">Web</span><a href="https://within.center">within.center</a></div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT FORM MODAL ── -->
+  <div id="contactFormModal" class="contact-modal" onclick="if(event.target===this)closeContactModal()">
+    <div class="contact-modal-inner">
+      <button type="button" class="contact-modal-close" onclick="closeContactModal()" aria-label="Close">&times;</button>
+      <div id="contactFormBody">
+        <div class="contact-modal-title">Send Us a Message</div>
+        <div class="contact-modal-sub">We respond within one business day.</div>
+        <form id="contactForm" class="contact-form" onsubmit="submitContactForm(event)">
+          <input type="text" id="cfFirstName" placeholder="First Name" required>
+          <input type="text" id="cfLastName" placeholder="Last Name" required>
+          <input type="tel" id="cfPhone" placeholder="Phone Number">
+          <input type="email" id="cfEmail" placeholder="Email" required>
+          <input type="text" id="cfCity" placeholder="City">
+          <input type="text" id="cfState" placeholder="State">
+          <textarea class="full" id="cfMessage" placeholder="What are you struggling with?" required></textarea>
+          <div class="full" style="text-align:center;">
+            <button type="submit" class="contact-form-submit">Send Message</button>
+          </div>
+        </form>
+      </div>
+      <div id="contactFormThanks" class="contact-modal-thanks" style="display:none;">
+        <div class="contact-modal-thanks-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="contact-modal-title">Thank you.</div>
+        <p>We&rsquo;ve received your message. Someone from our team will reach out shortly.</p>
+        <button type="button" class="contact-form-submit" onclick="closeContactModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--dark);border-top:1px solid rgba(255,255,255,0.08);padding:1.25rem 2rem;display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap;">
+    <span style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.4);">We Work With</span>
+    <a href="/depression-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Depression</a>
+    <a href="/anxiety-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Anxiety</a>
+    <a href="/burnout-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Burnout</a>
+    <a href="/grief-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Grief</a>
+    <a href="/addiction-treatment/" style="font-size:0.75rem;color:rgba(255,255,255,0.6);letter-spacing:0.15em;text-transform:uppercase;">Addiction</a>
+  </div>
+  <footer class="medical-disclaimer">
+    <p><strong>MEDICAL DISCLAIMER</strong> &middot; This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.</p>
+    <p style="margin-top:0.6rem;">&copy; 2026 Hearth Space Health, Inc. <span class="disclaimer-sep">&middot;</span> Within Center is a sister practice to <a href="https://awknranch.com" style="color:rgba(255,255,255,0.55);">AWKN Ranch</a></p>
+  </footer>
+
+  <script>
+    function submitContactForm(e) {
+      e.preventDefault();
+      var form = document.getElementById('contactForm');
+      var submitBtn = form.querySelector('.contact-form-submit');
+      var originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      var data = new FormData();
+      data.append('First Name', document.getElementById('cfFirstName').value.trim());
+      data.append('Last Name', document.getElementById('cfLastName').value.trim());
+      data.append('Phone', document.getElementById('cfPhone').value.trim());
+      data.append('email', document.getElementById('cfEmail').value.trim());
+      data.append('City', document.getElementById('cfCity').value.trim());
+      data.append('State', document.getElementById('cfState').value.trim());
+      data.append('Message', document.getElementById('cfMessage').value.trim());
+      data.append('_subject', 'New inquiry from Within Center contact form');
+      data.append('_autoresponse', "Thank you for reaching out to Within Center.\n\nWe've received your message and a member of our team will be in touch with you shortly.\n\nIf your need is urgent, please call us at 512-969-2399.\n\n— The Within Center Team");
+      data.append('_template', 'table');
+      data.append('_captcha', 'false');
+
+      fetch('https://formsubmit.co/ajax/intake@within.center', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      })
+      .then(function(resp){ if (!resp.ok) throw new Error('submit failed'); return resp.json(); })
+      .then(function(){
+        document.getElementById('contactFormBody').style.display = 'none';
+        document.getElementById('contactFormThanks').style.display = '';
+      })
+      .catch(function(){
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        alert('Something went wrong. Please try again or call 512-969-2399.');
+      });
+    }
+    function closeContactModal() {
+      var modal = document.getElementById('contactFormModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      setTimeout(function(){
+        document.getElementById('contactFormBody').style.display = '';
+        document.getElementById('contactFormThanks').style.display = 'none';
+        var form = document.getElementById('contactForm');
+        if (form) form.reset();
+      }, 250);
+    }
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeContactModal();
+    });
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){
+      var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');
+      var allSubs=document.querySelectorAll('.menu-sub');
+      function isOpen(){return panel.classList.contains('open');}
+      function closeAllSubs(){allSubs.forEach(function(s){s.classList.remove('open');});document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});}
+      function openSub(subId,li){closeAllSubs();var s=document.getElementById(subId);if(s){s.classList.add('open');li.classList.add('active');}}
+      function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}
+      toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});
+      backdrop.addEventListener('click',closeMenu);
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});});
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
+    })();
+  </script>
+</body>
+</html>

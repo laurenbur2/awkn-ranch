@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Call | Within Center</title>
+  <meta name="description" content="Schedule a free consultation with our team to learn whether ceremonial ketamine therapy is right for you.">
+  <link rel="icon" type="image/png" href="/awkn-ranch/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/within.css?v=20260413a">
+  <style>
+    body { background: var(--cream); }
+
+    .booking-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .booking-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .booking-header .eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .booking-header h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.8rem, 3.8vw, 2.6rem);
+      color: var(--dark);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .booking-header p {
+      font-size: 0.95rem;
+      color: var(--grey);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.85;
+    }
+
+    /* Calendar embed container */
+    .calendar-embed {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      min-height: 660px;
+      overflow: hidden;
+    }
+
+    /* Placeholder shown when no embed is configured yet */
+    .calendar-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 660px;
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--grey);
+    }
+    .calendar-placeholder .icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(201,148,62,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .calendar-placeholder h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .calendar-placeholder p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      max-width: 400px;
+      margin-bottom: 2rem;
+    }
+    .calendar-placeholder .cta-link {
+      display: inline-block;
+      padding: 0.85rem 2.2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #fff;
+      background: var(--gold);
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .calendar-placeholder .cta-link:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+
+    /* When a real embed (Calendly/Cal.com/etc.) is added */
+    .calendar-embed iframe {
+      width: 100%;
+      min-height: 660px;
+      border: none;
+    }
+
+    .booking-footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--grey);
+      line-height: 1.75;
+    }
+    .booking-footer a {
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .booking-wrap { padding: 7rem 1.25rem 3rem; }
+      .calendar-embed, .calendar-placeholder { min-height: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" id="siteNav">
+    <div class="nav-left">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span class="menu-toggle-bars"><span></span><span></span><span></span></span>
+        <span class="menu-label"></span>
+      </button>
+    </div>
+    <a href="../" class="nav-brand">
+      <span class="nav-brand-mark">Within Center</span>
+      <span class="nav-brand-sub">At AWKN Ranch &middot; Austin, TX</span>
+    </a>
+    <div class="nav-right">
+      <a href="../contact/" class="secondary-cta">Contact Us</a>
+      <a href="../ceremonial-ketamine/">Ceremonial Ketamine Therapy</a>
+    </div>
+  </nav>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="menu-panel" id="menuPanel" aria-hidden="true">
+    <ul>
+      <li><a href="../ceremonial-ketamine/" data-menu-link>Ceremonial Ketamine</a></li>
+      <li class="has-sub"><a href="../immersive-retreat/" data-submenu-toggle data-sub="menuSubRetreats">Immersive Retreats</a></li>
+      <li class="has-sub"><a href="../ceremonial-ketamine/" data-submenu-toggle data-sub="menuSubDay" style="flex-wrap:wrap;align-content:center;"><span style="width:calc(100% - 1.5rem);">Day Experiences<span style="display:block;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:0.7rem;color:var(--gold);margin-top:0.1rem;letter-spacing:0;text-transform:none;">No accommodations</span></span></a></li>
+      <li class="has-sub"><a href="../about/" data-submenu-toggle data-sub="menuSubAbout">About Us</a></li>
+      <li><a href="../contact/" data-menu-link>Contact Us</a></li>
+    </ul>
+    <div class="menu-panel-foot">
+      A sacred container for inner work, held at AWKN Ranch &mdash; Austin, Texas.
+    </div>
+  </aside>
+  <aside class="menu-sub" id="menuSubRetreats" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">All-Inclusive Retreats</span>
+    <ul>
+      <li><a href="../immersive-retreat/" data-menu-link>6-Day Retreat<span class="sub-tagline">Full immersive healing experience</span></a></li>
+      <li><a href="../immersive-retreat/3-day/" data-menu-link>3-Day Retreat<span class="sub-tagline">Condensed residential experience</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubDay" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">Our Packages</span>
+    <ul>
+      <li><a href="../ceremonial-ketamine/awkn/" data-menu-link>AWKN<span class="sub-tagline">Six guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/heal/" data-menu-link>Heal<span class="sub-tagline">Three guided ceremonies</span></a></li>
+      <li><a href="../ceremonial-ketamine/twin-flame/" data-menu-link>Couples Reset<span class="sub-tagline">One shared couples ceremony</span></a></li>
+      <li><a href="../ceremonial-ketamine/discover/" data-menu-link>Discover<span class="sub-tagline">One guided ceremony</span></a></li>
+    </ul>
+  </aside>
+  <aside class="menu-sub" id="menuSubAbout" aria-hidden="true">
+    <button class="menu-sub-back" data-sub-back>Menu</button>
+    <span class="sub-header">About Within</span>
+    <ul>
+      <li><a href="../about/" data-menu-link>About Us<span class="sub-tagline">Our story and approach</span></a></li>
+      <li><a href="../our-team/" data-menu-link>Our Team<span class="sub-tagline">Clinicians and guides</span></a></li>
+      <li><a href="../medication-management/" data-menu-link>Medication Management<span class="sub-tagline">Psychiatric care</span></a></li>
+      <li><a href="../faq/" data-menu-link>FAQ<span class="sub-tagline">Common questions</span></a></li>
+      <li><a href="../resources/" data-menu-link>Resources<span class="sub-tagline">Articles &amp; guides</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- ══ MAIN CONTENT ════════════════════════════════ -->
+  <div class="booking-wrap">
+    <div class="booking-header">
+      <div class="eyebrow">Free Consultation</div>
+      <h1>Book a Call</h1>
+      <p>Choose a time that works for you. We'll talk through your goals, answer questions, and help you find the right path.</p>
+    </div>
+
+    <div class="calendar-embed">
+      <!--
+        ═══════════════════════════════════════════════
+        EMBED YOUR CALENDAR HERE
+        ═══════════════════════════════════════════════
+
+        Replace the .calendar-placeholder div below with your embed code.
+
+        Calendly example:
+        <div class="calendly-inline-widget" data-url="https://calendly.com/YOUR-LINK" style="min-width:320px;height:660px;"></div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+        Cal.com example:
+        <iframe src="https://cal.com/YOUR-LINK" style="width:100%;min-height:660px;border:none;"></iframe>
+      -->
+      <div class="calendar-placeholder">
+        <div class="icon">&#128197;</div>
+        <h2>Schedule Your Consultation</h2>
+        <p>Our team is available Monday through Friday. Calls typically last 15&ndash;20 minutes.</p>
+        <a href="tel:5129692399" class="cta-link">Call Us Now &mdash; 512-969-2399</a>
+      </div>
+    </div>
+
+    <div class="booking-footer">
+      Prefer to reach out directly? Email <a href="mailto:intake@within.center">intake@within.center</a> or call <a href="tel:5129692399">512-969-2399</a>.
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════ -->
+  <footer style="background: var(--dark); padding: 2rem; text-align: center;">
+    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.8; max-width: 700px; margin: 0 auto;">
+      <strong style="color: rgba(255,255,255,0.6);">MEDICAL DISCLAIMER</strong> &middot;
+      This site is for informational purposes only, not medical advice. Consult your physician with health questions. In an emergency, call 911.
+    </p>
+    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 0.75rem;">
+      &copy; 2026 Hearth Space Health, Inc. &middot; Within Center is a sister practice to <a href="https://awkn.ranch" style="color: rgba(255,255,255,0.55);">AWKN Ranch</a>
+    </p>
+  </footer>
+
+  <script>
+    (function(){var n=document.getElementById('siteNav');function u(){if(window.scrollY>80)n.classList.add('scrolled');else n.classList.remove('scrolled');}window.addEventListener('scroll',u);u();})();
+    (function(){
+      var nav=document.getElementById('siteNav'),toggle=document.getElementById('menuToggle'),panel=document.getElementById('menuPanel'),backdrop=document.getElementById('menuBackdrop');
+      var allSubs=document.querySelectorAll('.menu-sub');
+      function isOpen(){return panel.classList.contains('open');}
+      function closeAllSubs(){
+        allSubs.forEach(function(s){s.classList.remove('open');});
+        document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.classList.remove('active');});
+      }
+      function openSub(subId,li){
+        closeAllSubs();
+        var s=document.getElementById(subId);
+        if(s){s.classList.add('open');li.classList.add('active');}
+      }
+      function openMenu(){panel.classList.add('open');backdrop.classList.add('open');nav.classList.add('menu-is-open');panel.setAttribute('aria-hidden','false');document.body.classList.add('menu-open');}
+      function closeMenu(){panel.classList.remove('open');backdrop.classList.remove('open');nav.classList.remove('menu-is-open');panel.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open');closeAllSubs();}
+      toggle.addEventListener('click',function(){isOpen()?closeMenu():openMenu();});
+      backdrop.addEventListener('click',closeMenu);
+      if(window.matchMedia('(hover: hover) and (pointer: fine)').matches){document.querySelectorAll('.menu-panel li.has-sub').forEach(function(li){li.addEventListener('mouseenter',function(){var a=li.querySelector('[data-sub]');if(a)openSub(a.getAttribute('data-sub'),li);});});allSubs.forEach(function(s){s.addEventListener('mouseleave',closeAllSubs);});document.querySelectorAll('.menu-panel li:not(.has-sub)').forEach(function(li){li.addEventListener('mouseenter',closeAllSubs);});}
+      document.querySelectorAll('[data-submenu-toggle]').forEach(function(a){
+        a.addEventListener('click',function(e){e.preventDefault();var li=a.parentNode;if(li.classList.contains('active')){closeAllSubs();}else{openSub(a.getAttribute('data-sub'),li);}});
+      });
+      document.querySelectorAll('[data-menu-link]').forEach(function(a){a.addEventListener('click',closeMenu);});document.querySelectorAll('[data-sub-back]').forEach(function(btn){btn.addEventListener('click',closeAllSubs);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen())closeMenu();});
+    })();
+  </script>
+</body>
+</html>

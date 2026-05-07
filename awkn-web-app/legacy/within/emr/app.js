@@ -1,0 +1,2483 @@
+// Within EMR — Application (non-module, uses global window.supabase from CDN)
+
+(function() {
+  'use strict';
+
+  var SUPABASE_URL = 'https://lnqxarwqckpmirpmixcw.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucXhhcndxY2twbWlycG1peGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMjAyMDIsImV4cCI6MjA4NzY5NjIwMn0.bw8b5XUcEFExlfTrR78Bu4Vdl7Oe_RtjlgvWA7SlQfo';
+
+  // ============================================
+  // HIPAA: INACTIVITY TIMEOUT (15 minutes)
+  // ============================================
+  var IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+  var IDLE_WARNING_MS = 13 * 60 * 1000; // warn at 13 min
+  var idleTimer = null;
+  var idleWarningTimer = null;
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    clearTimeout(idleWarningTimer);
+    dismissIdleWarning();
+
+    idleWarningTimer = setTimeout(function() {
+      showIdleWarning();
+    }, IDLE_WARNING_MS);
+
+    idleTimer = setTimeout(function() {
+      console.log('[HIPAA]', 'Session timed out due to inactivity');
+      auditLog('session_timeout', 'system', 'Auto-logout after 15 min inactivity');
+      performSecureLogout();
+    }, IDLE_TIMEOUT_MS);
+  }
+
+  function showIdleWarning() {
+    var existing = document.getElementById('idleWarningBanner');
+    if (existing) return;
+    var banner = document.createElement('div');
+    banner.id = 'idleWarningBanner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;background:#c53030;color:#fff;padding:0.75rem 1.5rem;text-align:center;font-size:0.875rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:1rem;';
+    banner.innerHTML = '<span>Your session will expire in 2 minutes due to inactivity.</span>' +
+      '<button onclick="document.getElementById(\'idleWarningBanner\').remove()" style="background:#fff;color:#c53030;border:none;padding:0.375rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;">Stay Logged In</button>';
+    document.body.appendChild(banner);
+  }
+
+  function dismissIdleWarning() {
+    var banner = document.getElementById('idleWarningBanner');
+    if (banner) banner.remove();
+  }
+
+  function performSecureLogout() {
+    // Clear all sensitive data
+    clearTimeout(idleTimer);
+    clearTimeout(idleWarningTimer);
+    localStorage.removeItem(CACHED_AUTH_KEY);
+    // Clear in-memory store
+    Object.keys(store).forEach(function(k) { store[k] = []; });
+    if (sb) {
+      sb.auth.signOut().then(function() {
+        window.location.href = getBasePath() + '/within/';
+      }).catch(function() {
+        window.location.href = getBasePath() + '/within/';
+      });
+    } else {
+      window.location.href = getBasePath() + '/within/';
+    }
+  }
+
+  function startIdleTracking() {
+    var events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    events.forEach(function(evt) {
+      document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+    resetIdleTimer();
+  }
+
+  // ============================================
+  // HIPAA: AUDIT LOGGING
+  // ============================================
+  function auditLog(action, resourceType, details) {
+    if (!sb) return;
+    var entry = {
+      user_email: currentUserEmail,
+      action: action,
+      resource_type: resourceType,
+      details: typeof details === 'string' ? details : JSON.stringify(details),
+      ip_hint: '',  // populated server-side if needed
+      timestamp: new Date().toISOString(),
+    };
+    // Fire and forget — don't block UI
+    sb.from('within_audit_log')
+      .insert(entry)
+      .then(function(result) {
+        if (result.error && result.error.code !== '42P01') {
+          console.warn('[HIPAA]', 'Audit log write failed:', result.error.message);
+        }
+      })
+      .catch(function() { /* non-critical */ });
+  }
+
+  // ============================================
+  // CONFIG & AUTH
+  // ============================================
+  // Admin email — only this user sees the Staff section
+  var ADMIN_EMAIL = 'justin@within.center';
+
+  // Default allowed emails (staff table extends this dynamically)
+  var DEFAULT_ALLOWED_EMAILS = [
+    'justin@within.center',
+    'lauren@awknranch.com',
+    'wdnaylor@gmail.com',
+  ];
+
+  var CACHED_AUTH_KEY = 'awkn-ranch-cached-auth';
+
+  var EMR_TABLES = {
+    patients: 'within_patients',
+    sessions: 'within_sessions',
+    assessments: 'within_assessments',
+    notes: 'within_notes',
+    appointments: 'within_appointments',
+    consents: 'within_consents',
+    inventory: 'within_inventory',
+    invoices: 'within_invoices',
+    vitals: 'within_session_vitals',
+    staff: 'within_staff',
+  };
+
+  // In-memory data store (loaded from Supabase)
+  var store = {
+    patients: [],
+    sessions: [],
+    assessments: [],
+    notes: [],
+    appointments: [],
+    consents: [],
+    inventory: [],
+    invoices: [],
+    staff: [],
+  };
+
+  var currentDate = new Date();
+  var vitalsCount = 1;
+  var currentUserEmail = '';
+  var isAdmin = false;
+  var sb = null; // supabase client
+
+  function getBasePath() {
+    var path = window.location.pathname;
+    var seg = path.split('/').filter(Boolean)[0];
+    if (seg && window.location.hostname.endsWith('.github.io')) {
+      return '/' + seg;
+    }
+    return '';
+  }
+
+  function waitForSupabase(callback) {
+    var attempts = 0;
+    var maxAttempts = 50;
+    function check() {
+      if (window.supabase && window.supabase.createClient) {
+        callback(null);
+      } else if (attempts >= maxAttempts) {
+        callback(new Error('Supabase library failed to load'));
+      } else {
+        attempts++;
+        setTimeout(check, 100);
+      }
+    }
+    check();
+  }
+
+  function initSupabase() {
+    if (sb) return sb;
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: 'awkn-ranch-auth',
+        flowType: 'pkce',
+      },
+    });
+    return sb;
+  }
+
+  // Build allowed emails list: defaults + active staff from DB
+  function getAllowedEmails() {
+    var emails = DEFAULT_ALLOWED_EMAILS.slice();
+    store.staff.forEach(function(s) {
+      var e = (s.email || '').toLowerCase();
+      if (e && s.status !== 'inactive' && emails.indexOf(e) === -1) {
+        emails.push(e);
+      }
+    });
+    return emails;
+  }
+
+  // ============================================
+  // INIT
+  // ============================================
+  function init() {
+    console.log('[WITHIN EMR]', 'Initializing...');
+
+    waitForSupabase(function(err) {
+      if (err) {
+        console.error('[WITHIN EMR]', 'Supabase failed to load:', err);
+        showToast('Failed to load. Please refresh.', 'error');
+        return;
+      }
+
+      initSupabase();
+      console.log('[WITHIN EMR]', 'Supabase client ready');
+
+      sb.auth.getSession().then(function(result) {
+        var session = result.data && result.data.session;
+        if (!session || !session.user) {
+          console.log('[WITHIN EMR]', 'No session, redirecting to login');
+          window.location.href = getBasePath() + '/within/';
+          return;
+        }
+
+        var email = (session.user.email || '').toLowerCase();
+        currentUserEmail = email;
+        isAdmin = (email === ADMIN_EMAIL);
+        console.log('[WITHIN EMR]', 'Session found:', email, 'admin:', isAdmin);
+
+        // Load staff list first to build dynamic allowed emails
+        loadTable('staff').then(function() {
+          var allowedEmails = getAllowedEmails();
+          if (allowedEmails.indexOf(email) === -1) {
+            console.log('[WITHIN EMR]', 'Unauthorized email');
+            window.location.href = getBasePath() + '/within/';
+            return;
+          }
+
+          // Set user info in UI
+          var name = session.user.user_metadata && session.user.user_metadata.full_name || email;
+          document.getElementById('userName').textContent = name;
+          document.getElementById('userEmail').textContent = email;
+          document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+
+          // Show staff nav for admin
+          if (isAdmin) {
+            document.getElementById('staffNavBtn').style.display = '';
+            document.getElementById('staffNavDivider').style.display = '';
+          }
+
+          // Show app
+          document.getElementById('loadingOverlay').classList.add('hidden');
+          document.getElementById('appShell').classList.remove('hidden');
+
+          // Load remaining data
+          loadAllData().then(function() {
+            renderDashboard();
+            renderScheduleDate();
+            setupEventListeners();
+            console.log('[WITHIN EMR]', 'Ready');
+            auditLog('login', 'session', 'EMR access granted');
+            startIdleTracking();
+          });
+        });
+      }).catch(function(error) {
+        console.error('[WITHIN EMR]', 'Session error:', error);
+        window.location.href = getBasePath() + '/within/';
+      });
+    });
+  }
+
+  // ============================================
+  // DATA LOADING
+  // ============================================
+  function loadAllData() {
+    return Promise.allSettled([
+      loadTable('patients'),
+      loadTable('sessions'),
+      loadTable('assessments'),
+      loadTable('notes'),
+      loadTable('appointments'),
+      loadTable('consents'),
+      loadTable('inventory'),
+      loadTable('invoices'),
+    ]);
+  }
+
+  function loadTable(key) {
+    return sb
+      .from(EMR_TABLES[key])
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(function(result) {
+        if (result.error) {
+          if (result.error.code === '42P01' || (result.error.message && result.error.message.includes('does not exist'))) {
+            console.log('[EMR] Table ' + EMR_TABLES[key] + ' not found, using empty data');
+            store[key] = [];
+            return;
+          }
+          throw result.error;
+        }
+        store[key] = result.data || [];
+      })
+      .catch(function(e) {
+        console.warn('[EMR] Failed to load ' + key + ':', e.message);
+        store[key] = [];
+      });
+  }
+
+  // ============================================
+  // SAVE HELPERS
+  // ============================================
+  function saveRecord(table, data) {
+    return sb
+      .from(EMR_TABLES[table])
+      .insert(data)
+      .select()
+      .single()
+      .then(function(result) {
+        if (result.error) throw result.error;
+        store[table].unshift(result.data);
+        auditLog('create', table, { record_id: result.data.id });
+        return result.data;
+      })
+      .catch(function(e) {
+        if (e.code === '42P01' || (e.message && e.message.includes('does not exist'))) {
+          var localRecord = Object.assign({ id: crypto.randomUUID(), created_at: new Date().toISOString() }, data);
+          store[table].unshift(localRecord);
+          showToast('Saved locally (database table pending setup)', 'info');
+          return localRecord;
+        }
+        throw e;
+      });
+  }
+
+  // ============================================
+  // TAB NAVIGATION
+  // ============================================
+  var TAB_TITLES = {
+    dashboard: ['Dashboard', 'Overview of your clinic'],
+    patients: ['Patients', 'Manage patient records'],
+    schedule: ['Schedule', 'Appointments and calendar'],
+    sessions: ['Treatment Sessions', 'Ketamine therapy session documentation'],
+    outcomes: ['Outcome Measures', 'PHQ-9, GAD-7, PCL-5 tracking'],
+    consents: ['Consents', 'Consent document management'],
+    notes: ['Clinical Notes', 'SOAP notes and documentation'],
+    inventory: ['Inventory', 'Controlled substance log (DEA compliance)'],
+    scribe: ['Scribe', 'Voice-to-text clinical documentation'],
+    billing: ['Billing', 'Invoices and payments'],
+    staff: ['Staff Management', 'Manage team access and permissions'],
+  };
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+      panel.classList.toggle('active', panel.dataset.panel === tabName);
+    });
+    var titles = TAB_TITLES[tabName] || [tabName, ''];
+    document.getElementById('pageTitle').textContent = titles[0];
+    document.getElementById('pageSubtitle').textContent = titles[1];
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
+    auditLog('view', tabName, 'Viewed ' + tabName + ' tab');
+    refreshTab(tabName);
+  }
+
+  window.switchTab = switchTab;
+
+  function refreshTab(tabName) {
+    switch (tabName) {
+      case 'dashboard': renderDashboard(); break;
+      case 'patients': renderPatients(); break;
+      case 'schedule': renderSchedule(); break;
+      case 'sessions': renderSessions(); break;
+      case 'outcomes': renderOutcomes(); break;
+      case 'consents': renderConsents(); break;
+      case 'scribe': renderScribe(); break;
+      case 'notes': renderNotes(); break;
+      case 'inventory': renderInventory(); break;
+      case 'billing': renderBilling(); break;
+      case 'staff': renderStaff(); break;
+    }
+  }
+
+  // ============================================
+  // EVENT LISTENERS
+  // ============================================
+  function setupEventListeners() {
+    // Sidebar nav
+    document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn) {
+      btn.addEventListener('click', function() { switchTab(btn.dataset.tab); });
+    });
+
+    // Sign out
+    document.getElementById('signOutBtn').addEventListener('click', function() {
+      auditLog('logout', 'session', 'User signed out');
+      performSecureLogout();
+    });
+
+    // Mobile menu
+    document.getElementById('menuToggle').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('hidden');
+    });
+    document.getElementById('sidebarOverlay').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.add('hidden');
+    });
+
+    // Modal close buttons
+    document.querySelectorAll('[data-close-modal]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.getElementById(btn.dataset.closeModal).classList.add('hidden');
+      });
+    });
+
+    // Modal overlay click to close
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.classList.add('hidden');
+      });
+    });
+
+    // Add Patient
+    document.getElementById('addPatientBtn').addEventListener('click', function() { openPatientModal(); });
+    document.getElementById('savePatientBtn').addEventListener('click', function() { savePatient(); });
+
+    // Import Patients
+    document.getElementById('importPatientsBtn').addEventListener('click', function() { openImportModal(); });
+    document.getElementById('importNextBtn').addEventListener('click', function() { showColumnMapping(); });
+    document.getElementById('importBackBtn').addEventListener('click', function() {
+      document.getElementById('importStep2').classList.add('hidden');
+      document.getElementById('importStep1').classList.remove('hidden');
+      document.getElementById('importNextBtn').classList.remove('hidden');
+      document.getElementById('importBackBtn').classList.add('hidden');
+      document.getElementById('importRunBtn').classList.add('hidden');
+    });
+    document.getElementById('importRunBtn').addEventListener('click', function() { runImport(); });
+
+    // CSV file input
+    var dropzone = document.getElementById('importDropzone');
+    var csvInput = document.getElementById('csvFileInput');
+    dropzone.addEventListener('click', function() { csvInput.click(); });
+    csvInput.addEventListener('change', function() {
+      if (csvInput.files.length > 0) handleCSVFile(csvInput.files[0]);
+    });
+    dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('drag-over'); });
+    dropzone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) handleCSVFile(e.dataTransfer.files[0]);
+    });
+
+    // New Session
+    document.getElementById('newSessionBtn').addEventListener('click', function() { openSessionModal(); });
+    document.getElementById('saveSessionBtn').addEventListener('click', function() { saveSession(); });
+
+    // New Assessment
+    document.getElementById('newAssessmentBtn').addEventListener('click', function() { openAssessmentModal(); });
+    document.getElementById('saveAssessmentBtn').addEventListener('click', function() { saveAssessment(); });
+
+    // New Note
+    document.getElementById('newNoteBtn').addEventListener('click', function() { openNoteModal(); });
+    document.getElementById('saveNoteBtn').addEventListener('click', function() { saveNote(); });
+
+    // New Appointment
+    document.getElementById('addApptBtn').addEventListener('click', function() { openApptModal(); });
+    document.getElementById('saveApptBtn').addEventListener('click', function() { saveAppointment(); });
+
+    // Add vitals entry
+    document.getElementById('addVitalEntry').addEventListener('click', addVitalsRow);
+
+    // Auto-calculate mg/kg
+    var doseInput = document.querySelector('[name="dose_mg"]');
+    var weightInput = document.querySelector('[name="weight_kg"]');
+    var mgkgInput = document.querySelector('[name="dose_mg_kg"]');
+    if (doseInput && weightInput) {
+      var calcMgKg = function() {
+        var dose = parseFloat(doseInput.value);
+        var weight = parseFloat(weightInput.value);
+        mgkgInput.value = (dose && weight) ? (dose / weight).toFixed(2) : '';
+      };
+      doseInput.addEventListener('input', calcMgKg);
+      weightInput.addEventListener('input', calcMgKg);
+    }
+
+    // Auto-sum PHQ-9
+    document.querySelectorAll('[name^="phq9_q"]').forEach(function(input) {
+      input.addEventListener('input', function() {
+        var sum = 0;
+        document.querySelectorAll('[name^="phq9_q"]').forEach(function(q) {
+          sum += parseInt(q.value) || 0;
+        });
+        var scoreInput = document.querySelector('#assessmentForm [name="score"]');
+        if (scoreInput) scoreInput.value = sum;
+      });
+    });
+
+    // Schedule navigation
+    document.getElementById('prevDay').addEventListener('click', function() {
+      currentDate.setDate(currentDate.getDate() - 1);
+      renderScheduleDate();
+      renderSchedule();
+    });
+    document.getElementById('nextDay').addEventListener('click', function() {
+      currentDate.setDate(currentDate.getDate() + 1);
+      renderScheduleDate();
+      renderSchedule();
+    });
+    document.getElementById('todayBtn').addEventListener('click', function() {
+      currentDate = new Date();
+      renderScheduleDate();
+      renderSchedule();
+    });
+
+    // Scribe
+    document.getElementById('scribeRecordBtn').addEventListener('click', function() { toggleScribeRecording(); });
+    document.getElementById('scribeClearBtn').addEventListener('click', function() {
+      if (scribeIsRecording) stopScribeRecording();
+      clearScribe();
+    });
+    document.getElementById('scribeGenerateBtn').addEventListener('click', function() { generateNoteFromTranscript(); });
+    document.getElementById('scribeSaveNoteBtn').addEventListener('click', function() { saveScribeNote(); });
+    // Update word count on manual edits
+    document.getElementById('scribeTranscript').addEventListener('input', function() {
+      scribeTranscriptText = this.innerText || this.textContent || '';
+      updateWordCount();
+    });
+    // Note format change — re-render dynamic fields
+    document.getElementById('scribeNoteFormat').addEventListener('change', function() {
+      renderNoteFormatFields();
+    });
+    // Patient select — load prior context
+    document.getElementById('scribePatientSelect').addEventListener('change', function() {
+      loadPriorContext();
+    });
+    // Prior context toggle
+    document.getElementById('scribePriorToggle').addEventListener('click', function() {
+      var body = document.getElementById('scribePriorBody');
+      if (body.style.display === 'none') {
+        body.style.display = '';
+        this.textContent = 'Hide';
+      } else {
+        body.style.display = 'none';
+        this.textContent = 'Show';
+      }
+    });
+    // Audio file upload for transcription
+    document.getElementById('scribeAudioInput').addEventListener('change', function() {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      showToast('Audio file selected: ' + file.name + '. Note: Browser-based transcription from audio files requires a server-side speech-to-text API. For now, please use the live microphone or paste transcript text.', 'info');
+    });
+
+    // Search handlers
+    var patientSearch = document.getElementById('patientSearch');
+    if (patientSearch) patientSearch.addEventListener('input', renderPatients);
+    var sessionSearch = document.getElementById('sessionSearch');
+    if (sessionSearch) sessionSearch.addEventListener('input', renderSessions);
+    var staffSearch = document.getElementById('staffSearch');
+    if (staffSearch) staffSearch.addEventListener('input', renderStaff);
+
+    // Staff management (admin only)
+    var addStaffBtn = document.getElementById('addStaffBtn');
+    if (addStaffBtn) addStaffBtn.addEventListener('click', function() { openStaffModal(); });
+    var saveStaffBtn = document.getElementById('saveStaffBtn');
+    if (saveStaffBtn) saveStaffBtn.addEventListener('click', function() { saveStaff(); });
+    var updateStaffBtn = document.getElementById('updateStaffBtn');
+    if (updateStaffBtn) updateStaffBtn.addEventListener('click', function() { updateStaff(); });
+
+    // Role preset permissions
+    var roleSelect = document.querySelector('[name="staff_role"]');
+    if (roleSelect) {
+      roleSelect.addEventListener('change', function() {
+        applyRolePresets(roleSelect.value, 'staffForm');
+      });
+    }
+  }
+
+  // ============================================
+  // RENDER FUNCTIONS
+  // ============================================
+
+  function renderDashboard() {
+    var activePatients = store.patients.filter(function(p) { return p.status !== 'inactive' && !p.is_archived; });
+    document.getElementById('statTotalPatients').textContent = activePatients.length;
+
+    var today = new Date().toISOString().slice(0, 10);
+    var todaySessions = store.appointments.filter(function(a) { return a.appt_date === today; });
+    document.getElementById('statTodaySessions').textContent = todaySessions.length;
+
+    var pendingConsents = store.consents.filter(function(c) { return c.status === 'sent' || c.status === 'pending'; });
+    document.getElementById('statPendingConsents').textContent = pendingConsents.length;
+
+    // Today's schedule on dashboard
+    var dashSchedule = document.getElementById('dashTodaySchedule');
+    if (todaySessions.length > 0) {
+      dashSchedule.innerHTML = todaySessions.slice(0, 5).map(function(a) {
+        var patient = store.patients.find(function(p) { return p.id === a.patient_id; });
+        var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+        return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);">' +
+          '<span style="font-weight:500;">' + name + '</span>' +
+          '<span style="color:var(--text-muted);font-size:0.8125rem;">' + (a.appt_time || '') + ' &middot; ' + formatApptType(a.appt_type) + '</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      dashSchedule.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">calendar_month</span><p>No sessions scheduled today</p></div>';
+    }
+
+    // Recent patients
+    var dashPatients = document.getElementById('dashRecentPatients');
+    if (activePatients.length > 0) {
+      dashPatients.innerHTML = activePatients.slice(0, 5).map(function(p) {
+        return '<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);">' +
+          '<span style="font-weight:500;">' + p.first_name + ' ' + p.last_name + '</span>' +
+          '<span class="badge badge--active">Active</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      dashPatients.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">group</span><p>No patients yet</p></div>';
+    }
+  }
+
+  function renderPatients() {
+    var searchEl = document.getElementById('patientSearch');
+    var search = searchEl ? searchEl.value.toLowerCase() : '';
+    var filtered = store.patients.filter(function(p) {
+      if (p.is_archived) return false;
+      if (!search) return true;
+      return (p.first_name + ' ' + p.last_name + ' ' + (p.email || '') + ' ' + (p.phone || '')).toLowerCase().indexOf(search) !== -1;
+    });
+
+    var tbody = document.getElementById('patientsBody');
+    var empty = document.getElementById('patientsEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('patientsTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('patientsTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(p) {
+      var sessionCount = store.sessions.filter(function(s) { return s.patient_id === p.id; }).length;
+      var lastSession = store.sessions.find(function(s) { return s.patient_id === p.id; });
+      return '<tr>' +
+        '<td style="font-weight:500;">' + p.first_name + ' ' + p.last_name + '</td>' +
+        '<td>' + (p.dob || '--') + '</td>' +
+        '<td>' + (p.phone || '--') + '</td>' +
+        '<td><span class="badge badge--' + (p.status === 'inactive' ? 'cancelled' : 'active') + '">' + (p.status || 'Active') + '</span></td>' +
+        '<td>' + (lastSession ? lastSession.session_date : '--') + '</td>' +
+        '<td>' + sessionCount + '</td>' +
+        '<td><div class="row-actions"><button title="View" onclick="viewPatient(\'' + p.id + '\')"><span class="material-symbols-outlined">visibility</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderScheduleDate() {
+    var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('scheduleDate').textContent = currentDate.toLocaleDateString('en-US', opts);
+    var apptDateInput = document.querySelector('#apptForm [name="appt_date"]');
+    if (apptDateInput) apptDateInput.value = currentDate.toISOString().slice(0, 10);
+  }
+
+  function renderSchedule() {
+    var dateStr = currentDate.toISOString().slice(0, 10);
+    var appts = store.appointments
+      .filter(function(a) { return a.appt_date === dateStr; })
+      .sort(function(a, b) { return (a.appt_time || '').localeCompare(b.appt_time || ''); });
+
+    var grid = document.getElementById('scheduleGrid');
+    var empty = document.getElementById('scheduleEmpty');
+
+    if (appts.length === 0) {
+      grid.innerHTML = '';
+      grid.appendChild(empty);
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    grid.innerHTML = appts.map(function(a) {
+      var patient = store.patients.find(function(p) { return p.id === a.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown Patient';
+      return '<div class="schedule-item">' +
+        '<div class="schedule-item__time">' + (a.appt_time || '--:--') + '</div>' +
+        '<div class="schedule-item__details">' +
+        '<div class="schedule-item__patient">' + name + '</div>' +
+        '<div class="schedule-item__type">' + formatApptType(a.appt_type) + '</div>' +
+        (a.room ? '<div class="schedule-item__room">' + a.room + '</div>' : '') +
+        '</div>' +
+        '<span class="badge badge--' + (a.status === 'completed' ? 'completed' : a.status === 'cancelled' ? 'cancelled' : 'active') + '">' + (a.status || 'Scheduled') + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderSessions() {
+    var searchEl = document.getElementById('sessionSearch');
+    var search = searchEl ? searchEl.value.toLowerCase() : '';
+    var filtered = store.sessions.filter(function(s) {
+      if (!search) return true;
+      var patient = store.patients.find(function(p) { return p.id === s.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : '';
+      return (name + ' ' + (s.route || '') + ' ' + (s.session_date || '')).toLowerCase().indexOf(search) !== -1;
+    });
+
+    var tbody = document.getElementById('sessionsBody');
+    var empty = document.getElementById('sessionsEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('sessionsTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('sessionsTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(s) {
+      var patient = store.patients.find(function(p) { return p.id === s.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+      return '<tr>' +
+        '<td>' + (s.session_date || '--') + '</td>' +
+        '<td style="font-weight:500;">' + name + '</td>' +
+        '<td>' + (s.route || '--') + '</td>' +
+        '<td>' + (s.dose_mg ? s.dose_mg + ' mg' : '--') + '</td>' +
+        '<td>' + (s.duration_min ? s.duration_min + ' min' : '--') + '</td>' +
+        '<td><span class="badge badge--' + (s.status === 'completed' ? 'completed' : s.status === 'in_progress' ? 'in-progress' : 'active') + '">' + (s.status || 'Documented') + '</span></td>' +
+        '<td><div class="row-actions"><button title="View"><span class="material-symbols-outlined">visibility</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderOutcomes() {
+    populatePatientSelects();
+  }
+
+  function renderConsents() {
+    var filtered = store.consents;
+    var tbody = document.getElementById('consentsBody');
+    var empty = document.getElementById('consentsEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('consentsTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('consentsTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(c) {
+      var patient = store.patients.find(function(p) { return p.id === c.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+      return '<tr>' +
+        '<td style="font-weight:500;">' + name + '</td>' +
+        '<td>' + (c.document_type || '--') + '</td>' +
+        '<td>' + (c.sent_date || '--') + '</td>' +
+        '<td><span class="badge badge--' + (c.status === 'signed' ? 'signed' : c.status === 'sent' ? 'sent' : 'draft') + '">' + (c.status || 'Draft') + '</span></td>' +
+        '<td>' + (c.signed_date || '--') + '</td>' +
+        '<td><div class="row-actions"><button title="View"><span class="material-symbols-outlined">visibility</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderNotes() {
+    var filtered = store.notes;
+    var tbody = document.getElementById('notesBody');
+    var empty = document.getElementById('notesEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('notesTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('notesTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(n) {
+      var patient = store.patients.find(function(p) { return p.id === n.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+      return '<tr>' +
+        '<td>' + (n.note_date || '--') + '</td>' +
+        '<td style="font-weight:500;">' + name + '</td>' +
+        '<td>' + formatNoteType(n.note_type) + '</td>' +
+        '<td>' + (n.provider || '--') + '</td>' +
+        '<td><span class="badge badge--' + (n.status === 'signed' ? 'signed' : 'draft') + '">' + (n.status || 'Draft') + '</span></td>' +
+        '<td><div class="row-actions"><button title="View"><span class="material-symbols-outlined">visibility</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderInventory() {
+    var filtered = store.inventory;
+    var tbody = document.getElementById('inventoryBody');
+    var empty = document.getElementById('inventoryEmpty');
+
+    // Calculate stock
+    var balance = 0;
+    var sorted = filtered.slice().sort(function(a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+    sorted.forEach(function(entry) {
+      if (entry.type === 'received') balance += (entry.quantity || 0);
+      else balance -= (entry.quantity || 0);
+    });
+    document.getElementById('invKetamineStock').textContent = balance > 0 ? balance.toFixed(1) : '--';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('inventoryTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('inventoryTable').classList.remove('hidden');
+
+    var runningBal = 0;
+    var rows = sorted.map(function(entry) {
+      if (entry.type === 'received') runningBal += (entry.quantity || 0);
+      else runningBal -= (entry.quantity || 0);
+      return '<tr>' +
+        '<td>' + (entry.entry_date || new Date(entry.created_at).toLocaleDateString()) + '</td>' +
+        '<td><span class="badge badge--' + (entry.type === 'received' ? 'active' : entry.type === 'administered' ? 'completed' : 'cancelled') + '">' + entry.type + '</span></td>' +
+        '<td>' + (entry.lot_number || '--') + '</td>' +
+        '<td>' + (entry.quantity || '--') + '</td>' +
+        '<td>' + runningBal.toFixed(1) + '</td>' +
+        '<td>' + (entry.witness || '--') + '</td>' +
+        '<td>' + (entry.notes || '--') + '</td>' +
+        '</tr>';
+    });
+
+    tbody.innerHTML = rows.join('');
+  }
+
+  function renderBilling() {
+    var filtered = store.invoices;
+    var tbody = document.getElementById('billingBody');
+    var empty = document.getElementById('billingEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('billingTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('billingTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(inv) {
+      var patient = store.patients.find(function(p) { return p.id === inv.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+      return '<tr>' +
+        '<td>' + (inv.invoice_number || '--') + '</td>' +
+        '<td style="font-weight:500;">' + name + '</td>' +
+        '<td>' + (inv.invoice_date || '--') + '</td>' +
+        '<td>$' + (inv.amount || 0).toFixed(2) + '</td>' +
+        '<td><span class="badge badge--' + (inv.status === 'paid' ? 'active' : inv.status === 'overdue' ? 'cancelled' : 'pending') + '">' + (inv.status || 'Pending') + '</span></td>' +
+        '<td><div class="row-actions"><button title="View"><span class="material-symbols-outlined">visibility</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+
+    // Summaries
+    var now = new Date();
+    var thisMonth = now.toISOString().slice(0, 7);
+    var collected = filtered.filter(function(i) { return i.status === 'paid' && i.invoice_date && i.invoice_date.startsWith(thisMonth); }).reduce(function(s, i) { return s + (i.amount || 0); }, 0);
+    var outstanding = filtered.filter(function(i) { return i.status !== 'paid'; }).reduce(function(s, i) { return s + (i.amount || 0); }, 0);
+    document.getElementById('billCollected').textContent = '$' + collected.toFixed(2);
+    document.getElementById('billOutstanding').textContent = '$' + outstanding.toFixed(2);
+  }
+
+  // ============================================
+  // MODAL HELPERS
+  // ============================================
+
+  function populatePatientSelects() {
+    var options = store.patients
+      .filter(function(p) { return !p.is_archived; })
+      .map(function(p) { return '<option value="' + p.id + '">' + p.first_name + ' ' + p.last_name + '</option>'; })
+      .join('');
+
+    ['sessionPatientSelect', 'assessmentPatientSelect', 'notePatientSelect', 'apptPatientSelect', 'outcomesPatientSelect'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        var firstOpt = el.querySelector('option:first-child');
+        el.innerHTML = '';
+        el.appendChild(firstOpt);
+        el.insertAdjacentHTML('beforeend', options);
+      }
+    });
+  }
+
+  function openPatientModal() {
+    document.getElementById('patientForm').reset();
+    document.getElementById('patientModalTitle').textContent = 'Add New Patient';
+    document.getElementById('patientModal').classList.remove('hidden');
+  }
+
+  function openSessionModal() {
+    document.getElementById('sessionForm').reset();
+    document.getElementById('sessionModalTitle').textContent = 'New Treatment Session';
+    document.querySelector('#sessionForm [name="session_date"]').value = new Date().toISOString().slice(0, 10);
+    vitalsCount = 1;
+    document.getElementById('vitalsLog').innerHTML = buildVitalsRow(0);
+    populatePatientSelects();
+    document.getElementById('sessionModal').classList.remove('hidden');
+  }
+
+  function openAssessmentModal() {
+    document.getElementById('assessmentForm').reset();
+    document.querySelector('#assessmentForm [name="assessment_date"]').value = new Date().toISOString().slice(0, 10);
+    populatePatientSelects();
+    document.getElementById('assessmentModal').classList.remove('hidden');
+  }
+
+  function openNoteModal() {
+    document.getElementById('noteForm').reset();
+    document.querySelector('#noteForm [name="note_date"]').value = new Date().toISOString().slice(0, 10);
+    populatePatientSelects();
+    document.getElementById('noteModal').classList.remove('hidden');
+  }
+
+  function openApptModal() {
+    document.getElementById('apptForm').reset();
+    document.querySelector('#apptForm [name="appt_date"]').value = currentDate.toISOString().slice(0, 10);
+    populatePatientSelects();
+    document.getElementById('apptModal').classList.remove('hidden');
+  }
+
+  // ============================================
+  // SAVE FUNCTIONS
+  // ============================================
+
+  function savePatient() {
+    var form = document.getElementById('patientForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var data = {
+      first_name: fd.get('first_name'),
+      last_name: fd.get('last_name'),
+      dob: fd.get('dob'),
+      sex: fd.get('sex'),
+      gender_identity: fd.get('gender_identity'),
+      pronouns: fd.get('pronouns'),
+      email: fd.get('email'),
+      phone: fd.get('phone'),
+      address: fd.get('address'),
+      emergency_name: fd.get('emergency_name'),
+      emergency_relationship: fd.get('emergency_relationship'),
+      emergency_phone: fd.get('emergency_phone'),
+      primary_diagnosis: fd.get('primary_diagnosis'),
+      referring_provider: fd.get('referring_provider'),
+      current_medications: fd.get('current_medications'),
+      allergies: fd.get('allergies'),
+      medical_history: fd.get('medical_history'),
+      contraindications: JSON.stringify({
+        hypertension: fd.get('contra_hypertension') === 'on',
+        psychosis: fd.get('contra_psychosis') === 'on',
+        pregnancy: fd.get('contra_pregnancy') === 'on',
+        allergy: fd.get('contra_allergy') === 'on',
+        substance: fd.get('contra_substance') === 'on',
+        icp: fd.get('contra_icp') === 'on',
+        hepatic: fd.get('contra_hepatic') === 'on',
+      }),
+      status: 'active',
+    };
+
+    saveRecord('patients', data).then(function() {
+      document.getElementById('patientModal').classList.add('hidden');
+      showToast('Patient added successfully', 'success');
+      renderPatients();
+      renderDashboard();
+    }).catch(function(e) {
+      showToast('Error saving patient: ' + e.message, 'error');
+    });
+  }
+
+  function saveSession() {
+    var form = document.getElementById('sessionForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+
+    // Collect vitals log
+    var vitals = [];
+    for (var i = 0; i < vitalsCount; i++) {
+      var time = fd.get('vital_time_' + i);
+      if (time) {
+        vitals.push({
+          time: time,
+          bp: fd.get('vital_bp_' + i),
+          hr: fd.get('vital_hr_' + i),
+          spo2: fd.get('vital_spo2_' + i),
+          rr: fd.get('vital_rr_' + i),
+          sedation: fd.get('vital_sedation_' + i),
+        });
+      }
+    }
+
+    var data = {
+      patient_id: fd.get('patient_id'),
+      session_date: fd.get('session_date'),
+      session_number: fd.get('session_number') ? parseInt(fd.get('session_number')) : null,
+      provider: fd.get('provider'),
+      route: fd.get('route'),
+      drug: fd.get('drug'),
+      weight_kg: fd.get('weight_kg') ? parseFloat(fd.get('weight_kg')) : null,
+      dose_mg: fd.get('dose_mg') ? parseFloat(fd.get('dose_mg')) : null,
+      dose_mg_kg: fd.get('dose_mg_kg') ? parseFloat(fd.get('dose_mg_kg')) : null,
+      duration_min: fd.get('duration_min') ? parseInt(fd.get('duration_min')) : null,
+      lot_number: fd.get('lot_number'),
+      lot_expiration: fd.get('lot_expiration'),
+      pre_vitals: JSON.stringify({
+        bp_systolic: fd.get('pre_bp_systolic'),
+        bp_diastolic: fd.get('pre_bp_diastolic'),
+        hr: fd.get('pre_hr'),
+        spo2: fd.get('pre_spo2'),
+        temp: fd.get('pre_temp'),
+        rr: fd.get('pre_rr'),
+      }),
+      post_vitals: JSON.stringify({
+        bp_systolic: fd.get('post_bp_systolic'),
+        bp_diastolic: fd.get('post_bp_diastolic'),
+        hr: fd.get('post_hr'),
+        spo2: fd.get('post_spo2'),
+      }),
+      intra_vitals: JSON.stringify(vitals),
+      last_meal_time: fd.get('last_meal_time'),
+      meds_today: fd.get('meds_today'),
+      pre_screening_notes: fd.get('pre_screening_notes'),
+      go_decision: fd.get('go_decision') === 'on',
+      side_effects: JSON.stringify({
+        nausea: fd.get('se_nausea') === 'on',
+        hypertension: fd.get('se_hypertension') === 'on',
+        dissociation: fd.get('se_dissociation') === 'on',
+        anxiety: fd.get('se_anxiety') === 'on',
+        headache: fd.get('se_headache') === 'on',
+        dizziness: fd.get('se_dizziness') === 'on',
+        blurred_vision: fd.get('se_blurred_vision') === 'on',
+      }),
+      adjunct_meds: fd.get('adjunct_meds'),
+      session_notes: fd.get('session_notes'),
+      discharge_criteria: JSON.stringify({
+        oriented: fd.get('dc_oriented') === 'on',
+        ambulating: fd.get('dc_ambulating') === 'on',
+        bp_normal: fd.get('dc_bp_normal') === 'on',
+        no_nausea: fd.get('dc_no_nausea') === 'on',
+        transport: fd.get('dc_transport') === 'on',
+      }),
+      discharge_time: fd.get('discharge_time'),
+      discharge_notes: fd.get('discharge_notes'),
+      status: 'completed',
+    };
+
+    saveRecord('sessions', data).then(function() {
+      document.getElementById('sessionModal').classList.add('hidden');
+      showToast('Treatment session saved', 'success');
+      renderSessions();
+      renderDashboard();
+    }).catch(function(e) {
+      showToast('Error saving session: ' + e.message, 'error');
+    });
+  }
+
+  function saveAssessment() {
+    var form = document.getElementById('assessmentForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+
+    // Collect item scores for PHQ-9
+    var items = {};
+    for (var i = 1; i <= 9; i++) {
+      var val = fd.get('phq9_q' + i);
+      if (val !== null && val !== '') items['q' + i] = parseInt(val);
+    }
+
+    var data = {
+      patient_id: fd.get('patient_id'),
+      assessment_date: fd.get('assessment_date'),
+      measure: fd.get('measure'),
+      score: parseInt(fd.get('score')),
+      item_scores: Object.keys(items).length > 0 ? JSON.stringify(items) : null,
+    };
+
+    // PHQ-9 Q9 alert
+    if (items.q9 && items.q9 > 0) {
+      showToast('ALERT: Patient endorsed suicidal ideation (PHQ-9 Item 9). Assess with C-SSRS.', 'error');
+    }
+
+    saveRecord('assessments', data).then(function() {
+      document.getElementById('assessmentModal').classList.add('hidden');
+      showToast('Assessment saved', 'success');
+      renderOutcomes();
+    }).catch(function(e) {
+      showToast('Error saving assessment: ' + e.message, 'error');
+    });
+  }
+
+  function saveNote() {
+    var form = document.getElementById('noteForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var data = {
+      patient_id: fd.get('patient_id'),
+      note_date: fd.get('note_date'),
+      note_type: fd.get('note_type'),
+      provider: fd.get('provider'),
+      subjective: fd.get('subjective'),
+      objective: fd.get('objective'),
+      assessment: fd.get('assessment'),
+      plan: fd.get('plan'),
+      status: 'draft',
+    };
+
+    saveRecord('notes', data).then(function() {
+      document.getElementById('noteModal').classList.add('hidden');
+      showToast('Note saved', 'success');
+      renderNotes();
+    }).catch(function(e) {
+      showToast('Error saving note: ' + e.message, 'error');
+    });
+  }
+
+  function saveAppointment() {
+    var form = document.getElementById('apptForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var data = {
+      patient_id: fd.get('patient_id'),
+      appt_date: fd.get('appt_date'),
+      appt_time: fd.get('appt_time'),
+      appt_type: fd.get('appt_type'),
+      provider: fd.get('provider'),
+      room: fd.get('room'),
+      notes: fd.get('notes'),
+      status: 'scheduled',
+    };
+
+    saveRecord('appointments', data).then(function() {
+      document.getElementById('apptModal').classList.add('hidden');
+      showToast('Appointment scheduled', 'success');
+      renderSchedule();
+      renderDashboard();
+    }).catch(function(e) {
+      showToast('Error saving appointment: ' + e.message, 'error');
+    });
+  }
+
+  // ============================================
+  // STAFF MANAGEMENT
+  // ============================================
+
+  function renderStaff() {
+    var searchEl = document.getElementById('staffSearch');
+    var search = searchEl ? searchEl.value.toLowerCase() : '';
+    var filtered = store.staff.filter(function(s) {
+      if (!search) return true;
+      return ((s.first_name || '') + ' ' + (s.last_name || '') + ' ' + (s.email || '') + ' ' + (s.role || '')).toLowerCase().indexOf(search) !== -1;
+    });
+
+    var tbody = document.getElementById('staffBody');
+    var empty = document.getElementById('staffEmpty');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      document.getElementById('staffTable').classList.add('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    document.getElementById('staffTable').classList.remove('hidden');
+
+    tbody.innerHTML = filtered.map(function(s) {
+      var perms = s.permissions || {};
+      var permList = Object.keys(perms).filter(function(k) { return perms[k]; });
+      var permDisplay = permList.length > 0 ? permList.length + ' sections' : 'None';
+      var statusClass = s.status === 'inactive' ? 'cancelled' : 'active';
+      var lastLogin = s.last_login_at ? new Date(s.last_login_at).toLocaleDateString() : 'Never';
+
+      return '<tr>' +
+        '<td style="font-weight:500;">' + (s.first_name || '') + ' ' + (s.last_name || '') +
+        (s.title ? '<br><span style="font-weight:400;font-size:0.75rem;color:var(--text-muted);">' + s.title + '</span>' : '') + '</td>' +
+        '<td>' + (s.email || '--') + '</td>' +
+        '<td><span class="badge badge--' + getRoleBadge(s.role) + '">' + formatRole(s.role) + '</span></td>' +
+        '<td style="font-size:0.8125rem;color:var(--text-muted);">' + permDisplay + '</td>' +
+        '<td><span class="badge badge--' + statusClass + '">' + (s.status || 'Active') + '</span></td>' +
+        '<td style="font-size:0.8125rem;color:var(--text-muted);">' + lastLogin + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button title="Edit" onclick="editStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">edit</span></button>' +
+        (s.status !== 'inactive' ? '<button title="Revoke Access" onclick="revokeStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">block</span></button>' : '<button title="Reactivate" onclick="reactivateStaff(\'' + s.id + '\')"><span class="material-symbols-outlined">check_circle</span></button>') +
+        '</div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function formatRole(role) {
+    var map = { admin: 'Admin', provider: 'Provider', staff: 'Staff', readonly: 'Read Only' };
+    return map[role] || role || '--';
+  }
+
+  function getRoleBadge(role) {
+    var map = { admin: 'active', provider: 'completed', staff: 'sent', readonly: 'draft' };
+    return map[role] || 'draft';
+  }
+
+  function applyRolePresets(role, formId) {
+    var prefix = formId === 'staffForm' ? 'perm_' : 'edit_perm_';
+    var form = document.getElementById(formId);
+    var allPerms = ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'];
+    var presets = {
+      admin: allPerms,
+      provider: ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes'],
+      staff: ['patients', 'schedule'],
+      readonly: ['patients', 'schedule'],
+    };
+    var allowed = presets[role] || [];
+    allPerms.forEach(function(p) {
+      var cb = form.querySelector('[name="' + prefix + p + '"]');
+      if (cb) cb.checked = allowed.indexOf(p) !== -1;
+    });
+  }
+
+  function openStaffModal() {
+    document.getElementById('staffForm').reset();
+    document.getElementById('staffModalTitle').textContent = 'Add Staff Member';
+    // Apply default presets
+    applyRolePresets('', 'staffForm');
+    document.getElementById('staffModal').classList.remove('hidden');
+  }
+
+  function getPermissions(formId, prefix) {
+    var form = document.getElementById(formId);
+    var perms = {};
+    ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'].forEach(function(p) {
+      var cb = form.querySelector('[name="' + prefix + p + '"]');
+      if (cb) perms[p] = cb.checked;
+    });
+    return perms;
+  }
+
+  function saveStaff() {
+    var form = document.getElementById('staffForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var email = (fd.get('staff_email') || '').toLowerCase().trim();
+
+    // Check for duplicate
+    var existing = store.staff.find(function(s) { return (s.email || '').toLowerCase() === email; });
+    if (existing) {
+      showToast('A staff member with this email already exists', 'error');
+      return;
+    }
+
+    var data = {
+      first_name: fd.get('staff_first_name'),
+      last_name: fd.get('staff_last_name'),
+      email: email,
+      role: fd.get('staff_role'),
+      title: fd.get('staff_title'),
+      permissions: getPermissions('staffForm', 'perm_'),
+      status: 'active',
+      added_by: currentUserEmail,
+    };
+
+    saveRecord('staff', data).then(function() {
+      document.getElementById('staffModal').classList.add('hidden');
+      showToast('Staff member added — they can now sign in with Google', 'success');
+      auditLog('staff_add', 'staff', { email: email, role: data.role });
+      renderStaff();
+    }).catch(function(e) {
+      showToast('Error adding staff: ' + e.message, 'error');
+    });
+  }
+
+  window.editStaff = function(id) {
+    var staff = store.staff.find(function(s) { return s.id === id; });
+    if (!staff) return;
+
+    var form = document.getElementById('editStaffForm');
+    form.querySelector('[name="edit_staff_id"]').value = staff.id;
+    form.querySelector('[name="edit_staff_first_name"]').value = staff.first_name || '';
+    form.querySelector('[name="edit_staff_last_name"]').value = staff.last_name || '';
+    form.querySelector('[name="edit_staff_email"]').value = staff.email || '';
+    form.querySelector('[name="edit_staff_role"]').value = staff.role || 'staff';
+    form.querySelector('[name="edit_staff_title"]').value = staff.title || '';
+    form.querySelector('[name="edit_staff_status"]').value = staff.status || 'active';
+
+    // Set permission checkboxes
+    var perms = staff.permissions || {};
+    ['patients', 'schedule', 'sessions', 'outcomes', 'consents', 'notes', 'inventory', 'billing'].forEach(function(p) {
+      var cb = form.querySelector('[name="edit_perm_' + p + '"]');
+      if (cb) cb.checked = !!perms[p];
+    });
+
+    document.getElementById('editStaffModal').classList.remove('hidden');
+  };
+
+  function updateStaff() {
+    var form = document.getElementById('editStaffForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    var fd = new FormData(form);
+    var id = fd.get('edit_staff_id');
+
+    var updates = {
+      first_name: fd.get('edit_staff_first_name'),
+      last_name: fd.get('edit_staff_last_name'),
+      role: fd.get('edit_staff_role'),
+      title: fd.get('edit_staff_title'),
+      status: fd.get('edit_staff_status'),
+      permissions: getPermissions('editStaffForm', 'edit_perm_'),
+    };
+
+    sb.from(EMR_TABLES.staff)
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+      .then(function(result) {
+        if (result.error) throw result.error;
+        // Update in-memory store
+        var idx = store.staff.findIndex(function(s) { return s.id === id; });
+        if (idx !== -1) store.staff[idx] = result.data;
+        document.getElementById('editStaffModal').classList.add('hidden');
+        showToast('Staff member updated', 'success');
+        auditLog('staff_update', 'staff', { staff_id: id, changes: updates });
+        renderStaff();
+      }).catch(function(e) {
+        // Fallback for missing table
+        if (e.code === '42P01' || (e.message && e.message.indexOf('does not exist') !== -1)) {
+          var idx = store.staff.findIndex(function(s) { return s.id === id; });
+          if (idx !== -1) Object.assign(store.staff[idx], updates);
+          document.getElementById('editStaffModal').classList.add('hidden');
+          showToast('Staff updated locally', 'info');
+          renderStaff();
+        } else {
+          showToast('Error updating staff: ' + e.message, 'error');
+        }
+      });
+  }
+
+  window.revokeStaff = function(id) {
+    if (!confirm('Revoke access for this staff member? They will no longer be able to sign in.')) return;
+    sb.from(EMR_TABLES.staff)
+      .update({ status: 'inactive' })
+      .eq('id', id)
+      .then(function(result) {
+        if (result.error && result.error.code !== '42P01') {
+          showToast('Error: ' + result.error.message, 'error');
+          return;
+        }
+        var s = store.staff.find(function(x) { return x.id === id; });
+        if (s) s.status = 'inactive';
+        showToast('Access revoked', 'success');
+        renderStaff();
+      });
+  };
+
+  window.reactivateStaff = function(id) {
+    sb.from(EMR_TABLES.staff)
+      .update({ status: 'active' })
+      .eq('id', id)
+      .then(function(result) {
+        if (result.error && result.error.code !== '42P01') {
+          showToast('Error: ' + result.error.message, 'error');
+          return;
+        }
+        var s = store.staff.find(function(x) { return x.id === id; });
+        if (s) s.status = 'active';
+        showToast('Access reactivated', 'success');
+        renderStaff();
+      });
+  };
+
+  // ============================================
+  // SCRIBE — Ambient clinical documentation
+  // ============================================
+
+  var scribeRecognition = null;
+  var scribeIsRecording = false;
+  var scribeStartTime = null;
+  var scribeTimerInterval = null;
+  var scribeTranscriptText = '';
+  var scribeInterimText = '';
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // Note format definitions
+  var NOTE_FORMATS = {
+    soap: {
+      label: 'SOAP Note',
+      fields: [
+        { id: 'S', label: 'Subjective', placeholder: 'Patient\'s reported symptoms, feelings, complaints, and history of present illness...', rows: 4 },
+        { id: 'O', label: 'Objective', placeholder: 'Vitals, mental status exam, observed behavior, medications administered, clinical findings...', rows: 4 },
+        { id: 'A', label: 'Assessment', placeholder: 'Clinical impressions, diagnosis, treatment response, risk evaluation...', rows: 3 },
+        { id: 'P', label: 'Plan', placeholder: 'Follow-up schedule, medication changes, referrals, next session plan, homework...', rows: 3 },
+      ],
+    },
+    dap: {
+      label: 'DAP Note',
+      fields: [
+        { id: 'D', label: 'Data', placeholder: 'Objective and subjective information gathered during the session...', rows: 5 },
+        { id: 'A', label: 'Assessment', placeholder: 'Clinical interpretation of the data, progress toward goals, diagnostic impressions...', rows: 4 },
+        { id: 'P', label: 'Plan', placeholder: 'Next steps, homework, interventions planned, referrals, follow-up...', rows: 3 },
+      ],
+    },
+    birp: {
+      label: 'BIRP Note',
+      fields: [
+        { id: 'B', label: 'Behavior', placeholder: 'Observable behavior, presentation, affect, what the client did/said...', rows: 4 },
+        { id: 'I', label: 'Intervention', placeholder: 'Therapeutic techniques used, medications administered, clinical actions taken...', rows: 4 },
+        { id: 'R', label: 'Response', placeholder: 'Client\'s response to interventions, changes in affect/behavior, insights gained...', rows: 3 },
+        { id: 'P', label: 'Plan', placeholder: 'Follow-up, homework, next session goals, referrals...', rows: 3 },
+      ],
+    },
+    intake: {
+      label: 'Intake Note',
+      fields: [
+        { id: 'CC', label: 'Chief Complaint', placeholder: 'Reason for seeking treatment in patient\'s own words...', rows: 2 },
+        { id: 'HPI', label: 'History of Present Illness', placeholder: 'Onset, duration, severity, associated symptoms, previous treatments...', rows: 4 },
+        { id: 'PMH', label: 'Past Medical/Psychiatric History', placeholder: 'Previous diagnoses, hospitalizations, medication trials, therapy history...', rows: 3 },
+        { id: 'SH', label: 'Social History', placeholder: 'Living situation, relationships, employment, substance use, support system...', rows: 3 },
+        { id: 'MSE', label: 'Mental Status Exam', placeholder: 'Appearance, behavior, speech, mood, affect, thought process/content, cognition, insight, judgment...', rows: 3 },
+        { id: 'IMP', label: 'Impressions & Plan', placeholder: 'Diagnostic impressions, treatment recommendations, safety plan if needed...', rows: 3 },
+      ],
+    },
+    treatment_plan: {
+      label: 'Treatment Plan',
+      fields: [
+        { id: 'DX', label: 'Diagnoses', placeholder: 'Primary and secondary diagnoses with ICD-10 codes...', rows: 2 },
+        { id: 'GOALS', label: 'Treatment Goals', placeholder: 'Measurable goals with target timeframes...', rows: 4 },
+        { id: 'OBJ', label: 'Objectives', placeholder: 'Specific behavioral objectives for each goal...', rows: 4 },
+        { id: 'INT', label: 'Interventions', placeholder: 'Planned therapeutic interventions, frequency, modalities...', rows: 3 },
+        { id: 'PROG', label: 'Prognosis', placeholder: 'Expected outcome, barriers to treatment, strengths...', rows: 2 },
+      ],
+    },
+    progress: {
+      label: 'Progress Note',
+      fields: [
+        { id: 'PRES', label: 'Presentation', placeholder: 'Client presentation, mood, affect, appearance...', rows: 3 },
+        { id: 'CONTENT', label: 'Session Content', placeholder: 'Topics discussed, themes explored, interventions used...', rows: 5 },
+        { id: 'PROG', label: 'Progress Toward Goals', placeholder: 'Movement toward treatment goals, barriers, changes noted...', rows: 3 },
+        { id: 'PLAN', label: 'Plan', placeholder: 'Next session focus, homework, adjustments to treatment plan...', rows: 3 },
+      ],
+    },
+  };
+
+  // CPT code database for ketamine/behavioral health
+  var CPT_CODES = {
+    ketamine_session: [
+      { code: '96365', desc: 'IV infusion, initial (up to 1 hr)', justification: 'Ketamine IV infusion administered under direct supervision' },
+      { code: '96366', desc: 'IV infusion, each additional hr', justification: 'Extended infusion beyond initial hour' },
+      { code: '96372', desc: 'Therapeutic injection (IM/SQ)', justification: 'Intramuscular ketamine injection administered' },
+    ],
+    psychotherapy: [
+      { code: '90834', desc: 'Individual psychotherapy, 45 min', justification: 'Individual psychotherapy session, 38-52 minutes' },
+      { code: '90837', desc: 'Individual psychotherapy, 60 min', justification: 'Individual psychotherapy session, 53+ minutes' },
+      { code: '90833', desc: 'Psychotherapy add-on, 30 min', justification: 'Psychotherapy add-on to E/M service, 16-37 minutes' },
+    ],
+    evaluation: [
+      { code: '99213', desc: 'Office visit, established, low', justification: 'Low complexity medical decision making' },
+      { code: '99214', desc: 'Office visit, established, moderate', justification: 'Moderate complexity medical decision making' },
+      { code: '99215', desc: 'Office visit, established, high', justification: 'High complexity medical decision making' },
+      { code: '99205', desc: 'Office visit, new, high', justification: 'New patient, high complexity medical decision making' },
+    ],
+    integration: [
+      { code: '90834', desc: 'Individual psychotherapy, 45 min', justification: 'Integration therapy session following ketamine treatment' },
+      { code: '90847', desc: 'Family/couples therapy with patient', justification: 'Family or couples integration session' },
+    ],
+    crisis: [
+      { code: '90839', desc: 'Crisis psychotherapy, first 60 min', justification: 'Crisis psychotherapy intervention, initial hour' },
+      { code: '90840', desc: 'Crisis psychotherapy, add-on 30 min', justification: 'Additional crisis psychotherapy time' },
+    ],
+    group: [
+      { code: '90853', desc: 'Group psychotherapy', justification: 'Group therapy session' },
+    ],
+    misc: [
+      { code: '90785', desc: 'Interactive complexity add-on', justification: 'Communication barriers, third-party involvement, or need for play/props' },
+      { code: '90791', desc: 'Psychiatric diagnostic evaluation', justification: 'Initial psychiatric diagnostic evaluation' },
+      { code: '96127', desc: 'Brief emotional/behavioral assessment', justification: 'Standardized instrument administered (PHQ-9, GAD-7, etc.)' },
+    ],
+  };
+
+  // Keyword classification sets
+  var KEYWORDS = {
+    subjective: ['reports', 'states', 'feels', 'feeling', 'complains', 'describes', 'says', 'mentioned', 'denies', 'endorses', 'pain', 'mood', 'sleep', 'appetite', 'anxiety', 'depression', 'stress', 'worried', 'hopeful', 'better', 'worse', 'symptom', 'history', 'prior', 'previous', 'last session', 'since last', 'been experiencing', 'noticed', 'concerned', 'fear', 'trigger', 'nightmare', 'flashback', 'intrusive', 'suicidal', 'self-harm', 'irritable', 'overwhelmed', 'hopeless', 'grief', 'trauma', 'relationship', 'work stress', 'panic', 'racing thoughts'],
+    objective: ['vitals', 'blood pressure', 'bp', 'heart rate', 'hr', 'pulse', 'spo2', 'oxygen', 'temperature', 'temp', 'weight', 'administered', 'dose', 'mg', 'milligram', 'iv', 'im', 'intramuscular', 'intravenous', 'sublingual', 'infusion', 'oriented', 'alert', 'pupils', 'observed', 'appeared', 'presentation', 'affect', 'cooperative', 'calm', 'agitated', 'drowsy', 'sedation', 'nausea', 'dissociation', 'tolerated', 'vital signs', 'well-groomed', 'eye contact', 'psychomotor', 'speech rate', 'thought process', 'linear', 'tangential', 'congruent', 'flat', 'labile', 'blunted', 'euthymic', 'dysphoric'],
+    assessment: ['diagnosis', 'impression', 'response', 'responded', 'improvement', 'progress', 'prognosis', 'condition', 'stable', 'improved', 'declined', 'treatment resistant', 'remission', 'therapeutic', 'effective', 'clinical', 'assessment', 'phq', 'gad', 'pcl', 'score', 'severity', 'mild', 'moderate', 'severe', 'acute', 'chronic', 'comorbid', 'differential', 'rule out', 'consistent with', 'meets criteria', 'functional impairment'],
+    plan: ['plan', 'follow up', 'follow-up', 'next session', 'schedule', 'recommend', 'continue', 'increase', 'decrease', 'adjust', 'taper', 'refer', 'referral', 'prescribe', 'medication', 'return', 'week', 'weeks', 'monitor', 'reassess', 'integration', 'homework', 'safety plan', 'coping skills', 'grounding', 'mindfulness', 'journal', 'exercise', 'goals', 'discharge', 'labs', 'blood work'],
+    risk: ['suicidal', 'suicide', 'self-harm', 'homicidal', 'homicide', 'si', 'hi', 'ideation', 'intent', 'plan to harm', 'overdose', 'cutting', 'safety', 'crisis', 'ER', 'emergency', 'hospitalization', 'danger', 'lethal means', 'firearms', 'weapons'],
+    dissociative: ['dissociation', 'out of body', 'floating', 'ego dissolution', 'mystical', 'transcendent', 'visionary', 'dreamlike', 'altered state', 'k-hole', 'ketamine experience', 'psychedelic', 'set and setting', 'intention', 'surrender', 'breakthrough'],
+  };
+
+  function initScribeRecognition() {
+    if (!SpeechRecognition) return null;
+    var recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = function(event) {
+      var interim = '';
+      var final = '';
+      for (var i = event.resultIndex; i < event.results.length; i++) {
+        var t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) { final += t + ' '; }
+        else { interim = t; }
+      }
+      if (final) { scribeTranscriptText += final; scribeInterimText = ''; }
+      else { scribeInterimText = interim; }
+      renderScribeTranscript();
+      updateWordCount();
+    };
+    recognition.onerror = function(event) {
+      if (event.error === 'not-allowed') {
+        showToast('Microphone access denied. Allow microphone in browser settings.', 'error');
+        stopScribeRecording();
+      } else if (event.error === 'no-speech' && scribeIsRecording) {
+        try { recognition.start(); } catch (e) {}
+      }
+    };
+    recognition.onend = function() {
+      if (scribeIsRecording) { try { recognition.start(); } catch (e) {} }
+    };
+    return recognition;
+  }
+
+  function startScribeRecording() {
+    if (!SpeechRecognition) {
+      showToast('Voice not supported in this browser. Use Chrome, or type/paste notes directly.', 'error');
+      return;
+    }
+    if (!scribeRecognition) scribeRecognition = initScribeRecognition();
+    if (!scribeRecognition) return;
+    try {
+      scribeRecognition.start();
+      scribeIsRecording = true;
+      scribeStartTime = Date.now();
+      document.getElementById('scribeRecordBtn').classList.add('recording');
+      document.getElementById('scribeRecordIcon').textContent = 'stop';
+      document.getElementById('scribeRecordLabel').textContent = 'End Session';
+      document.getElementById('scribeStatus').textContent = 'Listening...';
+      document.getElementById('scribeStatus').classList.add('listening');
+      scribeTimerInterval = setInterval(function() {
+        var elapsed = Math.floor((Date.now() - scribeStartTime) / 1000);
+        document.getElementById('scribeTimer').textContent = String(Math.floor(elapsed / 60)).padStart(2, '0') + ':' + String(elapsed % 60).padStart(2, '0');
+      }, 1000);
+      // Load prior context for selected patient
+      loadPriorContext();
+      auditLog('scribe_start', 'scribe', 'Ambient session started');
+    } catch (e) {
+      showToast('Could not start recording: ' + e.message, 'error');
+    }
+  }
+
+  function stopScribeRecording() {
+    scribeIsRecording = false;
+    if (scribeRecognition) try { scribeRecognition.stop(); } catch (e) {}
+    if (scribeInterimText) { scribeTranscriptText += scribeInterimText + ' '; scribeInterimText = ''; renderScribeTranscript(); }
+    document.getElementById('scribeRecordBtn').classList.remove('recording');
+    document.getElementById('scribeRecordIcon').textContent = 'mic';
+    document.getElementById('scribeRecordLabel').textContent = 'Start Session';
+    document.getElementById('scribeStatus').textContent = 'Session ended — Generate note when ready';
+    document.getElementById('scribeStatus').classList.remove('listening');
+    clearInterval(scribeTimerInterval);
+    updateWordCount();
+    auditLog('scribe_stop', 'scribe', 'Ambient session ended');
+  }
+
+  function toggleScribeRecording() {
+    if (scribeIsRecording) stopScribeRecording();
+    else startScribeRecording();
+  }
+
+  function renderScribeTranscript() {
+    var el = document.getElementById('scribeTranscript');
+    var html = scribeTranscriptText;
+    if (scribeInterimText) html += '<span class="interim">' + scribeInterimText + '</span>';
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function updateWordCount() {
+    var text = getScribeText();
+    var count = text.trim() ? text.trim().split(/\s+/).length : 0;
+    document.getElementById('scribeWordCount').textContent = count + ' words';
+  }
+
+  function getScribeText() {
+    var el = document.getElementById('scribeTranscript');
+    return el.innerText || el.textContent || '';
+  }
+
+  // Load prior session context for continuity
+  function loadPriorContext() {
+    var patientId = document.getElementById('scribePatientSelect').value;
+    var ctx = document.getElementById('scribePriorContext');
+    if (!patientId) { ctx.style.display = 'none'; return; }
+
+    var priorNotes = store.notes.filter(function(n) { return n.patient_id === patientId; }).slice(0, 3);
+    var priorSessions = store.sessions.filter(function(s) { return s.patient_id === patientId; }).slice(0, 2);
+
+    if (priorNotes.length === 0 && priorSessions.length === 0) { ctx.style.display = 'none'; return; }
+
+    var html = '';
+    if (priorNotes.length > 0) {
+      var lastNote = priorNotes[0];
+      html += '<div style="margin-bottom:0.5rem;"><strong>Last note (' + (lastNote.note_date || 'undated') + '):</strong></div>';
+      if (lastNote.plan) html += '<div style="margin-bottom:0.25rem;"><em>Plan:</em> ' + lastNote.plan.substring(0, 200) + (lastNote.plan.length > 200 ? '...' : '') + '</div>';
+      if (lastNote.assessment) html += '<div><em>Assessment:</em> ' + lastNote.assessment.substring(0, 200) + (lastNote.assessment.length > 200 ? '...' : '') + '</div>';
+    }
+    if (priorSessions.length > 0) {
+      var lastSession = priorSessions[0];
+      html += '<div style="margin-top:0.5rem;"><strong>Last treatment (' + (lastSession.session_date || 'undated') + '):</strong> ';
+      html += (lastSession.route || '?') + ' ' + (lastSession.dose_mg ? lastSession.dose_mg + 'mg' : '') + ' ' + (lastSession.duration_min ? lastSession.duration_min + 'min' : '') + '</div>';
+    }
+
+    document.getElementById('scribePriorBody').innerHTML = html;
+    ctx.style.display = '';
+  }
+
+  // Render dynamic note format fields
+  function renderNoteFormatFields() {
+    var format = document.getElementById('scribeNoteFormat').value;
+    var def = NOTE_FORMATS[format];
+    if (!def) return;
+
+    document.getElementById('scribeNoteFormatLabel').textContent = def.label;
+    var html = '';
+    def.fields.forEach(function(f) {
+      html += '<div class="form-group">' +
+        '<label>' + f.label + '</label>' +
+        '<textarea id="scribeField_' + f.id + '" rows="' + f.rows + '" placeholder="' + f.placeholder + '"></textarea>' +
+        '</div>';
+    });
+    document.getElementById('scribeNoteFields').innerHTML = html;
+  }
+
+  function clearScribe() {
+    scribeTranscriptText = '';
+    scribeInterimText = '';
+    document.getElementById('scribeTranscript').innerHTML = '';
+    document.getElementById('scribeTimer').textContent = '00:00';
+    document.getElementById('scribeExtract_route').value = '';
+    document.getElementById('scribeExtract_dose').value = '';
+    document.getElementById('scribeExtract_duration').value = '';
+    document.getElementById('scribeExtract_response').value = '';
+    document.getElementById('scribeExtract_sideEffects').value = '';
+    document.getElementById('scribeExtract_mood').value = '';
+    document.getElementById('scribeInsights').style.display = 'none';
+    document.getElementById('scribeCoding').style.display = 'none';
+    document.getElementById('scribeAVS').style.display = 'none';
+    renderNoteFormatFields();
+    updateWordCount();
+  }
+
+  // Main generation engine
+  function generateNoteFromTranscript() {
+    var text = getScribeText().trim();
+    if (!text) { showToast('No transcript to generate from. Record or type notes first.', 'info'); return; }
+
+    var format = document.getElementById('scribeNoteFormat').value;
+    var encounterType = document.getElementById('scribeEncounterType').value;
+    var detailLevel = document.getElementById('scribeDetailLevel').value;
+    var lower = text.toLowerCase();
+    var sentences = text.split(/[.!?]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+
+    // Classify sentences
+    var classified = classifySentences(sentences);
+
+    // Generate note based on format
+    if (format === 'soap') generateSOAP(classified, encounterType, detailLevel);
+    else if (format === 'dap') generateDAP(classified, encounterType, detailLevel);
+    else if (format === 'birp') generateBIRP(classified, encounterType, detailLevel);
+    else if (format === 'intake') generateIntake(classified, text, detailLevel);
+    else if (format === 'treatment_plan') generateTreatmentPlan(classified, text, detailLevel);
+    else if (format === 'progress') generateProgress(classified, detailLevel);
+
+    // Extract clinical data
+    extractClinicalData(lower);
+
+    // Generate session insights
+    generateInsights(text, lower, classified);
+
+    // Generate CPT codes
+    generateBillingCodes(encounterType, lower, text);
+
+    // Generate after-visit summary
+    generateAVS(text, encounterType);
+
+    showToast('Note generated. Review all sections and edit as needed.', 'success');
+    auditLog('scribe_generate', 'scribe', { format: format, encounter_type: encounterType, detail: detailLevel, words: text.split(/\s+/).length });
+  }
+
+  function classifySentences(sentences) {
+    var result = { subjective: [], objective: [], assessment: [], plan: [], risk: [], dissociative: [] };
+    sentences.forEach(function(sentence, idx) {
+      var sl = sentence.toLowerCase();
+      var scores = {};
+      ['subjective', 'objective', 'assessment', 'plan'].forEach(function(cat) {
+        scores[cat] = 0;
+        KEYWORDS[cat].forEach(function(kw) { if (sl.indexOf(kw) !== -1) scores[cat]++; });
+      });
+      // Check risk and dissociative separately (always tag)
+      var riskScore = 0; KEYWORDS.risk.forEach(function(kw) { if (sl.indexOf(kw) !== -1) riskScore++; });
+      var dissScore = 0; KEYWORDS.dissociative.forEach(function(kw) { if (sl.indexOf(kw) !== -1) dissScore++; });
+      if (riskScore > 0) result.risk.push(sentence);
+      if (dissScore > 0) result.dissociative.push(sentence);
+
+      var max = Math.max(scores.subjective, scores.objective, scores.assessment, scores.plan);
+      if (max === 0) {
+        // Position-based fallback: first half → subjective, last quarter → plan
+        var pos = idx / sentences.length;
+        if (pos < 0.5) result.subjective.push(sentence);
+        else if (pos > 0.75) result.plan.push(sentence);
+        else result.objective.push(sentence);
+      } else if (scores.subjective === max) result.subjective.push(sentence);
+      else if (scores.objective === max) result.objective.push(sentence);
+      else if (scores.assessment === max) result.assessment.push(sentence);
+      else result.plan.push(sentence);
+    });
+    return result;
+  }
+
+  function joinSentences(arr) { return arr.join('. ').trim() + (arr.length ? '.' : ''); }
+
+  function setField(id, val) {
+    var el = document.getElementById('scribeField_' + id);
+    if (el) el.value = val;
+  }
+
+  function generateSOAP(c, encounter, detail) {
+    setField('S', joinSentences(c.subjective));
+    var obj = joinSentences(c.objective);
+    if (!c.objective.length && encounter === 'ketamine_session') obj = 'Ketamine administered per protocol. Vitals monitored throughout session. Patient tolerated procedure without adverse events.';
+    setField('O', obj);
+    setField('A', joinSentences(c.assessment) || 'Patient participated in session. Treatment response noted.');
+    setField('P', joinSentences(c.plan) || 'Continue current treatment plan. Follow up as scheduled.');
+  }
+
+  function generateDAP(c, encounter, detail) {
+    // Data = subjective + objective combined
+    setField('D', joinSentences(c.subjective.concat(c.objective)));
+    setField('A', joinSentences(c.assessment) || 'Patient participated in session. Clinical status assessed.');
+    setField('P', joinSentences(c.plan) || 'Continue treatment plan. Follow up as scheduled.');
+  }
+
+  function generateBIRP(c, encounter, detail) {
+    // Behavior = subjective observations about client behavior
+    setField('B', joinSentences(c.subjective));
+    // Intervention = what the clinician did (objective actions)
+    var intervention = joinSentences(c.objective);
+    if (!c.objective.length && encounter === 'ketamine_session') intervention = 'Ketamine administered per established protocol. Vitals monitored. Supportive presence maintained throughout session.';
+    setField('I', intervention);
+    // Response = assessment of how client responded
+    setField('R', joinSentences(c.assessment) || 'Patient engaged with treatment. Response to intervention noted.');
+    setField('P', joinSentences(c.plan) || 'Continue treatment plan. Next session scheduled.');
+  }
+
+  function generateIntake(c, text, detail) {
+    setField('CC', c.subjective.slice(0, 2).join('. ') + (c.subjective.length > 0 ? '.' : ''));
+    setField('HPI', c.subjective.slice(2).join('. ') + (c.subjective.length > 2 ? '.' : ''));
+    setField('PMH', ''); // Can't reliably extract
+    setField('SH', '');
+    setField('MSE', joinSentences(c.objective));
+    setField('IMP', joinSentences(c.assessment.concat(c.plan)));
+  }
+
+  function generateTreatmentPlan(c, text, detail) {
+    setField('DX', '');
+    setField('GOALS', joinSentences(c.plan));
+    setField('OBJ', '');
+    setField('INT', joinSentences(c.objective));
+    setField('PROG', joinSentences(c.assessment));
+  }
+
+  function generateProgress(c, detail) {
+    setField('PRES', joinSentences(c.objective.slice(0, 3)));
+    setField('CONTENT', joinSentences(c.subjective));
+    setField('PROG', joinSentences(c.assessment));
+    setField('PLAN', joinSentences(c.plan));
+  }
+
+  // Session insights — risk flags, themes, areas for exploration
+  function generateInsights(text, lower, classified) {
+    var insights = [];
+
+    // Risk evaluation
+    if (classified.risk.length > 0) {
+      insights.push({ type: 'risk', icon: 'warning', text: 'Risk language detected: "' + classified.risk[0].substring(0, 80) + '..." — Assess with C-SSRS and document safety plan.' });
+    }
+
+    // Dissociative/ketamine experience themes
+    if (classified.dissociative.length > 0) {
+      insights.push({ type: 'theme', icon: 'psychology', text: 'Altered state experience noted. Integration focus recommended for follow-up.' });
+    }
+
+    // Key themes
+    if (lower.indexOf('sleep') !== -1 || lower.indexOf('insomnia') !== -1) insights.push({ type: 'theme', icon: 'bedtime', text: 'Sleep disturbance mentioned. Consider sleep hygiene assessment.' });
+    if (lower.indexOf('relationship') !== -1 || lower.indexOf('partner') !== -1 || lower.indexOf('marriage') !== -1) insights.push({ type: 'theme', icon: 'favorite', text: 'Relationship concerns raised. May benefit from couples or family work.' });
+    if (lower.indexOf('substance') !== -1 || lower.indexOf('alcohol') !== -1 || lower.indexOf('drinking') !== -1 || lower.indexOf('drug') !== -1) insights.push({ type: 'theme', icon: 'local_bar', text: 'Substance use discussed. Monitor and consider AUDIT/DAST screening.' });
+    if (lower.indexOf('trauma') !== -1 || lower.indexOf('ptsd') !== -1 || lower.indexOf('abuse') !== -1) insights.push({ type: 'theme', icon: 'shield', text: 'Trauma content present. Consider PCL-5 administration and trauma-focused approach.' });
+    if (lower.indexOf('medication') !== -1 || lower.indexOf('prescri') !== -1 || lower.indexOf('side effect') !== -1) insights.push({ type: 'theme', icon: 'medication', text: 'Medication discussion noted. Document med reconciliation.' });
+    if (lower.indexOf('improve') !== -1 || lower.indexOf('better') !== -1 || lower.indexOf('progress') !== -1) insights.push({ type: 'theme', icon: 'trending_up', text: 'Positive progress noted. Document treatment gains for continuity.' });
+
+    // Areas for deeper exploration
+    if (lower.indexOf('avoid') !== -1 || lower.indexOf('don\'t want to talk') !== -1) insights.push({ type: 'explore', icon: 'explore', text: 'Avoidance pattern detected. May warrant gentle exploration in future session.' });
+
+    var container = document.getElementById('scribeInsightsBody');
+    if (insights.length === 0) {
+      document.getElementById('scribeInsights').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('scribeInsights').style.display = '';
+    container.innerHTML = insights.map(function(ins) {
+      return '<div class="scribe-insight-item' + (ins.type === 'risk' ? ' risk' : '') + '">' +
+        '<span class="material-symbols-outlined" style="color:' + (ins.type === 'risk' ? 'var(--error)' : 'var(--accent)') + ';">' + ins.icon + '</span>' +
+        '<span>' + ins.text + '</span></div>';
+    }).join('');
+  }
+
+  // CPT billing code suggestions
+  function generateBillingCodes(encounterType, lower, text) {
+    var codes = [];
+    var duration = 0;
+    var durMatch = text.match(/(\d+)\s*(?:min|minute)/i);
+    if (durMatch) duration = parseInt(durMatch[1]);
+
+    if (encounterType === 'ketamine_session') {
+      if (lower.indexOf(' iv ') !== -1 || lower.indexOf('intravenous') !== -1 || lower.indexOf('infusion') !== -1) {
+        codes.push(CPT_CODES.ketamine_session[0]); // 96365
+        if (duration > 60) codes.push(CPT_CODES.ketamine_session[1]); // 96366
+      } else if (lower.indexOf(' im ') !== -1 || lower.indexOf('intramuscular') !== -1 || lower.indexOf('injection') !== -1) {
+        codes.push(CPT_CODES.ketamine_session[2]); // 96372
+      }
+      // Add psychotherapy add-on if integration work happened
+      if (lower.indexOf('process') !== -1 || lower.indexOf('integration') !== -1 || lower.indexOf('therapy') !== -1 || lower.indexOf('discuss') !== -1) {
+        codes.push(CPT_CODES.psychotherapy[2]); // 90833 add-on
+      }
+    } else if (encounterType === 'initial_consult' || encounterType === 'psychiatric_intake') {
+      codes.push(CPT_CODES.evaluation[3]); // 99205
+      codes.push(CPT_CODES.misc[2]); // 90791
+    } else if (encounterType === 'integration') {
+      if (duration >= 53) codes.push(CPT_CODES.psychotherapy[1]); // 90837
+      else codes.push(CPT_CODES.psychotherapy[0]); // 90834
+    } else if (encounterType === 'followup') {
+      if (duration >= 53) codes.push(CPT_CODES.psychotherapy[1]);
+      else if (duration >= 38) codes.push(CPT_CODES.psychotherapy[0]);
+      codes.push(CPT_CODES.evaluation[1]); // 99214
+    } else if (encounterType === 'crisis') {
+      codes.push(CPT_CODES.crisis[0]); // 90839
+      if (duration > 60) codes.push(CPT_CODES.crisis[1]); // 90840
+    } else if (encounterType === 'group_session') {
+      codes.push(CPT_CODES.group[0]); // 90853
+    }
+
+    // Check for assessment instruments
+    if (lower.indexOf('phq') !== -1 || lower.indexOf('gad') !== -1 || lower.indexOf('pcl') !== -1 || lower.indexOf('screening') !== -1 || lower.indexOf('questionnaire') !== -1) {
+      codes.push(CPT_CODES.misc[1]); // 96127
+    }
+
+    // Interactive complexity
+    if (lower.indexOf('interpreter') !== -1 || lower.indexOf('family member') !== -1 || lower.indexOf('guardian') !== -1 || lower.indexOf('play therapy') !== -1) {
+      codes.push(CPT_CODES.misc[0]); // 90785
+    }
+
+    var container = document.getElementById('scribeCodingBody');
+    if (codes.length === 0) { document.getElementById('scribeCoding').style.display = 'none'; return; }
+
+    document.getElementById('scribeCoding').style.display = '';
+    container.innerHTML = codes.map(function(c) {
+      return '<div class="scribe-code-item">' +
+        '<div><span class="scribe-code-item__code">' + c.code + '</span></div>' +
+        '<div><div class="scribe-code-item__desc">' + c.desc + '</div>' +
+        '<div class="scribe-code-item__justification">' + c.justification + '</div></div></div>';
+    }).join('');
+  }
+
+  // After-visit summary (patient-facing)
+  function generateAVS(text, encounterType) {
+    var lower = text.toLowerCase();
+    var avs = '';
+
+    var encounterNames = {
+      ketamine_session: 'ketamine therapy session', initial_consult: 'initial consultation',
+      psychiatric_intake: 'psychiatric evaluation', integration: 'integration therapy session',
+      followup: 'follow-up appointment', group_session: 'group therapy session',
+      telehealth: 'telehealth visit', crisis: 'crisis intervention session',
+    };
+
+    avs += 'Thank you for attending your ' + (encounterNames[encounterType] || 'appointment') + ' today.\n\n';
+
+    if (encounterType === 'ketamine_session') {
+      var route = document.getElementById('scribeExtract_route').value;
+      var dose = document.getElementById('scribeExtract_dose').value;
+      avs += 'Treatment Summary:\n';
+      if (route || dose) avs += '- Medication: Ketamine' + (route ? ' (' + route + ')' : '') + (dose ? ', ' + dose : '') + '\n';
+      avs += '- Please avoid driving or operating heavy machinery for 24 hours.\n';
+      avs += '- Stay hydrated and rest as needed.\n';
+      avs += '- Contact our office if you experience persistent nausea, severe headache, or unusual symptoms.\n\n';
+    }
+
+    // Extract plan items for patient
+    var planField = document.getElementById('scribeField_P') || document.getElementById('scribeField_PLAN');
+    if (planField && planField.value) {
+      avs += 'Next Steps:\n';
+      planField.value.split('.').filter(Boolean).forEach(function(item) {
+        if (item.trim()) avs += '- ' + item.trim() + '\n';
+      });
+      avs += '\n';
+    }
+
+    avs += 'If you have questions or concerns before your next appointment, please contact our office.\n';
+    avs += 'In case of emergency, call 911 or the 988 Suicide & Crisis Lifeline.';
+
+    document.getElementById('scribeAVSText').value = avs;
+    document.getElementById('scribeAVS').style.display = '';
+  }
+
+  // Clinical data extraction
+  function extractClinicalData(text) {
+    if (text.indexOf('intravenous') !== -1 || text.indexOf(' iv ') !== -1 || text.indexOf('iv infusion') !== -1) document.getElementById('scribeExtract_route').value = 'IV';
+    else if (text.indexOf('intramuscular') !== -1 || text.indexOf(' im ') !== -1) document.getElementById('scribeExtract_route').value = 'IM';
+    else if (text.indexOf('sublingual') !== -1 || text.indexOf(' sl ') !== -1) document.getElementById('scribeExtract_route').value = 'Sublingual';
+    else if (text.indexOf('intranasal') !== -1 || text.indexOf('nasal') !== -1) document.getElementById('scribeExtract_route').value = 'Intranasal';
+
+    var doseMatch = text.match(/(\d+\.?\d*)\s*(?:mg|milligram)/i);
+    if (doseMatch) document.getElementById('scribeExtract_dose').value = doseMatch[1] + ' mg';
+
+    var durMatch = text.match(/(\d+)\s*(?:min|minute)/i);
+    if (durMatch) document.getElementById('scribeExtract_duration').value = durMatch[1] + ' min';
+
+    var sideEffects = [];
+    ['nausea', 'dizziness', 'headache', 'dissociation', 'hypertension', 'blurred vision', 'vomiting', 'anxiety', 'tachycardia', 'drowsiness', 'emergence reaction'].forEach(function(se) {
+      if (text.indexOf(se) !== -1 && text.indexOf('no ' + se) === -1 && text.indexOf('denies ' + se) === -1) sideEffects.push(se);
+    });
+    document.getElementById('scribeExtract_sideEffects').value = sideEffects.length ? sideEffects.join(', ') : 'None reported';
+
+    if (text.indexOf('well tolerated') !== -1 || text.indexOf('tolerated well') !== -1 || text.indexOf('good response') !== -1) document.getElementById('scribeExtract_response').value = 'Good';
+    else if (text.indexOf('moderate response') !== -1 || text.indexOf('partial response') !== -1) document.getElementById('scribeExtract_response').value = 'Moderate';
+    else if (text.indexOf('poor response') !== -1 || text.indexOf('no improvement') !== -1) document.getElementById('scribeExtract_response').value = 'Poor';
+
+    var moodMatch = text.match(/mood.*?(\d+).*?(?:to|→|->).*?(\d+)/i);
+    if (moodMatch) document.getElementById('scribeExtract_mood').value = moodMatch[1] + '/10 → ' + moodMatch[2] + '/10';
+  }
+
+  // Save note from scribe
+  function saveScribeNote() {
+    var patientId = document.getElementById('scribePatientSelect').value;
+    if (!patientId) { showToast('Please select a patient before saving', 'error'); return; }
+
+    var format = document.getElementById('scribeNoteFormat').value;
+    var def = NOTE_FORMATS[format];
+    if (!def) return;
+
+    // Check if any field has content
+    var hasContent = false;
+    def.fields.forEach(function(f) {
+      var el = document.getElementById('scribeField_' + f.id);
+      if (el && el.value.trim()) hasContent = true;
+    });
+    if (!hasContent) { showToast('Generate or write a note before saving', 'error'); return; }
+
+    var encounterType = document.getElementById('scribeEncounterType').value;
+    var data = {
+      patient_id: patientId,
+      note_date: new Date().toISOString().slice(0, 10),
+      note_type: encounterType,
+      note_format: format,
+      provider: currentUserEmail,
+      status: 'draft',
+      scribe_transcript: getScribeText(),
+    };
+
+    // Map fields to standard SOAP columns + extras as JSON
+    if (format === 'soap') {
+      data.subjective = document.getElementById('scribeField_S').value;
+      data.objective = document.getElementById('scribeField_O').value;
+      data.assessment = document.getElementById('scribeField_A').value;
+      data.plan = document.getElementById('scribeField_P').value;
+    } else {
+      // Store all fields as JSON for non-SOAP formats
+      var fields = {};
+      def.fields.forEach(function(f) {
+        var el = document.getElementById('scribeField_' + f.id);
+        if (el) fields[f.id] = el.value;
+      });
+      data.subjective = JSON.stringify(fields);
+      data.objective = format; // store format type for reconstruction
+    }
+
+    // Store extracts and billing suggestions
+    data.scribe_extracts = JSON.stringify({
+      route: document.getElementById('scribeExtract_route').value,
+      dose: document.getElementById('scribeExtract_dose').value,
+      duration: document.getElementById('scribeExtract_duration').value,
+      response: document.getElementById('scribeExtract_response').value,
+      side_effects: document.getElementById('scribeExtract_sideEffects').value,
+      mood: document.getElementById('scribeExtract_mood').value,
+      avs: document.getElementById('scribeAVSText').value,
+    });
+
+    saveRecord('notes', data).then(function(result) {
+      showToast('Note saved as draft (' + NOTE_FORMATS[format].label + ')', 'success');
+      auditLog('scribe_save', 'notes', { patient_id: patientId, note_id: result.id, format: format });
+      renderScribeHistory();
+      clearScribe();
+    }).catch(function(e) {
+      showToast('Error saving note: ' + e.message, 'error');
+    });
+  }
+
+  function renderScribe() {
+    // Populate patient select
+    var options = store.patients
+      .filter(function(p) { return !p.is_archived && p.status !== 'inactive'; })
+      .map(function(p) { return '<option value="' + p.id + '">' + p.first_name + ' ' + p.last_name + '</option>'; })
+      .join('');
+    var sel = document.getElementById('scribePatientSelect');
+    var current = sel.value;
+    sel.innerHTML = '<option value="">Select patient...</option>' + options;
+    if (current) sel.value = current;
+
+    renderNoteFormatFields();
+    renderScribeHistory();
+
+    if (!SpeechRecognition) {
+      document.getElementById('scribeStatus').textContent = 'Voice not supported — type or paste notes';
+      document.getElementById('scribeRecordBtn').style.opacity = '0.5';
+    }
+  }
+
+  function renderScribeHistory() {
+    var container = document.getElementById('scribeHistory');
+    var scribeNotes = store.notes.filter(function(n) { return n.scribe_transcript; }).slice(0, 8);
+    if (scribeNotes.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8125rem;padding:0.5rem;">No scribe notes yet. Start a session to create your first note.</div>';
+      return;
+    }
+    container.innerHTML = scribeNotes.map(function(n) {
+      var patient = store.patients.find(function(p) { return p.id === n.patient_id; });
+      var name = patient ? patient.first_name + ' ' + patient.last_name : 'Unknown';
+      var fmt = n.note_format ? (NOTE_FORMATS[n.note_format] ? NOTE_FORMATS[n.note_format].label : n.note_format.toUpperCase()) : 'SOAP';
+      return '<div class="scribe-history-item">' +
+        '<div><strong>' + name + '</strong><br><span class="scribe-history-item__meta">' + (n.note_date || '') + ' &middot; ' + fmt + ' &middot; ' + formatApptType(n.note_type) + '</span></div>' +
+        '<span class="badge badge--' + (n.status === 'signed' ? 'signed' : 'draft') + '">' + (n.status || 'Draft') + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  // ============================================
+  // CSV IMPORT
+  // ============================================
+
+  var csvData = null; // parsed CSV rows
+  var csvHeaders = []; // CSV column headers
+
+  // Carepatron and common EMR column name mappings
+  var COLUMN_ALIASES = {
+    first_name: ['first name', 'first_name', 'firstname', 'given name', 'given_name', 'client first name', 'patient first name', 'name first'],
+    last_name: ['last name', 'last_name', 'lastname', 'surname', 'family name', 'family_name', 'client last name', 'patient last name', 'name last'],
+    email: ['email', 'email address', 'e-mail', 'client email', 'patient email'],
+    phone: ['phone', 'phone number', 'mobile', 'mobile phone', 'cell', 'cell phone', 'telephone', 'client phone', 'patient phone', 'primary phone'],
+    dob: ['dob', 'date of birth', 'birth date', 'birthdate', 'birthday', 'date_of_birth', 'birth_date'],
+    sex: ['sex', 'gender', 'biological sex', 'assigned sex'],
+    gender_identity: ['gender identity', 'gender_identity', 'preferred gender'],
+    pronouns: ['pronouns', 'preferred pronouns'],
+    address: ['address', 'full address', 'street address', 'home address', 'mailing address', 'address line 1'],
+    emergency_name: ['emergency contact', 'emergency contact name', 'emergency_contact', 'ice name', 'ice contact'],
+    emergency_phone: ['emergency phone', 'emergency contact phone', 'emergency_phone', 'ice phone'],
+    emergency_relationship: ['emergency relationship', 'emergency contact relationship', 'relationship', 'ice relationship'],
+    primary_diagnosis: ['diagnosis', 'primary diagnosis', 'primary_diagnosis', 'dx', 'icd-10', 'icd10'],
+    referring_provider: ['referring provider', 'referred by', 'referral', 'referring_provider', 'referral source'],
+    current_medications: ['medications', 'current medications', 'current_medications', 'meds', 'medication list'],
+    allergies: ['allergies', 'allergy', 'known allergies', 'drug allergies'],
+    medical_history: ['medical history', 'medical_history', 'past medical history', 'pmh', 'history', 'notes'],
+  };
+
+  function parseCSV(text) {
+    var lines = text.split(/\r?\n/);
+    var result = [];
+    var headers = [];
+
+    // Parse header
+    if (lines.length > 0) {
+      headers = parseCSVLine(lines[0]);
+    }
+
+    // Parse data rows
+    for (var i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '') continue;
+      var values = parseCSVLine(lines[i]);
+      var row = {};
+      for (var j = 0; j < headers.length; j++) {
+        row[headers[j]] = (values[j] || '').trim();
+      }
+      result.push(row);
+    }
+
+    return { headers: headers, rows: result };
+  }
+
+  function parseCSVLine(line) {
+    var result = [];
+    var current = '';
+    var inQuotes = false;
+
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          current += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          result.push(current);
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function autoMapColumn(header) {
+    var normalized = header.toLowerCase().trim();
+    for (var field in COLUMN_ALIASES) {
+      if (COLUMN_ALIASES[field].indexOf(normalized) !== -1) {
+        return field;
+      }
+    }
+    // Fuzzy: check if the field name is contained in the header
+    for (var field2 in COLUMN_ALIASES) {
+      if (normalized.indexOf(field2.replace(/_/g, ' ')) !== -1 || normalized.indexOf(field2) !== -1) {
+        return field2;
+      }
+    }
+    return '';
+  }
+
+  var PATIENT_FIELDS = [
+    { value: '', label: '— Skip —' },
+    { value: 'first_name', label: 'First Name' },
+    { value: 'last_name', label: 'Last Name' },
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'dob', label: 'Date of Birth' },
+    { value: 'sex', label: 'Sex' },
+    { value: 'gender_identity', label: 'Gender Identity' },
+    { value: 'pronouns', label: 'Pronouns' },
+    { value: 'address', label: 'Address' },
+    { value: 'emergency_name', label: 'Emergency Contact Name' },
+    { value: 'emergency_phone', label: 'Emergency Contact Phone' },
+    { value: 'emergency_relationship', label: 'Emergency Relationship' },
+    { value: 'primary_diagnosis', label: 'Primary Diagnosis' },
+    { value: 'referring_provider', label: 'Referring Provider' },
+    { value: 'current_medications', label: 'Current Medications' },
+    { value: 'allergies', label: 'Allergies' },
+    { value: 'medical_history', label: 'Medical History' },
+  ];
+
+  function openImportModal() {
+    csvData = null;
+    csvHeaders = [];
+    document.getElementById('importStep1').classList.remove('hidden');
+    document.getElementById('importStep2').classList.add('hidden');
+    document.getElementById('importStep3').classList.add('hidden');
+    document.getElementById('importNextBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.add('hidden');
+    document.getElementById('importRunBtn').classList.add('hidden');
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importModal').classList.remove('hidden');
+  }
+
+  function handleCSVFile(file) {
+    if (!file || !file.name.endsWith('.csv')) {
+      showToast('Please upload a .csv file', 'error');
+      return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var parsed = parseCSV(e.target.result);
+      if (parsed.rows.length === 0) {
+        showToast('CSV file is empty or could not be parsed', 'error');
+        return;
+      }
+
+      csvData = parsed.rows;
+      csvHeaders = parsed.headers;
+      console.log('[EMR]', 'Parsed CSV:', csvHeaders.length, 'columns,', csvData.length, 'rows');
+      showToast('Loaded ' + csvData.length + ' rows from CSV', 'success');
+      document.getElementById('importNextBtn').classList.remove('hidden');
+
+      // Update dropzone to show file info
+      document.getElementById('importDropzone').innerHTML =
+        '<span class="material-symbols-outlined" style="font-size:48px;color:var(--success);margin-bottom:0.5rem;">check_circle</span>' +
+        '<p style="font-weight:500;">' + file.name + '</p>' +
+        '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem;">' + csvData.length + ' rows &middot; ' + csvHeaders.length + ' columns</p>';
+    };
+    reader.readAsText(file);
+  }
+
+  function showColumnMapping() {
+    document.getElementById('importStep1').classList.add('hidden');
+    document.getElementById('importStep2').classList.remove('hidden');
+    document.getElementById('importNextBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.remove('hidden');
+    document.getElementById('importRunBtn').classList.remove('hidden');
+
+    // Show preview of first 3 rows
+    var previewHtml = '<table class="import-preview-table"><thead><tr>';
+    csvHeaders.forEach(function(h) { previewHtml += '<th>' + h + '</th>'; });
+    previewHtml += '</tr></thead><tbody>';
+    csvData.slice(0, 3).forEach(function(row) {
+      previewHtml += '<tr>';
+      csvHeaders.forEach(function(h) { previewHtml += '<td>' + (row[h] || '') + '</td>'; });
+      previewHtml += '</tr>';
+    });
+    previewHtml += '</tbody></table>';
+    document.getElementById('importPreview').innerHTML = previewHtml;
+
+    // Build column mapping dropdowns
+    var mappingsHtml = '';
+    csvHeaders.forEach(function(header, i) {
+      var autoMapped = autoMapColumn(header);
+      var optionsHtml = PATIENT_FIELDS.map(function(f) {
+        var selected = f.value === autoMapped ? ' selected' : '';
+        return '<option value="' + f.value + '"' + selected + '>' + f.label + '</option>';
+      }).join('');
+
+      mappingsHtml += '<div class="form-group">' +
+        '<label style="font-size:0.8125rem;">' + header +
+        (autoMapped ? ' <span style="color:var(--success);font-size:0.7rem;">AUTO</span>' : '') +
+        '</label>' +
+        '<select class="column-map" data-csv-col="' + i + '">' + optionsHtml + '</select>' +
+        '</div>';
+    });
+    document.getElementById('columnMappings').innerHTML = mappingsHtml;
+  }
+
+  function runImport() {
+    if (!csvData || csvData.length === 0) return;
+
+    // Gather mappings
+    var mappings = {};
+    document.querySelectorAll('.column-map').forEach(function(sel) {
+      var csvIdx = parseInt(sel.dataset.csvCol);
+      var field = sel.value;
+      if (field) {
+        mappings[csvHeaders[csvIdx]] = field;
+      }
+    });
+
+    // Check required fields
+    var mappedFields = Object.values ? Object.values(mappings) : Object.keys(mappings).map(function(k) { return mappings[k]; });
+    if (mappedFields.indexOf('first_name') === -1 || mappedFields.indexOf('last_name') === -1) {
+      showToast('First Name and Last Name are required mappings', 'error');
+      return;
+    }
+
+    // Build patient records
+    var patients = [];
+    var skipped = 0;
+
+    csvData.forEach(function(row) {
+      var patient = { status: 'active' };
+
+      for (var csvCol in mappings) {
+        var field = mappings[csvCol];
+        var val = (row[csvCol] || '').trim();
+        if (val) patient[field] = val;
+      }
+
+      // Skip if no name
+      if (!patient.first_name && !patient.last_name) {
+        skipped++;
+        return;
+      }
+
+      // Handle combined name field - check if first_name contains full name
+      if (patient.first_name && !patient.last_name && patient.first_name.indexOf(' ') !== -1) {
+        var parts = patient.first_name.split(' ');
+        patient.first_name = parts[0];
+        patient.last_name = parts.slice(1).join(' ');
+      }
+
+      // Normalize DOB format
+      if (patient.dob) {
+        var d = new Date(patient.dob);
+        if (!isNaN(d.getTime())) {
+          patient.dob = d.toISOString().slice(0, 10);
+        }
+      }
+
+      // Check for duplicate
+      var isDuplicate = store.patients.some(function(existing) {
+        return existing.first_name && existing.last_name &&
+          existing.first_name.toLowerCase() === (patient.first_name || '').toLowerCase() &&
+          existing.last_name.toLowerCase() === (patient.last_name || '').toLowerCase();
+      });
+
+      if (isDuplicate) {
+        skipped++;
+        return;
+      }
+
+      patients.push(patient);
+    });
+
+    if (patients.length === 0) {
+      showToast('No new patients to import (all duplicates or empty rows)', 'info');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('importRunBtn').textContent = 'Importing...';
+    document.getElementById('importRunBtn').disabled = true;
+
+    // Bulk insert
+    sb.from(EMR_TABLES.patients)
+      .insert(patients)
+      .select()
+      .then(function(result) {
+        document.getElementById('importRunBtn').textContent = 'Import Patients';
+        document.getElementById('importRunBtn').disabled = false;
+
+        if (result.error) {
+          // Fallback: insert locally
+          if (result.error.code === '42P01' || (result.error.message && result.error.message.indexOf('does not exist') !== -1)) {
+            patients.forEach(function(p) {
+              p.id = crypto.randomUUID();
+              p.created_at = new Date().toISOString();
+              store.patients.unshift(p);
+            });
+            showImportResults(patients.length, skipped, 0);
+          } else {
+            showToast('Import error: ' + result.error.message, 'error');
+          }
+          return;
+        }
+
+        // Add to store
+        if (result.data) {
+          result.data.forEach(function(p) { store.patients.unshift(p); });
+        }
+        var importCount = result.data ? result.data.length : patients.length;
+        auditLog('bulk_import', 'patients', { count: importCount, skipped: skipped });
+        showImportResults(importCount, skipped, 0);
+      })
+      .catch(function(e) {
+        document.getElementById('importRunBtn').textContent = 'Import Patients';
+        document.getElementById('importRunBtn').disabled = false;
+        showToast('Import failed: ' + e.message, 'error');
+      });
+  }
+
+  function showImportResults(imported, skipped, errors) {
+    document.getElementById('importStep2').classList.add('hidden');
+    document.getElementById('importStep3').classList.remove('hidden');
+    document.getElementById('importRunBtn').classList.add('hidden');
+    document.getElementById('importBackBtn').classList.add('hidden');
+
+    document.getElementById('importResults').innerHTML =
+      '<div style="text-align:center;padding:1rem;">' +
+      '<span class="material-symbols-outlined" style="font-size:64px;color:var(--success);margin-bottom:1rem;">check_circle</span>' +
+      '<h3 style="margin-bottom:1rem;">Import Complete</h3>' +
+      '<div style="display:flex;gap:2rem;justify-content:center;">' +
+      '<div><div style="font-size:2rem;font-weight:700;color:var(--success);">' + imported + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Imported</div></div>' +
+      '<div><div style="font-size:2rem;font-weight:700;color:var(--text-muted);">' + skipped + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Skipped</div></div>' +
+      (errors > 0 ? '<div><div style="font-size:2rem;font-weight:700;color:var(--error);">' + errors + '</div><div style="color:var(--text-muted);font-size:0.8125rem;">Errors</div></div>' : '') +
+      '</div></div>';
+
+    renderPatients();
+    renderDashboard();
+  }
+
+  // ============================================
+  // VITALS LOG
+  // ============================================
+
+  function buildVitalsRow(index) {
+    return '<div class="vitals-entry">' +
+      '<div class="form-grid form-grid--tight">' +
+      '<div class="form-group"><label>Time</label><input type="time" step="300" name="vital_time_' + index + '"></div>' +
+      '<div class="form-group"><label>BP</label><input type="text" name="vital_bp_' + index + '" placeholder="120/80"></div>' +
+      '<div class="form-group"><label>HR</label><input type="number" name="vital_hr_' + index + '" placeholder="bpm"></div>' +
+      '<div class="form-group"><label>SpO2</label><input type="number" name="vital_spo2_' + index + '" placeholder="%"></div>' +
+      '<div class="form-group"><label>RR</label><input type="number" name="vital_rr_' + index + '" placeholder="/min"></div>' +
+      '<div class="form-group"><label>Sedation</label>' +
+      '<select name="vital_sedation_' + index + '">' +
+      '<option value="">--</option>' +
+      '<option value="1">1 - Alert</option>' +
+      '<option value="2">2 - Drowsy</option>' +
+      '<option value="3">3 - Light sedation</option>' +
+      '<option value="4">4 - Moderate</option>' +
+      '<option value="5">5 - Deep</option>' +
+      '</select></div>' +
+      '</div></div>';
+  }
+
+  function addVitalsRow() {
+    document.getElementById('vitalsLog').insertAdjacentHTML('beforeend', buildVitalsRow(vitalsCount));
+    vitalsCount++;
+  }
+
+  // ============================================
+  // UTILITIES
+  // ============================================
+
+  function formatApptType(type) {
+    var map = {
+      initial_consult: 'Initial Consultation',
+      iv_infusion: 'IV Infusion',
+      im_session: 'IM Session',
+      sublingual: 'Sublingual Session',
+      integration: 'Integration Therapy',
+      followup: 'Follow-Up',
+      telehealth: 'Telehealth',
+    };
+    return map[type] || type || '--';
+  }
+
+  function formatNoteType(type) {
+    var map = {
+      soap: 'SOAP Note',
+      initial_eval: 'Initial Evaluation',
+      integration: 'Integration Therapy',
+      consultation: 'Consultation',
+    };
+    return map[type] || type || '--';
+  }
+
+  function showToast(message, type) {
+    type = type || 'info';
+    var container = document.getElementById('toastContainer');
+    var toast = document.createElement('div');
+    toast.className = 'toast toast--' + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
+  }
+
+  // Global for onclick in HTML
+  window.viewPatient = function(id) {
+    var patient = store.patients.find(function(p) { return p.id === id; });
+    if (patient) {
+      auditLog('view_record', 'patients', { patient_id: id });
+      showToast('Patient: ' + patient.first_name + ' ' + patient.last_name + ' — Full patient view coming soon', 'info');
+    }
+  };
+
+  // ============================================
+  // BOOT
+  // ============================================
+  console.log('[WITHIN EMR]', 'Script loaded');
+  init();
+})();

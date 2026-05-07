@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Job Titles - AWKN</title>
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <script>try{var c=localStorage.getItem("awkn-ranch-cached-auth");if(c&&JSON.parse(c).appUser)document.documentElement.dataset.cachedAuth="1"}catch(e){}</script>
+  <style>.hidden{display:none!important}[data-cached-auth] #loadingOverlay{opacity:0!important;pointer-events:none!important;visibility:hidden!important}[data-cached-auth] #appContent.hidden{display:block!important}#loadingOverlay{position:fixed;inset:0;background:#f6f5f0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .16s ease-out}.loading-overlay__logo{display:flex;align-items:center;gap:.75rem;min-height:40px}.loading-overlay__icon{height:40px;width:auto;max-width:none}.loading-overlay__wordmark{height:28px;width:auto;max-width:none}</style>
+  <link rel="stylesheet" href="../styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="manage-shared.css?v=5">
+  <link rel="stylesheet" href="../../styles/site.css">
+  <link rel="stylesheet" href="../../styles/tailwind.out.css">
+  <style>
+    .jt-wrap { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    .jt-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
+    @media (max-width: 780px) { .jt-layout { grid-template-columns: 1fr; } }
+
+    .jt-sidebar {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; padding: 0.75rem;
+    }
+    .jt-sidebar h3 {
+      margin: 0 0 0.5rem; font-size: 0.78rem; font-weight: 700;
+      color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .jt-new {
+      display: flex; gap: 0.375rem; margin-bottom: 0.625rem;
+    }
+    .jt-new input {
+      flex: 1; padding: 0.45rem 0.625rem; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 6px; font-family: inherit; font-size: 0.82rem;
+    }
+    .jt-new button {
+      padding: 0.45rem 0.75rem; border: none; background: var(--accent, #d4883a);
+      color: #fff; border-radius: 6px; font-weight: 600; font-size: 0.82rem; cursor: pointer;
+    }
+    .jt-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .jt-list li {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.45rem 0.625rem; border-radius: 6px; cursor: pointer;
+      font-size: 0.85rem; color: #111827;
+    }
+    .jt-list li:hover { background: #f9fafb; }
+    .jt-list li.active { background: var(--accent-light, #f3e6d3); color: #1f2937; }
+    .jt-list li .jt-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      background: #d1d5db;
+    }
+    .jt-list li .jt-count {
+      margin-left: auto; font-size: 0.7rem; color: var(--text-muted, #6b7280);
+    }
+
+    .jt-main {
+      background: #fff; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .jt-empty { text-align: center; color: var(--text-muted, #6b7280); padding: 3rem 1rem; font-style: italic; }
+
+    .jt-editor h2 { margin: 0 0 0.25rem; font-size: 1.25rem; }
+    .jt-editor .jt-sub { color: var(--text-muted, #6b7280); font-size: 0.85rem; margin-bottom: 1rem; }
+    .jt-editor-row { display: flex; gap: 0.5rem; margin-bottom: 0.625rem; flex-wrap: wrap; align-items: center; }
+    .jt-editor-row label { font-size: 0.75rem; font-weight: 600; color: #4b5563; min-width: 80px; }
+    .jt-editor-row input[type="text"], .jt-editor-row textarea, .jt-editor-row input[type="color"] {
+      padding: 0.45rem 0.625rem; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 6px; font-family: inherit; font-size: 0.85rem;
+    }
+    .jt-editor-row input[type="text"] { flex: 1; min-width: 200px; }
+    .jt-editor-row textarea { flex: 1; min-width: 200px; min-height: 44px; resize: vertical; }
+    .jt-editor-row input[type="color"] { padding: 2px; width: 40px; height: 32px; }
+
+    .jt-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin: 0.75rem 0 1.25rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 1rem; }
+    .jt-actions button { padding: 0.5rem 0.9rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border, #e5e7eb); background: #fff; }
+    .jt-actions .jt-save { background: var(--accent, #d4883a); color: #fff; border-color: var(--accent, #d4883a); }
+    .jt-actions .jt-save[disabled] { opacity: 0.45; cursor: not-allowed; }
+    .jt-actions .jt-danger { color: #b91c1c; border-color: #fecaca; }
+
+    .jt-perm-section {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #6b7280; padding: 0.75rem 0 0.375rem;
+    }
+    .jt-perm-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.375rem;
+    }
+    .jt-perm {
+      display: flex; align-items: flex-start; gap: 0.45rem;
+      padding: 0.45rem 0.625rem; border: 1px solid var(--border, #e5e7eb);
+      border-radius: 6px; cursor: pointer; background: #fff;
+      font-size: 0.8rem; line-height: 1.25;
+    }
+    .jt-perm:hover { border-color: #d1d5db; background: #f9fafb; }
+    .jt-perm input { margin-top: 2px; }
+    .jt-perm .jt-perm-label { font-weight: 600; color: #111827; }
+    .jt-perm .jt-perm-key { font-size: 0.68rem; color: var(--text-muted, #6b7280); }
+    .jt-perm .jt-perm-desc { font-size: 0.72rem; color: var(--text-muted, #6b7280); }
+
+    .jt-archived-badge { font-size: 0.65rem; background: #e5e7eb; color: #6b7280; padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-overlay__logo">
+      <img src="/awkn-ranch/assets/branding/logo-black-transparent.png" alt="" class="loading-overlay__icon" width="28" height="40">
+      <img src="/awkn-ranch/assets/branding/wordmark-black-transparent.png" alt="AWKN Ranch" class="loading-overlay__wordmark" width="28" height="28">
+    </div>
+    <div class="spinner spinner--sm"></div>
+  </div>
+
+  <div id="unauthorizedOverlay" class="loading-overlay hidden"></div>
+
+  <div id="appContent" class="hidden">
+    <div id="siteHeader"></div>
+    <span data-site-version style="display:none"></span>
+
+    <div class="context-switcher hidden" id="contextSwitcher">
+      <a href="/spaces/admin/dashboard.html" class="context-switcher-btn">Staff</a>
+      <a class="context-switcher-btn active">Admin</a>
+    </div>
+
+    <div class="manage-tabs"></div>
+
+    <div class="jt-wrap">
+      <div class="jt-layout">
+        <aside class="jt-sidebar">
+          <h3>Job Titles</h3>
+          <form class="jt-new" id="jtNewForm">
+            <input type="text" id="jtNewName" placeholder="New title…" required>
+            <button type="submit">Add</button>
+          </form>
+          <ul class="jt-list" id="jtList"></ul>
+          <label style="display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;color:#6b7280;margin-top:0.625rem;">
+            <input type="checkbox" id="jtShowArchived"> Show archived
+          </label>
+        </aside>
+
+        <section class="jt-main">
+          <div id="jtEditor" class="hidden">
+            <div class="jt-editor">
+              <h2 id="jtEditName"></h2>
+              <div class="jt-sub" id="jtEditSub"></div>
+
+              <div class="jt-editor-row">
+                <label for="jtEditNameInput">Name</label>
+                <input type="text" id="jtEditNameInput">
+                <input type="color" id="jtEditColor" title="Chip color">
+              </div>
+              <div class="jt-editor-row">
+                <label for="jtEditDesc">Description</label>
+                <textarea id="jtEditDesc" placeholder="Short description (optional)"></textarea>
+              </div>
+
+              <div class="jt-actions">
+                <button type="button" class="jt-danger" id="jtArchiveBtn">Archive</button>
+                <button type="button" id="jtResetBtn">Discard</button>
+                <button type="button" class="jt-save" id="jtSaveBtn" disabled>Save</button>
+              </div>
+
+              <div id="jtPermSections"></div>
+            </div>
+          </div>
+          <div id="jtPlaceholder" class="jt-empty">
+            Pick a job title on the left to edit its permissions, or add a new one above.
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/instant-chrome.js"></script>
+  <script type="module" src="../../shared/version-info.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <script type="module" src="job-titles.js"></script>
+</body>
+</html>
