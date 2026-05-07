@@ -188,6 +188,18 @@ VALUES
    ARRAY['Queen bed','Shared bath','Continental breakfast','Wellness facility access']::TEXT[],
    20),
 
+  ('retreat-house',
+   'The Retreat House',
+   'room',
+   'Take the whole house — sleeps eleven, holds the whole vibe.',
+   'Reserve the entire Retreat House for your group. Five private bedrooms and two shared rooms — sleeps up to eleven. Full kitchen, common living spaces, wraparound porch, continental breakfast each morning, and full access to sauna, cold plunge, and gardens. Three-night minimum. Ideal for retreats, family gatherings, and friend trips that want the whole place to themselves.',
+   1, 11, 2999, NULL, NULL, 0,
+   '[]'::jsonb,
+   '/assets/awkn/retreat-house.jpg',
+   ARRAY['/assets/awkn/retreat-house.jpg','/assets/awkn/awkn-sharedroom.png','/assets/awkn/sunflower-group.jpg']::TEXT[],
+   ARRAY['Five private bedrooms','Two shared rooms','Sleeps up to 11','Full kitchen & living areas','Continental breakfast','Wellness facility access','Three-night minimum']::TEXT[],
+   25),
+
   -- Spaces ────────────────────────────────────────────
   ('temple',
    'The Temple',
