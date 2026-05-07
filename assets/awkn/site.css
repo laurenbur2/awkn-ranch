@@ -53,7 +53,16 @@ img { display: block; max-width: 100%; }
   padding: 1.1rem 3rem;
 }
 
-.nav-left { justify-self: start; }
+/* .nav-left needs `display: flex; align-items: center` so the inline-flex
+ * button doesn't get pushed to the line-height baseline. Without this,
+ * the body's inherited line-height (26.4px) anchors the button at the
+ * bottom of .nav-left's box — visually misaligning it ~9px below the
+ * row's center where .nav-right text sits. */
+.nav-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+}
 .menu-toggle {
   display: inline-flex;
   align-items: center;
@@ -66,6 +75,7 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
   color: #fff;
   padding: 0;
+  line-height: 1;
   transition: color 0.3s;
 }
 .site-nav.scrolled .menu-toggle,

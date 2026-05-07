@@ -72,7 +72,14 @@
       padding: 1.1rem 3rem;
     }
 
-    .nav-left { justify-self: start; }
+    /* .nav-left needs flex+center so the inline-flex button doesn't get
+     * anchored at the line-height baseline (which sits ~9px below the
+     * row's actual center where .nav-right's text lives). */
+    .nav-left {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+    }
     .menu-toggle {
       display: inline-flex;
       align-items: center;
@@ -85,6 +92,7 @@
       text-transform: uppercase;
       color: #fff;
       padding: 0;
+      line-height: 1;
       transition: color 0.3s;
     }
     .site-nav.scrolled .menu-toggle { color: var(--dark); }
