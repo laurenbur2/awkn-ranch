@@ -23,10 +23,11 @@
 
 set -e
 
-# Default to repo-root sibling location (pre-split layout) — when
-# awkn-web-app lives inside the legacy repo at /awkn-ranch/awkn-web-app/.
-# Override with first arg for post-split layout.
-SRC="${1:-..}"
+# Default to ../legacy (post-restructure layout — legacy site content
+# lives under <repo-root>/legacy/, awkn-web-app is a sibling). Override
+# with first arg for post-split layout when the legacy repo is at a
+# different absolute path.
+SRC="${1:-../legacy}"
 
 # Resolve to absolute for clearer logs
 SRC=$(cd "$SRC" 2>/dev/null && pwd) || {

@@ -13,7 +13,7 @@ HOMEAUTOMATION.local.md
 
 # One-shot secret-dump function. Never commit.
 # Deploy → curl → delete pattern only — see docstring inside index.ts.
-supabase/functions/dump-secrets/
+legacy/supabase/functions/dump-secrets/
 
 # Stray Next.js artifacts at repo root (real ones live in awkn-web-app/)
 /next-env.d.ts

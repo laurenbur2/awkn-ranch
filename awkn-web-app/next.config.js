@@ -124,7 +124,8 @@ const config = {
               "img-src 'self' data: blob: https:", // Allow images from HTTPS sources and data URIs
               "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts woff2 files
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co", // Supabase API and realtime
-              "frame-src 'self'",
+              "frame-src 'self' https://www.google.com https://maps.google.com", // Google Maps embed on /contact
+
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

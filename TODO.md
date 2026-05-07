@@ -42,6 +42,11 @@ Tomorrow per stakeholder timing. The user is moving awkn-web-app to a clean GitH
 
 **Still open for CTO:**
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
+- [ ] **Wire AWKN public-site forms into the BOS as subscribable lead sources** — Currently the 3 public forms on awknranch.com (book, host-a-retreat, contact) are pure `mailto:hello@awknranch.com` scaffolding. Lauren created them on 2026-05-06 (commits `2c20f2c2` + `f07f3983`) as scaffolds and never wired backend. They send NO data to Supabase, NO data to CRM, no `crm_leads` row, no audit trail. Mobile users without configured email apps get silent failures. Should each become a `crm_leads` insert + Resend confirmation email + appear in BOS CRM as a new lead the operator can act on. Make each form a SUBSCRIBABLE source so operators can filter "show me all leads from /book" vs "from /host-a-retreat" etc. Form fields by page:
+  - `/book` — name, email, dates, party size, interest, description, notes
+  - `/host-a-retreat` — name, email, org, size, dates, modality, vision, description
+  - `/contact` — name, email, reason (general/rental/event/sauna/worktrade/visit/other), msg, description
+  - Plus the "Add me to the AWKN list" mailto on home → newsletter signup integration (separate decision: Mailchimp / Klaviyo / Resend Audience / Loops)
 
 **Process directives:** strategic well-scoped commits direct to `miceli`, zero prod DB writes during refactor (read-only prod via `supabase db query --linked` + `drizzle-kit pull` only), no parallel local DB. **Never merge to main without explicit user permission** (memory: `feedback_no-merge-to-main`).
 
