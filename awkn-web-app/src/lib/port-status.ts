@@ -519,35 +519,8 @@ export const PORTED_PAGES: PortedPage[] = [
     group: "BOS Admin",
   },
 
-  {
-    label: "Associates — Index",
-    domain: "awknranch",
-    path: "/associates",
-    legacyPath: "/associates/",
-    group: "Associates",
-    notes: "Justin's actively maintained work-tracking surface (recent edit 2026-05-01: 5-min snap on time inputs).",
-  },
-  {
-    label: "Associates — Projects",
-    domain: "awknranch",
-    path: "/associates/projects",
-    legacyPath: "/associates/projects.html",
-    group: "Associates",
-  },
-  {
-    label: "Associates — Project Inquiry",
-    domain: "awknranch",
-    path: "/associates/projectinquiry",
-    legacyPath: "/associates/projectinquiry.html",
-    group: "Associates",
-  },
-  {
-    label: "Associates — Worktracking",
-    domain: "awknranch",
-    path: "/associates/worktracking",
-    legacyPath: "/associates/worktracking.html",
-    group: "Associates",
-  },
+  // Associates surface retired 2026-05-06 (Phase 6a.4) — work-tracking
+  // moved into BOS proper.
 
   // Within Center marketing site — 37 pages ported verbatim under
   // within/(internal)/. Assets live at public/within-center/{css,images,videos}/.
