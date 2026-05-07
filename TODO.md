@@ -67,6 +67,31 @@ Tomorrow per stakeholder timing. The user is moving awkn-web-app to a clean GitH
 
 **Still open for CTO:**
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
+- [ ] **Move within email templates off public within.center → into auth-gated BOS** — STAKEHOLDER + SECURITY ITEM. Currently TWO email-body templates are reachable as PUBLIC pages on within.center, indexable by search engines (within's robots.txt is `Allow: /` — they will get crawled):
+
+  - `within.center/emails/deposit-received/` — branded HEAL/deposit confirmation email body, includes program flow + reservation language
+  - `within.center/emails/ketamine-prep/` — HEAL package welcome / pre-ceremony prep instructions email body (presumably contains operational details about prep protocol)
+
+  Routes / files:
+  - `awkn-web-app/src/app/within/(internal)/emails/deposit-received/route.ts`
+  - `awkn-web-app/src/app/within/(internal)/emails/ketamine-prep/route.ts`
+  - Source HTML: `legacy/within-center/emails/{deposit-received,ketamine-prep}.html`
+
+  **Why this matters:**
+  - These are operator-side preview templates, never meant to be customer-facing public URLs. They show what the email body LOOKS LIKE — internal tooling, not site content.
+  - Search engines will index them on next crawl. Anyone could find via Google or URL-guessing.
+  - Templates carry brand voice + operational content (prep instructions, confirmation language) that could leak treatment-protocol detail or package internals if someone curious lands there.
+  - Phase 6a moved AWKN's similar admin templates (`/admin/email-approved`, `/admin/email-confirm`) to the auth-gated team subdomain — these within ones got missed because they're under within domain, not awknranch.
+
+  **Action:**
+  - Move templates into BOS at `team.awknranch.com/spaces/admin/email-templates/{deposit-received,ketamine-prep}/` (auth-gated)
+  - Delete the public `/emails/*` Route Handlers under `awkn-web-app/src/app/within/(internal)/emails/`
+  - Delete the corresponding `port-status.ts` entries from "Email Templates" group
+  - Delete legacy source `legacy/within-center/emails/` if not referenced elsewhere
+  - Sweep within site for any hardcoded links to `/emails/*` (likely none — these are template previews, not navigated to from other pages)
+
+  Pre-existing exposure: these were also reachable on legacy GH Pages at `laurenbur2.github.io/awkn-ranch/within-center/emails/...` — the new app inherited the leak. Surfacing it now so the move-to-BOS happens before within.center DNS cuts over to Vercel and Google starts indexing the new domain.
+
 - [ ] **Wire AWKN public-site forms into the BOS as subscribable lead sources** — Currently the 3 public forms on awknranch.com (book, host-a-retreat, contact) are pure `mailto:hello@awknranch.com` scaffolding. Lauren created them on 2026-05-06 (commits `2c20f2c2` + `f07f3983`) as scaffolds and never wired backend. They send NO data to Supabase, NO data to CRM, no `crm_leads` row, no audit trail. Mobile users without configured email apps get silent failures. Should each become a `crm_leads` insert + Resend confirmation email + appear in BOS CRM as a new lead the operator can act on. Make each form a SUBSCRIBABLE source so operators can filter "show me all leads from /book" vs "from /host-a-retreat" etc. Form fields by page:
   - `/book` — name, email, dates, party size, interest, description, notes
   - `/host-a-retreat` — name, email, org, size, dates, modality, vision, description
