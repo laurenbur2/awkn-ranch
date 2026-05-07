@@ -14,6 +14,47 @@ import { updateSession } from "~/lib/supabase/middleware";
  * 3. `NEXT_PUBLIC_DISABLE_AUTH=true` short-circuits the auth check — useful
  *    during dev/testing before real auth is wired.
  */
+
+/**
+ * Auth-flow paths that should remain reachable without a session — login pages,
+ * password-reset pages, post-email-confirmation landings. Exact-match against
+ * a normalized pathname; no startsWith fallback (path-traversal safety).
+ */
+const AUTH_FLOW_PATHS = new Set([
+  "/login",
+  "/login/reset-password",
+  "/login/update-password",
+  "/admin/email-approved",
+  "/admin/email-confirm",
+]);
+
+/**
+ * Decides whether a pathname is an auth-flow page that should bypass the auth
+ * gate. Hardened against path-traversal:
+ *
+ * 1. Reject any path containing `..` or percent-encoded slashes (`%2f`, `%2e%2e`)
+ *    — these are common bypass vectors that look like `/login/../spaces/admin`.
+ * 2. Normalize via URL parsing so any remaining traversal resolves before the
+ *    allowlist check.
+ * 3. Strip trailing slash (other than root).
+ * 4. Exact-match against the allowlist.
+ */
+function isAuthFlowPath(pathname: string): boolean {
+  if (pathname.includes("..") || /%2[ef]/i.test(pathname)) {
+    return false;
+  }
+  let normalized: string;
+  try {
+    normalized = new URL(pathname, "http://localhost").pathname;
+  } catch {
+    return false;
+  }
+  if (normalized.length > 1 && normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
+  return AUTH_FLOW_PATHS.has(normalized);
+}
+
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host");
   const domain = resolveDomain(host);
@@ -57,8 +98,16 @@ export async function proxy(request: NextRequest) {
 
   // Auth gate (skipped when NEXT_PUBLIC_DISABLE_AUTH=true)
   if (domain.authRequired && !authDisabled) {
+    // Method gate — only GET/HEAD allowed unauthenticated for auth-flow pages.
+    // POSTs / writes go directly to Supabase from the browser, not through us;
+    // any non-read method on a gated path is treated as auth-required.
+    const method = request.method.toUpperCase();
+    const isReadMethod = method === "GET" || method === "HEAD";
+
     const session = await updateSession(request);
-    if (!session.user && pathname !== "/login") {
+    const isAllowed = isReadMethod && isAuthFlowPath(pathname);
+
+    if (!session.user && !isAllowed) {
       // Redirect to the clean public `/login` URL — proxy will rewrite it
       // to `/${prefix}/login` on the way in. Stay on the same hostname so
       // the URL bar shows e.g. `team.awknranch.com/login`, not `/team/login`.
