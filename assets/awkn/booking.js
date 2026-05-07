@@ -56,8 +56,8 @@ export const LISTINGS = [
     hourly_min_hours: null,
     cleaning_fee: 0,
     addons: [],
-    hero_image: '/assets/awkn/retreat-house.jpg',
-    gallery_images: ['/assets/awkn/retreat-house.jpg'],
+    hero_image: '/assets/awkn/private-room.png',
+    gallery_images: ['/assets/awkn/private-room.png','/assets/awkn/retreat-house.jpg'],
     amenities: ['Queen bed','Shared bath','Continental breakfast','Wellness facility access'],
   },
   {

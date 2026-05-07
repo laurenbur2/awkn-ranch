@@ -183,8 +183,8 @@ VALUES
    'A private bedroom in the Retreat House with a queen bed and shared bath access. Five rooms available. Includes continental breakfast and full access to sauna, cold plunge, and gardens.',
    1, 2, 349, NULL, NULL, 0,
    '[]'::jsonb,
-   '/assets/awkn/retreat-house.jpg',
-   ARRAY['/assets/awkn/retreat-house.jpg']::TEXT[],
+   '/assets/awkn/private-room.png',
+   ARRAY['/assets/awkn/private-room.png','/assets/awkn/retreat-house.jpg']::TEXT[],
    ARRAY['Queen bed','Shared bath','Continental breakfast','Wellness facility access']::TEXT[],
    20),
 
