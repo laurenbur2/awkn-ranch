@@ -56,7 +56,8 @@ Architecture and migration plan: `docs/ECOSYSTEM-MAP.md` + `docs/superpowers/spe
 | New Next.js app `awkn-web-app/` | 🟡 Phase 6 starting | 107 ports wired; functional `/login` legacy bridge; dev landing tracks port progress |
 | Voice / PAI / Vapi | ✅ Decommissioned | Source removed Pass 4. 5 prod edge fns still need undeploy at end-of-program cutover |
 | Payments (Stripe + Square + PayPal) | ✅ Live (legacy) | Stripe invoice flow added by Justin 2026-05-06; no CI gates on money flows |
-| SignWell webhook | 🟡 Empirically dead | Tables missing in prod; COO call pending |
+| SignWell e-sign | 🟡 Half-wired | Outbound `create-proposal-contract` + `create-retreat-agreement` ACTIVE (env-key based, real client emails ship); inbound webhook + browser `signwell-service.js` DEAD (read missing `signwell_config` table). Status updates likely manual. |
+| Cloudflare R2 storage | ❌ Unwired | All 5 R2_* env vars unset in prod (confirmed via dump). `r2-upload.ts` callers (`guestbook-upload`, `resend-inbound-webhook`) silently throw. Same revive-vs-retire call as SignWell webhook. |
 | Public sites (`awknranch.com`, `within.center`) | 🟡 External | Squarespace + WordPress; downstream of current port |
 | Client portal | ⏳ Phase 5 | Greenfield |
 

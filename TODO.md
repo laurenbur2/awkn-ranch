@@ -22,11 +22,12 @@ State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/mi
 **Resolved:** Vapi GO, vehicles DROP, PAI moot, Mac LaunchAgents irrelevant, post-login redirect, mobile/ delete, upstream-template-sync (negative), monorepo vs single-app (single-app wins).
 
 **Still open for COO:**
-- [ ] **SignWell webhook status** — Actively used for Within agreements / Ranch retreat housing, or fully retired? Empirically can't fire in prod (`signwell_config`, `rental_applications`, `lease_templates`, `event_hosting_requests` confirmed missing per Pass 5.1 audit). User's hunch: not in use. Determines deletion vs dormant-keep.
+- [x] ~~**SignWell webhook status**~~ — Resolved 2026-05-06 by dump-secrets audit + code trace. SignWell is **half-wired**: outbound signing flows (`create-proposal-contract` for AWKN rental agreements + `create-retreat-agreement` for Within retreat agreements) are ACTIVE in prod — operator clicks Send Proposal, SignWell emails the client a branded document, client signs. Inbound `signwell-webhook` and the browser-side `signwell-service.js` / `templates.js` UI are DEAD because they try to read missing `signwell_config` table. Status updates on signed/declined likely happen manually. Decision needed: fix the webhook (read API key from env instead of DB, like the outbound functions do) or accept manual status updates.
+- [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
 
 **Still open for CTO:**
-- [ ] **SignWell email CTA** (`signwell-webhook/index.ts:638, 669, 941`) — depends on SignWell decision above.
-- [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
+- [ ] **SignWell webhook fix** — `signwell-webhook/index.ts` reads from missing `signwell_config` table; should read `Deno.env.get("SIGNWELL_API_KEY")` like its outbound siblings do. Small surgical fix, not blocked by anything. Once fixed, signed/declined callbacks will flow through and proposal/retreat status will auto-update.
+- [ ] **R2 revive-or-retire** — All 5 R2_* env vars confirmed unset in prod (2026-05-06 dump). `supabase/functions/_shared/r2-upload.ts` callers (`guestbook-upload`, `resend-inbound-webhook` for attachment storage) silently throw. Mirror of SignWell-webhook situation. Either provision a Cloudflare R2 bucket + populate env, or delete the helper + 2 callers.
 
 **Process directives:** strategic well-scoped commits direct to `miceli`, zero prod DB writes during refactor (read-only prod via `supabase db query --linked` + `drizzle-kit pull` only), no parallel local DB.
 
