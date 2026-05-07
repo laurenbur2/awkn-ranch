@@ -29,6 +29,85 @@ const config = {
     ];
   },
 
+  // Phase 6a.8 — 301 redirects from legacy awknranch.com paths to the new
+  // team.awknranch.com home of all team-facing surfaces. These activate at
+  // production cutover (when team.awknranch.com is live on Vercel + DNS);
+  // local dev hits *.localhost which doesn't match these `host` rules, so
+  // redirects are a no-op locally.
+  //
+  // EXPLICITLY EXCLUDED: /api/webhooks/* — vendor URLs (Stripe, SignWell,
+  // Resend, Square) are registered against awknranch.com endpoints in
+  // their dashboards. Keep webhook handlers on awknranch.com host so we
+  // don't need to update vendor configs at cutover time.
+  async redirects() {
+    /** @type {Array<{type: "host", value: string}>} */
+    const legacyHost = [
+      { type: "host", value: "awknranch.com" },
+      { type: "host", value: "www.awknranch.com" },
+    ];
+    // Each redirect rule is duplicated for both bare-host and www variants
+    // because Next.js redirect rules don't support a host pattern with OR.
+    const rules = [];
+    for (const has of legacyHost) {
+      rules.push(
+        // BOS Admin paths
+        {
+          source: "/spaces/admin/:path*",
+          has: [has],
+          destination: "https://team.awknranch.com/spaces/admin/:path*",
+          permanent: true,
+        },
+        // Team Portal: /portal collapsed to /
+        {
+          source: "/portal",
+          has: [has],
+          destination: "https://team.awknranch.com",
+          permanent: true,
+        },
+        {
+          source: "/portal/team-chart",
+          has: [has],
+          destination: "https://team.awknranch.com/team-chart",
+          permanent: true,
+        },
+        // Auth flow
+        {
+          source: "/login",
+          has: [has],
+          destination: "https://team.awknranch.com/login",
+          permanent: true,
+        },
+        {
+          source: "/login/:path*",
+          has: [has],
+          destination: "https://team.awknranch.com/login/:path*",
+          permanent: true,
+        },
+        {
+          source: "/admin/email-:variant",
+          has: [has],
+          destination: "https://team.awknranch.com/admin/email-:variant",
+          permanent: true,
+        },
+        // Post-login landing
+        {
+          source: "/logged-in",
+          has: [has],
+          destination: "https://team.awknranch.com/logged-in",
+          permanent: true,
+        },
+        // Team API routes (NOT webhooks — those stay on awknranch host)
+        {
+          source: "/api/team/:path*",
+          has: [has],
+          destination: "https://team.awknranch.com/api/team/:path*",
+          permanent: true,
+        },
+      );
+    }
+    return rules;
+  },
+
   async headers() {
     return [
       {
