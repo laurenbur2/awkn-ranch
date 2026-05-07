@@ -38,7 +38,32 @@ Tomorrow per stakeholder timing. The user is moving awkn-web-app to a clean GitH
 - [x] ~~R2 revive-or-retire~~ — Retired. Hosting on Vercel; Vercel Blob handles future object-storage needs. Deleted `_shared/r2-upload.ts` + `guestbook-upload/`; dropped unused R2 import from `resend-inbound-webhook`. Deploy cleanup ↓.
 
 **Pending COO/CTO:**
-- [ ] **Within Center uses a SEPARATE Supabase project** — `within-center/book/index.html` calls `gatsnhekviqooafddzey.supabase.co` for `create-within-checkout-session`, distinct from AWKN's `lnqxarwqckpmirpmixcw`. The Within booking deposit flow runs against its own DB entirely. Long-term desire is a singular DB for everything; need stakeholder call on whether to consolidate Within into AWKN's Supabase, keep them separate, or migrate AWKN into Within's. Affects Phase 6+ Within-portion port planning.
+- [ ] **Within Center booking → SEPARATE Supabase project** — STAKEHOLDER DISCUSSION ITEM. The within booking page at `within.center/book/` (file: `legacy/within-center/book/index.html`) is the ONE real dynamic page on the within site. Its "Reserve" button POSTs to `https://gatsnhekviqooafddzey.supabase.co/functions/v1/create-within-checkout-session` — a completely separate Supabase project from AWKN's `lnqxarwqckpmirpmixcw`. The function returns a Stripe Checkout URL, browser redirects to it, payment processes via what's presumably a separate Stripe account too.
+
+  **Why this matters:**
+  - All Within bookings + Stripe payments live in a DB the BOS can't see. Operators can't view Within booking pipeline in CRM. No unified customer view.
+  - Customer email might exist in BOTH databases as separate records (someone who books a Within retreat AND a Ranch stay).
+  - Reporting is split — revenue, conversion analytics, lead-source attribution all bifurcated.
+  - Maintenance overhead — two Supabase projects to keep in sync, two Stripe accounts (presumably), two RLS policy sets.
+
+  **Migration consideration:**
+  - **Option A — full migration:** Move Within data + edge functions into AWKN's Supabase (`lnqxarwqckpmirpmixcw`). One DB, one CRM, one Stripe account. Significant migration work + cutover. Schema mapping (within tables → awkn tables or new namespace), edge function port (`create-within-checkout-session` becomes `create-checkout-session` with a `business_line` param like other unified functions), Stripe Connect or single account decision.
+  - **Option B — keep separate:** Two systems, accept the bifurcation. Less work but harder to unify reporting later.
+  - **Option C — partial:** Mirror within data into AWKN's Supabase via a sync job (one-way). Operators see Within bookings in BOS but can't act on them; Within auth + payments stay in their own system. Half-measure.
+
+  **Action:** Stakeholder call (COO + CTO + ops) to choose A/B/C. Affects: Within port scope, BOS roadmap, Stripe account consolidation, customer-data architecture.
+
+- [ ] **Within contact form → 3rd-party formsubmit.co** — STAKEHOLDER DISCUSSION ITEM. Route: `within.center/contact/` (file: `legacy/within-center/contact/index.html`, line 497). Form fields: First Name, Last Name, Phone, Email, City, State, Message. On submit, JS POSTs to `https://formsubmit.co/ajax/intake@within.center` which delivers an email to `intake@within.center` plus an autoresponder back to the user pointing them at the phone number 512-969-2399.
+
+  **Why this matters:**
+  - Form data NEVER lands in AWKN or Within Supabase. Lives only in formsubmit.co's email-sending pipeline + the recipient inbox.
+  - No CRM trail — Heather/within team get an email but operator can't filter, search, or report on inquiries.
+  - 3rd-party dependency for a critical lead-capture channel. If formsubmit.co changes terms / has downtime / suspends account, contact form breaks silently.
+  - Auto-response uses Within Center branding + phone number — inconsistent with how AWKN handles inquiries (which is mailto: only — also flagged for BOS integration; see "Wire AWKN public-site forms" item below).
+
+  **Migration option:** wire to the same `crm_leads` table + Resend confirmation pattern proposed for AWKN public forms. One unified intake API for both brands, marked by `business_line` field. Operator sees Within inquiries alongside AWKN inquiries in BOS CRM, can filter by source.
+
+  **Action:** Same stakeholder call as the booking-Supabase decision — these consolidate naturally into "Should Within share AWKN's data plane?"
 
 **Still open for CTO:**
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.

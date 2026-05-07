@@ -418,7 +418,15 @@ export default function DevLandingPage() {
                             </summary>
                             <div className="dev-pages">
                               {pages.map((p) => {
-                                const newUrl = `http://${p.domain}.localhost:${port}${p.path}`;
+                                // Append trailing slash so the browser
+                                // doesn't catch a 308 redirect from Next's
+                                // trailingSlash: true canonicalization.
+                                // The blank-page flicker during the redirect
+                                // is the UX cost we're avoiding.
+                                const canonicalPath = p.path.endsWith("/")
+                                  ? p.path
+                                  : `${p.path}/`;
+                                const newUrl = `http://${p.domain}.localhost:${port}${canonicalPath}`;
                                 const legacyUrl = `${LEGACY_LIVE_BASE}${p.legacyPath}`;
                                 return (
                                   <div
