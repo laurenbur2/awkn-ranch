@@ -191,32 +191,35 @@ export const PORTED_PAGES: PortedPage[] = [
     notes: "Was at /team/ before Lauren's 2026-05-06 split (when /team/ became the public team page).",
   },
 
+  // Auth flow — moved to team subdomain in Phase 6a.5 (2026-05-06).
+  // Auth-gated: anyone hitting team.awknranch.com without a session is
+  // redirected to /login. These 5 paths are the allowlist exemptions.
   {
     label: "Sign-in (legacy port, functional)",
-    domain: "awknranch",
+    domain: "team",
     path: "/login",
     legacyPath: "/login/",
     group: "Auth",
-    notes: "Legacy AWKN team-portal sign-in. JS deps copied to public/. After login, redirects to /logged-in. Session uses localStorage key awkn-ranch-auth — /team picks it up automatically.",
+    notes: "Legacy AWKN team-portal sign-in. After login, redirects to /logged-in (also on team). Session uses localStorage key awkn-ranch-auth — per-origin so post-cutover operators sign in fresh on team.",
   },
   {
     label: "Reset password (request)",
-    domain: "awknranch",
+    domain: "team",
     path: "/login/reset-password",
     legacyPath: "/login/reset-password.html",
     group: "Auth",
-    notes: "Legacy reset-password page, AlpacAPPs-branded → rebranded AWKN at serve time. Uses shared/auth.js (already in public/). Patched auth.js to export getBasePath which legacy reset page imported but was never defined.",
+    notes: "Legacy reset-password page, AlpacAPPs-branded → rebranded AWKN at serve time via legacyAuthPort rewrite.",
   },
   {
     label: "Update password (consume reset link)",
-    domain: "awknranch",
+    domain: "team",
     path: "/login/update-password",
     legacyPath: "/login/update-password.html",
     group: "Auth",
   },
   {
     label: "Email approved (admin confirmation)",
-    domain: "awknranch",
+    domain: "team",
     path: "/admin/email-approved",
     legacyPath: "/admin/email-approved.html",
     group: "Auth",
@@ -224,7 +227,7 @@ export const PORTED_PAGES: PortedPage[] = [
   },
   {
     label: "Email confirm (admin)",
-    domain: "awknranch",
+    domain: "team",
     path: "/admin/email-confirm",
     legacyPath: "/admin/email-confirm.html",
     group: "Auth",
