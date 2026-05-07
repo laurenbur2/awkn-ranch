@@ -29,6 +29,9 @@ State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/mi
 - [x] ~~SignWell webhook fix~~ — Done. `signwell-webhook/index.ts` now reads `Deno.env.get("SIGNWELL_API_KEY")` like its outbound siblings; signed/declined callbacks will flow on next prod deploy.
 - [x] ~~R2 revive-or-retire~~ — Retired. Hosting on Vercel; Vercel Blob handles future object-storage needs. Deleted `_shared/r2-upload.ts` + `guestbook-upload/`; dropped unused R2 import from `resend-inbound-webhook`. Deploy cleanup ↓.
 
+**Pending COO/CTO:**
+- [ ] **Within Center uses a SEPARATE Supabase project** — `within-center/book/index.html` calls `gatsnhekviqooafddzey.supabase.co` for `create-within-checkout-session`, distinct from AWKN's `lnqxarwqckpmirpmixcw`. The Within booking deposit flow runs against its own DB entirely. Long-term desire is a singular DB for everything; need stakeholder call on whether to consolidate Within into AWKN's Supabase, keep them separate, or migrate AWKN into Within's. Affects Phase 6+ Within-portion port planning.
+
 **Still open for CTO:**
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
 
