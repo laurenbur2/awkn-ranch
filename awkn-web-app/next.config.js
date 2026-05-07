@@ -13,6 +13,19 @@ const config = {
     root: import.meta.dirname,
   },
 
+  // Preserve trailing slashes site-wide. The legacy GH-Pages site we're
+  // porting was authored for trailing-slash URLs (every internal link uses
+  // `href="ceremonial-ketamine/"`, `href="property/"` etc.). Next 16's
+  // default behavior is to strip trailing slashes — which broke relative
+  // link resolution within the legacy HTML (e.g. clicking `awkn/` from
+  // `/ceremonial-ketamine` resolved to `/awkn/` instead of
+  // `/ceremonial-ketamine/awkn/` because the browser saw the bare URL as a
+  // file context). Setting trailingSlash: true makes Next canonicalize to
+  // the GH-Pages convention so every legacy relative link resolves
+  // correctly. M3 API routes still respond — Next 308-redirects POST/PATCH/
+  // DELETE while preserving method.
+  trailingSlash: true,
+
   // Prevent server-only DB drivers from being traced into client bundles.
   // postgres + @libsql/client transitively use node `tls`/`net`/`crypto`.
   serverExternalPackages: ["postgres", "@libsql/client"],

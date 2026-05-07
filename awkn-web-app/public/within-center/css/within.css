@@ -45,7 +45,13 @@ img { display: block; max-width: 100%; }
   transition: background 0.4s, padding 0.3s, border-color 0.3s;
 }
 .site-nav.scrolled { padding: 1.1rem 3rem; }
-.nav-left { justify-self: start; }
+/* .nav-left needs flex+center so the inline-flex button doesn't get
+ * anchored at the line-height baseline (same fix as awknranch site.css). */
+.nav-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+}
 .menu-toggle {
   display: inline-flex;
   align-items: center;
@@ -58,6 +64,7 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
   color: var(--dark);
   padding: 0;
+  line-height: 1;
   transition: color 0.3s;
 }
 .menu-toggle:hover { color: var(--gold); }
@@ -280,10 +287,17 @@ img { display: block; max-width: 100%; }
 .site-nav.menu-is-open .menu-toggle-bars span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
 .site-nav.menu-is-open .menu-toggle-bars span:nth-child(2) { opacity: 0; }
 .site-nav.menu-is-open .menu-toggle-bars span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-.site-nav.menu-is-open .menu-label::before { content: 'Close'; }
+/* Label flows naturally inside the menu-toggle flex row (same fix as
+ * awknranch site.css). min-width reserves space for the wider "Close"
+ * string so the button doesn't reflow when toggled. */
 .menu-label::before { content: 'Menu'; }
-.menu-label { visibility: hidden; position: relative; }
-.menu-label::before { visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap; }
+.site-nav.menu-is-open .menu-label::before { content: 'Close'; }
+.menu-label {
+  display: inline-block;
+  min-width: 3.6em;
+  white-space: nowrap;
+  text-align: left;
+}
 
 /* Back button: hidden on desktop, shown on mobile */
 .menu-sub-back {
