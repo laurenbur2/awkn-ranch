@@ -4,16 +4,24 @@
 > Program spec: `docs/superpowers/specs/2026-05-01-cleanup-and-nextjs-refactor-design.md`
 > Phase 1 spec: `docs/superpowers/specs/2026-05-03-phase-1-alpaca-purge-design.md`
 
-## Resume actions (next session — 2026-05-06 handoff)
+## Phase 6a status (as of 2026-05-06 EOD)
 
-State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/miceli`. Working tree has 5 uncommitted support fixes (proxy strip, next.config rewrite, auth bypass, flag injection, supabase-health.css). `stash@{0}` holds prior session's bos-revert workarounds as a safety net. Reflog has 8 discarded commits recoverable for ~90 days.
+Local implementation **complete** on `miceli`. 9 commits, `71b176da` → `f93c1ac3`. Plan locked at `docs/superpowers/specs/2026-05-07-phase-6a-team-subdomain-migration.md` (Codex-audited, 30 issues addressed).
 
-- [ ] **Restart Claude Code session, run `/mcp`, authenticate Supabase MCP server** — `.mcp.json` already has the entry; auth flow is interactive.
-- [ ] **Grant admin role on `app_users` for `mmicel583@gmail.com`** via Supabase MCP. Plan: SELECT first to confirm row, then `UPDATE app_users SET role = 'admin' WHERE email = 'mmicel583@gmail.com' RETURNING *;`. Unlocks RLS-protected admin queries so data tables actually populate.
-- [ ] **Verify dev experience end-to-end** — admin chrome renders + data loads on key pages: `/spaces/admin/dashboard`, `/spaces/admin/crm`, `/spaces/admin/venue-events`, `/spaces/admin/within-schedule` (Justin's new Edit button — incoming from main merge).
-- [ ] **Commit the 5 uncommitted support fixes** as one logical commit when verified.
-- [ ] **Force-push miceli to origin/miceli** (`git push --force-with-lease origin miceli`). Discards 8 commits on origin (recoverable from local reflog).
-- [ ] **Replay today's repo housekeeping** on top: legacy GH-Pages site → `legacy/`, `awkn-web-app/` flatten to root, archive 9 legacy-era docs, unify CLAUDE.md/STATUS.md/TODO.md per framework. (Optionally cherry-pick `95cfd0c9` portal split + `7367f657` visitor-identity TS port from reflog before the housekeeping replay — both were small wins lost to the reset.)
+**Awaiting user decision: merge `miceli` → `main`** (per `feedback_no-merge-to-main` rule, never auto-merge). Merge ships 6a.1 (M2) + 6a.4 (Associates delete) to GitHub Pages prod immediately; the rest is awkn-web-app changes that don't ship anywhere yet (no Vercel project linked).
+
+## Phase 6a-Deploy (production cutover — deferred)
+
+Tomorrow per stakeholder timing. The user is moving awkn-web-app to a clean GitHub repo + new Vercel project. Cutover steps:
+
+- [ ] Create new GitHub repo for awkn-web-app
+- [ ] Create new Vercel project linked to that repo
+- [ ] Set Vercel env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_PASSWORD`. Do NOT set `NEXT_PUBLIC_DISABLE_AUTH=true` in prod.
+- [ ] Add `team.awknranch.com` (and eventually `awknranch.com`, `www.awknranch.com`, `within.center`) as Vercel project domains
+- [ ] Add CNAME at DNS provider (TBD — `dig +short NS awknranch.com` to identify) → `cname.vercel-dns.com`. DNS-only / proxy OFF if Cloudflare.
+- [ ] Verify TLS provisioned: `curl -v https://team.awknranch.com/`
+- [ ] Promote main → Vercel prod
+- [ ] Operator runbook (planned per spec §Production Cutover) — communicate to team before flipping DNS
 
 ## Critical (blocks production)
 
@@ -35,7 +43,25 @@ State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/mi
 **Still open for CTO:**
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
 
-**Process directives:** strategic well-scoped commits direct to `miceli`, zero prod DB writes during refactor (read-only prod via `supabase db query --linked` + `drizzle-kit pull` only), no parallel local DB.
+**Process directives:** strategic well-scoped commits direct to `miceli`, zero prod DB writes during refactor (read-only prod via `supabase db query --linked` + `drizzle-kit pull` only), no parallel local DB. **Never merge to main without explicit user permission** (memory: `feedback_no-merge-to-main`).
+
+## Phase 6b — long-game React rebuild (post-cutover)
+
+After 6a-Deploy lands, kick off the page-by-page React rebuild on a separate dev branch. No time pressure. Order:
+
+- Tier 1 (warmup): manage, appdev, testdev, devcontrol, job-titles
+- Tier 2 (read-mostly): dashboard, staff, users, passwords
+- Tier 3 (real CRUD): clients, scheduling, reservations, events
+- Tier 4 (money/risk): crm, accounting, purchases, proposals — already protected by M3 server-side gates
+
+Other 6b deferred work:
+- [ ] Persistent audit log table for M3 mutations (currently console.log via Vercel logs)
+- [ ] HttpOnly-cookie session migration (currently bearer-token via legacy localStorage)
+- [ ] Browser-side `signwell-service.js` + `templates.js` UI cleanup (read missing `signwell_config` table — fully deletable)
+- [ ] Delete 37 Phase-2 RouteStubs in `awkn-web-app/src/app/team/<name>/page.tsx` as React rebuilds replace them
+- [ ] `savePermissions()` in users.js still client-side (M3 only covers wholesale resetPermissions, not per-permission editing)
+- [ ] Public/login/app.js TS errors (pre-existing checkJs noise) — clean up legacy JS or relax checkJs scope
+- [ ] SignWell webhook E2E test (bundled into UI testing pass — defer until live clients ramp up)
 
 ## Bugs (broken functionality)
 
