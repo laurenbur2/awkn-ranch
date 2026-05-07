@@ -328,6 +328,17 @@
       margin: 0;
     }
     .awknhero h1 em { font-style: italic; font-weight: 300; color: var(--gold); }
+    /* The logo JPG has a black background; mix-blend-mode: screen
+       drops the black and lets the bronze AWKN letters glow over the
+       hero photo. Requires .awknhero-content NOT to create a stacking
+       context (see above). */
+    .awknhero-logo {
+      display: block;
+      width: clamp(260px, 48vw, 540px);
+      height: auto;
+      margin: 0 auto;
+      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
+    }
     .awknhero-tagline {
       display: block;
       margin-top: 2rem;
@@ -899,7 +910,8 @@
     <div class="awknhero-bg"></div>
     <div class="awknhero-content">
       <span class="awknhero-place">Austin, Texas</span>
-      <h1>A<em>wake</em>n.</h1>
+      <h1 style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">AWKN Ranch</h1>
+      <img src="assets/awkn/awkn-logo.png" alt="AWKN — Ancient Wisdom Known Now" class="awknhero-logo">
       <span class="awknhero-tagline">A wellness retreat held by the land.</span>
     </div>
     <a href="#welcome" class="awknhero-scroll-cue" aria-label="Scroll down">
