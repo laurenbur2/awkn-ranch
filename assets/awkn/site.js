@@ -1,5 +1,6 @@
 /* AWKN Ranch — shared site behavior (nav, menu, submenus) */
-(function () {
+
+function awknInit() {
   // Nav background swap on scroll (no-op on pages where the nav already
   // has class="solid", but harmless).
   var nav = document.getElementById('siteNav');
@@ -12,11 +13,8 @@
     window.addEventListener('scroll', update, { passive: true });
     update();
   }
-})();
 
-(function () {
   // Menu panel + submenus
-  var nav = document.getElementById('siteNav');
   var toggle = document.getElementById('menuToggle');
   var panel = document.getElementById('menuPanel');
   var backdrop = document.getElementById('menuBackdrop');
@@ -104,4 +102,10 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && isOpen()) closeMenu();
   });
-})();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', awknInit);
+} else {
+  awknInit();
+}
