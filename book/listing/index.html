@@ -139,7 +139,7 @@
         </div>
         <div class="book-total-empty" id="totalEmpty">Pick your dates to see the total.</div>
 
-        <button type="submit" class="book-submit" id="submitBtn">Continue to Payment</button>
+        <button type="submit" class="book-submit" id="submitBtn">Book Your Stay</button>
         <div class="book-secure-note">Secured by Stripe &middot; you won&rsquo;t be charged until you confirm on the next page.</div>
         <div id="bookMessage"></div>
       </form>
@@ -456,7 +456,7 @@
 
         if (error) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Continue to Payment';
+          submitBtn.textContent = 'Book Your Stay';
           console.error('[booking] submit failed:', error);
           // If the table doesn't exist yet, fall back to mailto
           if (error.code === 'PGRST205' || /relation .* does not exist/.test(error.message || '')) {
@@ -478,7 +478,7 @@
         const checkout = await createStripeCheckout(data.id);
         if (checkout.error) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Continue to Payment';
+          submitBtn.textContent = 'Book Your Stay';
           console.error('[booking] checkout error:', checkout.error);
           messageEl.innerHTML = `
             <div class="book-success">
