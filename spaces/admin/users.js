@@ -770,13 +770,27 @@ window.revokeProspectToken = async function(tokenId, invitationId) {
 };
 
 async function updateUserRole(userId, newRole) {
+  // Phase 6a.2 — went through M3 server-side gate. Was a direct
+  // supabase.from('app_users').update({ role }) browser write. Now hits
+  // /api/team/users/[id]/role which validates caller role + audit-logs.
   try {
-    const { error } = await supabase
-      .from('app_users')
-      .update({ role: newRole })
-      .eq('id', userId);
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess?.session?.access_token;
+    if (!token) throw new Error('Not signed in');
 
-    if (error) throw error;
+    const res = await fetch(`/api/team/users/${userId}/role`, {
+      method: 'PATCH',
+      credentials: 'omit',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({ role: newRole }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      throw new Error(error || `HTTP ${res.status}`);
+    }
 
     await loadUsers();
     render();
@@ -792,12 +806,20 @@ async function removeUser(userId) {
   if (!confirm('Permanently DELETE this user? This removes the record. Use Archive instead if you might restore them later.')) return;
 
   try {
-    const { error } = await supabase
-      .from('app_users')
-      .delete()
-      .eq('id', userId);
+    // Phase 6a.2 — went through M3 server-side gate.
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess?.session?.access_token;
+    if (!token) throw new Error('Not signed in');
 
-    if (error) throw error;
+    const res = await fetch(`/api/team/users/${userId}`, {
+      method: 'DELETE',
+      credentials: 'omit',
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      throw new Error(error || `HTTP ${res.status}`);
+    }
 
     await loadUsers();
     render();
@@ -1503,11 +1525,23 @@ function closePermissionsModal() {
 async function resetPermissions() {
   if (!permModalUserId) return;
   try {
-    const { error } = await supabase
-      .from('user_permissions')
-      .delete()
-      .eq('app_user_id', permModalUserId);
-    if (error) throw error;
+    // Phase 6a.2 — went through M3 server-side gate. The savePermissions()
+    // flow below stays client-side (per-permission editing — lower risk
+    // than wholesale reset; reset wipes the entire override set).
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess?.session?.access_token;
+    if (!token) throw new Error('Not signed in');
+
+    const res = await fetch(`/api/team/users/${permModalUserId}/permissions`, {
+      method: 'DELETE',
+      credentials: 'omit',
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({}));
+      throw new Error(error || `HTTP ${res.status}`);
+    }
+
     showToast('Permissions reset to role defaults', 'success');
     // Reopen modal to refresh
     await showPermissionsModal(permModalUserId);

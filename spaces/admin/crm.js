@@ -2366,14 +2366,23 @@ function openLeadModal(lead = null) {
     }
   });
 
-  // Delete
+  // Delete (Phase 6a.2 — went through M3 server-side gate; cascades activities)
   document.getElementById('btn-delete-lead')?.addEventListener('click', async () => {
     if (!confirm('Are you sure you want to delete this lead? This cannot be undone.')) return;
     try {
-      // Delete activities first
-      await supabase.from('crm_activities').delete().eq('lead_id', lead.id);
-      const { error } = await supabase.from('crm_leads').delete().eq('id', lead.id);
-      if (error) throw error;
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (!token) throw new Error('Not signed in');
+
+      const res = await fetch(`/api/team/leads/${lead.id}`, {
+        method: 'DELETE',
+        credentials: 'omit',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({}));
+        throw new Error(error || `HTTP ${res.status}`);
+      }
       showToast('Lead deleted', 'success');
       await loadAllData();
       renderAll();
@@ -2933,9 +2942,14 @@ async function saveInvoice(existingInvoice, status) {
       const token = session?.access_token;
       if (token) {
         const cardTotal = Math.round(total * 1.03 * 100) / 100;
+        // Phase 6a.2 — payment-link creation goes through M3 server-side gate.
+        // Was a direct fetch to the create-payment-link edge function with the
+        // operator's session token. Now /api/team/payments/create-link
+        // validates caller role server-side before forwarding.
         async function makeLink(amount, method, suffix) {
-          const r = await fetch('https://lnqxarwqckpmirpmixcw.supabase.co/functions/v1/create-payment-link', {
+          const r = await fetch('/api/team/payments/create-link', {
             method: 'POST',
+            credentials: 'omit',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + token,
