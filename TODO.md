@@ -25,9 +25,12 @@ State: local `miceli` HEAD `29ccfab2` is 15 commits ahead / 11 behind `origin/mi
 - [x] ~~**SignWell webhook status**~~ — Resolved 2026-05-06 by dump-secrets audit + code trace. SignWell is **half-wired**: outbound signing flows (`create-proposal-contract` for AWKN rental agreements + `create-retreat-agreement` for Within retreat agreements) are ACTIVE in prod — operator clicks Send Proposal, SignWell emails the client a branded document, client signs. Inbound `signwell-webhook` and the browser-side `signwell-service.js` / `templates.js` UI are DEAD because they try to read missing `signwell_config` table. Status updates on signed/declined likely happen manually. Decision needed: fix the webhook (read API key from env instead of DB, like the outbound functions do) or accept manual status updates.
 - [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
 
+**Resolved 2026-05-06:**
+- [x] ~~SignWell webhook fix~~ — Done. `signwell-webhook/index.ts` now reads `Deno.env.get("SIGNWELL_API_KEY")` like its outbound siblings; signed/declined callbacks will flow on next prod deploy.
+- [x] ~~R2 revive-or-retire~~ — Retired. Hosting on Vercel; Vercel Blob handles future object-storage needs. Deleted `_shared/r2-upload.ts` + `guestbook-upload/`; dropped unused R2 import from `resend-inbound-webhook`. Deploy cleanup ↓.
+
 **Still open for CTO:**
-- [ ] **SignWell webhook fix** — `signwell-webhook/index.ts` reads from missing `signwell_config` table; should read `Deno.env.get("SIGNWELL_API_KEY")` like its outbound siblings do. Small surgical fix, not blocked by anything. Once fixed, signed/declined callbacks will flow through and proposal/retreat status will auto-update.
-- [ ] **R2 revive-or-retire** — All 5 R2_* env vars confirmed unset in prod (2026-05-06 dump). `supabase/functions/_shared/r2-upload.ts` callers (`guestbook-upload`, `resend-inbound-webhook` for attachment storage) silently throw. Mirror of SignWell-webhook situation. Either provision a Cloudflare R2 bucket + populate env, or delete the helper + 2 callers.
+- [ ] **`/directory/` historical intent** — AWKN scaffolding for client profiles, or partially-rebranded residue? Preserve regardless; answer informs Phase 5 build.
 
 **Process directives:** strategic well-scoped commits direct to `miceli`, zero prod DB writes during refactor (read-only prod via `supabase db query --linked` + `drizzle-kit pull` only), no parallel local DB.
 
@@ -49,9 +52,9 @@ Single multi-domain Next.js app at `awkn-web-app/`. Phase 2.1–2.4 done. Commit
 
 Single prod-write event after Phase 6. Runbook: `docs/migrations/2026-05-04-prod-cleanup-runbook.md`.
 
-- [ ] Undeploy 5 prod edge functions: `vapi-server`, `property-ai`, `generate-whispers`, `nest-control`, `tesla-command`
+- [ ] Undeploy 6 prod edge functions: `vapi-server`, `property-ai`, `generate-whispers`, `nest-control`, `tesla-command`, `guestbook-upload` (R2 retired 2026-05-06)
 - [ ] Stop droplet IoT pollers (`tesla-poller`, `lg-poller`) — needs SSH config first
-- [ ] Drop dormant Supabase Functions env vars on those undeployed functions
+- [ ] Drop dormant Supabase Functions env vars on those undeployed functions, plus the 5 R2_* secrets if any get set later
 
 ### Phase 3 — Audit-driven port of legacy → `awkn-web-app/` (in flight)
 
