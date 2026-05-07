@@ -170,25 +170,33 @@ export const PORTED_PAGES: PortedPage[] = [
     legacyPath: "/retreat/",
     group: "Reference",
   },
-  // Team Portal — moved from root /index.html in Lauren's 2026-05-06
-  // restructure (commit 8f463a41). Sign-in landing for AWKN team. Uses
-  // Supabase JS via CDN; bosPort strips /awkn-ranch/ prefix from absolute
-  // refs. Eventually destined for team.awknranch.com per Phase 6 IA.
+  // Team Portal — Phase 6a.6 (2026-05-06): moved to team subdomain.
+  // The bare team.awknranch.com is now the team-portal sign-in landing
+  // (URL collapsed from /portal/ → /). Org chart at /team-chart.
+  // Post-login landing /logged-in joins them on team.
   {
     label: "Team Portal — sign-in landing",
-    domain: "awknranch",
-    path: "/portal",
+    domain: "team",
+    path: "/",
     legacyPath: "/portal/index.html",
     group: "Team Portal",
-    notes: "Was at root /index.html before Lauren's 2026-05-06 split. Reads Supabase auth state, redirects signed-in users to /spaces/admin/dashboard.",
+    notes: "URL collapsed from /portal/ → / (Phase 6a.6). Reads Supabase auth state, redirects signed-in users to /spaces/admin/dashboard.",
   },
   {
     label: "Team Portal — Org Chart",
-    domain: "awknranch",
-    path: "/portal/team-chart",
+    domain: "team",
+    path: "/team-chart",
     legacyPath: "/portal/team-chart/index.html",
     group: "Team Portal",
-    notes: "Was at /team/ before Lauren's 2026-05-06 split (when /team/ became the public team page).",
+    notes: "URL collapsed from /portal/team-chart → /team-chart (Phase 6a.6). Was at /team/ before Lauren's 2026-05-06 public-site split.",
+  },
+  {
+    label: "Team Portal — post-login landing",
+    domain: "team",
+    path: "/logged-in",
+    legacyPath: "(custom — Server Component, see /logged-in/page.tsx)",
+    group: "Team Portal",
+    notes: "React page (Server Component), not a verbatim port. Custom-styled to match login aesthetic. Brief landing after sign-in before the legacy redirect to /spaces/admin/dashboard.",
   },
 
   // Auth flow — moved to team subdomain in Phase 6a.5 (2026-05-06).
