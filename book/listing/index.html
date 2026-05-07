@@ -137,6 +137,7 @@
             <span id="totalAmount">$0</span>
           </div>
         </div>
+        <div class="book-total-empty" id="totalEmpty">Pick your dates to see the total.</div>
 
         <button type="submit" class="book-submit" id="submitBtn">Continue to Payment</button>
         <div class="book-secure-note">Secured by Stripe &middot; you won&rsquo;t be charged until you confirm on the next page.</div>
@@ -357,18 +358,21 @@
       })();
 
       // ── Recalc + render total ──
+      const totalEmpty = document.getElementById('totalEmpty');
       function recalc() {
         if (!cal) return;
         const { checkIn, checkOut } = cal.getRange();
         if (!checkIn || !checkOut) {
           totalHost.hidden = true;
+          totalEmpty.hidden = false;
           return;
         }
         const guests = Number(document.querySelector('[name=guests]')?.value) || 1;
         const hours = mode === 'hourly' ? Number(durationSel.value) || (listing.hourly_min_hours || 1) : 0;
         const breakdown = calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons, staffHours, guests, hours });
-        if (!breakdown.lines.length) { totalHost.hidden = true; return; }
+        if (!breakdown.lines.length) { totalHost.hidden = true; totalEmpty.hidden = false; return; }
         totalHost.hidden = false;
+        totalEmpty.hidden = true;
         totalLines.innerHTML = breakdown.lines.map(l =>
           `<div class="book-total-line"><span>${l.label}</span><span>${fmtMoney(l.amount)}</span></div>`
         ).join('');

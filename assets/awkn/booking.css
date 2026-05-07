@@ -366,6 +366,18 @@
   padding-top: 1.2rem;
   border-top: 1px solid var(--border);
 }
+.book-total-empty {
+  margin-top: 1.5rem;
+  padding: 0.95rem 1rem;
+  border: 1px dashed rgba(201,148,62,0.4);
+  border-radius: 10px;
+  background: rgba(201,148,62,0.05);
+  color: var(--brown);
+  font-size: 0.82rem;
+  text-align: center;
+  font-style: italic;
+}
+.book-total-empty[hidden] { display: none; }
 .book-total-line {
   display: flex;
   justify-content: space-between;

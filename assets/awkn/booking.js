@@ -220,10 +220,12 @@ export function mountCalendar(host, { blocked = new Set(), singleDay = false, on
   let hover = null;
   let mode = singleDay ? 'single' : 'range';
 
+  // Committed range only (does NOT include hover preview). Hover preview is
+  // painted via DOM class updates after render to avoid re-rendering on every
+  // mousemove (which destroys the button mid-click and breaks the second click).
   function inRange(key) {
     if (mode === 'single') return false;
     if (!checkIn) return false;
-    if (!checkOut && hover && key >= toDateKey(checkIn) && key <= hover) return true;
     if (!checkOut) return key === toDateKey(checkIn);
     return key >= toDateKey(checkIn) && key <= toDateKey(checkOut);
   }
@@ -320,12 +322,27 @@ export function mountCalendar(host, { blocked = new Set(), singleDay = false, on
         if (btn.getAttribute('aria-disabled') === 'true') return;
         pick(fromDateKey(btn.dataset.date));
       });
+      // Hover preview: update classes only (no re-render — re-rendering on
+      // mousemove destroys the button mid-click and breaks the second click).
       btn.addEventListener('mouseenter', () => {
-        if (checkIn && !checkOut) {
-          hover = btn.dataset.date;
-          render();
-        }
+        if (mode !== 'range' || !checkIn || checkOut) return;
+        hover = btn.dataset.date;
+        paintHoverRange();
       });
+    });
+    host.addEventListener('mouseleave', () => {
+      if (hover) { hover = null; paintHoverRange(); }
+    });
+  }
+
+  function paintHoverRange() {
+    if (!checkIn || checkOut) return;
+    const checkInKey = toDateKey(checkIn);
+    host.querySelectorAll('.cal-day').forEach(b => {
+      if (b.classList.contains('check-in') || b.classList.contains('check-out')) return;
+      const key = b.dataset.date;
+      const inHover = hover && key > checkInKey && key <= hover;
+      b.classList.toggle('in-range', !!inHover);
     });
   }
 
