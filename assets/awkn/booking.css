@@ -1,5 +1,12 @@
 /* AWKN Booking — gallery + detail page styles */
 
+/* Custom display rules below override the user-agent [hidden] {display:none}.
+   Restore the hidden behavior so JS-toggled visibility actually works. */
+.mode-toggle[hidden],
+.book-staff-hours[hidden],
+.book-addons[hidden],
+.book-total[hidden] { display: none; }
+
 /* ── FILTER TABS ──────────────────────────────────────── */
 .book-tabs {
   display: inline-flex;
