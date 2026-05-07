@@ -209,16 +209,19 @@ export function fromDateKey(key) {
 }
 
 // ─── Calendar widget ────────────────────────────────────────────────────────
-// Vanilla two-month calendar with date-range selection. Renders into a host
-// element and calls onChange({ checkIn, checkOut }) whenever the range updates.
-export function mountCalendar(host, { blocked = new Set(), onChange } = {}) {
+// Vanilla two-month calendar. By default picks a date range (check-in →
+// check-out). When singleDay=true, one click selects a single day (used for
+// hourly bookings where the time picker handles the duration).
+export function mountCalendar(host, { blocked = new Set(), singleDay = false, onChange } = {}) {
   let viewMonth = new Date();
   viewMonth.setDate(1);
   let checkIn = null;
   let checkOut = null;
   let hover = null;
+  let mode = singleDay ? 'single' : 'range';
 
   function inRange(key) {
+    if (mode === 'single') return false;
     if (!checkIn) return false;
     if (!checkOut && hover && key >= toDateKey(checkIn) && key <= hover) return true;
     if (!checkOut) return key === toDateKey(checkIn);
@@ -233,6 +236,13 @@ export function mountCalendar(host, { blocked = new Set(), onChange } = {}) {
   function pick(d) {
     const key = toDateKey(d);
     if (blocked.has(key)) return;
+    if (mode === 'single') {
+      checkIn = d;
+      checkOut = new Date(d);
+      onChange?.({ checkIn, checkOut });
+      render();
+      return;
+    }
     if (!checkIn || (checkIn && checkOut)) {
       checkIn = d;
       checkOut = null;
@@ -291,11 +301,13 @@ export function mountCalendar(host, { blocked = new Set(), onChange } = {}) {
       <div class="cal-head">
         <button type="button" class="cal-nav" data-cal-prev aria-label="Previous month">&larr;</button>
         <span class="cal-summary">${
-          checkIn && checkOut
-            ? `${checkIn.toLocaleDateString('en-US', { month:'short', day:'numeric' })} → ${checkOut.toLocaleDateString('en-US', { month:'short', day:'numeric' })}`
-            : checkIn
-              ? `Check-in ${checkIn.toLocaleDateString('en-US', { month:'short', day:'numeric' })} — pick check-out`
-              : 'Select your dates'
+          mode === 'single'
+            ? (checkIn ? checkIn.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }) : 'Pick a date')
+            : checkIn && checkOut
+              ? `${checkIn.toLocaleDateString('en-US', { month:'short', day:'numeric' })} → ${checkOut.toLocaleDateString('en-US', { month:'short', day:'numeric' })}`
+              : checkIn
+                ? `Check-in ${checkIn.toLocaleDateString('en-US', { month:'short', day:'numeric' })} — pick check-out`
+                : 'Select your dates'
         }</span>
         <button type="button" class="cal-nav" data-cal-next aria-label="Next month">&rarr;</button>
       </div>
@@ -321,11 +333,12 @@ export function mountCalendar(host, { blocked = new Set(), onChange } = {}) {
   return {
     reset() { checkIn = null; checkOut = null; render(); },
     getRange() { return { checkIn, checkOut }; },
+    setMode(m) { mode = m; checkIn = null; checkOut = null; render(); },
   };
 }
 
 // ─── Pricing ─────────────────────────────────────────────────────────────────
-export function calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons = [], staffHours = 0, guests = 1 }) {
+export function calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons = [], staffHours = 0, guests = 1, hours = 0 }) {
   const breakdown = { lines: [], total: 0 };
   if (!checkIn || !checkOut) return breakdown;
 
@@ -346,9 +359,9 @@ export function calculatePrice(listing, { mode, checkIn, checkOut, selectedAddon
     breakdown.lines.push({ label, amount: sub });
     breakdown.total += sub;
   } else if (mode === 'hourly' && listing.hourly_rate) {
-    const hours = Math.max(listing.hourly_min_hours || 1, Math.round(ms / 3600000));
-    const sub = listing.hourly_rate * hours;
-    breakdown.lines.push({ label: `${hours} hour${hours > 1 ? 's' : ''} × ${fmtMoney(listing.hourly_rate)}`, amount: sub });
+    const hrs = Math.max(listing.hourly_min_hours || 1, Number(hours) || listing.hourly_min_hours || 1);
+    const sub = listing.hourly_rate * hrs;
+    breakdown.lines.push({ label: `${hrs} hour${hrs > 1 ? 's' : ''} × ${fmtMoney(listing.hourly_rate)}`, amount: sub });
     breakdown.total += sub;
   }
 

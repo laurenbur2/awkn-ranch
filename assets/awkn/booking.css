@@ -5,6 +5,7 @@
 .mode-toggle[hidden],
 .book-staff-hours[hidden],
 .book-addons[hidden],
+.book-time[hidden],
 .book-total[hidden] { display: none; }
 
 /* ── FILTER TABS ──────────────────────────────────────── */
@@ -313,6 +314,19 @@
   border-color: var(--gold);
 }
 .book-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+
+.book-time {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.book-time select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2rem;
+}
 
 .book-addons {
   margin-top: 1rem;

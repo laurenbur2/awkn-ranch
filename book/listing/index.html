@@ -92,22 +92,38 @@
       </div>
 
       <form id="bookForm" novalidate>
-        <label class="book-field">Your Name</label>
-        <input type="text" name="guest_name" required>
-
         <div class="book-row">
           <div>
-            <label class="book-field">Email</label>
-            <input type="email" name="guest_email" required>
+            <label class="book-field">First Name</label>
+            <input type="text" name="first_name" required autocomplete="given-name">
           </div>
           <div>
-            <label class="book-field">Phone</label>
-            <input type="tel" name="guest_phone">
+            <label class="book-field">Last Name</label>
+            <input type="text" name="last_name" required autocomplete="family-name">
           </div>
         </div>
 
+        <label class="book-field">Email</label>
+        <input type="email" name="guest_email" required autocomplete="email">
+
+        <label class="book-field">Phone</label>
+        <input type="tel" name="guest_phone" required autocomplete="tel">
+
         <label class="book-field">Number of Guests</label>
         <input type="number" name="guests" min="1" value="1" required>
+
+        <div class="book-time" id="bookTime" hidden>
+          <div class="book-row">
+            <div>
+              <label class="book-field">Start Time</label>
+              <select name="start_time" id="startTime"></select>
+            </div>
+            <div>
+              <label class="book-field">Duration</label>
+              <select name="duration_hours" id="durationHours"></select>
+            </div>
+          </div>
+        </div>
 
         <div class="book-addons" id="addonsHost" hidden></div>
 
@@ -186,17 +202,61 @@
       const supportsNightly = !!listing.nightly_rate;
       let mode = supportsNightly ? 'nightly' : 'hourly';
       const modeToggle = document.getElementById('modeToggle');
+      const bookTime = document.getElementById('bookTime');
+      function applyMode() {
+        // Hourly bookings need single-day calendar + start/duration pickers.
+        // Nightly bookings keep the date-range calendar.
+        if (mode === 'hourly') {
+          bookTime.hidden = false;
+          cal?.setMode('single');
+        } else {
+          bookTime.hidden = true;
+          cal?.setMode('range');
+        }
+        updatePriceLabel();
+        recalc();
+      }
       if (supportsHourly && supportsNightly) {
         modeToggle.hidden = false;
         modeToggle.querySelectorAll('button').forEach(btn => {
           btn.addEventListener('click', () => {
             mode = btn.dataset.mode;
             modeToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-            updatePriceLabel();
-            recalc();
+            applyMode();
           });
         });
+      } else if (mode === 'hourly') {
+        // Hourly-only listing (no overnight option).
+        bookTime.hidden = false;
       }
+
+      // ── Hourly time picker setup ──
+      const startTimeSel = document.getElementById('startTime');
+      const durationSel = document.getElementById('durationHours');
+      // Populate start times: every 30 min from 8 AM to 9 PM
+      const fmt12 = (h, m) => {
+        const period = h < 12 ? 'AM' : 'PM';
+        const hh = ((h + 11) % 12) + 1;
+        return `${hh}:${String(m).padStart(2,'0')} ${period}`;
+      };
+      const startOptions = [];
+      for (let h = 8; h <= 21; h++) {
+        for (const m of [0, 30]) {
+          startOptions.push(`<option value="${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}">${fmt12(h, m)}</option>`);
+        }
+      }
+      startTimeSel.innerHTML = startOptions.join('');
+      startTimeSel.value = '10:00';
+      // Populate durations from listing.hourly_min_hours up to 12
+      const minHrs = listing.hourly_min_hours || 2;
+      const durations = [];
+      for (let h = minHrs; h <= 12; h++) {
+        durations.push(`<option value="${h}">${h} hour${h > 1 ? 's' : ''}</option>`);
+      }
+      durationSel.innerHTML = durations.join('');
+      durationSel.value = String(minHrs);
+      startTimeSel.addEventListener('change', recalc);
+      durationSel.addEventListener('change', recalc);
 
       function updatePriceLabel() {
         if (mode === 'nightly' && listing.nightly_rate) {
@@ -290,6 +350,7 @@
         const blocked = await fetchBlockedDates(listingDbId, from.toISOString(), to.toISOString());
         cal = mountCalendar(document.getElementById('calHost'), {
           blocked,
+          singleDay: mode === 'hourly',
           onChange: () => recalc(),
         });
       })();
@@ -303,7 +364,8 @@
           return;
         }
         const guests = Number(document.querySelector('[name=guests]')?.value) || 1;
-        const breakdown = calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons, staffHours, guests });
+        const hours = mode === 'hourly' ? Number(durationSel.value) || (listing.hourly_min_hours || 1) : 0;
+        const breakdown = calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons, staffHours, guests, hours });
         if (!breakdown.lines.length) { totalHost.hidden = true; return; }
         totalHost.hidden = false;
         totalLines.innerHTML = breakdown.lines.map(l =>
@@ -325,36 +387,54 @@
         messageEl.innerHTML = '';
         const { checkIn, checkOut } = cal?.getRange() || {};
         if (!checkIn || !checkOut) {
-          messageEl.innerHTML = '<div class="book-error">Please select your dates first.</div>';
+          messageEl.innerHTML = `<div class="book-error">Please ${mode === 'hourly' ? 'pick a date' : 'select your dates'} first.</div>`;
           return;
         }
         const fd = new FormData(form);
-        const guest_name = fd.get('guest_name')?.toString().trim();
+        const first_name = fd.get('first_name')?.toString().trim();
+        const last_name = fd.get('last_name')?.toString().trim();
         const guest_email = fd.get('guest_email')?.toString().trim();
-        if (!guest_name || !guest_email) {
-          messageEl.innerHTML = '<div class="book-error">Please fill in your name and email.</div>';
+        const guest_phone = fd.get('guest_phone')?.toString().trim();
+        if (!first_name || !last_name) {
+          messageEl.innerHTML = '<div class="book-error">Please enter your first and last name.</div>';
           return;
         }
+        if (!guest_email) {
+          messageEl.innerHTML = '<div class="book-error">Please enter your email.</div>';
+          return;
+        }
+        if (!guest_phone) {
+          messageEl.innerHTML = '<div class="book-error">Please enter a phone number so we can reach you.</div>';
+          return;
+        }
+        const guest_name = `${first_name} ${last_name}`;
 
         const guests = Number(fd.get('guests')) || 1;
-        const breakdown = calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons, staffHours, guests });
+        const hours = mode === 'hourly' ? Number(durationSel.value) || (listing.hourly_min_hours || 1) : 0;
+        const breakdown = calculatePrice(listing, { mode, checkIn, checkOut, selectedAddons, staffHours, guests, hours });
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending…';
 
-        // Default check-in 3pm, check-out 11am for nightly stays
+        // Build start/end timestamps. For nightly: 3pm check-in, 11am check-out.
+        // For hourly: chosen start time + duration on the selected day.
         const start = new Date(checkIn);
-        const end = new Date(checkOut);
+        let end = new Date(checkOut);
         if (mode === 'nightly') {
           start.setHours(15, 0, 0, 0);
           end.setHours(11, 0, 0, 0);
+        } else {
+          const [sh, sm] = startTimeSel.value.split(':').map(Number);
+          start.setHours(sh, sm, 0, 0);
+          end = new Date(start);
+          end.setHours(end.getHours() + hours);
         }
 
         const { data, error } = await submitBookingRequest({
           listing_id: listingDbId,
           guest_name,
           guest_email,
-          guest_phone: fd.get('guest_phone')?.toString().trim() || null,
+          guest_phone,
           start_at: start.toISOString(),
           end_at: end.toISOString(),
           mode,
