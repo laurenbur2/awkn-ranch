@@ -141,13 +141,47 @@
     .staff-section {
       padding: 2rem 0 8rem;
     }
-    .staff-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 5rem 4rem;
-      margin: 0 auto;
+    .staff-group {
       max-width: 1100px;
+      margin: 0 auto;
       padding: 0 2.5rem;
+      margin-bottom: 6rem;
+    }
+    .staff-group:last-child {
+      margin-bottom: 0;
+    }
+    .staff-group-title {
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin: 0 0 0.75rem;
+    }
+    .staff-group-rule {
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      margin: 0 auto 3rem;
+      opacity: 0.55;
+    }
+    .staff-group-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4rem 3rem;
+    }
+    .staff-group-grid .staff-card {
+      width: 300px;
+      max-width: 100%;
+    }
+    @media (max-width: 900px) {
+      .staff-group { padding: 0 2rem; margin-bottom: 4.5rem; }
+      .staff-group-grid { gap: 3rem 2rem; }
+    }
+    @media (max-width: 600px) {
+      .staff-group-grid .staff-card { width: 100%; max-width: 360px; }
     }
     .staff-card {
       display: flex;
@@ -232,14 +266,6 @@
     }
     .view-bio-btn:hover::after {
       transform: translateX(3px);
-    }
-
-    @media (max-width: 900px) {
-      .staff-grid { grid-template-columns: repeat(2, 1fr); gap: 4rem 2.5rem; }
-    }
-    @media (max-width: 600px) {
-      .staff-grid { grid-template-columns: 1fr; gap: 3.5rem; }
-      .event-hero { padding: 4.5rem 1.5rem 3rem; }
     }
 
     /* Page foot */
@@ -392,63 +418,94 @@
   </section>
 
   <section class="staff-section">
-    <div class="staff-grid">
 
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center 40%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">William Naylor</div>
-          <div class="staff-role">AWKN Ranch Founder</div>
-          <button class="view-bio-btn" data-bio="william">View Bio</button>
+    <div class="staff-group">
+      <h3 class="staff-group-title">Facilitated By</h3>
+      <div class="staff-group-rule"></div>
+      <div class="staff-group-grid">
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik" style="object-position: center 15%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">Magdalena Mystik</div>
+            <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
+            <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
+          </div>
         </div>
-      </div>
 
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz" style="object-position: center 25%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">Justin De La Cruz</div>
-          <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
-          <button class="view-bio-btn" data-bio="justin">View Bio</button>
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/the-cloud-people.jpg" alt="The Cloud People" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">The Cloud People</div>
+            <div class="staff-role">Music &middot; Brent &amp; Anthony Weiss</div>
+            <button class="view-bio-btn" data-bio="cloudpeople">View Bio</button>
+          </div>
         </div>
-      </div>
 
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik" style="object-position: center 15%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">Magdalena Mystik</div>
-          <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
-          <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
-        </div>
       </div>
-
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/heather-hoover.jpg" alt="Heather Hoover" style="object-position: center 25%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">Heather Hoover</div>
-          <div class="staff-role">Within Center Director &amp; Lead Guide</div>
-          <button class="view-bio-btn" data-bio="heather">View Bio</button>
-        </div>
-      </div>
-
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/mariya-naylor.jpg" alt="Mariya Naylor" style="object-position: center 25%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">Mariya Naylor</div>
-          <div class="staff-role">Sacred Space Holder &amp; Integration Guide</div>
-          <button class="view-bio-btn" data-bio="mariya">View Bio</button>
-        </div>
-      </div>
-
-      <div class="staff-card">
-        <div class="staff-photo"><img src="photos/laney-sianto.png" alt="Laney Sianto" style="object-position: center 25%;"></div>
-        <div class="staff-content">
-          <div class="staff-name">Laney Sianto</div>
-          <div class="staff-role">Sacred Space Holder</div>
-          <button class="view-bio-btn" data-bio="laney">View Bio</button>
-        </div>
-      </div>
-
     </div>
+
+    <div class="staff-group">
+      <h3 class="staff-group-title">Sacred Space Holders</h3>
+      <div class="staff-group-rule"></div>
+      <div class="staff-group-grid">
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/laney-sianto.png" alt="Laney Sianto" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">Laney Sianto</div>
+            <div class="staff-role">Sacred Space Holder</div>
+            <button class="view-bio-btn" data-bio="laney">View Bio</button>
+          </div>
+        </div>
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/heather-hoover.jpg" alt="Heather Hoover" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">Heather Hoover</div>
+            <div class="staff-role">Within Center Director &amp; Lead Guide</div>
+            <button class="view-bio-btn" data-bio="heather">View Bio</button>
+          </div>
+        </div>
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/mariya-naylor.jpg" alt="Mariya Naylor" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">Mariya Naylor</div>
+            <div class="staff-role">Sacred Space Holder &amp; Integration Guide</div>
+            <button class="view-bio-btn" data-bio="mariya">View Bio</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="staff-group">
+      <h3 class="staff-group-title">Hosted By</h3>
+      <div class="staff-group-rule"></div>
+      <div class="staff-group-grid">
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center 40%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">William Naylor</div>
+            <div class="staff-role">AWKN Ranch Founder</div>
+            <button class="view-bio-btn" data-bio="william">View Bio</button>
+          </div>
+        </div>
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">Justin De La Cruz</div>
+            <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
+            <button class="view-bio-btn" data-bio="justin">View Bio</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </section>
 
   <!-- BIO MODAL -->
@@ -487,6 +544,12 @@
         name: 'Magdalena Mystik',
         role: 'Transformational Facilitator & Ritual Practitioner',
         bio: 'Full bio for Magdalena Mystik goes here. Replace this paragraph with the real biography.'
+      },
+      cloudpeople: {
+        photo: 'photos/the-cloud-people.jpg',
+        name: 'The Cloud People',
+        role: 'Music · Brent & Anthony Weiss',
+        bio: 'Full bio for The Cloud People (Brent & Anthony Weiss) goes here. Replace this paragraph with the real biography.'
       },
       heather: {
         photo: 'photos/heather-hoover.jpg',
