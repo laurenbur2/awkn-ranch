@@ -666,6 +666,31 @@ From preparing intentional meals to overseeing the daily flow and care of the ho
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.classList.contains('open')) closeBio();
     });
+
+    // Auto-resize when embedded in an iframe (eg. Squarespace).
+    // Posts the document height to the parent window; the parent listens
+    // and resizes the iframe to match, eliminating nested scrollbars.
+    (function () {
+      if (window.parent === window) return;
+      let lastHeight = 0;
+      function postHeight() {
+        const h = Math.max(
+          document.documentElement.scrollHeight,
+          document.body.scrollHeight
+        );
+        if (h !== lastHeight) {
+          lastHeight = h;
+          window.parent.postMessage({ type: 'awkn-iframe-height', height: h }, '*');
+        }
+      }
+      window.addEventListener('load', postHeight);
+      window.addEventListener('resize', postHeight);
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(postHeight).observe(document.body);
+      }
+      // Re-post a few times after load to catch late image layout shifts.
+      [100, 500, 1500, 3000].forEach((d) => setTimeout(postHeight, d));
+    })();
   </script>
 
 </body>
