@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWKN Ranch Event Support Staff | May 19</title>
+  <meta name="description" content="Support staff for the AWKN Ranch event on May 19.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/awkn/site.css?v=20260507c">
+
+  <style>
+    .event-hero {
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+      background: linear-gradient(180deg, var(--cream-deep) 0%, var(--cream) 100%);
+    }
+    .event-hero-logo {
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 2rem;
+      display: block;
+    }
+    .event-hero-eyebrow {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .event-hero h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 500;
+      color: var(--dark);
+      margin: 0 0 1rem;
+      line-height: 1.15;
+    }
+    .event-hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .event-hero-date {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      color: var(--grey);
+      font-size: 1.15rem;
+    }
+
+    .staff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin: 0 auto;
+      max-width: 1200px;
+      padding: 0 2rem;
+    }
+    .staff-card {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--white);
+      padding: 2.5rem 1.5rem 2rem;
+      border-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .staff-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .staff-avatar {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      background: var(--cream-deep);
+      border: 4px solid var(--white);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 3.5rem;
+      font-weight: 400;
+      color: var(--gold);
+      background: linear-gradient(135deg, var(--cream-deep) 0%, var(--cream) 100%);
+    }
+    .staff-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
+    }
+    .staff-role {
+      font-size: 0.65rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .staff-desc {
+      font-size: 0.9rem;
+      color: var(--grey);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      min-height: 4.5rem;
+    }
+    .view-bio-btn {
+      display: inline-block;
+      padding: 0.7rem 1.6rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--dark);
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    .view-bio-btn:hover {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    @media (max-width: 900px) {
+      .staff-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    }
+    @media (max-width: 600px) {
+      .staff-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Bio Modal */
+    .bio-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 18, 14, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 1000;
+    }
+    .bio-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .bio-modal {
+      background: var(--cream);
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 4px;
+      padding: 3rem 2.5rem 2.5rem;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+    }
+    .bio-modal-backdrop.open .bio-modal {
+      transform: translateY(0);
+    }
+    .bio-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      font-size: 1.5rem;
+      color: var(--grey);
+      cursor: pointer;
+      line-height: 1;
+      border-radius: 50%;
+      transition: background 0.2s ease;
+    }
+    .bio-modal-close:hover {
+      background: var(--cream-deep);
+      color: var(--dark);
+    }
+    .bio-modal-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      background: linear-gradient(135deg, var(--cream-deep) 0%, var(--cream) 100%);
+      border: 3px solid var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+    .bio-modal-name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dark);
+      text-align: center;
+      margin-bottom: 0.3rem;
+    }
+    .bio-modal-role {
+      font-size: 0.7rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .bio-modal-bio {
+      font-size: 0.95rem;
+      color: var(--dark);
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="event-hero">
+    <img src="../../assets/awkn/awkn-logo.png" alt="AWKN Ranch" class="event-hero-logo">
+    <span class="event-hero-eyebrow">May 19 · Event Team</span>
+    <h1>AWKN Ranch <em>Event Support Staff</em></h1>
+    <div class="event-hero-date">The people holding the day.</div>
+  </header>
+
+  <section class="bg-cream" style="padding: 4rem 0 6rem;">
+    <div class="staff-grid">
+
+      <!-- STAFF 1 -->
+      <div class="staff-card">
+        <div class="staff-avatar">1</div>
+        <div class="staff-name">Staff Name 1</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff1">View Bio</button>
+      </div>
+
+      <!-- STAFF 2 -->
+      <div class="staff-card">
+        <div class="staff-avatar">2</div>
+        <div class="staff-name">Staff Name 2</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff2">View Bio</button>
+      </div>
+
+      <!-- STAFF 3 -->
+      <div class="staff-card">
+        <div class="staff-avatar">3</div>
+        <div class="staff-name">Staff Name 3</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff3">View Bio</button>
+      </div>
+
+      <!-- STAFF 4 -->
+      <div class="staff-card">
+        <div class="staff-avatar">4</div>
+        <div class="staff-name">Staff Name 4</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff4">View Bio</button>
+      </div>
+
+      <!-- STAFF 5 -->
+      <div class="staff-card">
+        <div class="staff-avatar">5</div>
+        <div class="staff-name">Staff Name 5</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff5">View Bio</button>
+      </div>
+
+      <!-- STAFF 6 -->
+      <div class="staff-card">
+        <div class="staff-avatar">6</div>
+        <div class="staff-name">Staff Name 6</div>
+        <div class="staff-role">Title / Role</div>
+        <div class="staff-desc">Short description of what this person is doing for the event.</div>
+        <button class="view-bio-btn" data-bio="staff6">View Bio</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BIO MODAL -->
+  <div class="bio-modal-backdrop" id="bioModal" aria-hidden="true" role="dialog" aria-labelledby="bioModalName">
+    <div class="bio-modal">
+      <button class="bio-modal-close" id="bioModalClose" aria-label="Close">&times;</button>
+      <div class="bio-modal-avatar" id="bioModalAvatar">·</div>
+      <div class="bio-modal-name" id="bioModalName">Name</div>
+      <div class="bio-modal-role" id="bioModalRole">Role</div>
+      <div class="bio-modal-bio" id="bioModalBio">Bio text.</div>
+    </div>
+  </div>
+
+  <footer class="site-foot" style="text-align:center;">
+    <p>&copy; 2026 AWKN Ranch. Event team page &mdash; May 19.</p>
+  </footer>
+
+  <script>
+    // Full bios — replace placeholder text with real content
+    const BIOS = {
+      staff1: {
+        avatar: '1',
+        name: 'Staff Name 1',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 1 goes here. This text only appears when the user clicks "View Bio" — it can be as long as you need. Replace this paragraph with the real biography.\n\nYou can use double line breaks to create new paragraphs in the bio.'
+      },
+      staff2: {
+        avatar: '2',
+        name: 'Staff Name 2',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 2 goes here. Replace this paragraph with the real biography.'
+      },
+      staff3: {
+        avatar: '3',
+        name: 'Staff Name 3',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 3 goes here. Replace this paragraph with the real biography.'
+      },
+      staff4: {
+        avatar: '4',
+        name: 'Staff Name 4',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 4 goes here. Replace this paragraph with the real biography.'
+      },
+      staff5: {
+        avatar: '5',
+        name: 'Staff Name 5',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 5 goes here. Replace this paragraph with the real biography.'
+      },
+      staff6: {
+        avatar: '6',
+        name: 'Staff Name 6',
+        role: 'Title / Role',
+        bio: 'Full bio for Staff Member 6 goes here. Replace this paragraph with the real biography.'
+      }
+    };
+
+    const modal = document.getElementById('bioModal');
+    const modalAvatar = document.getElementById('bioModalAvatar');
+    const modalName = document.getElementById('bioModalName');
+    const modalRole = document.getElementById('bioModalRole');
+    const modalBio = document.getElementById('bioModalBio');
+    const closeBtn = document.getElementById('bioModalClose');
+
+    function openBio(key) {
+      const data = BIOS[key];
+      if (!data) return;
+      modalAvatar.textContent = data.avatar;
+      modalName.textContent = data.name;
+      modalRole.textContent = data.role;
+      modalBio.textContent = data.bio;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBio() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.view-bio-btn').forEach(btn => {
+      btn.addEventListener('click', () => openBio(btn.dataset.bio));
+    });
+
+    closeBtn.addEventListener('click', closeBio);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeBio();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeBio();
+    });
+  </script>
+
+</body>
+</html>
