@@ -18,22 +18,21 @@
       background: var(--cream);
     }
 
-    /* Top wordmark bar */
-    .brand-bar {
-      padding: 2.5rem 2rem 2.25rem;
-      text-align: center;
-      background: var(--cream);
-    }
+    /* Brand overlay sits on top of hero image */
     .event-hero-brand {
-      display: block;
+      position: absolute;
+      top: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
       text-align: center;
+      z-index: 2;
     }
     .event-hero-mark {
       display: block;
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 1.85rem;
       font-weight: 400;
-      color: var(--dark);
+      color: var(--white);
       letter-spacing: 0.22em;
       text-transform: uppercase;
       line-height: 1;
@@ -45,9 +44,10 @@
       font-weight: 500;
       letter-spacing: 0.36em;
       text-transform: uppercase;
-      color: var(--grey);
+      color: rgba(255, 255, 255, 0.7);
     }
     @media (max-width: 600px) {
+      .event-hero-brand { top: 1.75rem; }
       .event-hero-mark { font-size: 1.4rem; letter-spacing: 0.18em; }
       .event-hero-sub { font-size: 0.5rem; letter-spacing: 0.3em; }
     }
@@ -55,11 +55,11 @@
     /* Hero image with overlay */
     .hero-image {
       position: relative;
-      min-height: 540px;
+      min-height: 600px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 7rem 2rem;
+      padding: 9rem 2rem 6rem;
       text-align: center;
       background-color: #2a2620;
       background-image:
@@ -355,14 +355,11 @@
 </head>
 <body>
 
-  <div class="brand-bar">
+  <header class="hero-image">
     <div class="event-hero-brand">
       <span class="event-hero-mark">AWKN Ranch</span>
       <span class="event-hero-sub">Ancient Wisdom Known Now</span>
     </div>
-  </div>
-
-  <header class="hero-image">
     <div class="hero-image-inner">
       <span class="hero-image-eyebrow">May 19 &middot; Event Team</span>
       <h1>Event <em>Support Staff</em></h1>
@@ -375,7 +372,7 @@
     <div class="staff-grid">
 
       <div class="staff-card">
-        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center top;"></div>
+        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center 40%;"></div>
         <div class="staff-content">
           <div class="staff-name">William Naylor</div>
           <div class="staff-role">AWKN Ranch Founder</div>
