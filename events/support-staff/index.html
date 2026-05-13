@@ -18,19 +18,20 @@
       background: var(--cream);
     }
 
-    .event-hero {
-      padding: 7rem 2rem 5rem;
+    /* Top wordmark bar */
+    .brand-bar {
+      padding: 2.5rem 2rem 2.25rem;
       text-align: center;
+      background: var(--cream);
     }
     .event-hero-brand {
       display: block;
       text-align: center;
-      margin: 0 auto 3.5rem;
     }
     .event-hero-mark {
       display: block;
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 2.4rem;
+      font-size: 1.85rem;
       font-weight: 400;
       color: var(--dark);
       letter-spacing: 0.22em;
@@ -39,53 +40,83 @@
     }
     .event-hero-sub {
       display: block;
-      margin-top: 0.85rem;
-      font-size: 0.62rem;
+      margin-top: 0.7rem;
+      font-size: 0.58rem;
       font-weight: 500;
       letter-spacing: 0.36em;
       text-transform: uppercase;
       color: var(--grey);
     }
     @media (max-width: 600px) {
-      .event-hero-mark { font-size: 1.7rem; letter-spacing: 0.18em; }
-      .event-hero-sub { font-size: 0.55rem; letter-spacing: 0.3em; }
+      .event-hero-mark { font-size: 1.4rem; letter-spacing: 0.18em; }
+      .event-hero-sub { font-size: 0.5rem; letter-spacing: 0.3em; }
     }
-    .event-hero-eyebrow {
+
+    /* Hero image with overlay */
+    .hero-image {
+      position: relative;
+      min-height: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7rem 2rem;
+      text-align: center;
+      background-color: #2a2620;
+      background-image:
+        linear-gradient(rgba(20, 18, 14, 0.45), rgba(20, 18, 14, 0.55)),
+        url('photos/hero.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: var(--white);
+      overflow: hidden;
+    }
+    .hero-image-inner {
+      position: relative;
+      max-width: 720px;
+    }
+    .hero-image-eyebrow {
       display: inline-block;
       font-size: 0.65rem;
       letter-spacing: 0.45em;
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 500;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
-    .event-hero h1 {
+    .hero-image h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
       font-weight: 400;
-      color: var(--dark);
+      color: var(--white);
       margin: 0 0 1.5rem;
-      line-height: 1.15;
+      line-height: 1.1;
       letter-spacing: -0.005em;
     }
-    .event-hero h1 em {
+    .hero-image h1 em {
       font-style: italic;
       color: var(--gold);
       font-weight: 400;
     }
-    .event-hero-rule {
-      width: 40px;
+    .hero-image-rule {
+      width: 48px;
       height: 1px;
       background: var(--gold);
       margin: 2rem auto 1.5rem;
-      opacity: 0.6;
+      opacity: 0.7;
     }
-    .event-hero-date {
+    .hero-image-tagline {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
-      color: var(--grey);
-      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 1.15rem;
       font-weight: 300;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    @media (max-width: 600px) {
+      .hero-image { min-height: 380px; padding: 5rem 1.5rem; }
     }
 
     .staff-section {
@@ -324,22 +355,27 @@
 </head>
 <body>
 
-  <header class="event-hero">
+  <div class="brand-bar">
     <div class="event-hero-brand">
       <span class="event-hero-mark">AWKN Ranch</span>
       <span class="event-hero-sub">Ancient Wisdom Known Now</span>
     </div>
-    <span class="event-hero-eyebrow">May 19 &middot; Event Team</span>
-    <h1>Event <em>Support Staff</em></h1>
-    <div class="event-hero-rule"></div>
-    <div class="event-hero-date">The people holding the day.</div>
+  </div>
+
+  <header class="hero-image">
+    <div class="hero-image-inner">
+      <span class="hero-image-eyebrow">May 19 &middot; Event Team</span>
+      <h1>Event <em>Support Staff</em></h1>
+      <div class="hero-image-rule"></div>
+      <div class="hero-image-tagline">The people holding the day.</div>
+    </div>
   </header>
 
   <section class="staff-section">
     <div class="staff-grid">
 
       <div class="staff-card">
-        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center 25%;"></div>
+        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center top;"></div>
         <div class="staff-content">
           <div class="staff-name">William Naylor</div>
           <div class="staff-role">AWKN Ranch Founder</div>
