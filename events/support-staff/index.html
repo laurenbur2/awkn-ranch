@@ -100,14 +100,13 @@
       padding: 0 2.5rem;
     }
     .staff-card {
-      text-align: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
       background: var(--white);
-      padding: 2.75rem 1.75rem 2.5rem;
+      padding: 0;
       border: 1px solid rgba(184, 134, 84, 0.15);
       border-radius: 2px;
+      overflow: hidden;
       transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     }
     .staff-card:hover {
@@ -115,21 +114,25 @@
       transform: translateY(-3px);
       box-shadow: 0 12px 32px rgba(20, 18, 14, 0.06);
     }
-    .staff-avatar {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      margin-bottom: 1.75rem;
+    .staff-photo {
+      width: 100%;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       background: var(--cream-deep);
-      border: 1px solid rgba(184, 134, 84, 0.18);
-      flex-shrink: 0;
     }
-    .staff-avatar img {
+    .staff-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center 25%;
       display: block;
+    }
+    .staff-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 1.75rem 2.5rem;
     }
     .staff-name {
       font-family: 'Cormorant Garamond', Georgia, serif;
@@ -281,6 +284,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center 25%;
       display: block;
     }
     .bio-modal-name {
@@ -335,45 +339,57 @@
     <div class="staff-grid">
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/william-naylor.jpg" alt="William Naylor"></div>
-        <div class="staff-name">William Naylor</div>
-        <div class="staff-role">AWKN Ranch Founder</div>
-        <button class="view-bio-btn" data-bio="william">View Bio</button>
+        <div class="staff-photo"><img src="photos/william-naylor.jpg" alt="William Naylor" style="object-position: center 25%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">William Naylor</div>
+          <div class="staff-role">AWKN Ranch Founder</div>
+          <button class="view-bio-btn" data-bio="william">View Bio</button>
+        </div>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz"></div>
-        <div class="staff-name">Justin De La Cruz</div>
-        <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
-        <button class="view-bio-btn" data-bio="justin">View Bio</button>
+        <div class="staff-photo"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz" style="object-position: center 25%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">Justin De La Cruz</div>
+          <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
+          <button class="view-bio-btn" data-bio="justin">View Bio</button>
+        </div>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik"></div>
-        <div class="staff-name">Magdalena Mystik</div>
-        <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
-        <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
+        <div class="staff-photo"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik" style="object-position: center 15%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">Magdalena Mystik</div>
+          <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
+          <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
+        </div>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/heather-hoover.jpg" alt="Heather Hoover"></div>
-        <div class="staff-name">Heather Hoover</div>
-        <div class="staff-role">Within Center Director &amp; Lead Guide</div>
-        <button class="view-bio-btn" data-bio="heather">View Bio</button>
+        <div class="staff-photo"><img src="photos/heather-hoover.jpg" alt="Heather Hoover" style="object-position: center 25%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">Heather Hoover</div>
+          <div class="staff-role">Within Center Director &amp; Lead Guide</div>
+          <button class="view-bio-btn" data-bio="heather">View Bio</button>
+        </div>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/mariya-naylor.jpg" alt="Mariya Naylor"></div>
-        <div class="staff-name">Mariya Naylor</div>
-        <div class="staff-role">Sacred Space Holder &amp; Integration Guide</div>
-        <button class="view-bio-btn" data-bio="mariya">View Bio</button>
+        <div class="staff-photo"><img src="photos/mariya-naylor.jpg" alt="Mariya Naylor" style="object-position: center 25%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">Mariya Naylor</div>
+          <div class="staff-role">Sacred Space Holder &amp; Integration Guide</div>
+          <button class="view-bio-btn" data-bio="mariya">View Bio</button>
+        </div>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar"><img src="photos/laney-sianto.png" alt="Laney Sianto"></div>
-        <div class="staff-name">Laney Sianto</div>
-        <div class="staff-role">Sacred Space Holder</div>
-        <button class="view-bio-btn" data-bio="laney">View Bio</button>
+        <div class="staff-photo"><img src="photos/laney-sianto.png" alt="Laney Sianto" style="object-position: center 25%;"></div>
+        <div class="staff-content">
+          <div class="staff-name">Laney Sianto</div>
+          <div class="staff-role">Sacred Space Holder</div>
+          <button class="view-bio-btn" data-bio="laney">View Bio</button>
+        </div>
       </div>
 
     </div>
