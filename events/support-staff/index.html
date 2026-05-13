@@ -116,20 +116,20 @@
       box-shadow: 0 12px 32px rgba(20, 18, 14, 0.06);
     }
     .staff-avatar {
-      width: 140px;
-      height: 140px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
       margin-bottom: 1.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 2.5rem;
-      font-weight: 300;
-      font-style: italic;
-      color: var(--gold);
+      overflow: hidden;
       background: var(--cream-deep);
       border: 1px solid rgba(184, 134, 84, 0.18);
+      flex-shrink: 0;
+    }
+    .staff-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .staff-name {
       font-family: 'Cormorant Garamond', Georgia, serif;
@@ -140,20 +140,14 @@
       letter-spacing: 0.005em;
     }
     .staff-role {
-      font-size: 0.6rem;
-      letter-spacing: 0.36em;
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 500;
-      margin-bottom: 1.25rem;
-    }
-    .staff-desc {
-      font-size: 0.9rem;
-      color: var(--grey);
-      line-height: 1.75;
-      margin-bottom: 1.75rem;
-      max-width: 240px;
-      font-weight: 300;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      max-width: 260px;
     }
     .view-bio-btn {
       display: inline-flex;
@@ -275,19 +269,19 @@
       color: var(--gold);
     }
     .bio-modal-avatar {
-      width: 100px;
-      height: 100px;
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
       margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 2rem;
-      font-style: italic;
-      color: var(--gold);
+      overflow: hidden;
       background: var(--cream-deep);
       border: 1px solid rgba(184, 134, 84, 0.18);
+    }
+    .bio-modal-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .bio-modal-name {
       font-family: 'Cormorant Garamond', Georgia, serif;
@@ -341,51 +335,45 @@
     <div class="staff-grid">
 
       <div class="staff-card">
-        <div class="staff-avatar">i</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff1">View Bio</button>
+        <div class="staff-avatar"><img src="photos/william-naylor.jpg" alt="William Naylor"></div>
+        <div class="staff-name">William Naylor</div>
+        <div class="staff-role">AWKN Ranch Founder</div>
+        <button class="view-bio-btn" data-bio="william">View Bio</button>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar">ii</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff2">View Bio</button>
+        <div class="staff-avatar"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz"></div>
+        <div class="staff-name">Justin De La Cruz</div>
+        <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
+        <button class="view-bio-btn" data-bio="justin">View Bio</button>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar">iii</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff3">View Bio</button>
+        <div class="staff-avatar"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik"></div>
+        <div class="staff-name">Magdalena Mystik</div>
+        <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
+        <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar">iv</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff4">View Bio</button>
+        <div class="staff-avatar"><img src="photos/heather-hoover.jpg" alt="Heather Hoover"></div>
+        <div class="staff-name">Heather Hoover</div>
+        <div class="staff-role">Within Center Director &amp; Lead Guide</div>
+        <button class="view-bio-btn" data-bio="heather">View Bio</button>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar">v</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff5">View Bio</button>
+        <div class="staff-avatar"><img src="photos/mariya-naylor.jpg" alt="Mariya Naylor"></div>
+        <div class="staff-name">Mariya Naylor</div>
+        <div class="staff-role">Sacred Space Holder &amp; Integration Guide</div>
+        <button class="view-bio-btn" data-bio="mariya">View Bio</button>
       </div>
 
       <div class="staff-card">
-        <div class="staff-avatar">vi</div>
-        <div class="staff-name">Staff Name</div>
-        <div class="staff-role">Title / Role</div>
-        <div class="staff-desc">Short description of what this person is doing for the event.</div>
-        <button class="view-bio-btn" data-bio="staff6">View Bio</button>
+        <div class="staff-avatar"><img src="photos/laney-sianto.png" alt="Laney Sianto"></div>
+        <div class="staff-name">Laney Sianto</div>
+        <div class="staff-role">Sacred Space Holder</div>
+        <button class="view-bio-btn" data-bio="laney">View Bio</button>
       </div>
 
     </div>
@@ -395,7 +383,7 @@
   <div class="bio-modal-backdrop" id="bioModal" aria-hidden="true" role="dialog" aria-labelledby="bioModalName">
     <div class="bio-modal">
       <button class="bio-modal-close" id="bioModalClose" aria-label="Close">&times;</button>
-      <div class="bio-modal-avatar" id="bioModalAvatar">·</div>
+      <div class="bio-modal-avatar" id="bioModalAvatar"><img id="bioModalAvatarImg" src="" alt=""></div>
       <div class="bio-modal-name" id="bioModalName">Name</div>
       <div class="bio-modal-role" id="bioModalRole">Role</div>
       <div class="bio-modal-rule"></div>
@@ -410,46 +398,46 @@
 
   <script>
     const BIOS = {
-      staff1: {
-        avatar: 'i',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 1 goes here. This text only appears when the user clicks "View Bio" — it can be as long as you need. Replace this paragraph with the real biography.\n\nYou can use double line breaks to create new paragraphs in the bio.'
+      william: {
+        photo: 'photos/william-naylor.jpg',
+        name: 'William Naylor',
+        role: 'AWKN Ranch Founder',
+        bio: 'Full bio for William Naylor goes here. Replace this paragraph with the real biography.'
       },
-      staff2: {
-        avatar: 'ii',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 2 goes here. Replace this paragraph with the real biography.'
+      justin: {
+        photo: 'photos/justin-de-la-cruz.jpg',
+        name: 'Justin De La Cruz',
+        role: 'Executive Director · AWKN Ranch & Within Center',
+        bio: 'Full bio for Justin De La Cruz goes here. Replace this paragraph with the real biography.'
       },
-      staff3: {
-        avatar: 'iii',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 3 goes here. Replace this paragraph with the real biography.'
+      magdalena: {
+        photo: 'photos/magdalena-mystik.jpg',
+        name: 'Magdalena Mystik',
+        role: 'Transformational Facilitator & Ritual Practitioner',
+        bio: 'Full bio for Magdalena Mystik goes here. Replace this paragraph with the real biography.'
       },
-      staff4: {
-        avatar: 'iv',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 4 goes here. Replace this paragraph with the real biography.'
+      heather: {
+        photo: 'photos/heather-hoover.jpg',
+        name: 'Heather Hoover',
+        role: 'Within Center Director & Lead Guide',
+        bio: 'Full bio for Heather Hoover goes here. Replace this paragraph with the real biography.'
       },
-      staff5: {
-        avatar: 'v',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 5 goes here. Replace this paragraph with the real biography.'
+      mariya: {
+        photo: 'photos/mariya-naylor.jpg',
+        name: 'Mariya Naylor',
+        role: 'Sacred Space Holder & Integration Guide',
+        bio: 'Full bio for Mariya Naylor goes here. Replace this paragraph with the real biography.'
       },
-      staff6: {
-        avatar: 'vi',
-        name: 'Staff Name',
-        role: 'Title / Role',
-        bio: 'Full bio for Staff Member 6 goes here. Replace this paragraph with the real biography.'
+      laney: {
+        photo: 'photos/laney-sianto.png',
+        name: 'Laney Sianto',
+        role: 'Sacred Space Holder',
+        bio: 'Full bio for Laney Sianto goes here. Replace this paragraph with the real biography.'
       }
     };
 
     const modal = document.getElementById('bioModal');
-    const modalAvatar = document.getElementById('bioModalAvatar');
+    const modalAvatarImg = document.getElementById('bioModalAvatarImg');
     const modalName = document.getElementById('bioModalName');
     const modalRole = document.getElementById('bioModalRole');
     const modalBio = document.getElementById('bioModalBio');
@@ -458,7 +446,8 @@
     function openBio(key) {
       const data = BIOS[key];
       if (!data) return;
-      modalAvatar.textContent = data.avatar;
+      modalAvatarImg.src = data.photo;
+      modalAvatarImg.alt = data.name;
       modalName.textContent = data.name;
       modalRole.textContent = data.role;
       modalBio.textContent = data.bio;
