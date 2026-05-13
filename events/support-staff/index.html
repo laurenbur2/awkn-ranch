@@ -172,6 +172,11 @@
       justify-content: center;
       gap: 4rem 3rem;
     }
+    .staff-group-grid.is-pair-rows {
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     .staff-group-grid .staff-card {
       width: 300px;
       max-width: 100%;
@@ -422,7 +427,7 @@
     <div class="staff-group">
       <h3 class="staff-group-title">Facilitators</h3>
       <div class="staff-group-rule"></div>
-      <div class="staff-group-grid">
+      <div class="staff-group-grid is-pair-rows">
 
         <div class="staff-card">
           <div class="staff-photo"><img src="photos/magdalena-mystik.jpg" alt="Magdalena Mystik" style="object-position: center 15%;"></div>
@@ -430,6 +435,15 @@
             <div class="staff-name">Magdalena Mystik</div>
             <div class="staff-role">Transformational Facilitator &amp; Ritual Practitioner</div>
             <button class="view-bio-btn" data-bio="magdalena">View Bio</button>
+          </div>
+        </div>
+
+        <div class="staff-card">
+          <div class="staff-photo"><img src="photos/the-cloud-people.jpg" alt="The Cloud People" style="object-position: center 25%;"></div>
+          <div class="staff-content">
+            <div class="staff-name">The Cloud People</div>
+            <div class="staff-role">Music &middot; Brent &amp; Anthony Weiss</div>
+            <button class="view-bio-btn" data-bio="cloudpeople">View Bio</button>
           </div>
         </div>
 
@@ -443,11 +457,11 @@
         </div>
 
         <div class="staff-card">
-          <div class="staff-photo"><img src="photos/the-cloud-people.jpg" alt="The Cloud People" style="object-position: center 25%;"></div>
+          <div class="staff-photo"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz" style="object-position: center 30%;"></div>
           <div class="staff-content">
-            <div class="staff-name">The Cloud People</div>
-            <div class="staff-role">Music &middot; Brent &amp; Anthony Weiss</div>
-            <button class="view-bio-btn" data-bio="cloudpeople">View Bio</button>
+            <div class="staff-name">Justin De La Cruz</div>
+            <div class="staff-role">Breathwork Facilitator &amp; Executive Director</div>
+            <button class="view-bio-btn" data-bio="justin">View Bio</button>
           </div>
         </div>
 
@@ -503,15 +517,6 @@
           </div>
         </div>
 
-        <div class="staff-card">
-          <div class="staff-photo"><img src="photos/justin-de-la-cruz.jpg" alt="Justin De La Cruz" style="object-position: center 30%;"></div>
-          <div class="staff-content">
-            <div class="staff-name">Justin De La Cruz</div>
-            <div class="staff-role">Executive Director &middot; AWKN Ranch &amp; Within Center</div>
-            <button class="view-bio-btn" data-bio="justin">View Bio</button>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -549,7 +554,7 @@ A 2/4 Generator and lifelong builder, William previously founded and exited mult
       justin: {
         photo: 'photos/justin-de-la-cruz.jpg',
         name: 'Justin De La Cruz',
-        role: 'Executive Director · AWKN Ranch & Within Center',
+        role: 'Breathwork Facilitator & Executive Director',
         bio: `Justin De La Cruz serves as Executive Director of AWKN Ranch and Within Center, holding the long-view direction of the work and the people who do it. He was brought into this role for a rare combination the team had been searching for: a proven heart-led leader with the business acumen to build something that lasts.
 
 An entrepreneur by background and a SOMA IQ Certified Breathwork Facilitator by training, Justin has spent years guiding and holding space in the psychedelic medicine community and helping lead men's groups grounded in brotherhood, accountability, and inner work.
@@ -580,7 +585,9 @@ With Aztec lineage on both sides of her family and a background deeply connected
         photo: 'photos/the-cloud-people.jpg',
         name: 'The Cloud People',
         role: 'Music · Brent & Anthony Weiss',
-        bio: 'Full bio for The Cloud People (Brent & Anthony Weiss) goes here. Replace this paragraph with the real biography.'
+        bio: `Creators and twin brothers Anthony and Brent Weiss have been musicians for over 20 years. Their combined talents take people into a live meditative experience that is nothing like what you've ever experienced. Committed to their spiritual paths of discovery, their music gives you the opportunity to heal inner conflicts and release tension within.
+
+They use a combination of unique world instruments, etheric vocals, and deep meditative frequency music to help you enter into a theta state where you can experience a complete reset of your nervous system. Cloud People's live and freestyle sound healings connect you with yourself in a way that will awaken the divine within.`
       },
       heather: {
         photo: 'photos/heather-hoover.jpg',
