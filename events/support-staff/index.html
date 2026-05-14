@@ -313,6 +313,19 @@
       transition: opacity 0.35s ease;
       z-index: 1000;
     }
+    /* When iframe-embedded (eg. Squarespace), the iframe is expanded to its
+       full content height and never scrolls. position:fixed then pins the
+       modal to the iframe's top, far above the user's actual viewport.
+       In that case, render the modal inline near the clicked button. */
+    .bio-modal-backdrop.is-inline {
+      position: absolute;
+      inset: auto 0 auto 0;
+      min-height: 720px;
+      align-items: flex-start;
+      padding-top: 3rem;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
     .bio-modal-backdrop.open {
       opacity: 1;
       pointer-events: auto;
@@ -696,8 +709,9 @@ Her offerings include private mentorship, clarity readings, personalized retreat
     const modalRole = document.getElementById('bioModalRole');
     const modalBio = document.getElementById('bioModalBio');
     const closeBtn = document.getElementById('bioModalClose');
+    const isIframed = window.parent !== window;
 
-    function openBio(key) {
+    function openBio(key, btn) {
       const data = BIOS[key];
       if (!data) return;
       modalAvatarImg.src = data.photo;
@@ -705,19 +719,37 @@ Her offerings include private mentorship, clarity readings, personalized retreat
       modalName.textContent = data.name;
       modalRole.textContent = data.role;
       modalBio.textContent = data.bio;
+
+      if (isIframed && btn) {
+        // Place backdrop near the clicked button, then ask the browser to
+        // scroll it into view (the parent will scroll the iframe).
+        const docY = btn.getBoundingClientRect().top + window.scrollY;
+        modal.classList.add('is-inline');
+        modal.style.top = Math.max(0, docY - 80) + 'px';
+      } else {
+        document.body.style.overflow = 'hidden';
+      }
+
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+
+      if (isIframed) {
+        requestAnimationFrame(() => {
+          modal.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        });
+      }
     }
 
     function closeBio() {
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('is-inline');
+      modal.style.top = '';
       document.body.style.overflow = '';
     }
 
     document.querySelectorAll('.view-bio-btn').forEach(btn => {
-      btn.addEventListener('click', () => openBio(btn.dataset.bio));
+      btn.addEventListener('click', () => openBio(btn.dataset.bio, btn));
     });
 
     closeBtn.addEventListener('click', closeBio);
