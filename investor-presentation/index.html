@@ -63,6 +63,13 @@
   }
   .opp .band{border-color:rgba(244,237,224,.18)}
   .opp .band figcaption{color:#a89c83}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+  .grid3 figure{
+    border-radius:18px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:0 24px 50px -34px rgba(33,26,18,.5);
+  }
+  .grid3 img{display:block;width:100%;height:clamp(300px,36vw,440px);object-fit:cover}
+  .grid3-cap{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:14px}
 
   /* FINANCIALS BUTTON */
   .financials-btn{
@@ -220,7 +227,8 @@
     .financials-btn{top:14px;right:14px;padding:7px 16px;font-size:10px}
   }
   @media(max-width:520px){
-    .stat-strip,.quad,.three,.years,.vert,.trac{grid-template-columns:1fr}
+    .stat-strip,.quad,.three,.years,.vert,.trac,.grid3{grid-template-columns:1fr}
+    .grid3 img{height:clamp(260px,70vw,360px)}
     .hero h1{font-size:48px}
   }
 </style>
@@ -280,10 +288,12 @@
       <div class="q reveal"><div class="n">$150K</div><div class="l">Net profit · 2 years, growing</div></div>
       <div class="q reveal"><div class="n">18 mo</div><div class="l">At AWKN Ranch</div></div>
     </div>
-    <figure class="band reveal">
-      <img src="images/ceremony-space.jpg" alt="The ceremony space at AWKN Ranch" loading="lazy">
-      <figcaption>The ceremony space at AWKN Ranch — in operation today.</figcaption>
-    </figure>
+    <div class="grid3 reveal">
+      <figure><img src="images/temple-interior.jpg" alt="The temple ceremony space at AWKN Ranch" loading="lazy"></figure>
+      <figure><img src="images/ketamine-session.jpg" alt="A guided ketamine session at AWKN Ranch" loading="lazy"></figure>
+      <figure><img src="images/honey-dome.jpg" alt="The Honey Dome interior at AWKN Ranch" loading="lazy"></figure>
+    </div>
+    <p class="grid3-cap reveal">Inside AWKN Ranch today — the temple, a guided session, and the Honey Dome.</p>
     <table class="tbl reveal">
       <thead><tr><th>Current Stream</th><th>Volume</th><th class="r">Rate</th><th class="r">Monthly</th></tr></thead>
       <tbody>
