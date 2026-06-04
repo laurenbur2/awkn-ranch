@@ -236,10 +236,22 @@
     .financials-btn{top:14px;right:14px;padding:7px 16px;font-size:10px}
   }
   @media(max-width:520px){
-    .quad,.three,.years,.vert,.trac{grid-template-columns:1fr}
+    .three,.years,.vert,.trac{grid-template-columns:1fr}
+    .quad{grid-template-columns:repeat(2,1fr);gap:14px}
+    .quad .q{padding:16px 0}
+    .quad .q .n{font-size:32px}
     .three{gap:12px}
     .biz{padding:22px 22px}
     .biz h3{margin:8px 0 8px}
+    .years{gap:12px}
+    .yr{padding:22px 24px}
+    .yr .yval{font-size:46px;margin:10px 0 4px}
+    .vert{gap:12px}
+    .va{padding:22px 24px}
+    .va p{min-height:0}
+    .va .vf{margin-top:10px}
+    .bigfig{padding:28px 24px}
+    .bigfig .mid{font-size:46px;margin:10px 0}
     .stat-strip{grid-template-columns:repeat(2,1fr);margin-top:44px}
     .stat-strip .s{padding:18px 16px}
     .stat-strip .n{font-size:27px}
