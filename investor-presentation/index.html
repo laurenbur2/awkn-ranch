@@ -182,6 +182,23 @@
   .bigfig .mid{font-family:'Fraunces',serif;font-size:62px;line-height:1;margin:14px 0}
   .bigfig .bot{color:#d6cbb6;font-size:15px}
 
+  /* RESIDENTIAL TIERS */
+  .tiers{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:48px}
+  .tier{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 30px;display:flex;flex-direction:column}
+  .tier.prize{border-color:var(--gold);box-shadow:0 0 0 1px rgba(189,139,60,.28)}
+  .tier .tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);font-weight:600}
+  .tier.prize .tag{color:var(--gold)}
+  .tier h3{margin:12px 0 4px}
+  .tier .rent{font-family:'Fraunces',serif;font-size:30px;color:var(--clay-deep);line-height:1;margin:6px 0 4px}
+  .tier .rent span{font-family:'Outfit',sans-serif;font-size:14px;color:var(--muted)}
+  .tier p{font-size:14.5px;color:var(--muted);margin:12px 0 16px}
+  .tier ul{list-style:none;margin-top:auto}
+  .tier li{font-size:13.5px;color:var(--ink);padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+  .tier li::before{content:'✦';color:var(--gold);font-size:11px;margin-top:3px;flex:none}
+  .tier li.no{color:var(--muted)}
+  .tier li.no::before{content:'—';color:var(--muted)}
+  @media(max-width:640px){.tiers{grid-template-columns:1fr}}
+
   /* PHASE III VERTICAL */
   .vert{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
   .va{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px}
@@ -289,7 +306,7 @@
     <div class="stat-strip reveal">
       <div class="s"><div class="n">$917K</div><div class="l">Current Run-Rate</div></div>
       <div class="s"><div class="n">$2.4M</div><div class="l">Year 1 Revenue</div></div>
-      <div class="s"><div class="n">$7.5M</div><div class="l">Year 3 Revenue</div></div>
+      <div class="s"><div class="n">$9.5M</div><div class="l">Year 3 Revenue</div></div>
       <div class="s"><div class="n">4.5 yrs</div><div class="l">Operating · 5.0★</div></div>
     </div>
 
@@ -310,7 +327,7 @@
     <div class="three">
       <div class="biz reveal"><span class="num">01</span><div class="tag">Medical Co.</div><h3>Within Center</h3><p>Ketamine therapy, IV wellness, and licensed clinical services — 4.5 years operating, 1,800+ sessions, all five-star.</p></div>
       <div class="biz reveal"><span class="num">02</span><div class="tag">Concierge Co.</div><h3>AWKN Ranch</h3><p>The guest-facing brand: retreats, lodging, events, venue rentals, memberships, and add-on experiences that drive recurring revenue.</p></div>
-      <div class="biz reveal"><span class="num">03</span><div class="tag">Real Estate Co.</div><h3>The Dome Collective</h3><p>Land control and development — 60 private domes and a world-class Amenities Center, built on sacred geometry to replicate across properties.</p></div>
+      <div class="biz reveal"><span class="num">03</span><div class="tag">Real Estate Co.</div><h3>The Dome Collective</h3><p>A private residential conscious community — 60 dome residences, 80 elevated apartments, and a world-class Longevity &amp; Amenity Center, built on sacred geometry to replicate across properties.</p></div>
     </div>
   </div>
 </section>
@@ -376,24 +393,48 @@
 <!-- PHASE II -->
 <section>
   <div class="wrap">
-    <div class="eyebrow reveal">Phase II · The Dome Collective</div>
-    <h2 class="reveal">60 domes.<br>A living sanctuary.</h2>
-    <p class="lede reveal">An adjacent parcel becomes a private, protected sanctuary — 60 beautiful domes built on sacred geometry, each an all-inclusive residence rather than just a rental. Twelve-month leases starting at $2,750/mo, averaging ~$3,300. Phase II opens in Year 2.</p>
+    <div class="eyebrow reveal">Phase II · The Dome Collective · Real Estate Co.</div>
+    <h2 class="reveal">A private residential<br>conscious community.</h2>
+    <p class="lede reveal">An adjacent parcel becomes a capped, intentional community where longevity medicine and sacred design aren't amenities bolted on — they're the foundation. Two residential tiers share one protected sanctuary, both on 12-month leases. This is a separate company: the Dome Collective / Real Estate Co. Phase II opens in Year 2.</p>
     <figure class="band reveal">
       <img src="images/dome-collective.png" alt="Dome residences at AWKN Ranch at sunset" loading="lazy">
       <figcaption>Dome residences — built with high intention, so you feel it in your nervous system the moment you arrive.</figcaption>
     </figure>
+    <div class="tiers reveal">
+      <div class="tier prize">
+        <div class="tag">The Prize · Most Exclusive</div>
+        <h3>Dome Park Residences</h3>
+        <div class="rent">$2,800<span> / mo avg</span></div>
+        <p>60 private domes set on sacred geometry and anchored by the 13 Oracle Angel Stations — walking trails, sculptural art, crystal installations, organic farm. The Core Team is included in residency:</p>
+        <ul>
+          <li>Annual comprehensive bloodwork &amp; functional health panels</li>
+          <li>Monthly IV drip therapy</li>
+          <li>Every morning &amp; evening class, all amenities</li>
+          <li>20% off the restaurant &amp; all longevity services</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="tag">Elevated Living</div>
+        <h3>Apartment Residences</h3>
+        <div class="rent">$2,200<span> / mo avg</span></div>
+        <p>80 eco-friendly, sustainable homes rising six stories above the Longevity Center at the front of the community — refined and beautiful, distinct from the private Dome Park at its heart.</p>
+        <ul>
+          <li>Full access to wellness amenities &amp; pool</li>
+          <li class="no">Dome Collective Core Team not included</li>
+        </ul>
+      </div>
+    </div>
     <div class="feature">
       <ul class="reveal">
-        <li>Built on sacred geometry — high intention in every detail</li>
-        <li>A private, protected sanctuary — residents only, closed to the public</li>
-        <li>Rent includes IV drips, membership, ranch access &amp; bloodwork</li>
+        <li>A single underground garage keeps the surface free of cars</li>
+        <li>A private, protected sanctuary — closed to the public</li>
+        <li>The founder's family lives on the land alongside residents</li>
         <li>408-person waitlist, built organically</li>
       </ul>
       <div class="bigfig reveal">
-        <div class="top">60 × ~$3,300 avg · 95% occupancy</div>
-        <div class="mid">$2.26M</div>
-        <div class="bot">per year · $188,100 / month</div>
+        <div class="top">60 domes × $2,800 + 80 apts × $2,200 · 100% occupancy</div>
+        <div class="mid">$4.13M</div>
+        <div class="bot">per year · $344,000 / month</div>
       </div>
     </div>
   </div>
@@ -403,12 +444,12 @@
 <section>
   <div class="wrap">
     <div class="eyebrow reveal">3-Year Projection</div>
-    <h2 class="reveal">The path to $7.5M.</h2>
-    <p class="lede reveal">Current streams grow 15% a year. New Phase I lines launch at half run-rate in Year 1, reach full pace in Year 2, then grow 20%. The Dome Collective opens in Year 2.</p>
+    <h2 class="reveal">The path to $9.5M.</h2>
+    <p class="lede reveal">Current streams grow 15% a year. New Phase I lines launch at half run-rate in Year 1, reach full pace in Year 2, then grow 20%. Both residential tiers — domes and apartments — open in Year 2 at 100% occupancy.</p>
     <div class="years">
       <div class="yr reveal"><div class="ylabel">Year 1</div><div class="yval">$2.4M</div><div class="ynote">Phase I ramping</div></div>
-      <div class="yr reveal"><div class="ylabel">Year 2</div><div class="yval">$6.6M</div><div class="ynote">Dome Collective opens</div></div>
-      <div class="yr reveal"><div class="ylabel">Year 3</div><div class="yval">$7.5M</div><div class="ynote">Full ecosystem</div></div>
+      <div class="yr reveal"><div class="ylabel">Year 2</div><div class="yval">$8.5M</div><div class="ynote">Residences open</div></div>
+      <div class="yr reveal"><div class="ylabel">Year 3</div><div class="yval">$9.5M</div><div class="ynote">Full ecosystem</div></div>
     </div>
     <table class="tbl reveal">
       <thead><tr><th>Segment</th><th class="r">Year 1</th><th class="r">Year 2</th><th class="r">Year 3</th></tr></thead>
@@ -416,33 +457,34 @@
         <tr><td class="name">Phase I — current</td><td class="r">$1.20M</td><td class="r">$1.38M</td><td class="r">$1.59M</td></tr>
         <tr><td class="name">Phase I — new</td><td class="r">$0.90M</td><td class="r">$2.33M</td><td class="r">$2.80M</td></tr>
         <tr><td class="name">Phase I — add-ons</td><td class="r">$0.28M</td><td class="r">$0.67M</td><td class="r">$0.81M</td></tr>
-        <tr><td class="name">Phase II — Dome Collective</td><td class="r">—</td><td class="r">$2.26M</td><td class="r">$2.35M</td></tr>
-        <tr class="total"><td>Total gross revenue</td><td class="r mono">$2.4M</td><td class="r mono">$6.6M</td><td class="r mono">$7.5M</td></tr>
+        <tr><td class="name">Phase II — Dome Park (60 domes)</td><td class="r">—</td><td class="r">$2.02M</td><td class="r">$2.10M</td></tr>
+        <tr><td class="name">Phase II — Apartments (80 units)</td><td class="r">—</td><td class="r">$2.11M</td><td class="r">$2.20M</td></tr>
+        <tr class="total"><td>Total gross revenue</td><td class="r mono">$2.4M</td><td class="r mono">$8.5M</td><td class="r mono">$9.5M</td></tr>
       </tbody>
     </table>
-    <p class="disc reveal">Phase III — the Amenities Center below — drives these premium dome rents rather than adding a separate revenue line.</p>
+    <p class="disc reveal">Phase III — the Longevity &amp; Amenity Center below — drives these residential rents rather than adding a separate revenue line.</p>
   </div>
 </section>
 
 <!-- PHASE III -->
 <section>
   <div class="wrap">
-    <div class="eyebrow reveal">Phase III · The Amenities Center</div>
-    <h2 class="reveal">A world-class<br>amenities center.</h2>
-    <p class="lede reveal">A state-of-the-art Amenities Center designed with the same sacred geometry and high intention as the domes — the heart of the Collective, where true health equals true wealth.</p>
+    <div class="eyebrow reveal">Phase III · The Longevity &amp; Amenity Center</div>
+    <h2 class="reveal">The engine<br>of vitality.</h2>
+    <p class="lede reveal">Wellness here is not an occasional escape — it's a way of life. The six-story apartment block rises above it, the domes surround it, and a single underground garage sits beneath it, keeping the surface free of cars. Built on the same sacred geometry as the residences, where true health equals true wealth.</p>
     <figure class="band full reveal">
-      <img src="images/amenities-center.png?v=4" alt="The AWKN Amenities Center — pickleball, paddle courts, tennis court, child art therapy studio, climbing wall, and longevity center" loading="lazy">
-      <figcaption>The AWKN Amenities Center (rendering).</figcaption>
+      <img src="images/amenities-center.png?v=4" alt="The AWKN Longevity & Amenity Center — pool, hydrotherapy, pickleball, paddle courts, longevity diagnostics, and chef-driven restaurant" loading="lazy">
+      <figcaption>The Longevity &amp; Amenity Center (rendering).</figcaption>
     </figure>
     <div class="vert">
-      <div class="va reveal"><h3>Pool &amp; Hydrotherapy</h3><p>An outdoor pool, plus a state-of-the-art sauna, cold plunge, and steam room inside.</p></div>
-      <div class="va reveal"><h3>Movement</h3><p>Indoor and outdoor fitness areas, plus pickleball, tennis, and paddle courts and a climbing wall.</p></div>
-      <div class="va reveal"><h3>Nourishment</h3><p>A high-intention restaurant — no seed oils, top-tier smoothies, meals, and kitchen, where true health is true wealth.</p></div>
-      <div class="va reveal"><h3>Family &amp; Play</h3><p>Children's art and play therapy, with indoor and outdoor kids' gyms.</p></div>
-      <div class="va reveal"><h3>Longevity Center</h3><p>A dedicated longevity center — diagnostics and regenerative support.</p></div>
-      <div class="va reveal"><h3>The Studio</h3><p>A podcast and creator studio.</p></div>
+      <div class="va reveal"><h3>Longevity Medicine</h3><p>Annual comprehensive bloodwork and functional health panels, plus monthly IV drip therapy — included for dome residents.</p></div>
+      <div class="va reveal"><h3>Daily Practice</h3><p>Morning and evening classes, every day, plus red light therapy beds and the latest in longevity technology.</p></div>
+      <div class="va reveal"><h3>Hydrotherapy</h3><p>An outdoor pool, plus a salt room, sauna, and cold plunge inside.</p></div>
+      <div class="va reveal"><h3>Movement</h3><p>Indoor and outdoor fitness, plus an indoor pickleball court and a paddle court.</p></div>
+      <div class="va reveal"><h3>Nourishment</h3><p>A healthy, chef-driven restaurant attached on-site — where true health is true wealth.</p></div>
+      <div class="va reveal"><h3>Family &amp; Play</h3><p>An outdoor children's play area, kids' fitness, and art &amp; play therapy.</p></div>
     </div>
-    <p class="disc reveal">Every amenity is built on sacred geometry — a value driver that commands premium, fully-occupied dome rents rather than a separate income line.</p>
+    <p class="disc reveal">Every amenity is built on sacred geometry — a value driver that commands premium, fully-occupied residential rents rather than a separate income line.</p>
   </div>
 </section>
 
@@ -469,11 +511,11 @@
   <div class="wrap">
     <div class="eyebrow reveal">The Opportunity</div>
     <h2 class="reveal">$1.5M SAFE · $8M cap.</h2>
-    <p class="lede reveal">$400K committed to date. The remaining $1.1M funds site planning, engineering, permitting, and the Dome Collective &amp; Amenities Center buildout — with operating reserves to bridge to refinance.</p>
+    <p class="lede reveal">$400K committed to date. The remaining $1.1M funds site planning, engineering, permitting, and the Dome Collective &amp; Longevity Center buildout — with operating reserves to bridge to refinance.</p>
 
     <div style="margin-top:54px" class="reveal">
       <div class="eyebrow">What It's Worth</div>
-      <h2 style="font-size:clamp(30px,4.5vw,48px)">A $51M ecosystem at full build.</h2>
+      <h2 style="font-size:clamp(30px,4.5vw,48px)">A $67M ecosystem at full build.</h2>
       <p class="lede">Each piece valued on its own standard — operating businesses on EBITDA multiples, real estate on income and market value. Together they form the asset base behind a Series A and an eventual refinance.</p>
     </div>
 
@@ -481,17 +523,17 @@
       <thead><tr><th>Component</th><th>Method</th><th class="r">Value</th></tr></thead>
       <tbody>
         <tr><td class="name">Clinical &amp; ranch operating business</td><td>~$2.0M EBITDA × 7.5×</td><td class="r mono">$15.0M</td></tr>
-        <tr><td class="name">Dome Collective + Amenities Center</td><td>~$1.35M NOI ÷ 6.5% cap</td><td class="r mono">$21.0M</td></tr>
+        <tr><td class="name">Dome Collective — domes, apartments + Amenity Center</td><td>~$2.4M NOI ÷ 6.5% cap</td><td class="r mono">$37.0M</td></tr>
         <tr><td class="name">Land (12+ acres)</td><td>Market value</td><td class="r mono">$15.0M</td></tr>
-        <tr class="total"><td>Total enterprise value</td><td></td><td class="r mono">~$51.0M</td></tr>
+        <tr class="total"><td>Total enterprise value</td><td></td><td class="r mono">~$67.0M</td></tr>
       </tbody>
     </table>
 
     <div class="multiple reveal">
-      <div class="big">~6.3× the entry cap.</div>
-      <p>Phase 1 investors enter at an $8M cap against a fully-built ecosystem worth roughly $51M — a private living sanctuary, a high-margin clinical business, and appreciating Austin land secured under a 15-year lease with a $10M purchase option.</p>
+      <div class="big">~8.4× the entry cap.</div>
+      <p>Phase 1 investors enter at an $8M cap against a fully-built ecosystem worth roughly $67M — a private living sanctuary, a high-margin clinical business, and appreciating Austin land secured under a 15-year lease with a $10M purchase option.</p>
     </div>
-    <p class="disc reveal">Valuation reflects fully-stabilized, built-out figures. The Amenities Center carries no separate income line — its value is captured in premium, fully-occupied dome rents (60 × ~$3,300/mo, 95% occupancy), capitalized at a market cap rate. EBITDA multiples per wellness/hospitality (7–8×) norms. Internal estimates, not a guarantee of returns.</p>
+    <p class="disc reveal">Valuation reflects fully-stabilized, built-out figures. The Longevity &amp; Amenity Center carries no separate income line — its value is captured in fully-occupied residential rents (60 domes × $2,800/mo + 80 apartments × $2,200/mo, 100% occupancy), capitalized at a market cap rate. EBITDA multiples per wellness/hospitality (7–8×) norms. Internal estimates, not a guarantee of returns.</p>
   </div>
 </section>
 
