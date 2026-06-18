@@ -197,6 +197,8 @@
   .tier li::before{content:'✦';color:var(--gold);font-size:11px;margin-top:3px;flex:none}
   .tier li.no{color:var(--muted)}
   .tier li.no::before{content:'—';color:var(--muted)}
+  .tiers.three{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:860px){.tiers.three{grid-template-columns:1fr}}
   @media(max-width:640px){.tiers{grid-template-columns:1fr}}
 
   /* PHASE III VERTICAL */
@@ -504,6 +506,59 @@
       <div class="t reveal"><div class="n">$40K</div><div class="l">Deposits collected pre-buildout</div></div>
       <div class="t reveal"><div class="n">250K</div><div class="l">Views on a single post</div></div>
     </div>
+  </div>
+</section>
+
+<!-- INVEST THREE WAYS -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">Invest Three Ways</div>
+    <h2 class="reveal">Three ways to help<br>build Live Well.</h2>
+    <p class="lede reveal">Three distinct paths, open in parallel — each suited to a different kind of partner. An invitation into what we're building, not a capital ask.</p>
+    <div class="tiers three reveal">
+      <div class="tier">
+        <div class="tag">Path 1 · For Future Residents</div>
+        <h3>Founding Resident Lease</h3>
+        <div class="rent">$2,400<span> / mo · year one</span></div>
+        <p>Reserve your dome as a founding resident — a 20% first-year discount, waived deposit, and your place secured before we open. Commit with a single $2,400 payment that applies directly to your first month.</p>
+        <ul>
+          <li>Standard $3,000/mo → founding rate $2,400/mo (year one)</li>
+          <li>Annual bloodwork, monthly IV drip, full longevity &amp; amenity access</li>
+          <li>Target: 60 founding residents × $2,400 = $144,000 reserved</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="tag">Path 2 · For Facilitators &amp; Friends</div>
+        <h3>Retreat Partner</h3>
+        <div class="rent">$50K–$100K<span> · 80% back as credits</span></div>
+        <p>Partners contribute capital and receive 80% back as credits toward weekend retreat stays and bookings — the Maloka, temple, Retreat House, and yurts. We get capital and committed bookings now; they get deep, usable value on the land they help create.</p>
+        <ul>
+          <li>Target: 4 × $50K + 1 × $100K = $300,000 committed</li>
+          <li>~$60,000 net capital + ~$240,000 in pre-booked retreat value</li>
+        </ul>
+      </div>
+      <div class="tier prize">
+        <div class="tag">Path 3 · For Ecosystem Investors</div>
+        <h3>Equity Partner — SAFE</h3>
+        <div class="rent">$8M<span> valuation cap</span></div>
+        <p>A direct equity stake in Heart Space Health — the parent company behind Within Center, AWKN Ranch, and Live Well — via a SAFE note, for those who want to own a piece of the whole.</p>
+        <ul>
+          <li>Target: 4 × $100,000 = $400,000</li>
+          <li class="no">Securities offering — full terms provided separately</li>
+        </ul>
+      </div>
+    </div>
+    <table class="tbl reveal">
+      <thead><tr><th>Path</th><th class="r">Committed</th><th class="r">Net capital to build</th><th>Best for</th></tr></thead>
+      <tbody>
+        <tr><td class="name">1 · Founding Lease</td><td class="r mono">$144,000</td><td class="r mono">$144,000</td><td>Future residents</td></tr>
+        <tr><td class="name">2 · Retreat Partner</td><td class="r mono">$300,000</td><td class="r mono">~$60,000</td><td>Facilitators</td></tr>
+        <tr><td class="name">3 · Equity SAFE</td><td class="r mono">$400,000</td><td class="r mono">$400,000</td><td>Ecosystem investors</td></tr>
+        <tr class="total"><td>Total</td><td class="r mono">~$844,000</td><td class="r mono">~$604,000</td><td></td></tr>
+      </tbody>
+    </table>
+    <p class="disc reveal"><strong style="font-style:normal;color:var(--ink)">How we protect your commitment:</strong> Lease and partner funds are held in a dedicated account and applied directly to future occupancy or bookings. If the timeline shifts materially, the commitment is fully refundable or convertible to credit toward any AWKN experience — their choice.</p>
+    <p class="disc reveal">At the standard $3,000/mo rate, 60 leases represent ~$2.16M in annual value once stabilized — the committed demand that anchors our path to Phase 1 capital.</p>
   </div>
 </section>
 
