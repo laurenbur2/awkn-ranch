@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dome Collective — Investor Deck</title>
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Dome Collective — Love Where You Live">
+<meta property="og:description" content="80 private dome residences on 9 acres in Austin — recurring lease income, a rare land-option spread, and a lifestyle brand built to replicate.">
+<meta property="og:url" content="https://laurenbur2.github.io/awkn-ranch/dome-collective/">
+<meta property="og:image" content="https://laurenbur2.github.io/awkn-ranch/investor-presentation/images/dome-collective.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laurenbur2.github.io/awkn-ranch/investor-presentation/images/dome-collective.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#211a12;
+    --paper:#f4ede0;
+    --paper-2:#ece2d2;
+    --clay:#b5562e;
+    --clay-deep:#8f3f1f;
+    --sage:#5c6b4a;
+    --gold:#bd8b3c;
+    --line:#d8cbb4;
+    --muted:#6f6450;
+    --card:#fbf6ec;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Outfit',sans-serif;
+    background:#2a2118;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar{
+    position:fixed;top:18px;right:20px;z-index:200;display:flex;gap:10px;align-items:center;
+  }
+  .dl-btn{
+    display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+    padding:11px 22px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;text-decoration:none;
+    color:#231a10;border:none;border-radius:100px;background:var(--gold);
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.6);transition:transform .2s ease,box-shadow .2s ease;
+  }
+  .dl-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px -8px rgba(0,0,0,.7)}
+  .dl-btn svg{width:15px;height:15px;fill:currentColor}
+  .dl-hint{font-size:11px;color:#cabfa9;background:rgba(0,0,0,.4);padding:7px 13px;border-radius:100px;letter-spacing:.02em}
+
+  /* ===== DECK / SLIDES ===== */
+  .deck{max-width:1180px;margin:0 auto;padding:78px 20px 60px;display:flex;flex-direction:column;gap:26px}
+  .slide{
+    position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;
+    background:var(--paper);border:1px solid rgba(0,0,0,.08);border-radius:16px;overflow:hidden;
+    box-shadow:0 34px 70px -44px rgba(0,0,0,.85);
+  }
+  .pad{position:absolute;inset:0;padding:4.4cqw 5.4cqw;display:flex;flex-direction:column}
+  /* base type scale — every slide inner wrapper scales with slide width */
+  .pad,.cover .c-inner,.split .col-pad{font-size:1.6cqw;line-height:1.5}
+  .slide h1,.slide h2,.slide h3,.slide h4{font-family:'Fraunces',serif;font-weight:400;line-height:1.03;letter-spacing:-.01em}
+  .eyebrow{font-size:.72em;letter-spacing:.3em;text-transform:uppercase;color:var(--clay);font-weight:600;margin-bottom:.9em}
+  .slide h2{font-size:2.85em;margin-bottom:.4em}
+  .slide h2 em{font-style:italic;color:var(--gold)}
+  .lede{font-size:1.12em;color:var(--muted);font-weight:300;max-width:34em}
+  .snum{position:absolute;bottom:3.4cqw;right:5.2cqw;font-family:'Fraunces',serif;font-size:.82em;color:var(--muted);opacity:.7;letter-spacing:.1em}
+  .brandmark{position:absolute;bottom:3.4cqw;left:5.6cqw;font-size:.66em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);opacity:.75}
+
+  /* dark slide */
+  .slide.dark{background:linear-gradient(158deg,#2a2118,#43331f);color:var(--paper);border-color:rgba(0,0,0,.4)}
+  .slide.dark h2{color:var(--paper)}
+  .slide.dark .eyebrow{color:var(--gold)}
+  .slide.dark .lede{color:#d6cbb6}
+  .slide.dark .snum,.slide.dark .brandmark{color:#a89c83}
+
+  /* ===== SPLIT LAYOUT ===== */
+  .split{display:grid;grid-template-columns:1fr 1fr;height:100%}
+  .split.wide-r{grid-template-columns:1.05fr .95fr}
+  .split .col-pad{padding:4.4cqw 4.8cqw;display:flex;flex-direction:column;justify-content:center}
+  .split .col-img{position:relative;overflow:hidden}
+  .split .col-img img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* ===== COVER ===== */
+  .cover{position:absolute;inset:0}
+  .cover img{width:100%;height:100%;object-fit:cover}
+  .cover .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,20,14,.55),rgba(28,20,14,.86)),radial-gradient(120% 90% at 80% 8%,rgba(189,139,60,.22),transparent 55%)}
+  .cover .c-inner{position:absolute;inset:0;padding:6cqw 6cqw;display:flex;flex-direction:column;justify-content:center;color:var(--paper)}
+  .cover h1{font-size:7.2em;font-weight:300;line-height:.98;letter-spacing:-.03em}
+  .cover h1 em{font-style:italic;color:var(--gold)}
+  .cover .tagline{font-family:'Fraunces',serif;font-style:italic;font-size:2.1em;color:#f0e6d2;margin-top:.3em}
+  .cover p{font-size:1.05em;color:#e6dcc8;max-width:32em;margin-top:1em;font-weight:300}
+  .cstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:2.4em;background:rgba(244,237,224,.18);border:1px solid rgba(244,237,224,.18);border-radius:12px;overflow:hidden;max-width:44em}
+  .cstrip .s{background:rgba(28,20,14,.5);padding:1.1em 1.2em}
+  .cstrip .n{font-family:'Fraunces',serif;font-size:1.9em;color:var(--gold);line-height:1}
+  .cstrip .l{font-size:.66em;letter-spacing:.16em;text-transform:uppercase;color:#cabfa9;margin-top:.7em}
+
+  /* ===== CARDS / GRIDS ===== */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1.1em;margin-top:1.3em}
+  .biz{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.5em 1.5em}
+  .biz .tag{font-size:.66em;letter-spacing:.18em;text-transform:uppercase;color:var(--clay);font-weight:600}
+  .biz h3{font-size:1.55em;margin:.4em 0 .35em}
+  .biz p{font-size:.82em;color:var(--muted);line-height:1.5}
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3em;margin-top:1.5em}
+  .pil{border-top:2px solid var(--clay);padding-top:.9em}
+  .pil h4{font-size:1.05em;margin-bottom:.35em}
+  .pil p{font-size:.76em;color:var(--muted);line-height:1.45}
+
+  .vert{display:grid;grid-template-columns:repeat(2,1fr);gap:.7em 1.4em;margin-top:1.4em}
+  .va{border-top:1px solid var(--line);padding-top:.7em}
+  .va h3{font-size:1.02em;margin-bottom:.2em}
+  .va p{font-size:.74em;color:var(--muted);line-height:1.4}
+
+  /* STACKED AMENITY BUILDING */
+  .stack{display:flex;flex-direction:column;gap:.5em;margin-top:.85em}
+  .floor{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:.7em 1.3em;display:grid;grid-template-columns:9em 1fr;gap:1.4em;align-items:center}
+  .floor.roof{border-color:var(--gold);background:linear-gradient(115deg,rgba(189,139,60,.16),var(--card) 60%);box-shadow:0 0 0 1px rgba(189,139,60,.25)}
+  .floor .fname{font-family:'Fraunces',serif;font-size:1.35em;color:var(--clay-deep);line-height:1}
+  .floor.roof .fname{color:var(--clay)}
+  .floor .fsq{font-size:.68em;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:.35em}
+  .floor .fprog{font-size:.86em;color:var(--ink);line-height:1.45}
+  .floor .rooftag{display:inline-block;font-size:.6em;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.4em}
+
+  /* TEAM */
+  .founder{background:linear-gradient(115deg,rgba(189,139,60,.15),var(--card) 55%);border:1px solid var(--gold);border-radius:14px;padding:1.3em 1.6em;margin-top:1.1em}
+  .founder .frole{font-size:.68em;letter-spacing:.18em;text-transform:uppercase;color:var(--clay);font-weight:600}
+  .founder h3{font-family:'Fraunces',serif;font-size:1.75em;color:var(--clay-deep);margin:.15em 0 .35em}
+  .founder p{font-size:.9em;color:var(--muted);line-height:1.55;max-width:44em}
+  .bench{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2em;margin-top:1.2em}
+  .bench .b{border-top:2px solid var(--clay);padding-top:.8em}
+  .bench .b h4{font-family:'Fraunces',serif;font-size:1.12em;margin-bottom:.25em}
+  .bench .b .brole{font-size:.62em;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);font-weight:600;margin-bottom:.4em}
+  .bench .b p{font-size:.8em;color:var(--muted);line-height:1.45}
+
+  .resid{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.15em 1.4em;margin-top:1em}
+  .resid .tag{font-size:.7em;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .resid .rent{font-family:'Fraunces',serif;font-size:1.55em;color:var(--clay-deep);margin:.2em 0 .1em}
+  .resid .rent span{font-family:'Outfit',sans-serif;font-size:.5em;color:var(--muted)}
+  .resid ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:.1em 1.4em;margin-top:.6em}
+  .resid li{font-size:.82em;padding:.4em 0;border-top:1px solid var(--line);display:flex;gap:.6em}
+  .resid li::before{content:'✦';color:var(--gold);font-size:.7em;margin-top:.35em;flex:none}
+
+  /* ===== TABLES ===== */
+  .tbl{width:100%;border-collapse:collapse;font-size:.82em}
+  .tbl caption{text-align:left;font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);font-weight:600;margin-bottom:.8em}
+  .tbl td{padding:.42em .3em;border-bottom:1px solid var(--line)}
+  .tbl td.name{font-weight:500}
+  .tbl td.r{text-align:right;font-family:'Fraunces',serif;font-variant-numeric:tabular-nums}
+  .tbl tr.total td{border-bottom:none;border-top:2px solid var(--ink);padding-top:.6em;font-weight:600}
+  .tbl tr.total td.r{font-size:1.35em;color:var(--clay-deep)}
+  .tbl tr.sub td{color:var(--muted);font-style:italic;border-bottom:none;padding-top:.7em;padding-bottom:.2em;font-size:.82em;letter-spacing:.1em;text-transform:uppercase}
+  .tbl tr.rule td{border-top:1.5px solid var(--ink);font-weight:600}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:2.4em;align-items:start;margin-top:1.3em}
+  .dense .tbl{font-size:.68em}
+  .dense .tbl td{padding:.2em .3em}
+  .dense h2{font-size:2.2em;margin-bottom:.25em}
+  .dense .cols2{margin-top:.85em}
+  .dark .tbl td{border-color:rgba(244,237,224,.16)}
+  .dark .tbl td.r{color:var(--gold)}
+  .dark .tbl caption{color:#bdb094}
+  .dark .tbl tr.total td{border-top-color:rgba(244,237,224,.5)}
+  .dark .tbl tr.total td.r{color:var(--gold)}
+  .dark .tbl tr.sub td{color:#bdb094}
+  .dark .tbl tr.rule td{border-top-color:rgba(244,237,224,.5)}
+
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1em;margin-top:auto}
+  .metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1em 1.1em}
+  .metric .mv{font-family:'Fraunces',serif;font-size:1.9em;color:var(--clay-deep);line-height:1}
+  .metric .ml{font-size:.68em;color:var(--muted);margin-top:.5em;line-height:1.3}
+  .dark .metric{background:rgba(244,237,224,.05);border-color:rgba(244,237,224,.16)}
+  .dark .metric .mv{color:var(--gold)}
+  .dark .metric .ml{color:#cabfa9}
+
+  .callout{border-left:3px solid var(--gold);background:rgba(244,237,224,.06);border-radius:0 12px 12px 0;padding:1.2em 1.4em;font-size:.9em;line-height:1.55;color:#e6dcc8}
+  .callout strong{color:var(--gold)}
+
+  /* feature list */
+  .feat{display:grid;grid-template-columns:1.05fr .95fr;gap:2.2em;align-items:center;margin-top:1.4em}
+  .feat ul{list-style:none}
+  .feat li{padding:.7em 0;border-bottom:1px solid var(--line);font-size:.9em;display:flex;gap:.7em;line-height:1.45}
+  .feat li::before{content:'';width:.42em;height:.42em;border-radius:50%;background:var(--clay);margin-top:.55em;flex:none}
+  .bigfig{background:linear-gradient(155deg,#3a2c1e,#4a3622);color:var(--paper);border-radius:16px;padding:1.8em 1.6em;text-align:center}
+  .bigfig .top{font-size:.72em;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
+  .bigfig .mid{font-family:'Fraunces',serif;font-size:3.6em;line-height:1;margin:.2em 0}
+  .bigfig .bot{color:#d6cbb6;font-size:.82em}
+
+  /* traction */
+  .trac{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2em;margin-top:auto}
+  .trac .n{font-family:'Fraunces',serif;font-size:3.1em;color:var(--clay-deep);line-height:1}
+  .dark .trac .n{color:var(--gold)}
+  .trac .l{font-size:.76em;color:var(--muted);margin-top:.5em;line-height:1.35}
+  .dark .trac .l{color:#cabfa9}
+
+  /* phases */
+  .years{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1em;margin-top:1.3em}
+  .yr{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3em 1.4em;position:relative;overflow:hidden}
+  .yr::before{content:'';position:absolute;inset:0 auto auto 0;height:4px;width:100%;background:linear-gradient(90deg,var(--clay),var(--gold))}
+  .yr .ylabel{font-size:.68em;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .yr .yval{font-family:'Fraunces',serif;font-size:3em;color:var(--clay-deep);margin:.2em 0 .1em;line-height:1}
+  .yr .ynote{font-size:.78em;color:var(--muted);line-height:1.4}
+
+  .multiple{margin-top:1.4em;text-align:center;padding:1.6em;border:1px solid rgba(244,237,224,.22);border-radius:16px;background:rgba(244,237,224,.04)}
+  .multiple .big{font-family:'Fraunces',serif;font-size:2.6em;color:var(--gold);line-height:1}
+  .multiple p{color:#d6cbb6;max-width:34em;margin:.7em auto 0;font-size:.86em;line-height:1.5}
+
+  .close-contact{margin-top:auto;font-size:.82em;color:#cabfa9;line-height:1.7}
+  .close-contact a{color:var(--gold);text-decoration:none}
+  .disc{font-size:.62em;color:#a89c83;font-style:italic;margin-top:1.1em;line-height:1.45;max-width:52em}
+
+  /* ===== RESPONSIVE (screen only) ===== */
+  @media(max-width:640px){
+    .deck{padding:70px 12px 40px;gap:16px}
+    .toolbar{top:12px;right:12px}
+    .dl-hint{display:none}
+  }
+
+  /* ===== PRINT → PDF ===== */
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{background:#fff}
+    .toolbar{display:none!important}
+    .deck{max-width:none;margin:0;padding:0;gap:0}
+    .slide{
+      width:1280px;height:720px;aspect-ratio:auto;border-radius:0;border:none;box-shadow:none;
+      break-after:page;page-break-after:always;break-inside:avoid;
+    }
+    .slide:last-child{break-after:auto;page-break-after:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="dl-hint">Opens print dialog → “Save as PDF”, Landscape</span>
+  <button class="dl-btn" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2h14v2H5v-2z"/></svg>
+    Download PDF
+  </button>
+</div>
+
+<div class="deck">
+
+  <!-- 1 · COVER -->
+  <div class="slide" id="s1">
+    <div class="cover">
+      <img src="../investor-presentation/images/dome-collective.png" alt="Dome residences at sunset">
+      <div class="veil"></div>
+      <div class="c-inner">
+        <div class="eyebrow" style="color:var(--gold)">A Heart Space Health Company · Investor Deck 2026</div>
+        <h1>The Dome <em>Collective</em></h1>
+        <div class="tagline">Love where you live.</div>
+        <p>A private residential conscious community in Austin — 80 dome residences on 9 acres, where longevity medicine, sacred design, and belonging are the foundation, not the amenities. Born from AWKN Ranch. Built to stand alone.</p>
+        <div class="cstrip">
+          <div class="s"><div class="n">80</div><div class="l">Dome Residences</div></div>
+          <div class="s"><div class="n">9 acres</div><div class="l">Single-Purpose LLC</div></div>
+          <div class="s"><div class="n">$32.2M</div><div class="l">Stabilized Value</div></div>
+          <div class="s"><div class="n">408</div><div class="l">On the Waitlist</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · THE SECOND BUSINESS -->
+  <div class="slide" id="s2">
+    <div class="pad">
+      <div class="eyebrow">The Second Business</div>
+      <h2>Born from the ranch. <em>Built to stand alone.</em></h2>
+      <p class="lede">The Dome Collective turns AWKN Ranch's one-time journey into a way of life — 80 private domes leased month after month, a distinct company with its own brand, real estate, and balance sheet.</p>
+      <div class="two">
+        <div class="biz"><div class="tag">01 · The Destination</div><h3>AWKN Ranch</h3><p>Clinical care, ceremony, retreats, and events. People come for days or weeks. Proven over 4.5 years, ~$1.3M/yr in sales, profitable, five-star.</p></div>
+        <div class="biz"><div class="tag">02 · The Home</div><h3>The Dome Collective</h3><p>A residential community where people live full-time. Recurring 12-month leases, real estate you own, and a lifestyle brand that scales beyond a single property.</p></div>
+      </div>
+      <div class="pillars">
+        <div class="pil"><h4>Its own brand</h4><p>“Love Where You Live” — a consumer lifestyle brand of memberships, residency, and belonging.</p></div>
+        <div class="pil"><h4>Its own real estate</h4><p>80 domes on 9 acres in a single-purpose LLC with its own capital stack, debt, and equity.</p></div>
+        <div class="pil"><h4>Its own recurring revenue</h4><p>Month-after-month lease income — the most predictable and replicable revenue there is.</p></div>
+      </div>
+    </div>
+    <div class="snum">02</div>
+  </div>
+
+  <!-- 3 · THE RESIDENCES -->
+  <div class="slide" id="s3">
+    <div class="split wide-r">
+      <div class="col-pad">
+        <div class="eyebrow">The Residences</div>
+        <h2>80 domes on <em>sacred geometry.</em></h2>
+        <p class="lede">Each dome is a private residence built with high intention — set on sacred geometry and anchored by the 13 Oracle Angel Stations: trails, sculptural art, crystal installations, and an organic farm.</p>
+        <div class="resid">
+          <div class="tag">$3,000 / mo avg · 12-month leases · 95% stabilized</div>
+          <div class="rent">Residency includes the Core Team</div>
+          <ul>
+            <li>Annual comprehensive bloodwork</li>
+            <li>Monthly IV drip therapy</li>
+            <li>Every morning &amp; evening class</li>
+            <li>15% off food &amp; longevity services</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-img"><img src="images/residences.png" alt="Geodesic greenhouse dome over the organic farm at golden hour" style="object-position:25% center"></div>
+    </div>
+    <div class="snum">03</div>
+  </div>
+
+  <!-- 4 · LONGEVITY & AMENITY CENTER -->
+  <div class="slide" id="s4">
+    <div class="split">
+      <div class="col-pad">
+        <div class="eyebrow">The Heart · Longevity &amp; Amenity Center</div>
+        <h2>The engine <em>of vitality.</em></h2>
+        <p class="lede">Wellness here is a way of life. The domes surround it, the trails connect to it, and it sits at the center — with an independent restaurant and leased offices as their own income lines.</p>
+        <div class="vert">
+          <div class="va"><h3>Longevity Medicine</h3><p>Annual bloodwork + monthly IV drip therapy, included.</p></div>
+          <div class="va"><h3>Daily Practice</h3><p>Morning &amp; evening classes, red-light beds, longevity tech.</p></div>
+          <div class="va"><h3>Hydrotherapy</h3><p>Outdoor pool, salt room, sauna, and cold plunge.</p></div>
+          <div class="va"><h3>Movement</h3><p>Indoor &amp; outdoor fitness, pickleball and paddle courts.</p></div>
+          <div class="va"><h3>Nourishment</h3><p>Chef-driven restaurant on-site, leased as income.</p></div>
+          <div class="va"><h3>Family &amp; Play</h3><p>Children's play area, kids' fitness, art &amp; play therapy.</p></div>
+        </div>
+      </div>
+      <div class="col-img"><img src="images/amenity.png" alt="Dome residences aglow at golden hour along a lantern-lit path"></div>
+    </div>
+    <div class="snum">04</div>
+  </div>
+
+  <!-- 4b · STACKED AMENITY BUILDING -->
+  <div class="slide" id="s4b">
+    <div class="pad" style="--h2:2.55em">
+      <div class="eyebrow">The Heart · Signature Architecture</div>
+      <h2 style="font-size:2.55em;margin-bottom:.3em">Wellness, stacked. <em>Courts on the roof.</em></h2>
+      <p class="lede">A vertical amenity building — hospitality and wellness below, the highest-energy amenities up on the roof with the views. Stacking the courts shrinks the footprint and creates a signature moment.</p>
+      <div class="stack">
+        <div class="floor roof">
+          <div><div class="rooftag">The Signature Moment</div><div class="fname">Rooftop</div><div class="fsq">~6,500 sf plate</div></div>
+          <div class="fprog">Pickleball court · Padel court (10-ft glass enclosure) · Rooftop sauna + cold-plunge deck + lounge — with the views.</div>
+        </div>
+        <div class="floor">
+          <div><div class="fname">Second Floor</div><div class="fsq">~6,500 sf</div></div>
+          <div class="fprog">Fitness · Interior sauna / cold-plunge / salt-room suite · Functional-health offices (IV, coaching, functional medicine) · Changing &amp; support</div>
+        </div>
+        <div class="floor">
+          <div><div class="fname">Ground Floor</div><div class="fsq">~6,500 sf</div></div>
+          <div class="fprog">Café + coffee bar (the social lobby) · Restaurant + shared commercial kitchen · Kids room · Restrooms / lockers · Lobby &amp; circulation</div>
+        </div>
+      </div>
+      <div class="metrics" style="margin-top:auto">
+        <div class="metric"><div class="mv">~13,000 sf</div><div class="ml">Two floors + activated rooftop</div></div>
+        <div class="metric"><div class="mv">$275 / sf</div><div class="ml">Rate carries the rooftop complexity</div></div>
+        <div class="metric"><div class="mv">$3.575M</div><div class="ml">Amenity center · in Phase 1</div></div>
+        <div class="metric"><div class="mv">65 ft</div><div class="ml">Height variance enables padel</div></div>
+      </div>
+    </div>
+    <div class="snum">05</div>
+  </div>
+
+  <!-- 5 · ECONOMICS I · COSTS -->
+  <div class="slide" id="s5">
+    <div class="pad dense">
+      <div class="eyebrow">The Economics · Built Lean</div>
+      <h2>A true all-in cost of <em>$99,300</em> per dome.</h2>
+      <div class="cols2">
+        <table class="tbl">
+          <caption>True Cost Per Dome · Bulk Pricing</caption>
+          <tbody>
+            <tr><td class="name">Dome shell / kit</td><td class="r">$27,000</td></tr>
+            <tr><td class="name">Delivery</td><td class="r">$2,700</td></tr>
+            <tr><td class="name">Assembly / erection</td><td class="r">$4,500</td></tr>
+            <tr><td class="name">Foundation / pad + deck</td><td class="r">$5,000</td></tr>
+            <tr><td class="name">Flooring</td><td class="r">$5,400</td></tr>
+            <tr><td class="name">Plumbing rough-in + fixtures</td><td class="r">$8,100</td></tr>
+            <tr><td class="name">Electrical + panel / wiring</td><td class="r">$6,300</td></tr>
+            <tr><td class="name">HVAC / mini-split AC</td><td class="r">$4,850</td></tr>
+            <tr><td class="name">Insulation + interior finish</td><td class="r">$6,300</td></tr>
+            <tr><td class="name">Windows + doors</td><td class="r">$4,500</td></tr>
+            <tr><td class="name">Kitchenette + cabinetry</td><td class="r">$6,200</td></tr>
+            <tr><td class="name">Bathroom buildout</td><td class="r">$8,100</td></tr>
+            <tr><td class="name">Interior designer + FF&amp;E</td><td class="r">$1,000</td></tr>
+            <tr><td class="name">Landscaping</td><td class="r">$3,500</td></tr>
+            <tr><td class="name">Utility trenching / hookup</td><td class="r">$3,600</td></tr>
+            <tr><td class="name">Permits / inspections</td><td class="r">$2,250</td></tr>
+            <tr class="total"><td>Total per dome</td><td class="r">$99,300</td></tr>
+          </tbody>
+        </table>
+        <table class="tbl">
+          <caption>Construction Cost Breakdown</caption>
+          <tbody>
+            <tr class="sub"><td colspan="2">Phase 1 — ~$10.575M · 40 domes + Center</td></tr>
+            <tr><td class="name">Amenity center (13K sf @ $275)</td><td class="r">$3.575M</td></tr>
+            <tr><td class="name">Surface parking (120 spaces)</td><td class="r">$0.60M</td></tr>
+            <tr><td class="name">40 domes @ $99.3K</td><td class="r">$3.97M</td></tr>
+            <tr><td class="name">Site, trails, lighting, pad</td><td class="r">$1.00M</td></tr>
+            <tr><td class="name">Soft costs (design, permits)</td><td class="r">$0.66M</td></tr>
+            <tr><td class="name">Contingency</td><td class="r">$0.77M</td></tr>
+            <tr class="sub"><td colspan="2">Phase 2 — ~$5.5M · 40 domes</td></tr>
+            <tr><td class="name">40 domes @ $99.3K</td><td class="r">$3.97M</td></tr>
+            <tr><td class="name">Shared site work</td><td class="r">$0.70M</td></tr>
+            <tr><td class="name">Soft costs</td><td class="r">$0.36M</td></tr>
+            <tr><td class="name">Contingency</td><td class="r">$0.42M</td></tr>
+            <tr class="rule"><td class="name">Total construction</td><td class="r">~$16.075M</td></tr>
+            <tr><td class="name">Land purchase option (pre-yr 8)</td><td class="r">$10.0M</td></tr>
+            <tr class="total"><td>True all-in at stabilization</td><td class="r">~$26.075M</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="snum">06</div>
+  </div>
+
+  <!-- 6 · ECONOMICS II · REVENUE & NOI -->
+  <div class="slide" id="s6">
+    <div class="pad dense">
+      <div class="eyebrow">The Economics · Valued High</div>
+      <h2>$2.19M stabilized NOI · <em>$32.2M</em> value.</h2>
+      <div class="cols2">
+        <table class="tbl">
+          <caption>Stabilized Monthly Revenue</caption>
+          <tbody>
+            <tr><td class="name">80 domes @ $3,000/mo avg</td><td class="r">$240,000</td></tr>
+            <tr><td class="name">Restaurant rent</td><td class="r">$9,000</td></tr>
+            <tr><td class="name">Practitioner / longevity offices</td><td class="r">$7,500</td></tr>
+            <tr class="total"><td>Gross revenue / mo</td><td class="r">$256,500</td></tr>
+            <tr><td class="name" style="color:var(--muted)">Annualized</td><td class="r" style="color:var(--muted)">~$3.08M</td></tr>
+          </tbody>
+        </table>
+        <table class="tbl">
+          <caption>Operating Expenses · Lease Phase</caption>
+          <tbody>
+            <tr><td class="name">Ground lease rent (9 acres)</td><td class="r">$8,000</td></tr>
+            <tr><td class="name">Improvement property tax</td><td class="r">$20,464</td></tr>
+            <tr><td class="name">Manager, maintenance, help</td><td class="r">$13,500</td></tr>
+            <tr><td class="name">Insurance</td><td class="r">$8,000</td></tr>
+            <tr><td class="name">Utilities</td><td class="r">$9,000</td></tr>
+            <tr><td class="name">Repairs + reserves</td><td class="r">$8,000</td></tr>
+            <tr><td class="name">Landscaping / trails</td><td class="r">$3,000</td></tr>
+            <tr><td class="name">Marketing / admin</td><td class="r">$4,000</td></tr>
+            <tr class="total"><td>Total OpEx / mo</td><td class="r">~$74,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="mv">$2.19M</div><div class="ml">Stabilized NOI/yr · lease phase</div></div>
+        <div class="metric"><div class="mv">$1.99M</div><div class="ml">NOI/yr · after land purchase</div></div>
+        <div class="metric"><div class="mv">$32.2M</div><div class="ml">Stabilized value · 6.8% cap</div></div>
+        <div class="metric"><div class="mv">~23.5%</div><div class="ml">Value created (~$6.13M)</div></div>
+      </div>
+    </div>
+    <div class="snum">07</div>
+  </div>
+
+  <!-- 7 · CAPITAL STACK -->
+  <div class="slide dark" id="s7">
+    <div class="pad">
+      <div class="eyebrow">The Capital Stack · ~65 / 35</div>
+      <h2>Financed like real estate. <em>Shared like a deal.</em></h2>
+      <div class="cols2">
+        <table class="tbl">
+          <caption>Sources · All-In ~$26.1M</caption>
+          <tbody>
+            <tr><td class="name">Construction-to-perm loan (~65%)</td><td class="r">~$17.0M</td></tr>
+            <tr><td class="name">Equity — LP units (~35%)</td><td class="r">~$9.1M</td></tr>
+            <tr class="total"><td>Total capitalization</td><td class="r">~$26.1M</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <strong>LP terms.</strong> An 8% preferred return to LPs, then a 70/30 split above the pref — with the founder co-investing alongside the group. Straightforward, aligned, and built to capture the land-option spread for the equity.
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="mv">8%</div><div class="ml">Preferred return to LPs</div></div>
+        <div class="metric"><div class="mv">70 / 30</div><div class="ml">Split above the pref</div></div>
+        <div class="metric"><div class="mv">~65 / 35</div><div class="ml">Debt / equity stack</div></div>
+        <div class="metric"><div class="mv">Founder</div><div class="ml">Co-investing alongside LPs</div></div>
+      </div>
+    </div>
+    <div class="snum">08</div>
+  </div>
+
+  <!-- 8 · THE EDGE / LAND -->
+  <div class="slide" id="s8">
+    <div class="pad">
+      <div class="eyebrow">The Edge</div>
+      <h2>The land structure <em>is the moat.</em></h2>
+      <div class="feat">
+        <ul>
+          <li>15-year ground lease on the 9-acre parcel at just <strong>$8,000/mo</strong> (2% annual escalator)</li>
+          <li>A <strong>$10M option to purchase</strong> the land before year 8</li>
+          <li>During the lease, the landowner carries the land taxes — we only pay on our improvements, keeping carrying costs low through construction and lease-up</li>
+          <li>When we exercise, we lock $10M land beneath a ~$32M stabilized asset — and capture that spread for our equity, not the landowner's</li>
+        </ul>
+        <div class="bigfig">
+          <div class="top">Lock $10M land beneath</div>
+          <div class="mid">$32M</div>
+          <div class="bot">a stabilized asset — the spread is ours</div>
+        </div>
+      </div>
+    </div>
+    <div class="snum">09</div>
+  </div>
+
+  <!-- 9 · DEMAND -->
+  <div class="slide" id="s9">
+    <div class="pad">
+      <div class="eyebrow">Demand Is Already Here</div>
+      <h2>The waitlist <em>speaks for itself.</em></h2>
+      <p class="lede">The first two founding residents have already committed and put deposits down, with 408 more waiting — built organically, with zero ad spend. This community is demanded before it's built.</p>
+      <div class="trac">
+        <div><div class="n">408</div><div class="l">On the waitlist · zero ad spend</div></div>
+        <div><div class="n">2</div><div class="l">Applications &amp; deposits in now</div></div>
+        <div><div class="n">$40K</div><div class="l">Deposits collected pre-buildout</div></div>
+        <div><div class="n">250K</div><div class="l">Views on a single post</div></div>
+      </div>
+    </div>
+    <div class="snum">10</div>
+  </div>
+
+  <!-- 10 · HOW IT COMES ONLINE -->
+  <div class="slide" id="s10">
+    <div class="split wide-r">
+      <div class="col-pad">
+        <div class="eyebrow">How It Comes Online</div>
+        <h2>Two phases, <em>one community.</em></h2>
+        <div class="years">
+          <div class="yr"><div class="ylabel">Phase 1</div><div class="yval">40</div><div class="ynote">domes + Longevity Center, front 5 acres near the highway</div></div>
+          <div class="yr"><div class="ylabel">Phase 2</div><div class="yval">+40</div><div class="ynote">domes on the back 4 acres, on infrastructure already paid for</div></div>
+          <div class="yr"><div class="ylabel">Stabilized</div><div class="yval">95%</div><div class="ynote">occupancy · $2.19M NOI · $32.2M value</div></div>
+        </div>
+      </div>
+      <div class="col-img"><img src="images/masterplan.png" alt="The Dome Collective masterplan — 80 domes around the stacked amenity building with rooftop courts"></div>
+    </div>
+    <div class="snum">11</div>
+  </div>
+
+  <!-- 12 · TEAM -->
+  <div class="slide" id="s12">
+    <div class="pad">
+      <div class="eyebrow">Who's Building This</div>
+      <h2>Operators, <em>not first-timers.</em></h2>
+      <p class="lede">The Dome Collective is built by a team that already runs a profitable, five-star wellness business on the land next door — with specialist partners locking the model, the design, and the build.</p>
+      <div class="founder">
+        <div class="frole">Founder · Heart Space Health</div>
+        <h3>William David Naylor</h3>
+        <p>Built and operates AWKN Ranch &amp; Within Center — 4.5 years, ~$1.3M/yr in sales, two years profitable, five-star. He and his family live on the land alongside residents, and he co-invests in the raise alongside the group.</p>
+      </div>
+      <div class="bench">
+        <div class="b"><div class="brole">Financial Model</div><h4>Irene</h4><p>Locking the underwriting and the single-source-of-truth model behind every number in this deck.</p></div>
+        <div class="b"><div class="brole">Amenity Concept &amp; Costing</div><h4>Bowman + Jennifer</h4><p>Concept plan and cost-per-sq-ft for the stacked amenity center, pressure-testing the $275/sf basis.</p></div>
+        <div class="b"><div class="brole">Construction JV</div><h4>Builder Partner</h4><p>In selection now — rooftop structural experience from The Sanctuary to solve the stacked-courts build.</p></div>
+      </div>
+    </div>
+    <div class="snum">12</div>
+  </div>
+
+  <!-- 13 · THE OPPORTUNITY / CLOSE -->
+  <div class="slide dark" id="s11">
+    <div class="pad">
+      <div class="eyebrow">The Opportunity</div>
+      <h2>A $32M asset, <em>built for ~$26.1M.</em></h2>
+      <div class="cols2" style="grid-template-columns:1fr 1fr;align-items:start">
+        <table class="tbl">
+          <tbody>
+            <tr><td class="name">True all-in basis (construction + land)</td><td class="r">~$26.1M</td></tr>
+            <tr><td class="name">Stabilized NOI (lease phase)</td><td class="r">$2.19M/yr</td></tr>
+            <tr><td class="name">Stabilized value · 6.8% cap</td><td class="r">~$32.2M</td></tr>
+            <tr class="total"><td>Value created over all-in</td><td class="r">~$6.13M</td></tr>
+          </tbody>
+        </table>
+        <div class="multiple" style="margin-top:0">
+          <div class="big">Recurring. Financeable. Replicable.</div>
+          <p>A private living sanctuary with recurring lease income, a rare land-option spread, and a lifestyle brand built to replicate — “Love Where You Live,” on the next parcel and the next.</p>
+        </div>
+      </div>
+      <div class="close-contact">
+        <strong style="color:var(--paper);font-family:'Fraunces',serif;font-size:1.5em;font-weight:400">The Dome Collective</strong> · <em style="color:var(--gold)">Love where you live.</em><br>
+        A Heart Space Health Company · William David Naylor, Founder · 512.810.6517 · <a href="https://www.awknranch.com">www.awknranch.com</a>
+      </div>
+      <div class="disc">Valuation reflects fully-stabilized figures: 80 domes × $3,000/mo at 95% occupancy, with the leased restaurant and offices as their own income lines, capitalized at a 6.8% market cap rate. Construction costs are current estimates (pre-GC-bid); the program assumes City confirmation of the impervious-coverage strategy (in process, 50% credit on the domes). Internal estimates, not a guarantee of returns.</div>
+    </div>
+    <div class="snum">13</div>
+  </div>
+
+</div>
+</body>
+</html>
