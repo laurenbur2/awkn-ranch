@@ -3,18 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AWKN Ranch — Investor Overview</title>
+<title>Within | AWKN — Investor Overview</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="AWKN Ranch — Investor Overview">
-<meta property="og:description" content="A 12-acre wellness sanctuary in Austin, TX — combining clinical care, ceremony, lodging, and community in one operating ecosystem.">
+<meta property="og:title" content="Within | AWKN — Investor Overview">
+<meta property="og:description" content="A 12-acre sacred sanctuary in South Austin — ketamine-assisted retreats and a thriving events ranch, under one roof. $500K seed raise.">
 <meta property="og:url" content="https://laurenbur2.github.io/awkn-ranch/investor-presentation/">
 <meta property="og:image" content="https://laurenbur2.github.io/awkn-ranch/investor-presentation/images/og-cover.png?v=5">
 <meta property="og:image:width" content="1535">
 <meta property="og:image:height" content="1024">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AWKN Ranch — Investor Overview">
-<meta name="twitter:description" content="A 12-acre wellness sanctuary in Austin, TX.">
-<meta name="twitter:image" content="https://laurenbur2.github.io/awkn-ranch/investor-presentation/images/og-cover.png?v=5">
+<meta name="twitter:title" content="Within | AWKN — Investor Overview">
+<meta name="twitter:description" content="A 12-acre sacred sanctuary in South Austin.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -58,13 +57,9 @@
     box-shadow:0 24px 50px -34px rgba(33,26,18,.5);position:relative;
   }
   .band img{display:block;width:100%;height:clamp(260px,38vw,440px);object-fit:cover}
-  .band.full{max-width:720px;margin-left:auto;margin-right:auto}
-  .band.full img{height:auto;object-fit:contain}
   .band figcaption{
     font-size:12.5px;color:var(--muted);font-style:italic;margin-top:14px;
   }
-  .opp .band{border-color:rgba(244,237,224,.18)}
-  .opp .band figcaption{color:#a89c83}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
   .grid3 img{
     display:block;width:100%;height:clamp(300px,36vw,440px);object-fit:cover;
@@ -108,9 +103,10 @@
   }
   .hero .wrap{position:relative;z-index:2}
   .hero .eyebrow{color:var(--gold)}
-  .hero h1{font-size:clamp(54px,9vw,116px);font-weight:300;letter-spacing:-.03em}
+  .hero h1{font-size:clamp(48px,8vw,104px);font-weight:300;letter-spacing:-.03em}
   .hero h1 em{font-style:italic;color:var(--gold)}
-  .hero p{font-size:clamp(17px,2vw,21px);color:#e6dcc8;max-width:640px;margin-top:26px;font-weight:300}
+  .hero .tagline{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(18px,2.4vw,26px);color:#e6dcc8;margin-top:14px}
+  .hero p{font-size:clamp(17px,2vw,21px);color:#e6dcc8;max-width:660px;margin-top:20px;font-weight:300}
   .stat-strip{
     display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
     margin-top:64px;background:rgba(244,237,224,.16);border:1px solid rgba(244,237,224,.16);border-radius:14px;overflow:hidden;
@@ -125,15 +121,17 @@
   .raise-tag b{color:var(--paper);font-weight:600}
   .pill{border:1px solid rgba(244,237,224,.3);padding:7px 16px;border-radius:100px;font-size:12.5px;letter-spacing:.04em;background:rgba(33,26,18,.4)}
 
-  /* THREE BUSINESSES */
+  /* ENGINE CARDS */
   .three{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px}
+  .three.two{grid-template-columns:repeat(2,1fr)}
   .biz{
     background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px 30px;
     transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s;
   }
   .biz:hover{transform:translateY(-6px);box-shadow:0 24px 50px -28px rgba(33,26,18,.4)}
   .biz .tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);font-weight:600}
-  .biz h3{margin:14px 0 12px}
+  .biz h3{margin:10px 0 12px}
+  .biz .sub{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);font-weight:600;margin-bottom:10px}
   .biz p{font-size:15px;color:var(--muted)}
   .biz .num{font-family:'Fraunces',serif;font-size:40px;color:var(--ink);opacity:.12;float:right;line-height:.8}
 
@@ -142,6 +140,34 @@
   .quad .q{padding:24px 0;border-top:2px solid var(--clay)}
   .quad .q .n{font-family:'Fraunces',serif;font-size:42px;line-height:1}
   .quad .q .l{font-size:13px;color:var(--muted);margin-top:8px}
+
+  /* WEEKLY SCHEDULE */
+  .week{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:44px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 10px;text-align:center;position:relative;overflow:hidden}
+  .day::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:var(--clay)}
+  .day.ev::before{background:var(--sage)}
+  .day.flip::before{background:linear-gradient(90deg,var(--clay),var(--sage))}
+  .day .d{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .day .a{font-family:'Fraunces',serif;font-size:15px;margin-top:10px;color:var(--ink);line-height:1.15}
+  .weekkey{display:flex;gap:22px;flex-wrap:wrap;margin-top:20px;font-size:12.5px;color:var(--muted)}
+  .weekkey span{display:inline-flex;align-items:center;gap:8px}
+  .weekkey i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .weekkey .ret{background:var(--clay)}
+  .weekkey .evk{background:var(--sage)}
+
+  /* ECONOMICS */
+  .econ2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:40px}
+  .econ{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 30px}
+  .econ .etag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);font-weight:600}
+  .econ.ev .etag{color:var(--sage)}
+  .econ h3{margin:10px 0 18px}
+  .econ .row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:15px}
+  .econ .row.neg span{color:var(--muted)}
+  .econ .row.net{border-top:2px solid var(--ink);margin-top:6px;padding-top:15px;font-weight:600}
+  .econ .row.net .fig{font-family:'Fraunces',serif;font-size:22px;color:var(--clay-deep)}
+  .econ.ev .row.net .fig{color:var(--sage)}
+  .econ .fig{font-variant-numeric:tabular-nums}
+  @media(max-width:640px){.econ2{grid-template-columns:1fr}}
 
   /* TABLES */
   .tbl{width:100%;border-collapse:collapse;margin-top:40px;font-size:15px}
@@ -153,95 +179,68 @@
   .tbl td{padding:15px 14px;border-bottom:1px solid var(--line)}
   .tbl td.name{font-weight:500}
   .tbl .mono{font-family:'Fraunces',serif;font-size:17px}
-  .badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:6px;font-weight:600}
-  .b-cur{background:#e7e0cf;color:var(--muted)}
-  .b-new{background:var(--sage);color:#f4ede0}
+  .tbl tr.hl td{background:rgba(92,107,74,.08)}
   .tbl tr.total td{border-bottom:none;border-top:2px solid var(--ink);padding-top:20px;font-weight:600}
-  .tbl tr.total .mono{font-size:24px;color:var(--clay-deep)}
-  .addon td{color:var(--sage);font-style:italic}
+  .tbl tr.total .mono{font-size:22px;color:var(--clay-deep)}
 
-  /* YEAR CARDS */
-  .years{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
-  .yr{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px;position:relative;overflow:hidden}
-  .yr::before{content:'';position:absolute;inset:0 auto auto 0;height:4px;width:100%;background:linear-gradient(90deg,var(--clay),var(--gold))}
-  .yr .ylabel{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
-  .yr .yval{font-family:'Fraunces',serif;font-size:56px;line-height:1;margin:14px 0 6px;color:var(--clay-deep)}
-  .yr .ynote{font-size:14px;color:var(--muted)}
+  /* USE OF FUNDS */
+  .funds{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .fund{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 24px;position:relative}
+  .fund .amt{font-family:'Fraunces',serif;font-size:34px;color:var(--clay-deep);line-height:1}
+  .fund h3{font-size:18px;margin:12px 0 8px}
+  .fund p{font-size:13.5px;color:var(--muted)}
+  .fund.reserve{border-style:dashed}
+  @media(max-width:760px){.funds{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.funds{grid-template-columns:1fr}}
+  .fundtotal{margin-top:26px;display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);padding-top:18px}
+  .fundtotal .l{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .fundtotal .v{font-family:'Fraunces',serif;font-size:30px;color:var(--clay-deep)}
 
-  /* DOME / PHASE II */
-  .feature{
-    display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;margin-top:48px;
-  }
-  .feature ul{list-style:none;margin-top:10px}
-  .feature li{padding:13px 0;border-bottom:1px solid var(--line);font-size:16px;display:flex;gap:12px;align-items:flex-start}
-  .feature li::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--clay);margin-top:9px;flex:none}
-  .bigfig{
-    background:linear-gradient(155deg,#3a2c1e,#4a3622);color:var(--paper);border-radius:20px;padding:44px 36px;text-align:center;
-  }
-  .bigfig .top{font-size:14px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase}
-  .bigfig .mid{font-family:'Fraunces',serif;font-size:62px;line-height:1;margin:14px 0}
-  .bigfig .bot{color:#d6cbb6;font-size:15px}
+  /* BAR CHART */
+  .legend{display:flex;gap:22px;margin-top:36px;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .legend .lrev{background:var(--clay)}
+  .legend .leb{background:var(--sage)}
+  .barchart{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,2vw,20px);margin-top:26px;padding-top:30px}
+  .bargroup{display:flex;flex-direction:column;align-items:center}
+  .bars{display:flex;gap:clamp(4px,1.2vw,9px);align-items:flex-end;height:240px}
+  .bar{width:clamp(16px,4vw,34px);border-radius:6px 6px 0 0;position:relative}
+  .bar.rev{background:linear-gradient(180deg,var(--clay),var(--clay-deep))}
+  .bar.eb{background:linear-gradient(180deg,#6f7f5a,var(--sage))}
+  .bar .v{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:clamp(9px,2.2vw,11.5px);font-weight:600;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .bargroup .yl{font-family:'Fraunces',serif;font-size:clamp(14px,2.4vw,18px);margin-top:14px;color:var(--ink)}
+  .bargroup .ml{font-size:clamp(10px,2vw,12.5px);color:var(--sage);font-weight:600;margin-top:2px}
 
-  /* RESIDENTIAL TIERS */
-  .tiers{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:48px}
-  .tier{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 30px;display:flex;flex-direction:column}
-  .tier.prize{border-color:var(--gold);box-shadow:0 0 0 1px rgba(189,139,60,.28)}
-  .tier .tag{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--clay);font-weight:600}
-  .tier.prize .tag{color:var(--gold)}
-  .tier h3{margin:12px 0 4px}
-  .tier .rent{font-family:'Fraunces',serif;font-size:30px;color:var(--clay-deep);line-height:1;margin:6px 0 4px}
-  .tier .rent span{font-family:'Outfit',sans-serif;font-size:14px;color:var(--muted)}
-  .tier p{font-size:14.5px;color:var(--muted);margin:12px 0 16px}
-  .tier ul{list-style:none;margin-top:auto}
-  .tier li{font-size:13.5px;color:var(--ink);padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
-  .tier li::before{content:'✦';color:var(--gold);font-size:11px;margin-top:3px;flex:none}
-  .tier li.no{color:var(--muted)}
-  .tier li.no::before{content:'—';color:var(--muted)}
-  .tiers.three{grid-template-columns:repeat(3,1fr)}
-  @media(max-width:860px){.tiers.three{grid-template-columns:1fr}}
-  @media(max-width:640px){.tiers{grid-template-columns:1fr}}
-
-  /* PHASE III VERTICAL */
-  .vert{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
-  .va{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px}
-  .va h3{font-size:20px;margin-bottom:10px}
-  .va p{font-size:14px;color:var(--muted);min-height:66px}
-  .va .vf{font-family:'Fraunces',serif;font-size:34px;color:var(--clay-deep);margin-top:14px}
-  .va .vl{font-size:13px;color:var(--muted)}
-
-  /* TRACTION */
-  .trac{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px;text-align:center}
-  .trac .t .n{font-family:'Fraunces',serif;font-size:50px;color:var(--clay-deep);line-height:1}
-  .trac .t .l{font-size:14px;color:var(--muted);margin-top:10px}
-
-  /* OPPORTUNITY / VALUATION */
+  /* OPPORTUNITY / RETURNS (dark) */
   .opp{background:linear-gradient(160deg,#2a2118,#43331f);color:var(--paper)}
   .opp .eyebrow{color:var(--gold)}
   .opp h2{color:var(--paper)}
   .opp h2 em{font-style:italic;color:var(--gold)}
   .opp .lede{color:#d6cbb6}
-  .opp .tbl th{color:#bdb094;border-color:rgba(244,237,224,.5)}
-  .opp .tbl td{border-color:rgba(244,237,224,.14)}
-  .opp .tbl .mono{color:var(--gold)}
-  .opp .tbl tr.total td{border-top-color:rgba(244,237,224,.5)}
-  .opp .tbl tr.total .mono{color:var(--gold);font-size:26px}
+  .rquad{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:44px;text-align:center}
+  .rquad .q{padding:26px 14px;border:1px solid rgba(244,237,224,.16);border-radius:16px;background:rgba(244,237,224,.04)}
+  .rquad .n{font-family:'Fraunces',serif;font-size:clamp(34px,5vw,46px);color:var(--gold);line-height:1}
+  .rquad .l{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#cabfa9;margin-top:10px}
   .multiple{
-    margin-top:54px;text-align:center;padding:48px;border:1px solid rgba(244,237,224,.2);border-radius:20px;
+    margin-top:40px;text-align:center;padding:48px;border:1px solid rgba(244,237,224,.2);border-radius:20px;
     background:rgba(244,237,224,.04);
   }
-  .multiple .big{font-family:'Fraunces',serif;font-size:clamp(40px,7vw,76px);color:var(--gold);line-height:1}
-  .multiple p{color:#d6cbb6;max-width:560px;margin:18px auto 0;font-size:16px}
+  .multiple .big{font-family:'Fraunces',serif;font-size:clamp(38px,6.5vw,70px);color:var(--gold);line-height:1}
+  .multiple p{color:#d6cbb6;max-width:600px;margin:18px auto 0;font-size:16px}
 
   .disc{font-size:12.5px;color:var(--muted);margin-top:30px;font-style:italic;max-width:760px}
   .opp .disc{color:#a89c83}
 
   /* FOOTER */
-  .foot{background:var(--ink);color:var(--paper);text-align:center;padding:80px 28px;border:none}
-  .foot h2{color:var(--paper);font-size:46px}
-  .foot .contact{margin-top:24px;color:#cabfa9;font-size:15px;letter-spacing:.02em}
+  .foot{background:var(--ink);color:var(--paper);text-align:center;padding:90px 28px;border:none}
+  .foot .eyebrow{color:var(--gold);justify-content:center}
+  .foot h2{color:var(--paper);font-size:clamp(30px,5vw,50px);max-width:760px;margin:0 auto 8px}
+  .foot .sub{color:#cabfa9;font-size:15px;margin-top:18px}
+  .foot .contact{margin-top:22px;color:#cabfa9;font-size:15px;letter-spacing:.02em;line-height:1.9}
   .foot .contact a{color:#cabfa9;text-decoration:none;border-bottom:1px solid rgba(202,191,169,.35)}
   .foot .contact a:hover{color:var(--gold)}
-  .foot .fine{margin-top:18px;color:#7d7159;font-size:12px}
+  .foot .fine{margin-top:22px;color:#7d7159;font-size:12px}
 
   /* reveal */
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
@@ -249,33 +248,17 @@
 
   @media(max-width:860px){
     section{padding:64px 0}
-    .stat-strip,.quad,.three,.years,.vert,.trac{grid-template-columns:repeat(2,1fr)}
-    .feature{grid-template-columns:1fr;gap:30px}
+    .stat-strip,.quad,.three,.three.two,.rquad{grid-template-columns:repeat(2,1fr)}
     .tbl{font-size:13.5px}
     .tbl th,.tbl td{padding-left:8px;padding-right:8px}
     .hero{min-height:auto}
     .financials-btn{top:14px;right:14px;padding:7px 16px;font-size:10px}
   }
   @media(max-width:520px){
-    .three,.years,.vert{grid-template-columns:1fr}
-    .quad{grid-template-columns:repeat(2,1fr);gap:14px}
+    .three,.three.two{grid-template-columns:1fr}
+    .quad,.rquad{grid-template-columns:repeat(2,1fr);gap:14px}
     .quad .q{padding:16px 0}
     .quad .q .n{font-size:32px}
-    .trac{grid-template-columns:repeat(2,1fr);gap:24px 14px;margin-top:36px}
-    .trac .t .n{font-size:36px}
-    .three{gap:12px}
-    .biz{padding:22px 22px}
-    .biz h3{margin:8px 0 8px}
-    .years{gap:10px}
-    .yr{padding:15px 22px}
-    .yr .yval{font-size:38px;margin:5px 0 3px}
-    .yr .ynote{font-size:13px}
-    .vert{gap:12px}
-    .va{padding:22px 24px}
-    .va p{min-height:0}
-    .va .vf{margin-top:10px}
-    .bigfig{padding:28px 24px}
-    .bigfig .mid{font-size:46px;margin:10px 0}
     .stat-strip{grid-template-columns:repeat(2,1fr);margin-top:44px}
     .stat-strip .s{padding:18px 16px}
     .stat-strip .n{font-size:27px}
@@ -283,7 +266,14 @@
     .grid3{grid-template-columns:repeat(3,1fr);gap:8px}
     .grid3 img{height:clamp(210px,46vw,270px)}
     .grid3 .tile-label{font-size:9.5px;margin-top:7px;letter-spacing:.01em}
-    .hero h1{font-size:48px}
+    .hero h1{font-size:44px}
+    .week{grid-template-columns:repeat(7,1fr);gap:5px}
+    .day{padding:12px 4px}
+    .day .a{font-size:11px;margin-top:6px}
+    .day .d{font-size:8.5px;letter-spacing:.06em}
+    .bars{height:180px}
+    .bar.eb .v{display:none}
+    .bar .v{font-size:9.5px}
   }
 </style>
 </head>
@@ -301,302 +291,197 @@
   </video>
   <div class="hero-overlay"></div>
   <div class="wrap">
-    <div class="eyebrow reveal">Investor Overview · 2026</div>
+    <div class="eyebrow reveal">Within <em style="color:var(--gold)">|</em> AWKN · Seed Raise</div>
     <h1 class="reveal">AWKN <em>Ranch</em></h1>
-    <p class="reveal">A 12-acre wellness sanctuary in Austin, Texas — combining clinical care, ceremony, lodging, and community in one operating ecosystem.</p>
+    <div class="tagline reveal">Ancient Wisdom, Knowing Now</div>
+    <p class="reveal">A 12-acre sacred sanctuary in South Austin — ketamine-assisted retreats and a thriving events ranch, under one roof.</p>
 
     <div class="stat-strip reveal">
-      <div class="s"><div class="n">$917K</div><div class="l">Current Run-Rate</div></div>
-      <div class="s"><div class="n">$2.4M</div><div class="l">Year 1 Revenue</div></div>
-      <div class="s"><div class="n">$8.4M</div><div class="l">Year 3 Revenue</div></div>
-      <div class="s"><div class="n">4.5 yrs</div><div class="l">Operating · 5.0★</div></div>
+      <div class="s"><div class="n">4.5+ yrs</div><div class="l">Within Center operating</div></div>
+      <div class="s"><div class="n">1,500+</div><div class="l">Sessions delivered</div></div>
+      <div class="s"><div class="n">100%</div><div class="l">Five-star reviews</div></div>
+      <div class="s"><div class="n">~1 yr</div><div class="l">AWKN Ranch live</div></div>
     </div>
 
     <div class="raise-tag reveal">
-      <span class="pill"><b>$400K committed</b> of ~$844K round</span>
-      <span class="pill">SAFE · $8M valuation cap</span>
-      <span class="pill">~$444K remaining</span>
+      <span class="pill"><b>$500K seed raise</b></span>
+      <span class="pill">$8M valuation</span>
+      <span class="pill">~6.3% equity</span>
     </div>
   </div>
 </header>
 
-<!-- THE BUSINESS -->
+<!-- THE OPPORTUNITY -->
 <section>
-  <div class="wrap">
-    <div class="eyebrow reveal">The Business</div>
-    <h2 class="reveal">One ecosystem,<br>three businesses.</h2>
-    <p class="lede reveal">Each entity is built for its own market and scales independently — together they form a single guest journey from first session to living on the land.</p>
-    <div class="three">
-      <div class="biz reveal"><span class="num">01</span><div class="tag">Medical Co.</div><h3>Within Center</h3><p>Ketamine therapy, IV wellness, and licensed clinical services — 4.5 years operating, 1,800+ sessions, all five-star.</p></div>
-      <div class="biz reveal"><span class="num">02</span><div class="tag">Concierge Co.</div><h3>AWKN Ranch</h3><p>The guest-facing brand: retreats, lodging, events, venue rentals, memberships, and add-on experiences that drive recurring revenue.</p></div>
-      <div class="biz reveal"><span class="num">03</span><div class="tag">Real Estate Co.</div><h3>The Dome Collective</h3><p>A private residential conscious community — 70 dome residences, 18 luxury apartments atop a world-class Longevity &amp; Amenity Center — 88 homes built on sacred geometry to replicate across properties.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- TODAY -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Where We Are Today</div>
-    <h2 class="reveal">Already operating.<br>Already earning.</h2>
-    <p class="lede reveal">This isn't a concept. We're 4.5 years in business with a real track record — roughly $1.3M in sales each of the last three years and two straight years of profitability at about $150K net, growing every year. We moved to AWKN Ranch 18 months ago, and the ranch is billing roughly $76,400/month today — before the new revenue lines turn on.</p>
-    <div class="quad">
-      <div class="q reveal"><div class="n">4.5 yrs</div><div class="l">In business</div></div>
-      <div class="q reveal"><div class="n">$1.3M</div><div class="l">Annual sales, 3 years running</div></div>
-      <div class="q reveal"><div class="n">$150K</div><div class="l">Net profit · 2 years, growing</div></div>
-      <div class="q reveal"><div class="n">18 mo</div><div class="l">At AWKN Ranch</div></div>
-    </div>
-    <div class="grid3 reveal">
-      <figure><img src="images/maloka-dome.png" alt="The Maloka dome at AWKN Ranch" loading="lazy"><figcaption class="tile-label">The Maloka Dome</figcaption></figure>
-      <figure><img src="images/ketamine-session.jpg" alt="A guided ketamine session at AWKN Ranch" loading="lazy"><figcaption class="tile-label">A Guided Session</figcaption></figure>
-      <figure><img src="images/honey-dome.jpg" alt="The Honeycomb Dome interior at AWKN Ranch" loading="lazy"><figcaption class="tile-label">The Honeycomb Dome</figcaption></figure>
-    </div>
-    <table class="tbl reveal">
-      <thead><tr><th>Current Stream</th><th>Volume</th><th class="r">Rate</th><th class="r">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td class="name">Ketamine outpatient</td><td>6 / mo</td><td class="r">$4,000</td><td class="r mono">$24,000</td></tr>
-        <tr><td class="name">Psychedelic weekly retreats</td><td>6 / mo</td><td class="r">$4,900</td><td class="r mono">$29,400</td></tr>
-        <tr><td class="name">Venue rentals (Maloka + Temple)</td><td>—</td><td class="r">current</td><td class="r mono">$20,000</td></tr>
-        <tr><td class="name">Practitioner space rentals</td><td>2</td><td class="r">$1,500</td><td class="r mono">$3,000</td></tr>
-        <tr class="total"><td>Billing today</td><td></td><td></td><td class="r mono">$76,400 / mo</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- PHASE I -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Phase I · Ranch Operations</div>
-    <h2 class="reveal">The full ecosystem<br>at run-rate.</h2>
-    <p class="lede reveal">Current streams keep growing while new lines — lodging, memberships, buyouts, events, and the Ibogaine initiative — come online. Every guest also drives high-margin add-ons.</p>
-    <figure class="band reveal">
-      <img src="images/retreat-house.jpg" alt="The Retreat House at AWKN Ranch" loading="lazy">
-      <figcaption>The Retreat House — on-site lodging coming online in Phase I.</figcaption>
-    </figure>
-    <table class="tbl reveal">
-      <thead><tr><th>Revenue Stream</th><th>Status</th><th class="r">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td class="name">Ketamine outpatient</td><td><span class="badge b-cur">Current</span></td><td class="r mono">$24,000</td></tr>
-        <tr><td class="name">Psychedelic weekly retreats</td><td><span class="badge b-cur">Current</span></td><td class="r mono">$29,400</td></tr>
-        <tr><td class="name">Venue rentals (ramping)</td><td><span class="badge b-cur">Current</span></td><td class="r mono">$34,640</td></tr>
-        <tr><td class="name">Practitioner rentals (2 → 8)</td><td><span class="badge b-cur">Current</span></td><td class="r mono">$12,000</td></tr>
-        <tr><td class="name">Retreat House lodging (11 beds)</td><td><span class="badge b-new">New</span></td><td class="r mono">$80,309</td></tr>
-        <tr><td class="name">Memberships + IV drips (25)</td><td><span class="badge b-new">New</span></td><td class="r mono">$7,500</td></tr>
-        <tr><td class="name">Full ranch buyout (2 nights)</td><td><span class="badge b-new">New</span></td><td class="r mono">$30,000</td></tr>
-        <tr><td class="name">Ibogaine initiative</td><td><span class="badge b-new">New</span></td><td class="r mono">$16,667</td></tr>
-        <tr><td class="name">Curated events</td><td><span class="badge b-new">New</span></td><td class="r mono">$15,000</td></tr>
-        <tr class="addon"><td class="name">Add-ons — chef, bodywork, drips, sound &amp; breathwork</td><td></td><td class="r mono">$46,700</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- PHASE II -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Phase II · The Dome Collective · Real Estate Co.</div>
-    <h2 class="reveal">A private residential<br>conscious community.</h2>
-    <p class="lede reveal">An adjacent parcel becomes a capped, intentional community where longevity medicine and sacred design aren't amenities bolted on — they're the foundation. Two residential tiers share one protected sanctuary, both on 12-month leases. This is a separate company: the Dome Collective / Real Estate Co. Phase II opens in Year 2.</p>
-    <figure class="band reveal">
-      <img src="images/dome-collective.png" alt="Dome residences at AWKN Ranch at sunset" loading="lazy">
-      <figcaption>Dome residences — built with high intention, so you feel it in your nervous system the moment you arrive.</figcaption>
-    </figure>
-    <div class="tiers reveal">
-      <div class="tier prize">
-        <div class="tag">The Prize · Most Exclusive</div>
-        <h3>Dome Park Residences</h3>
-        <div class="rent">$3,000<span> / mo avg</span></div>
-        <p>70 private domes set on sacred geometry and anchored by the 13 Oracle Angel Stations — walking trails, sculptural art, crystal installations, organic farm. The Core Team is included in residency:</p>
-        <ul>
-          <li>Annual comprehensive bloodwork &amp; functional health panels</li>
-          <li>Monthly IV drip therapy</li>
-          <li>Every morning &amp; evening class, all amenities</li>
-          <li>15% off all food &amp; longevity services</li>
-        </ul>
-      </div>
-      <div class="tier">
-        <div class="tag">Elevated Living</div>
-        <h3>Apartment Residences</h3>
-        <div class="rent">$3,500<span> / mo avg</span></div>
-        <p>18 luxury, eco-friendly homes set atop the Longevity &amp; Amenity Center — just three stories, refined and beautiful, distinct from the private Dome Park at its heart.</p>
-        <ul>
-          <li>Full access to wellness amenities &amp; pool</li>
-          <li class="no">Dome Collective Core Team not included</li>
-        </ul>
-      </div>
-    </div>
-    <div class="feature">
-      <ul class="reveal">
-        <li>408-person waitlist &amp; $40K in deposits — built organically, zero ad spend</li>
-        <li>A single underground garage (75 spaces) keeps the surface free of cars</li>
-        <li>An independent on-site restaurant — leased to us as income, not overhead</li>
-        <li>A private, protected sanctuary — closed to the public</li>
-        <li>The founder's family lives on the land alongside residents</li>
-      </ul>
-      <div class="bigfig reveal">
-        <div class="top">70 domes × $3,000 + 18 apts × $3,500 · 95% stabilized occupancy</div>
-        <div class="mid">$2.13M</div>
-        <div class="bot">stabilized net operating income · 7.1% yield on cost</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 3 YEAR -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">3-Year Projection</div>
-    <h2 class="reveal">The path to $8.4M.</h2>
-    <p class="lede reveal">Current streams grow 15% a year. New Phase I lines launch at half run-rate in Year 1, reach full pace in Year 2, then grow 20%. Both residential tiers — domes and apartments — open in Year 2, stabilizing at 95% occupancy.</p>
-    <div class="years">
-      <div class="yr reveal"><div class="ylabel">Year 1</div><div class="yval">$2.4M</div><div class="ynote">Phase I ramping</div></div>
-      <div class="yr reveal"><div class="ylabel">Year 2</div><div class="yval">$7.5M</div><div class="ynote">Residences open</div></div>
-      <div class="yr reveal"><div class="ylabel">Year 3</div><div class="yval">$8.4M</div><div class="ynote">Full ecosystem</div></div>
-    </div>
-    <table class="tbl reveal">
-      <thead><tr><th>Segment</th><th class="r">Year 1</th><th class="r">Year 2</th><th class="r">Year 3</th></tr></thead>
-      <tbody>
-        <tr><td class="name">Phase I — current</td><td class="r">$1.20M</td><td class="r">$1.38M</td><td class="r">$1.59M</td></tr>
-        <tr><td class="name">Phase I — new</td><td class="r">$0.90M</td><td class="r">$2.33M</td><td class="r">$2.80M</td></tr>
-        <tr><td class="name">Phase I — add-ons</td><td class="r">$0.28M</td><td class="r">$0.67M</td><td class="r">$0.81M</td></tr>
-        <tr><td class="name">Phase II — Dome Park (70 domes)</td><td class="r">—</td><td class="r">$2.39M</td><td class="r">$2.49M</td></tr>
-        <tr><td class="name">Phase II — Apartments (18 units)</td><td class="r">—</td><td class="r">$0.72M</td><td class="r">$0.75M</td></tr>
-        <tr class="total"><td>Total gross revenue</td><td class="r mono">$2.4M</td><td class="r mono">$7.5M</td><td class="r mono">$8.4M</td></tr>
-      </tbody>
-    </table>
-    <p class="disc reveal">Phase III — the Longevity &amp; Amenity Center below — drives these residential rents rather than adding a separate revenue line.</p>
-  </div>
-</section>
-
-<!-- PHASE III -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Phase III · The Longevity &amp; Amenity Center</div>
-    <h2 class="reveal">The engine<br>of vitality.</h2>
-    <p class="lede reveal">Wellness here is not an occasional escape — it's a way of life. The three-story apartment block rises above it, the domes surround it, and a single underground garage sits beneath it, keeping the surface free of cars. Built on the same sacred geometry as the residences, where true health equals true wealth.</p>
-    <figure class="band full reveal">
-      <img src="images/amenities-center.png?v=5" alt="The AWKN Longevity & Amenity Center — pickleball, IV therapy, red-light sauna & cold plunge, child art therapy studio, climbing wall, and fitness center" loading="lazy">
-      <figcaption>The Longevity &amp; Amenity Center (rendering).</figcaption>
-    </figure>
-    <div class="vert">
-      <div class="va reveal"><h3>Longevity Medicine</h3><p>Annual comprehensive bloodwork and functional health panels, plus monthly IV drip therapy — included for dome residents.</p></div>
-      <div class="va reveal"><h3>Daily Practice</h3><p>Morning and evening classes, every day, plus red light therapy beds and the latest in longevity technology.</p></div>
-      <div class="va reveal"><h3>Hydrotherapy</h3><p>An outdoor pool, plus a salt room, sauna, and cold plunge inside.</p></div>
-      <div class="va reveal"><h3>Movement</h3><p>Indoor and outdoor fitness, plus an indoor pickleball court and a paddle court.</p></div>
-      <div class="va reveal"><h3>Nourishment</h3><p>An independent, chef-driven restaurant on-site — members enjoy 15% off, with takeaway-only for outside guests so the sanctuary stays private.</p></div>
-      <div class="va reveal"><h3>Family &amp; Play</h3><p>An outdoor children's play area, kids' fitness, and art &amp; play therapy.</p></div>
-    </div>
-    <p class="disc reveal">Every amenity is built on sacred geometry — a value driver that commands premium residential rents, with the on-site restaurant leased out as its own income line.</p>
-  </div>
-</section>
-
-<!-- TRACTION -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Traction</div>
-    <h2 class="reveal">The waitlist<br>speaks for itself.</h2>
-    <figure class="band reveal">
-      <img src="images/maloka-wedding.png?v=3" alt="The Dome Collective and AWKN wellness residences at AWKN Ranch" loading="lazy" style="height:auto;object-fit:contain">
-      <figcaption>The Dome Collective &amp; AWKN residences — the heart of the living sanctuary (rendering).</figcaption>
-    </figure>
-    <div class="trac">
-      <div class="t reveal"><div class="n">1,800+</div><div class="l">Sessions delivered, all 5.0★</div></div>
-      <div class="t reveal"><div class="n">408</div><div class="l">Dome Collective waitlist</div></div>
-      <div class="t reveal"><div class="n">$40K</div><div class="l">Deposits collected pre-buildout</div></div>
-      <div class="t reveal"><div class="n">250K</div><div class="l">Views on a single post</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- INVEST THREE WAYS -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">Three Ways to Participate</div>
-    <h2 class="reveal">Three ways to participate<br>or invest.</h2>
-    <p class="lede reveal">Three distinct paths, open in parallel — each suited to a different kind of partner. An invitation into what we're building, not a capital ask.</p>
-    <div class="tiers three reveal">
-      <div class="tier">
-        <div class="tag">Path 1 · For Future Residents</div>
-        <h3>Founding Resident Lease</h3>
-        <div class="rent">$2,400<span> / mo · year one</span></div>
-        <p>Reserve your dome as a founding resident — a 20% first-year discount, waived deposit, and your place secured before we open. Commit with a single $2,400 payment that applies directly to your first month.</p>
-        <ul>
-          <li>Standard $3,000/mo → founding rate $2,400/mo (year one)</li>
-          <li>Annual bloodwork, monthly IV drip, full longevity &amp; amenity access</li>
-          <li>Target: 60 founding residents × $2,400 = $144,000 reserved</li>
-        </ul>
-      </div>
-      <div class="tier">
-        <div class="tag">Path 2 · For Facilitators &amp; Friends</div>
-        <h3>Retreat Partner</h3>
-        <div class="rent">$50K–$100K<span> · 80% back as credits</span></div>
-        <p>Partners contribute capital and receive 80% back as credits toward weekend retreat stays and bookings — the Maloka, temple, Retreat House, and yurts. We get capital and committed bookings now; they get deep, usable value on the land they help create.</p>
-        <ul>
-          <li>Target: 4 × $50K + 1 × $100K = $300,000 committed</li>
-          <li>~$60,000 net capital + ~$240,000 in pre-booked retreat value</li>
-        </ul>
-      </div>
-      <div class="tier prize">
-        <div class="tag">Path 3 · For Ecosystem Investors</div>
-        <h3>Equity Partner — SAFE</h3>
-        <div class="rent">$8M<span> valuation cap</span></div>
-        <p>A direct equity stake in Heart Space Health — the parent company behind Within Center, AWKN Ranch, and the Dome Collective — via a SAFE note, for those who want to own a piece of the whole.</p>
-        <ul>
-          <li>Target: 4 × $100,000 = $400,000</li>
-          <li class="no">Securities offering — full terms provided separately</li>
-        </ul>
-      </div>
-    </div>
-    <table class="tbl reveal">
-      <thead><tr><th>Path</th><th class="r">Committed</th><th>Best for</th></tr></thead>
-      <tbody>
-        <tr><td class="name">1 · Founding Lease</td><td class="r mono">$144,000</td><td>Future residents</td></tr>
-        <tr><td class="name">2 · Retreat Partner</td><td class="r mono">$300,000</td><td>Facilitators</td></tr>
-        <tr><td class="name">3 · Equity SAFE</td><td class="r mono">$400,000</td><td>Ecosystem investors</td></tr>
-        <tr class="total"><td>Total</td><td class="r mono">~$844,000</td><td></td></tr>
-      </tbody>
-    </table>
-    <p class="disc reveal"><strong style="font-style:normal;color:var(--ink)">How we protect your commitment:</strong> Lease and partner funds are held in a dedicated account and applied directly to future occupancy or bookings. If the timeline shifts materially, the commitment is fully refundable or convertible to credit toward any AWKN experience — their choice.</p>
-    <p class="disc reveal">At the standard $3,000/mo rate, 60 leases represent ~$2.16M in annual value once stabilized — the committed demand that anchors our path to Phase 1 capital.</p>
-  </div>
-</section>
-
-<!-- OPPORTUNITY + VALUATION -->
-<section class="opp">
   <div class="wrap">
     <div class="eyebrow reveal">The Opportunity</div>
-    <h2 class="reveal">~$844K Phase 1 round · $8M SAFE cap.</h2>
-    <p class="lede reveal">$400K committed to date across the three paths, of a ~$844K round. The balance funds site planning, engineering, permitting, and the Dome Collective &amp; Longevity Center buildout — with operating reserves to bridge to refinance.</p>
-
-    <div style="margin-top:54px" class="reveal">
-      <div class="eyebrow">What It's Worth</div>
-      <h2 style="font-size:clamp(30px,4.5vw,48px)">A $69M ecosystem at full build.</h2>
-      <p class="lede">Each piece valued on its own standard — operating businesses on EBITDA multiples, real estate on income and market value. Together they form the asset base behind a Series A and an eventual refinance.</p>
+    <h2 class="reveal">Two proven revenue engines,<br>one piece of land.</h2>
+    <p class="lede reveal">Already operating, already profitable. The same 12 acres runs two businesses — a clinical retreat center and an events ranch — that share one team, one container, and one guest journey. Both sit under Heart Space Health Inc., which also holds the Dome Collective.</p>
+    <div class="three two">
+      <div class="biz reveal"><span class="num">01</span><div class="tag">Engine 1 · Retreats</div><div class="sub">Within Center</div><h3>Ketamine-assisted retreats</h3><p>Immersive, integration-centered retreats, Sunday–Thursday. Ceremonial and clinical — medical run by our partner Harmonia, Katie Murray, PA. Psilocybin retreats are coming next through our church partnership, now nearing completion.</p></div>
+      <div class="biz reveal"><span class="num">02</span><div class="tag">Engine 2 · Events</div><div class="sub">AWKN Ranch</div><h3>Weekend events, weddings &amp; lodging</h3><p>Thursday–Sunday, the whole ranch rents out — the temple space, the Maloka dome, two yurts, the honeycomb dome, and the Retreat House — plus weddings. Roughly $10,000 in revenue per weekend, every weekend.</p></div>
     </div>
-
-    <table class="tbl reveal">
-      <thead><tr><th>Component</th><th>Method</th><th class="r">Value</th></tr></thead>
-      <tbody>
-        <tr><td class="name">Clinical &amp; ranch operating business</td><td>~$2.0M EBITDA × 7.5×</td><td class="r mono">$15.0M</td></tr>
-        <tr><td class="name">Dome Collective — domes, apartments + Amenity Center</td><td>~$2.13M NOI ÷ ~5.5% cap</td><td class="r mono">$38.8M</td></tr>
-        <tr><td class="name">Land (12+ acres)</td><td>Market value</td><td class="r mono">$15.0M</td></tr>
-        <tr class="total"><td>Total enterprise value</td><td></td><td class="r mono">~$69.0M</td></tr>
-      </tbody>
-    </table>
-
-    <div class="multiple reveal">
-      <div class="big">~8.6× the entry cap.</div>
-      <p>Phase 1 investors enter at an $8M cap against a fully-built ecosystem worth roughly $69M — a private living sanctuary, a high-margin clinical business, and appreciating Austin land secured under a 15-year lease with a $10M purchase option.</p>
+    <div class="grid3 reveal">
+      <figure><img src="images/ketamine-session.jpg" alt="A guided ketamine-assisted session at Within Center" loading="lazy"><figcaption class="tile-label">A Guided Session</figcaption></figure>
+      <figure><img src="images/honey-dome.jpg" alt="The Honeycomb Dome at AWKN Ranch" loading="lazy"><figcaption class="tile-label">The Honeycomb Dome</figcaption></figure>
+      <figure><img src="images/retreat-house.jpg" alt="The Retreat House at AWKN Ranch" loading="lazy"><figcaption class="tile-label">The Retreat House</figcaption></figure>
     </div>
-    <p class="disc reveal">Valuation reflects fully-stabilized, built-out figures. The Longevity &amp; Amenity Center carries no separate income line — its value is captured in stabilized residential rents (70 domes × $3,000/mo + 18 apartments × $3,500/mo at 95% occupancy), with the leased on-site restaurant as its own income line, capitalized at a market cap rate. EBITDA multiples per wellness/hospitality (7–8×) norms. Construction costs are current estimates (pre-GC-bid) and the program assumes City confirmation of the impervious-coverage strategy (in process) — a strong concept stage firming toward fundable. Internal estimates, not a guarantee of returns.</p>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- TWO ENGINES, ONE CONTAINER -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">Two Engines, One Container</div>
+    <h2 class="reveal">The same land works<br>seven days a week.</h2>
+    <p class="lede reveal">Retreats run Sunday through Thursday; events run Thursday through Sunday. Thursday is the flip — one container, fully utilized.</p>
+    <div class="week reveal">
+      <div class="day"><div class="d">Sun</div><div class="a">Arrival</div></div>
+      <div class="day"><div class="d">Mon</div><div class="a">Session 1</div></div>
+      <div class="day"><div class="d">Tue</div><div class="a">Integration</div></div>
+      <div class="day"><div class="d">Wed</div><div class="a">Session 2</div></div>
+      <div class="day flip"><div class="d">Thu</div><div class="a">Close / Flip</div></div>
+      <div class="day ev"><div class="d">Fri</div><div class="a">Event</div></div>
+      <div class="day ev"><div class="d">Sat</div><div class="a">Event</div></div>
+    </div>
+    <div class="weekkey reveal">
+      <span><i class="ret"></i> Engine 1 — Within Center retreats</span>
+      <span><i class="evk"></i> Engine 2 — AWKN Ranch events</span>
+    </div>
+    <div class="econ2 reveal">
+      <div class="econ">
+        <div class="etag">Retreat economics</div>
+        <h3>Per private retreat</h3>
+        <div class="row"><span>Private retreat</span><span class="fig">$4,950</span></div>
+        <div class="row neg"><span>Less medical (Katie)</span><span class="fig">($880)</span></div>
+        <div class="row neg"><span>Less commission 6%</span><span class="fig">($297)</span></div>
+        <div class="row net"><span>Net to Within</span><span class="fig">$3,773</span></div>
+      </div>
+      <div class="econ ev">
+        <div class="etag">Weekend economics</div>
+        <h3>Per weekend</h3>
+        <div class="row"><span>Avg weekend revenue</span><span class="fig">$10,000</span></div>
+        <div class="row neg"><span>Less Jeri 10%</span><span class="fig">($1,000)</span></div>
+        <div class="row net"><span>Net per weekend</span><span class="fig">$9,000</span></div>
+        <div class="row"><span>Net per month</span><span class="fig">~$38,700</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM PROGRAMS -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">Premium Programs, Strong Margins</div>
+    <h2 class="reveal">A laddered offering.</h2>
+    <p class="lede reveal">From a first-taste day program to a flagship immersive retreat — every rung is high-margin, and guests move up the ladder over time.</p>
+    <table class="tbl reveal">
+      <thead><tr><th>Program</th><th class="r">Price</th><th class="r">Net to Within</th><th class="r">Margin</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Private Retreat + Ketamine</td><td class="r">$4,950</td><td class="r mono">$3,773</td><td class="r">76%</td></tr>
+        <tr class="hl"><td class="name">No-Ketamine Retreat (Rest &amp; Restore)</td><td class="r">$3,950</td><td class="r mono">$3,633</td><td class="r">92%</td></tr>
+        <tr><td class="name">AWKN — 6 sessions</td><td class="r">$5,750</td><td class="r mono">$2,765</td><td class="r">48%</td></tr>
+        <tr><td class="name">HEAL — 3 sessions</td><td class="r">$3,450</td><td class="r mono">$1,923</td><td class="r">56%</td></tr>
+        <tr><td class="name">DISCOVER — 1 session</td><td class="r">$1,450</td><td class="r mono">$923</td><td class="r">64%</td></tr>
+      </tbody>
+    </table>
+    <p class="disc reveal">No-ketamine "Rest &amp; Restore" weeks carry the highest margin at 92% — a deliberate strategic lever we can pull as demand fills the calendar.</p>
+  </div>
+</section>
+
+<!-- THE RAISE -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">The Raise · $500,000</div>
+    <h2 class="reveal">Capital to build capacity<br>and switch on demand.</h2>
+    <p class="lede reveal">The raise funds new capacity across both engines and the demand-generation engine that fills it — with runway to bridge the build-out.</p>
+    <figure class="band reveal">
+      <img src="images/maloka-dome-buildout.png" alt="The Maloka Dome build-out at AWKN Ranch" loading="lazy">
+      <figcaption>The 200-person Maloka Dome — new Engine 2 capacity funded by the raise.</figcaption>
+    </figure>
+    <div class="funds reveal">
+      <div class="fund"><div class="amt">$100K</div><h3>Maloka Dome (200-person)</h3><p>+$10,000/mo Engine 2 revenue</p></div>
+      <div class="fund"><div class="amt">$80K</div><h3>2 Lodging Domes (4 BR)</h3><p>New retreat + weekend lodging</p></div>
+      <div class="fund"><div class="amt">$120K</div><h3>Google Ads / Marketing</h3><p>$10,000/mo paid acquisition</p></div>
+      <div class="fund"><div class="amt">$48K</div><h3>New Sales Role</h3><p>$4,000/mo, drives both engines</p></div>
+      <div class="fund"><div class="amt">$5K</div><h3>Relocate RVs Off-Site</h3><p>Clears land for lodging domes</p></div>
+      <div class="fund reserve"><div class="amt">$147K</div><h3>Working Capital / Reserve</h3><p>Runway &amp; contingency</p></div>
+    </div>
+    <div class="fundtotal reveal"><div class="l">Total seed raise</div><div class="v">$500,000</div></div>
+  </div>
+</section>
+
+<!-- 5-YEAR PROJECTION -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">5-Year Financial Projection</div>
+    <h2 class="reveal">To $2.66M revenue<br>at 60% margin.</h2>
+    <p class="lede reveal">Moderate ~17.5% annual growth. Year 1 reflects a 3-month build-out before new capacity comes online — then margins widen every year as the fixed base leverages.</p>
+    <div class="legend reveal">
+      <span><i class="lrev"></i> Net revenue</span>
+      <span><i class="leb"></i> EBITDA / net profit</span>
+    </div>
+    <div class="barchart reveal">
+      <div class="bargroup">
+        <div class="bars"><div class="bar rev" style="height:126px"><span class="v">$1.40M</span></div><div class="bar eb" style="height:47px"><span class="v">$0.52M</span></div></div>
+        <div class="yl">Year 1</div><div class="ml">37% margin</div>
+      </div>
+      <div class="bargroup">
+        <div class="bars"><div class="bar rev" style="height:148px"><span class="v">$1.64M</span></div><div class="bar eb" style="height:65px"><span class="v">$0.72M</span></div></div>
+        <div class="yl">Year 2</div><div class="ml">44% margin</div>
+      </div>
+      <div class="bargroup">
+        <div class="bars"><div class="bar rev" style="height:174px"><span class="v">$1.93M</span></div><div class="bar eb" style="height:87px"><span class="v">$0.96M</span></div></div>
+        <div class="yl">Year 3</div><div class="ml">50% margin</div>
+      </div>
+      <div class="bargroup">
+        <div class="bars"><div class="bar rev" style="height:205px"><span class="v">$2.27M</span></div><div class="bar eb" style="height:113px"><span class="v">$1.25M</span></div></div>
+        <div class="yl">Year 4</div><div class="ml">55% margin</div>
+      </div>
+      <div class="bargroup">
+        <div class="bars"><div class="bar rev" style="height:240px"><span class="v">$2.66M</span></div><div class="bar eb" style="height:143px"><span class="v">$1.59M</span></div></div>
+        <div class="yl">Year 5</div><div class="ml">60% margin</div>
+      </div>
+    </div>
+    <table class="tbl reveal">
+      <thead><tr><th>Year</th><th class="r">Net revenue</th><th class="r">EBITDA / net profit</th><th class="r">Margin</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Year 1</td><td class="r">$1.40M</td><td class="r mono">$0.52M</td><td class="r">37%</td></tr>
+        <tr><td class="name">Year 2</td><td class="r">$1.64M</td><td class="r mono">$0.72M</td><td class="r">44%</td></tr>
+        <tr><td class="name">Year 3</td><td class="r">$1.93M</td><td class="r mono">$0.96M</td><td class="r">50%</td></tr>
+        <tr><td class="name">Year 4</td><td class="r">$2.27M</td><td class="r mono">$1.25M</td><td class="r">55%</td></tr>
+        <tr><td class="name">Year 5</td><td class="r">$2.66M</td><td class="r mono">$1.59M</td><td class="r">60%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- INVESTOR RETURNS -->
+<section class="opp">
+  <div class="wrap">
+    <div class="eyebrow reveal">Investor Returns</div>
+    <h2 class="reveal">A $500K seed into<br>a cash-generative business.</h2>
+    <p class="lede reveal">Illustrative, based on the model. Valuation and terms open to discussion.</p>
+    <div class="rquad reveal">
+      <div class="q"><div class="n">$500K</div><div class="l">Raise</div></div>
+      <div class="q"><div class="n">$8M</div><div class="l">Valuation</div></div>
+      <div class="q"><div class="n">~6.3%</div><div class="l">Investor equity</div></div>
+      <div class="q"><div class="n">$1.6M</div><div class="l">Yr-5 EBITDA</div></div>
+    </div>
+    <div class="multiple reveal">
+      <div class="big">Plus the Dome Collective.</div>
+      <p>Your equity is in Heart Space Health Inc. — which owns Within Center, AWKN Ranch, <em>and</em> the Dome Collective, a planned residential community. At 5× Year-5 EBITDA the operating business alone grows into the $8M valuation; the Dome upside comes on top.</p>
+    </div>
+    <p class="disc reveal">Operating figures reflect Within Center + AWKN Ranch only and exclude the Dome Collective — that residential upside is not modeled here. ~17.5% annual revenue growth; Year 1 reflects a 3-month build-out. Not a guarantee of returns; valuation and terms open to discussion.</p>
+  </div>
+</section>
+
+<!-- CLOSING -->
 <footer class="foot">
-  <h2>AWKN Ranch</h2>
-  <div class="contact">William David Naylor · Founder<br>512.810.6517 · <a href="https://www.awknranch.com">www.awknranch.com</a> · <a href="https://www.within.center">www.within.center</a></div>
+  <div class="eyebrow">Heart Space Health Inc.</div>
+  <h2>Join us in building the future of sacred wellness.</h2>
+  <div class="sub">$500,000 seed raise</div>
+  <div class="contact">William David Naylor · Founder<br><a href="mailto:william@awknranch.com">william@awknranch.com</a> · 512.810.6517 · South Austin, TX<br><a href="https://www.awknranch.com">www.awknranch.com</a> · <a href="https://www.within.center">www.within.center</a></div>
   <div class="fine">All figures are internal estimates based on operational modeling.</div>
 </footer>
 
