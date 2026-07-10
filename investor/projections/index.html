@@ -537,10 +537,16 @@
                                    0,       0, 243_248, 249_329, 255_562];
     const domeOpsCost     = [546_000, 559_650, 573_641, 587_982, 602_682,
                              617_749, 633_193, 649_022, 665_248, 681_879];
+    // Construction loan: $10M @ 7%, interest-only (~$700K/yr). Principal is
+    // repaid at the Year-5 recapitalization, so the carry runs every year.
+    const DOME_LOAN = 10_000_000, DOME_RATE = 0.07;
+    const domeDebtService = Math.round(DOME_LOAN * DOME_RATE); // $700,000/yr
     const dome = domeRev.map((rev, i) => ({
         year: i + 1, rev, noi: domeNOI[i], opex: rev - domeNOI[i],
         groundLease: domeGroundLease[i], improvTax: domeImprovTax[i],
-        landTax: domeLandTax[i], opsCost: domeOpsCost[i]
+        landTax: domeLandTax[i], opsCost: domeOpsCost[i],
+        debtService: domeDebtService,
+        realProfit: domeNOI[i] - domeDebtService
     }));
 
     // ============================================================
@@ -647,11 +653,12 @@
     //  RENDER — DOME COLLECTIVE
     // ============================================================
     const domeCum = dome.reduce((s, r) => s + r.noi, 0);
+    const domeRealCum = dome.reduce((s, r) => s + r.realProfit, 0);
     document.getElementById('dome-cards').innerHTML = `
         <div class="summary-card green"><div class="summary-card-value">${fmtM(dome[0].noi)}</div><div class="summary-card-label">Year 1 NOI</div></div>
-        <div class="summary-card"><div class="summary-card-value">$30M+</div><div class="summary-card-label">Stabilized Asset Value</div></div>
+        <div class="summary-card green"><div class="summary-card-value">${fmtM(dome[0].realProfit)}</div><div class="summary-card-label">Year 1 Profit After Debt</div></div>
         <div class="summary-card blue"><div class="summary-card-value">$16M</div><div class="summary-card-label">Construction Raise ($10M debt + $6M LP)</div></div>
-        <div class="summary-card green"><div class="summary-card-value">${fmtM(domeCum)}</div><div class="summary-card-label">10-Yr Cumulative NOI</div></div>
+        <div class="summary-card green"><div class="summary-card-value">${fmtM(domeRealCum)}</div><div class="summary-card-label">10-Yr Cumulative Cash After Debt</div></div>
     `;
     const domeMax = Math.max(...dome.map(r => r.rev)) * 1.15;
     stackChart('dome-chart',
@@ -683,6 +690,9 @@
             <tr style="border-top:1px solid var(--border-light);"><td style="padding-left:18px;"><strong>Total Operating Expenses</strong></td>${cells(r => r.opex, { paren: true, style: 'color:var(--accent-terracotta); font-weight:600;' })}</tr>
             <tr class="total"><td><strong>Net Operating Income (NOI)</strong></td>${cells(r => r.noi, { style: 'color:var(--accent-green); font-weight:700;' })}</tr>
             <tr><td>NOI margin</td>${dome.map(r => `<td style="text-align:right; color:var(--text-muted);">${pct(r.noi / r.rev)}</td>`).join('')}</tr>
+            <tr><td colspan="11" style="padding-top:14px; color:var(--text-muted); font-size:12px; letter-spacing:.06em; text-transform:uppercase;">Debt Service</td></tr>
+            <tr><td style="padding-left:18px;">Construction loan interest <span style="color:var(--text-muted);">(7% &times; $10M, interest-only &middot; ~$58.3K/mo)</span></td>${cells(r => r.debtService, { paren: true, style: 'color:var(--accent-terracotta);' })}</tr>
+            <tr class="total" style="border-top:2px solid var(--border-light);"><td><strong>Real Profit &mdash; Cash Flow After Debt</strong></td>${cells(r => r.realProfit, { style: 'color:var(--accent-green); font-weight:700;' })}</tr>
         </tbody>
     `;
 
