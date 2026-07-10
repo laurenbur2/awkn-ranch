@@ -318,7 +318,7 @@
         <div class="section-label">Business 1 &amp; 2 &middot; The Operating Engine</div>
         <h2>Within | AWKN &mdash; The Cash Engine</h2>
         <p class="section-desc">
-            Two revenue engines run today: private ketamine-assisted retreats (Sun&ndash;Thu) and weekend events, weddings &amp; venue rentals (Thu&ndash;Sun). Net revenue compounds ~17.5% a year. Shown here at a deliberately conservative <strong>flat 30% net margin</strong> &mdash; well below the 40&ndash;60% the operating model actually produces &mdash; so every number carries a cushion.
+            Two revenue engines run today: private ketamine-assisted retreats (Sun&ndash;Thu) and weekend events, weddings &amp; venue rentals (Thu&ndash;Sun). Net revenue is grown at a deliberately conservative <strong>10% a year</strong> &mdash; well below the business's actual trajectory &mdash; and shown at a <strong>flat 30% net margin</strong> versus the 40&ndash;60% the operating model produces, so every number carries a cushion.
         </p>
         <div class="summary-grid" id="op-cards"></div>
 
@@ -395,9 +395,9 @@
     <!-- ===== COMBINED ===== -->
     <section class="section" id="combined">
         <div class="section-label">The Full Picture &middot; All Three Businesses</div>
-        <h2>Combined: To $9.7M in Annual Revenue</h2>
+        <h2>Combined: To $6.8M in Annual Revenue</h2>
         <p class="section-desc">
-            Stacked together, the operating businesses and the residential engine grow combined revenue from <strong>$4.3M in Year 1 to $9.7M in Year 10</strong>, with combined operating profit and NOI reaching over <strong>$4M a year</strong>.
+            Stacked together, the operating businesses and the residential engine grow combined revenue from <strong>$4.3M in Year 1 to $6.8M in Year 10</strong>, with combined operating profit and NOI reaching over <strong>$3.2M a year</strong>.
         </p>
         <div class="summary-grid" id="combined-cards"></div>
 
@@ -447,7 +447,7 @@
                 <li>Retreats (Sun&ndash;Thu): blended price $4,950 &middot; ~4 clients/week &middot; medical/Katie cost $880/client &middot; 6% commission &rarr; $3,773 net per retreat</li>
                 <li>Weekend events (Thu&ndash;Sun): ~$10,000/weekend &middot; 10% commission &rarr; $9,000 net (~$38,700/mo); weddings add to weekend revenue</li>
                 <li>Maloka Dome venue adds ~$10,000/mo &middot; two 4-BR lodging domes add ~$8,000/mo</li>
-                <li>Net revenue grows 17.5%/yr from $1.40M (Yr 1, after a 3-month build-out) to $6.18M (Yr 10)</li>
+                <li>Net revenue grows a conservative 10%/yr from $1.40M (Yr 1, after a 3-month build-out) to $3.30M (Yr 10)</li>
                 <li>Presented at a conservative <strong>flat 30% net margin</strong>; the operating model itself produces 40&ndash;60% margins &mdash; the difference is cushion</li>
                 <li>Psilocybin retreats via church partnership are coming next &mdash; upside, not modeled</li>
             </ul>
@@ -500,11 +500,11 @@
 
     // ============================================================
     //  WITHIN | AWKN OPERATING MODEL (10-year, conservative 30% margin)
-    //  Net revenue: Years 1-5 from the operating model, Years 6-10 grown 17.5%/yr.
+    //  Net revenue grows at a conservative 10%/yr from a $1.40M Year-1 base.
     // ============================================================
     const AWKN_MARGIN = 0.30;
-    const awknRev = [1_400_000, 1_700_000, 2_000_000, 2_350_000, 2_760_000,
-                     3_243_000, 3_811_000, 4_478_000, 5_262_000, 6_183_000];
+    const awknRev = [1_400_000, 1_540_000, 1_690_000, 1_860_000, 2_050_000,
+                     2_250_000, 2_480_000, 2_730_000, 3_000_000, 3_300_000];
     const awkn = awknRev.map((rev, i) => {
         const profit = Math.round(rev * AWKN_MARGIN);
         return { year: i + 1, rev, profit, cost: rev - profit };
