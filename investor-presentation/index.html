@@ -213,6 +213,32 @@
   .bargroup .yl{font-family:'Fraunces',serif;font-size:clamp(14px,2.4vw,18px);margin-top:14px;color:var(--ink)}
   .bargroup .ml{font-size:clamp(10px,2vw,12.5px);color:var(--sage);font-weight:600;margin-top:2px}
 
+  /* COMBINED 10-YEAR STACKED CHART */
+  .barchart.ten{grid-template-columns:repeat(10,1fr);gap:clamp(3px,1vw,10px)}
+  .barchart.ten .yl{font-size:clamp(11px,2vw,15px)}
+  .stackbar{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:260px;width:100%}
+  .stackbar .seg{width:clamp(15px,3.4vw,32px);border-radius:0}
+  .stackbar .seg.dome{background:linear-gradient(180deg,#6f7f5a,var(--sage));border-radius:6px 6px 0 0}
+  .stackbar .seg.awkn{background:linear-gradient(180deg,var(--clay),var(--clay-deep))}
+  .stackbar .tv{font-size:clamp(9px,2vw,11.5px);font-weight:600;color:var(--ink);margin-bottom:6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .legend .ldome{background:var(--sage)}
+  .legend .lawkn{background:var(--clay)}
+  @media(max-width:640px){.stackbar{height:180px}.barchart.ten .tv{font-size:8.5px}}
+
+  /* CAPITAL STACK / WATERFALL */
+  .capstack{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;margin-top:44px}
+  @media(max-width:760px){.capstack{grid-template-columns:1fr}}
+  .capcard{background:rgba(244,237,224,.05);border:1px solid rgba(244,237,224,.16);border-radius:16px;padding:26px 24px}
+  .capcard h3{font-family:'Fraunces',serif;font-size:20px;color:var(--gold);margin-bottom:14px}
+  .caprow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(244,237,224,.12);font-size:14px;color:#e7ddca}
+  .caprow:last-child{border-bottom:none}
+  .caprow .amt{font-family:'Fraunces',serif;color:var(--paper);font-variant-numeric:tabular-nums}
+  .fall{counter-reset:step;margin-top:2px}
+  .fall li{list-style:none;position:relative;padding:12px 0 12px 44px;border-bottom:1px solid rgba(244,237,224,.12);font-size:14px;color:#e7ddca}
+  .fall li:last-child{border-bottom:none}
+  .fall li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#2a2118;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .fall li b{color:var(--paper)}
+
   /* OPPORTUNITY / RETURNS (dark) */
   .opp{background:linear-gradient(160deg,#2a2118,#43331f);color:var(--paper)}
   .opp .eyebrow{color:var(--gold)}
@@ -410,51 +436,6 @@
   </div>
 </section>
 
-<!-- 5-YEAR PROJECTION -->
-<section>
-  <div class="wrap">
-    <div class="eyebrow reveal">5-Year Financial Projection</div>
-    <h2 class="reveal">To $2.66M revenue<br>at 60% margin.</h2>
-    <p class="lede reveal">Moderate ~17.5% annual growth. Year 1 reflects a 3-month build-out before new capacity comes online — then margins widen every year as the fixed base leverages.</p>
-    <div class="legend reveal">
-      <span><i class="lrev"></i> Net revenue</span>
-      <span><i class="leb"></i> EBITDA / net profit</span>
-    </div>
-    <div class="barchart reveal">
-      <div class="bargroup">
-        <div class="bars"><div class="bar rev" style="height:126px"><span class="v">$1.40M</span></div><div class="bar eb" style="height:47px"><span class="v">$0.52M</span></div></div>
-        <div class="yl">Year 1</div><div class="ml">37% margin</div>
-      </div>
-      <div class="bargroup">
-        <div class="bars"><div class="bar rev" style="height:148px"><span class="v">$1.64M</span></div><div class="bar eb" style="height:65px"><span class="v">$0.72M</span></div></div>
-        <div class="yl">Year 2</div><div class="ml">44% margin</div>
-      </div>
-      <div class="bargroup">
-        <div class="bars"><div class="bar rev" style="height:174px"><span class="v">$1.93M</span></div><div class="bar eb" style="height:87px"><span class="v">$0.96M</span></div></div>
-        <div class="yl">Year 3</div><div class="ml">50% margin</div>
-      </div>
-      <div class="bargroup">
-        <div class="bars"><div class="bar rev" style="height:205px"><span class="v">$2.27M</span></div><div class="bar eb" style="height:113px"><span class="v">$1.25M</span></div></div>
-        <div class="yl">Year 4</div><div class="ml">55% margin</div>
-      </div>
-      <div class="bargroup">
-        <div class="bars"><div class="bar rev" style="height:240px"><span class="v">$2.66M</span></div><div class="bar eb" style="height:143px"><span class="v">$1.59M</span></div></div>
-        <div class="yl">Year 5</div><div class="ml">60% margin</div>
-      </div>
-    </div>
-    <table class="tbl reveal">
-      <thead><tr><th>Year</th><th class="r">Net revenue</th><th class="r">EBITDA / net profit</th><th class="r">Margin</th></tr></thead>
-      <tbody>
-        <tr><td class="name">Year 1</td><td class="r">$1.40M</td><td class="r mono">$0.52M</td><td class="r">37%</td></tr>
-        <tr><td class="name">Year 2</td><td class="r">$1.64M</td><td class="r mono">$0.72M</td><td class="r">44%</td></tr>
-        <tr><td class="name">Year 3</td><td class="r">$1.93M</td><td class="r mono">$0.96M</td><td class="r">50%</td></tr>
-        <tr><td class="name">Year 4</td><td class="r">$2.27M</td><td class="r mono">$1.25M</td><td class="r">55%</td></tr>
-        <tr><td class="name">Year 5</td><td class="r">$2.66M</td><td class="r mono">$1.59M</td><td class="r">60%</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
 <!-- INVESTOR RETURNS -->
 <section class="opp">
   <div class="wrap">
@@ -495,6 +476,80 @@
       <div class="fund reserve"><div class="amt">$150K</div><h3>Capital Reserves</h3><p>Runway &amp; contingency across all three businesses.</p></div>
     </div>
     <div class="fundtotal reveal"><div class="l">Total seed raise</div><div class="v">$500,000</div></div>
+  </div>
+</section>
+
+<!-- COMBINED 10-YEAR FINANCIAL MODEL -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow reveal">The Full Picture · 10-Year Financial Model</div>
+    <h2 class="reveal">Two operating businesses.<br>One residential engine.<br>To <em style="font-style:italic;color:var(--clay-deep)">$9.7M</em> in annual revenue.</h2>
+    <p class="lede reveal">Within + AWKN are live and profitable today, compounding at ~17.5% a year on a conservative 30% net margin. On the same land, the Dome Collective adds a stabilized residential community throwing off ~$2M of NOI from Year 1. Stacked together, combined revenue grows from <strong style="color:var(--ink)">$4.3M to $9.7M</strong> over ten years.</p>
+    <div class="legend reveal">
+      <span><i class="lawkn"></i> Within + AWKN (operating)</span>
+      <span><i class="ldome"></i> Dome Collective (residential)</span>
+    </div>
+    <div class="barchart ten reveal">
+      <div class="bargroup"><div class="stackbar"><span class="tv">$4.3M</span><div class="seg dome" style="height:79px"></div><div class="seg awkn" style="height:38px"></div></div><div class="yl">Y1</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$4.7M</span><div class="seg dome" style="height:80px"></div><div class="seg awkn" style="height:46px"></div></div><div class="yl">Y2</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$5.0M</span><div class="seg dome" style="height:82px"></div><div class="seg awkn" style="height:54px"></div></div><div class="yl">Y3</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$5.5M</span><div class="seg dome" style="height:83px"></div><div class="seg awkn" style="height:63px"></div></div><div class="yl">Y4</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$5.9M</span><div class="seg dome" style="height:85px"></div><div class="seg awkn" style="height:74px"></div></div><div class="yl">Y5</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$6.5M</span><div class="seg dome" style="height:87px"></div><div class="seg awkn" style="height:87px"></div></div><div class="yl">Y6</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$7.1M</span><div class="seg dome" style="height:89px"></div><div class="seg awkn" style="height:102px"></div></div><div class="yl">Y7</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$7.8M</span><div class="seg dome" style="height:90px"></div><div class="seg awkn" style="height:120px"></div></div><div class="yl">Y8</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$8.7M</span><div class="seg dome" style="height:92px"></div><div class="seg awkn" style="height:141px"></div></div><div class="yl">Y9</div></div>
+      <div class="bargroup"><div class="stackbar"><span class="tv">$9.7M</span><div class="seg dome" style="height:94px"></div><div class="seg awkn" style="height:166px"></div></div><div class="yl">Y10</div></div>
+    </div>
+    <table class="tbl reveal">
+      <thead><tr><th>Year</th><th class="r">Within + AWKN rev.</th><th class="r">Dome rev.</th><th class="r">Combined rev.</th><th class="r">Operating profit / NOI</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Year 1</td><td class="r">$1.40M</td><td class="r">$2.93M</td><td class="r mono">$4.33M</td><td class="r">$2.47M</td></tr>
+        <tr><td class="name">Year 2</td><td class="r">$1.70M</td><td class="r">$2.99M</td><td class="r mono">$4.69M</td><td class="r">$2.59M</td></tr>
+        <tr><td class="name">Year 3</td><td class="r">$2.00M</td><td class="r">$3.05M</td><td class="r mono">$5.05M</td><td class="r">$2.72M</td></tr>
+        <tr><td class="name">Year 4</td><td class="r">$2.35M</td><td class="r">$3.11M</td><td class="r mono">$5.46M</td><td class="r">$2.86M</td></tr>
+        <tr><td class="name">Year 5</td><td class="r">$2.76M</td><td class="r">$3.18M</td><td class="r mono">$5.93M</td><td class="r">$3.03M</td></tr>
+        <tr><td class="name">Year 6</td><td class="r">$3.24M</td><td class="r">$3.24M</td><td class="r mono">$6.48M</td><td class="r">$3.21M</td></tr>
+        <tr><td class="name">Year 7</td><td class="r">$3.81M</td><td class="r">$3.30M</td><td class="r mono">$7.11M</td><td class="r">$3.42M</td></tr>
+        <tr><td class="name">Year 8</td><td class="r">$4.47M</td><td class="r">$3.37M</td><td class="r mono">$7.84M</td><td class="r">$3.53M</td></tr>
+        <tr><td class="name">Year 9</td><td class="r">$5.26M</td><td class="r">$3.44M</td><td class="r mono">$8.70M</td><td class="r">$3.80M</td></tr>
+        <tr class="total"><td class="name">Year 10</td><td class="r">$6.18M</td><td class="r">$3.51M</td><td class="r mono">$9.69M</td><td class="r">$4.11M</td></tr>
+      </tbody>
+    </table>
+    <p class="disc reveal" style="margin-top:22px;">Within + AWKN modeled at a conservative flat 30% net margin (well below the 40–60% the operating model actually shows). Dome figures are stabilized NOI from the 15-year pro forma; operations begin Jan 2028 after an 18-month rent-free build. Combined revenue excludes the Year-8 land-purchase financing shown below.</p>
+  </div>
+</section>
+
+<!-- DOME COLLECTIVE CAPITAL STACK & WATERFALL -->
+<section class="opp">
+  <div class="wrap">
+    <div class="eyebrow reveal">The Dome Collective · Capital Stack &amp; Waterfall</div>
+    <h2 class="reveal">Structured like an<br>institutional real-estate deal.</h2>
+    <p class="lede reveal">A <strong style="color:var(--paper)">$16M</strong> residential community, financed the way multifamily and apartment sponsors do it: senior bank debt plus limited-partner equity, an 8% preferred return, and a Year-5 recapitalization that returns capital and targets a <strong style="color:var(--paper)">2–3× MOIC</strong> — while Heart Space Health, as General Partner, retains majority ownership of the asset for the long run.</p>
+    <div class="capstack reveal">
+      <div class="capcard">
+        <h3>Capital Stack · $16M</h3>
+        <div class="caprow"><span>Senior bank debt @ 7%</span><span class="amt">$10.0M</span></div>
+        <div class="caprow"><span>LP equity (limited partners)</span><span class="amt">$6.0M</span></div>
+        <div class="caprow"><span>General Partner (Heart Space Health)</span><span class="amt">Sponsor / promote</span></div>
+        <div class="caprow"><span>Land beneath the asset (Yr-8 purchase)</span><span class="amt">$10.0M</span></div>
+        <div class="caprow"><span>Stabilized asset value (~$32M @ 6.8% cap)</span><span class="amt">$30M+</span></div>
+      </div>
+      <div class="capcard">
+        <h3>Distribution Waterfall</h3>
+        <ol class="fall">
+          <li><b>Bank debt service first</b> — the 7% senior loan is paid off the top of NOI.</li>
+          <li><b>8% preferred return to LPs</b> — cumulative, accrues on the $6M until fully paid.</li>
+          <li><b>Return of LP capital</b> — the $6M is returned at the Year-5 recapitalization.</li>
+          <li><b>70 / 30 profit split</b> — remaining cash flow splits 70% LPs / 30% GP promote.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="multiple reveal">
+      <div class="big">Cash out, or stay in.</div>
+      <p>At the Year-5 recap we refinance and return LP capital. Each investor then chooses: take a <strong style="color:var(--paper)">2–3× multiple</strong> in cash, or roll their proceeds back in as a <strong style="color:var(--paper)">Legacy Investor</strong> — owning the stabilized community alongside us for the long term. Either path, Heart Space Health remains the majority owner and General Partner.</p>
+    </div>
+    <p class="disc reveal">Illustrative structure based on standard real-estate syndication mechanics (senior debt + LP pref + return of capital + GP promote, with a Year-5 refinance/recap as the liquidity event). Debt at 7%, 8% LP preferred return, 70/30 LP/GP split above the pref. Not an offer to sell securities; terms, valuation and structure open to discussion and subject to definitive documentation.</p>
   </div>
 </section>
 
