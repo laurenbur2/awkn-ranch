@@ -71,6 +71,15 @@
     font-size:12.5px;letter-spacing:.04em;color:var(--muted);font-style:italic;margin-top:12px;
   }
 
+  /* SIDE-BY-SIDE IMAGE PAIR (allocation of funds) */
+  .fundpair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:48px;align-items:start}
+  .fundpair figure{margin:0}
+  .fundpair img{display:block;width:100%;height:clamp(340px,44vw,560px);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 50px -34px rgba(33,26,18,.5)}
+  .fundpair img.cover-img{object-fit:cover}
+  .fundpair img.contain-img{object-fit:contain;background:#2a2118;padding:6px}
+  .fundpair figcaption{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:14px}
+  @media(max-width:640px){.fundpair{grid-template-columns:1fr}.fundpair img{height:auto}}
+
   /* FINANCIALS BUTTON */
   .financials-btn{
     position:fixed;top:22px;right:26px;z-index:100;
@@ -465,10 +474,16 @@
     <div class="eyebrow reveal">Allocation of Funds · $500,000</div>
     <h2 class="reveal">Allocation of Funds.</h2>
     <p class="lede reveal">The $500K raise is deployed across all three businesses — pre-development capital for the Dome Collective, buildout and marketing for AWKN Ranch, a new revenue stream for Within Center, and reserves to bridge it all.</p>
-    <figure class="band reveal">
-      <img src="images/maloka-dome-buildout.png" alt="The Maloka Dome build-out at AWKN Ranch" loading="lazy">
-      <figcaption>The 200-person Maloka Dome — new Engine 2 capacity funded by the raise.</figcaption>
-    </figure>
+    <div class="fundpair reveal">
+      <figure>
+        <img class="cover-img" src="images/maloka-dome-buildout.png" alt="The Maloka Dome build-out at AWKN Ranch" loading="lazy">
+        <figcaption>The 200-person Maloka Dome — new Engine 2 capacity funded by the raise.</figcaption>
+      </figure>
+      <figure>
+        <img class="contain-img" src="images/expansion-land-survey.png" alt="Survey and slope-analysis plan of the 9-acre Dome Park expansion parcel along SH 71" loading="lazy">
+        <figcaption>9-acre expansion Dome Park with 408 on the waitlist.</figcaption>
+      </figure>
+    </div>
     <div class="funds reveal">
       <div class="fund"><div class="amt">$150K</div><h3>Dome Collective — Cap Ex</h3><p>Pre-development for the residential build: Boundary Title Survey ($5,500), Topographic Survey ($7,900), Tree Survey ($9,900), Feasibility Study ($5,000), Site Planning / Concept Design ($15,000), Permitting ($15,000), and legal set-up of the entity &amp; investor structure ($10,000) — ~$68K itemized (plus taxes), balance to contingency.</p></div>
       <div class="fund"><div class="amt">$100K</div><h3>AWKN Ranch Business</h3><p>$60K to complete the Maloka Dome: landscaping, wedding chairs, parking, lighting &amp; sound system. $4,000/mo marketing — content, filming &amp; video. Remainder to capital reserves.</p></div>
@@ -476,10 +491,6 @@
       <div class="fund reserve"><div class="amt">$150K</div><h3>Capital Reserves</h3><p>Runway &amp; contingency across all three businesses.</p></div>
     </div>
     <div class="fundtotal reveal"><div class="l">Total seed raise</div><div class="v">$500,000</div></div>
-    <figure class="band reveal">
-      <img src="images/expansion-land-survey.png" alt="Survey and slope-analysis plan of the 9-acre Dome Park expansion parcel along SH 71" loading="lazy">
-      <figcaption>9-acre expansion Dome Park with 408 on the waitlist.</figcaption>
-    </figure>
   </div>
 </section>
 
