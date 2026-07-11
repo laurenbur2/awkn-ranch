@@ -344,7 +344,7 @@
         <div class="section-label">Business 3 &middot; The Residential Engine</div>
         <h2>The Dome Collective &mdash; Residential Longevity</h2>
         <p class="section-desc">
-            An 80-dome residential longevity community with a restaurant and practitioner offices, plus one longevity/amenity center, on a low-cost $8,000/mo ground lease we buy into in Year 8. Built with a $16M raise ($10M bank loan @ 7% + $6M LP @ 8% pref). The table below drills all the way down &mdash; every operating expense line item (ground lease, property tax, management, insurance, utilities, repairs, landscaping, marketing) subtracted from gross revenue &mdash; to the <em>real</em> net operating income of ~$2.05M a year, against a stabilized asset value north of $30M.
+            An 80-dome residential longevity community with a restaurant and practitioner offices, plus one longevity/amenity center, on a low-cost $8,000/mo ground lease we buy into later. Built with a $16M raise ($10M bank loan @ 7% + $6M LP @ 8% pref). <strong>Revenue begins August 2027</strong>, when the first 40 domes open; the next 40 come online March 2028 — so Year 1 is a partial ramp year. From Year 2 on it runs at a full 80 domes. The table below drills all the way down &mdash; every operating expense line item (ground lease, property tax, management, insurance, utilities, repairs, landscaping, marketing) subtracted from gross revenue &mdash; to the <em>real</em> net operating income, stabilizing at ~$2.05M a year against an asset value north of $30M.
         </p>
         <div class="summary-grid" id="dome-cards"></div>
 
@@ -404,9 +404,9 @@
     <!-- ===== COMBINED ===== -->
     <section class="section" id="combined">
         <div class="section-label">The Full Picture &middot; All Three Businesses</div>
-        <h2>Combined: To $6.8M in Annual Revenue</h2>
+        <h2>Combined: To $6.7M in Annual Revenue</h2>
         <p class="section-desc">
-            Stacked together, the operating businesses and the residential engine grow combined revenue from <strong>$4.3M in Year 1 to $6.8M in Year 10</strong>, with combined operating profit and NOI reaching over <strong>$3.2M a year</strong>.
+            Stacked together, the operating businesses and the residential engine grow combined revenue from <strong>$3.5M in Year 1 (Dome mid-ramp) to $6.7M in Year 10</strong>, with combined operating profit and NOI reaching over <strong>$3.2M a year</strong>.
         </p>
         <div class="summary-grid" id="combined-cards"></div>
 
@@ -467,8 +467,8 @@
             <h3>The Dome Collective (Business 3)</h3>
             <ul>
                 <li>80 domes &times; $3,000/mo &times; 95% occupancy, plus restaurant ($9,000/mo) and practitioner/longevity offices ($7,500/mo)</li>
-                <li>All revenue escalates 2%/yr; operations begin Jan 2028 after an 18-month rent-free build</li>
-                <li>7 years of low-cost ground lease ($8,000/mo, +2%/yr), then a $10M land purchase in Year 8 &mdash; the Dome carries $7M (70%), AWKN/Within the other $3M (30%)</li>
+                <li><strong>Phased opening:</strong> first 40 domes online Aug 2027, next 40 Mar 2028. Revenue begins Aug 2027; Year 1 is a partial ramp (~$2.14M gross), full 80-dome run-rate from Year 2. All revenue escalates 2%/yr</li>
+                <li>Ground lease ($8,000/mo, +2%/yr) begins Aug 2027 at move-in; land purchased later ($10M) &mdash; the Dome carries $7M (70%), AWKN/Within the other $3M (30%)</li>
                 <li>Stabilized NOI ~$2.05M/yr; asset value = NOI &divide; 6.8% cap rate &rarr; ~$30M</li>
                 <li>$16M construction raise: $10M bank loan @ 7% + $6M LP equity @ 8% pref</li>
                 <li>Waterfall: debt service &rarr; 8% LP preferred &rarr; return of LP capital at Year-5 recap &rarr; 70/30 LP/GP split; GP retains majority ownership</li>
@@ -490,7 +490,7 @@
             <ul>
                 <li>All figures in USD. Internal estimates &mdash; not a guarantee of returns.</li>
                 <li>Not an offer to sell securities. The Dome capital structure is illustrative and subject to definitive documentation.</li>
-                <li>Year 1 (Within|AWKN) reflects a 3-month build-out; Dome Year 1 is Jan 2028 after the build.</li>
+                <li>Year 1 (Within|AWKN) reflects a 3-month build-out; Dome Year 1 begins Aug 2027 (first 40 domes) and is a partial ramp, running at a full 80 domes from Year 2.</li>
             </ul>
         </div>
     </section>
@@ -523,20 +523,27 @@
     // ============================================================
     //  DOME COLLECTIVE (10-year, from the 15-year pro forma)
     // ============================================================
-    const domeRev = [2_934_000, 2_992_680, 3_052_534, 3_113_584, 3_175_856,
-                     3_239_373, 3_304_161, 3_370_244, 3_437_649, 3_506_402];
-    const domeNOI = [2_046_432, 2_083_403, 2_121_014, 2_159_276, 2_198_200,
-                     2_237_795, 2_278_073, 2_186_070, 2_223_871, 2_262_279];
-    // Itemized operating expenses (from the 15-yr pro forma). Ground lease stops
-    // at the Year-8 land purchase, when land property tax begins.
-    const domeGroundLease = [ 96_000,  97_920,  99_878, 101_876, 103_913,
-                             105_992, 108_112,       0,       0,       0];
-    const domeImprovTax   = [245_568, 251_707, 258_000, 264_450, 271_061,
-                             277_838, 284_784, 291_903, 299_201, 306_681];
+    // PHASED OPENING: Operations begin Aug 2027. Year 1 (Aug 2027-Jul 2028) is a
+    // ramp — 40 domes for 7 months, then 80 domes for 5 months (Mar 2028). Ground
+    // lease ($8K/mo) starts Aug 2027. Years 2-10 are full 80-dome operation (the
+    // pro-forma full-year figures, shifted one year later, 2%/yr escalator intact).
+    //   Y1 dome rent = 7mo×(40×$3K×95%) + 5mo×(80×$3K×95%) = $0.798M + $1.140M = $1.938M
+    //   Y1 restaurant+offices (Center opens Aug 2027) = 12×$16.5K = $0.198M  ->  Y1 gross = $2.136M
+    const domeRev = [2_136_000, 2_934_000, 2_992_680, 3_052_534, 3_113_584,
+                     3_175_856, 3_239_373, 3_304_161, 3_370_244, 3_437_649];
+    const domeNOI = [1_426_750, 2_046_432, 2_083_403, 2_121_014, 2_159_276,
+                     2_198_200, 2_237_795, 2_278_073, 2_186_070, 2_223_871];
+    // Itemized operating expenses. Year 1 opex is ramped (fixed costs full, variable
+    // scales with delivered domes). Ground lease stops when the land is purchased in
+    // Year 9 of operations, at which point land property tax begins.
+    const domeGroundLease = [ 96_000,  96_000,  97_920,  99_878, 101_876,
+                             103_913, 105_992, 108_112,       0,       0];
+    const domeImprovTax   = [174_000, 245_568, 251_707, 258_000, 264_450,
+                             271_061, 277_838, 284_784, 291_903, 299_201];
     const domeLandTax     = [      0,       0,       0,       0,       0,
-                                   0,       0, 243_248, 249_329, 255_562];
-    const domeOpsCost     = [546_000, 559_650, 573_641, 587_982, 602_682,
-                             617_749, 633_193, 649_022, 665_248, 681_879];
+                                   0,       0,       0, 243_248, 249_329];
+    const domeOpsCost     = [439_250, 546_000, 559_650, 573_641, 587_982,
+                             602_682, 617_749, 633_193, 649_022, 665_248];
     // Construction loan: $10M @ 7%, interest-only (~$700K/yr). Principal is
     // repaid at the Year-5 recapitalization, so the carry runs every year.
     const DOME_LOAN = 10_000_000, DOME_RATE = 0.07;
@@ -655,8 +662,8 @@
     const domeCum = dome.reduce((s, r) => s + r.noi, 0);
     const domeRealCum = dome.reduce((s, r) => s + r.realProfit, 0);
     document.getElementById('dome-cards').innerHTML = `
-        <div class="summary-card green"><div class="summary-card-value">${fmtM(dome[0].noi)}</div><div class="summary-card-label">Year 1 NOI</div></div>
-        <div class="summary-card green"><div class="summary-card-value">${fmtM(dome[0].realProfit)}</div><div class="summary-card-label">Year 1 Profit After Debt</div></div>
+        <div class="summary-card green"><div class="summary-card-value">${fmtM(dome[1].noi)}</div><div class="summary-card-label">Stabilized NOI/yr (Year 2+)</div></div>
+        <div class="summary-card"><div class="summary-card-value">${fmtM(dome[0].noi)}</div><div class="summary-card-label">Year 1 NOI (Aug-2027 ramp)</div></div>
         <div class="summary-card blue"><div class="summary-card-value">$16M</div><div class="summary-card-label">Construction Raise ($10M debt + $6M LP)</div></div>
         <div class="summary-card green"><div class="summary-card-value">${fmtM(domeRealCum)}</div><div class="summary-card-label">10-Yr Cumulative Cash After Debt</div></div>
     `;
