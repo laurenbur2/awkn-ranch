@@ -111,8 +111,8 @@
         .hero h1 .gold { color: var(--accent-gold); }
         .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.65); max-width: 620px; margin: 0 auto 48px; line-height: 1.75; font-weight: 300; }
         .hero-stats {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
-            max-width: 540px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+            max-width: 720px; margin: 0 auto;
             border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden;
             background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
         }
@@ -222,7 +222,8 @@
             .hero h1 { font-size: 26px; line-height: 1.25; }
             .hero-badge { font-size: 0.55rem; padding: 5px 16px; margin-bottom: 1.25rem; }
             .hero-sub { font-size: 0.85rem; margin-bottom: 28px; line-height: 1.6; }
-            .hero-stats { grid-template-columns: repeat(3, 1fr); max-width: 100%; }
+            .hero-stats { grid-template-columns: repeat(2, 1fr); max-width: 100%; }
+            .hero-stat:nth-child(2) { border-right: none; }
             .hero-stat { padding: 0.75rem 0.5rem; }
             .hero-stat-value { font-size: 1.1rem; }
             .hero-stat-label { font-size: 0.5rem; letter-spacing: 0.08em; }
@@ -582,10 +583,13 @@
     // ============================================================
     //  RENDER — HERO
     // ============================================================
+    const domeAssetVal = dome[1].noi / 0.068;          // stabilized NOI ÷ 6.8% cap ≈ $30M
+    const stabilizedVal = 8000000 + domeAssetVal;      // + $8M operating business ≈ $38M
     document.getElementById('hero-stats').innerHTML = `
         <div class="hero-stat"><div class="hero-stat-value">3</div><div class="hero-stat-label">Businesses, One Land</div></div>
         <div class="hero-stat"><div class="hero-stat-value">${fmtM(combined[0].rev)}</div><div class="hero-stat-label">Year 1 Combined Rev.</div></div>
         <div class="hero-stat"><div class="hero-stat-value">${fmtM(combined[9].rev)}</div><div class="hero-stat-label">Year 10 Combined Rev.</div></div>
+        <div class="hero-stat"><div class="hero-stat-value">~$${Math.round(stabilizedVal / 1e6)}M</div><div class="hero-stat-label">Est. Value · All 3 Stabilized</div></div>
     `;
 
     // ============================================================
