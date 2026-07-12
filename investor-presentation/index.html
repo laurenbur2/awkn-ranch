@@ -72,13 +72,13 @@
   }
 
   /* SIDE-BY-SIDE IMAGE PAIR (allocation of funds) */
-  .fundpair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:48px;align-items:start}
+  .fundpair{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px;align-items:start}
   .fundpair figure{margin:0}
-  .fundpair img{display:block;width:100%;height:clamp(340px,44vw,560px);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 50px -34px rgba(33,26,18,.5)}
+  .fundpair img{display:block;width:100%;height:clamp(300px,26vw,360px);border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 50px -34px rgba(33,26,18,.5);background:#2a2118}
   .fundpair img.cover-img{object-fit:cover}
-  .fundpair img.contain-img{object-fit:contain;background:#2a2118;padding:6px}
-  .fundpair figcaption{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:14px}
-  @media(max-width:640px){.fundpair{grid-template-columns:1fr}.fundpair img{height:auto}}
+  .fundpair img.contain-img{object-fit:contain;padding:6px}
+  .fundpair figcaption{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:14px;text-align:center}
+  @media(max-width:760px){.fundpair{grid-template-columns:1fr}.fundpair img{height:auto;max-height:70vh}}
 
   /* FINANCIALS BUTTON */
   .financials-btn{
@@ -492,6 +492,10 @@
       <figure>
         <img class="contain-img" src="images/expansion-land-survey.png" alt="Survey and slope-analysis plan of the 9-acre Dome Park expansion parcel along SH 71" loading="lazy">
         <figcaption>9-acre expansion Dome Park with 408 on the waitlist.</figcaption>
+      </figure>
+      <figure>
+        <img class="contain-img" src="images/dome-technology.png" alt="Natural hempcrete dome construction technology — thermal, non-flammable, sustainable build system" loading="lazy">
+        <figcaption>Natural dome technology — hempcrete build: thermal, non-flammable, sustainable.</figcaption>
       </figure>
     </div>
     <div class="funds reveal">
