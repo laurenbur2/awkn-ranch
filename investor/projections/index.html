@@ -345,7 +345,7 @@
         <div class="section-label">Business 3 &middot; The Residential Engine</div>
         <h2>The Dome Collective &mdash; Residential Longevity</h2>
         <p class="section-desc">
-            An 84-dome residential longevity community on a low-cost $8,000/mo ground lease we buy into later. Wellness is delivered by AWKN Ranch and Within Center &mdash; already live on the same land &mdash; so there is no amenity center to build and no restaurant or office rent line. Built with a $11.9M raise ($7.5M bank loan @ 7% + $4.4M LP @ 8% pref). <strong>Revenue begins August 2027</strong>, when the first 42 domes open; the next 42 come online March 2028 — so Year 1 is a partial ramp year. From Year 2 on it runs at a full 84 domes. The table below drills all the way down &mdash; every operating expense line item (ground lease, property tax, management, insurance, utilities, repairs, landscaping, marketing) subtracted from gross revenue &mdash; to the <em>real</em> net operating income, stabilizing at ~$2.06M a year against an asset value north of $30M.
+            An 84-dome residential longevity community on a low-cost $8,000/mo ground lease we buy into later. Wellness is delivered by AWKN Ranch and Within Center &mdash; already live on the same land &mdash; so there is no amenity center to build and no restaurant or office rent line. Built with a $11.9M raise ($7.5M bank loan @ 7% + $4.4M LP @ 8% pref). <strong>Revenue begins August 2027</strong>, when the first 42 domes open; the next 42 come online March 2028 — so Year 1 is a partial ramp year. From Year 2 on it runs at a full 84 domes. The table below drills all the way down &mdash; every operating expense line item (ground lease, property tax, management, insurance, utilities, repairs, landscaping, marketing) subtracted from gross revenue &mdash; to the <em>real</em> net operating income, stabilizing at ~$2.01M a year against an asset value near $29.5M.
         </p>
         <div class="summary-grid" id="dome-cards"></div>
 
@@ -374,14 +374,14 @@
                 <div class="stack-row"><span>LP equity @ 8% pref (37%)</span><span class="amt">$4.4M</span></div>
                 <div class="stack-row"><span>General Partner (Heart Space Health)</span><span class="amt">Sponsor / promote</span></div>
                 <div class="stack-row"><span>Land &mdash; Dome's 70% of the $10M parcel</span><span class="amt">$7.0M</span></div>
-                <div class="stack-row"><span>Stabilized asset value (~6.8% cap)</span><span class="amt">$30M+</span></div>
+                <div class="stack-row"><span>Stabilized asset value (~6.8% cap)</span><span class="amt">~$29.5M</span></div>
             </div>
             <div class="stack-card">
                 <h3>NOI &rarr; Cash to Equity</h3>
-                <div class="stack-row"><span>Net operating income (stabilized)</span><span class="amt">$2.06M</span></div>
+                <div class="stack-row"><span>Net operating income (stabilized)</span><span class="amt">$2.01M</span></div>
                 <div class="stack-row"><span>&minus; Bank interest (7% &times; $7.5M)</span><span class="amt">($0.53M)</span></div>
                 <div class="stack-row"><span>&minus; 8% pref to LPs (8% &times; $4.4M)</span><span class="amt">($0.35M)</span></div>
-                <div class="stack-row"><span><strong>Cash to the 70 / 30 split</strong></span><span class="amt"><strong>~$1.18M</strong></span></div>
+                <div class="stack-row"><span><strong>Cash to the 70 / 30 split</strong></span><span class="amt"><strong>~$1.13M</strong></span></div>
             </div>
         </div>
         <div class="stack-grid" style="margin-top:20px;">
@@ -467,10 +467,10 @@
         <div class="assumptions" style="margin-top:24px;">
             <h3>The Dome Collective (Business 3)</h3>
             <ul>
-                <li>84 domes &times; $3,000/mo &times; 95% occupancy; wellness delivered by AWKN Ranch and Within Center already on the land, so no amenity center, restaurant, or office rent line</li>
+                <li>84 domes &times; $3,000/mo &times; 95% occupancy; wellness delivered by AWKN Ranch and Within Center already on the land, so no amenity center, restaurant, or office rent line. OpEx adds a dedicated management staff line (~$15K/mo); improvement tax reflects tent-like dome structures (~$10K/mo)</li>
                 <li><strong>Phased opening:</strong> first 42 domes online Aug 2027, next 42 Mar 2028. Revenue begins Aug 2027; Year 1 is a partial ramp (~$2.03M gross), full 84-dome run-rate from Year 2. All revenue escalates 2%/yr</li>
                 <li>Ground lease ($8,000/mo, +2%/yr) begins Aug 2027 at move-in; land purchased later ($10M) &mdash; the Dome carries $7M (70%), AWKN/Within the other $3M (30%)</li>
-                <li>Stabilized NOI ~$2.06M/yr; asset value = NOI &divide; 6.8% cap rate &rarr; ~$30M</li>
+                <li>Stabilized NOI ~$2.01M/yr; asset value = NOI &divide; 6.8% cap rate &rarr; ~$29.5M</li>
                 <li>$11.9M construction raise: $7.5M bank loan @ 7% + $4.4M LP equity @ 8% pref</li>
                 <li>Waterfall: debt service &rarr; 8% LP preferred &rarr; return of LP capital at Year-5 recap &rarr; 70/30 LP/GP split; GP retains majority ownership</li>
             </ul>
@@ -533,19 +533,21 @@
     //   amenity center is built, so there is no restaurant/office rent line.
     const domeRev = [2_034_900, 2_872_800, 2_930_256, 2_988_861, 3_048_638,
                      3_109_611, 3_171_803, 3_235_239, 3_299_944, 3_365_943];
-    const domeNOI = [1_388_400, 2_063_232, 2_100_929, 2_139_291, 2_178_328,
-                     2_218_053, 2_258_474, 2_299_606, 2_208_488, 2_247_200];
+    const domeNOI = [1_301_763, 2_008_800, 2_045_136, 2_082_103, 2_119_711,
+                     2_157_970, 2_196_889, 2_236_482, 2_143_785, 2_180_880];
     // Itemized operating expenses. Year 1 opex is ramped (fixed costs full, variable
     // scales with delivered domes). Ground lease stops when the land is purchased in
     // Year 9 of operations, at which point land property tax begins.
+    // Improvement tax reflects tent-like dome structures (~$10K/mo stabilized), not a
+    // big amenity building. opsCost includes a dedicated management staff line (~$15K/mo).
     const domeGroundLease = [ 96_000,  96_000,  97_920,  99_878, 101_876,
                              103_913, 105_992, 108_112,       0,       0];
-    const domeImprovTax   = [174_000, 245_568, 251_707, 258_000, 264_450,
-                             271_061, 277_838, 284_784, 291_903, 299_201];
+    const domeImprovTax   = [ 85_027, 120_000, 123_000, 126_075, 129_227,
+                             132_458, 135_769, 139_163, 142_642, 146_208];
     const domeLandTax     = [      0,       0,       0,       0,       0,
                                    0,       0,       0, 243_248, 249_329];
-    const domeOpsCost     = [376_500, 468_000, 479_700, 491_692, 503_984,
-                             516_584, 529_499, 542_737, 556_305, 570_213];
+    const domeOpsCost     = [552_110, 648_000, 664_200, 680_805, 697_824,
+                             715_270, 733_153, 751_482, 770_269, 789_526];
     // Construction loan: $7.5M @ 7%, interest-only (~$525K/yr). Principal is
     // repaid at the Year-5 recapitalization, so the carry runs every year.
     const DOME_LOAN = 7_500_000, DOME_RATE = 0.07;
